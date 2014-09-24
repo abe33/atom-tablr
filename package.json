@@ -9,6 +9,8 @@
     "atom": ">0.130.0"
   },
   "dependencies": {
-    "event-kit": ">= 0.7.2"
+    "event-kit": ">= 0.7.2",
+    "theorist": "1.x",
+    "mixto": "1.x"
   }
 }
