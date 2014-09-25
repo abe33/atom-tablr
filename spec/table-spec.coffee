@@ -67,6 +67,19 @@ describe 'Table', ->
         it 'throws an error with an index greater that the columns count', ->
           expect(-> table.removeColumnAt(2)).toThrow()
 
+      describe 'changing a column name', ->
+        beforeEach ->
+          row = table.addRow key: 'foo', value: 'bar'
+          table.addRow key: 'oof', value: 'rab'
+
+          column.setName('content')
+
+        it 'changes the accessors on the existing rows', ->
+          oldDescriptor = Object.getOwnPropertyDescriptor(row, 'value')
+
+          expect(oldDescriptor).toBeUndefined()
+          expect(row.content).toEqual('bar')
+
       describe 'adding a row', ->
         describe 'with an object', ->
           it 'creates a row with a cell for each value', ->

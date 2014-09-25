@@ -10,6 +10,8 @@ class Table extends Model
   constructor: (options={}) ->
     @columns = []
     @rows = []
+    @emitter = new Emitter
+    @columnSubscriptions = {}
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -32,6 +34,7 @@ class Table extends Model
       throw new Error "Can't add column #{name} as one already exist"
     column = new Column {name, options}
     @columns.push column
+    @subscribeToColumn(column)
     @extendExistingRows(column)
     column
 
@@ -44,8 +47,19 @@ class Table extends Model
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
+    @unsubscribeFromColumn(@columns[index])
     @columns.splice(index, 1)
     row.removeCellAt(index) for row in @rows
+
+  subscribeToColumn: (column) ->
+    subscriptions = @columnSubscriptions[column.id] = new CompositeDisposable
+
+    subscriptions.add column.onDidChangeName @updateRowsColumnAccessor
+
+  unsubscribeFromColumn: (column) ->
+    @columnSubscriptions[column.id].dispose()
+    delete @columnSubscriptions[column.id]
+
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -92,6 +106,8 @@ class Table extends Model
   extendExistingRows: (column) ->
     row.addCell new Cell {column} for row in @rows
 
+  updateRowsColumnAccessor: ({oldName, newName}) =>
+    row.updateCellAccessorName(oldName, newName) for row in @rows
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##

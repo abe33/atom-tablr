@@ -13,6 +13,8 @@ class Row
 
   getCells: -> @cells
 
+  getCell: (index) -> @cells[index]
+
   getCellsCount: -> @cells.length
 
   addCell: (cell) ->
@@ -23,6 +25,9 @@ class Row
     @destroyCellAccessor(@cells[index])
     @cells.splice(index, 1)
 
+  cellByColumnName: (name) ->
+    @cells.filter((cell) -> cell.getColumn().name is name)[0]
+
   createCellAccessor: (cell) ->
     @accessor cell.getColumn().name,
       configurable: true
@@ -31,3 +36,9 @@ class Row
 
   destroyCellAccessor: (cell) ->
     delete @[cell.getColumn().name]
+
+  updateCellAccessorName: (oldName, newName) ->
+    cell = @cellByColumnName(newName)
+
+    delete @[oldName]
+    @createCellAccessor(cell)
