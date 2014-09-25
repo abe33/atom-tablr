@@ -11,6 +11,9 @@
   "dependencies": {
     "event-kit": ">= 0.7.2",
     "theorist": "1.x",
-    "mixto": "1.x"
+    "mixto": "1.x",
+    "serializable": "1.x",
+    "property-accessors": "1.x",
+    "delegato": "1.x"
   }
 }
