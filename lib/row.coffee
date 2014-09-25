@@ -1,10 +1,14 @@
 PropertyAccessors = require 'property-accessors'
+Identifiable = require './mixins/identifiable'
 
 module.exports =
 class Row
   PropertyAccessors.includeInto(this)
+  Identifiable.includeInto(this)
 
   constructor: ({@cells, @table}={cells: []}) ->
+    @initID()
+
     @createCellAccessor(cell) for cell in @cells
 
   getCells: -> @cells
