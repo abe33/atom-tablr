@@ -6,8 +6,9 @@ class Row
   PropertyAccessors.includeInto(this)
   Identifiable.includeInto(this)
 
-  constructor: ({@cells, @table}={cells: []}) ->
+  constructor: ({@cells, @table}={}) ->
     @initID()
+    @cells ||= []
 
     @createCellAccessor(cell) for cell in @cells
 
