@@ -18,7 +18,17 @@ class Row
   getCellsCount: -> @cells.length
 
   addCell: (cell) ->
-    @cells.push cell
+    @addCellAt(@cells.length, cell)
+
+  addCellAt: (index, cell) ->
+    if index < 0
+      throw new Error "Can't add cell at index #{index}"
+
+    if index >= @cells.length
+      @cells.push cell
+    else
+      @cells.splice index, 0, cell
+
     @createCellAccessor(cell)
 
   removeCellAt: (index) ->

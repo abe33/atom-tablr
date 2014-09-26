@@ -36,6 +36,32 @@ describe 'Table', ->
       it 'raises an exception when adding a column whose name already exist in table', ->
         expect(-> table.addColumn('key')).toThrow()
 
+      describe 'when there is already rows in the table', ->
+        beforeEach ->
+          row = table.addRow key: 'foo', value: 'bar'
+          table.addRow key: 'oof', value: 'rab'
+
+        describe 'adding a column', ->
+          it 'extend all the rows with a new cell', ->
+            table.addColumn 'required', default: false
+
+            expect(row.getCellsCount()).toEqual(3)
+
+        describe 'adding a column at a given index', ->
+          beforeEach ->
+            column = table.addColumnAt 1, 'required', default: false
+
+          it 'adds the column at the right place', ->
+            expect(table.getColumn(1)).toEqual(column)
+            expect(table.getColumn(2).name).toEqual('value')
+
+          it 'extend the existing rows at the right place', ->
+            expect(row.getCell(1).getColumn()).toEqual(column)
+            expect(row.getCell(2).getColumn().name).toEqual('value')
+
+          it 'throws an error if the index is negative', ->
+            expect(-> table.addColumnAt -1, 'foo').toThrow()
+
       describe 'removing a column', ->
         describe 'when there is alredy rows in the table', ->
           beforeEach ->
@@ -101,16 +127,6 @@ describe 'Table', ->
 
             expect(row.key).toEqual('foo')
             expect(row.data).toBeUndefined()
-
-        describe 'adding a column when there is already rows in the table', ->
-          beforeEach ->
-            row = table.addRow key: 'foo', value: 'bar'
-            table.addRow key: 'oof', value: 'rab'
-
-          it 'extend all the rows with a new cell', ->
-            table.addColumn 'required', default: false
-
-            expect(row.getCellsCount()).toEqual(3)
 
       describe 'removing a row', ->
         beforeEach ->

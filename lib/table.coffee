@@ -30,12 +30,25 @@ class Table extends Model
   getColumnsCount: -> @columns.length
 
   addColumn: (name, options={}) ->
+    @addColumnAt(@columns.length, name, options)
+
+  addColumnAt: (index, name, options={}) ->
+    if index < 0
+      throw new Error "Can't add column #{name} at index #{index}"
+
     if name in @getColumnNames()
       throw new Error "Can't add column #{name} as one already exist"
+
     column = new Column {name, options}
-    @columns.push column
+
     @subscribeToColumn(column)
-    @extendExistingRows(column)
+    @extendExistingRows(column, index)
+
+    if index >= @columns.length
+      @columns.push column
+    else
+      @columns.splice index, 0, column
+
     column
 
   removeColumn: (column) ->
@@ -103,8 +116,8 @@ class Table extends Model
 
     @rows.splice(index, 1)
 
-  extendExistingRows: (column) ->
-    row.addCell new Cell {column} for row in @rows
+  extendExistingRows: (column, index) ->
+    row.addCellAt index, new Cell {column} for row in @rows
 
   updateRowsColumnAccessor: ({oldName, newName}) =>
     row.updateCellAccessorName(oldName, newName) for row in @rows
