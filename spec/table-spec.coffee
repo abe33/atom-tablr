@@ -143,6 +143,33 @@ describe 'Table', ->
             it 'throws an error if the index is negative', ->
               expect(-> table.addRowAt -1, {}).toThrow()
 
+        describe 'with an array', ->
+          it 'creates a row with a cell for each value', ->
+            row = table.addRow ['foo', 'bar']
+
+            expect(table.getRowsCount()).toEqual(1)
+            expect(table.getRow(0)).toBe(row)
+            expect(row.key).toEqual('foo')
+            expect(row.value).toEqual('bar')
+
+          it "uses the column default when the value isn't provided", ->
+            row = table.addRow []
+
+            expect(row.key).toBeNull()
+            expect(row.value).toEqual('empty')
+
+          describe 'at a specified index', ->
+            beforeEach ->
+              table.addRow ['foo', 'bar']
+              table.addRow ['oof', 'rab']
+
+            it 'inserts the row at the specified position', ->
+              table.addRowAt(1, ['hello', 'world'])
+
+              expect(table.getRowsCount()).toEqual(3)
+              expect(table.getRow(1).key).toEqual('hello')
+              expect(table.getRow(1).value).toEqual('world')
+
       describe 'removing a row', ->
         beforeEach ->
           row = table.addRow key: 'foo', value: 'bar'

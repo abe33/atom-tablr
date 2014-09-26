@@ -101,6 +101,10 @@ class Table extends Model
     cells = []
 
     if Array.isArray(values)
+      for column,i in @columns
+        value = values[i]
+        cell = new Cell {value, column}
+        cells.push cell
     else
       for column in @columns
         value = values[column.name]
