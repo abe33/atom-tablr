@@ -1,13 +1,16 @@
-{Model} = require 'theorist'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 
+Identifiable = require './mixins/identifiable'
 Column = require './column'
 Row = require './row'
 Cell = require './cell'
 
 module.exports =
-class Table extends Model
+class Table
+  Identifiable.includeInto(this)
+
   constructor: (options={}) ->
+    @initID()
     @columns = []
     @rows = []
     @emitter = new Emitter
