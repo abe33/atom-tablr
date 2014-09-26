@@ -128,6 +128,21 @@ describe 'Table', ->
             expect(row.key).toEqual('foo')
             expect(row.data).toBeUndefined()
 
+          describe 'at a specified index', ->
+            beforeEach ->
+              table.addRow key: 'foo', value: 'bar'
+              table.addRow key: 'oof', value: 'rab'
+
+            it 'inserts the row at the specified position', ->
+              table.addRowAt(1, key: 'hello', value: 'world')
+
+              expect(table.getRowsCount()).toEqual(3)
+              expect(table.getRow(1).key).toEqual('hello')
+              expect(table.getRow(1).value).toEqual('world')
+
+            it 'throws an error if the index is negative', ->
+              expect(-> table.addRowAt -1, {}).toThrow()
+
       describe 'removing a row', ->
         beforeEach ->
           row = table.addRow key: 'foo', value: 'bar'

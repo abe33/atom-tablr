@@ -89,6 +89,12 @@ class Table extends Model
   getRowsCount: -> @rows.length
 
   addRow: (values) ->
+    @addRowAt(@rows.length, values)
+
+  addRowAt: (index, values={}) ->
+    if index < 0
+      throw new Error "Can't add column #{name} at index #{index}"
+
     if @getColumns().length is 0
       throw new Error "Can't add rows to a table without column"
 
@@ -102,7 +108,12 @@ class Table extends Model
         cells.push cell
 
     row = new Row {cells, table: this}
-    @rows.push row
+
+    if index >= @rows.length
+      @rows.push row
+    else
+      @rows.splice index, 0, row
+
     row
 
   removeRow: (row) ->
