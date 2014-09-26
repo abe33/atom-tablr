@@ -52,10 +52,14 @@ describe 'Table', ->
             column = table.addColumnAt 1, 'required', default: false
 
           it 'adds the column at the right place', ->
+            expect(table.getColumnsCount()).toEqual(3)
             expect(table.getColumn(1)).toEqual(column)
             expect(table.getColumn(2).name).toEqual('value')
 
           it 'extend the existing rows at the right place', ->
+            expect(table.getRow(0).getCellsCount()).toEqual(3)
+            expect(table.getRow(1).getCellsCount()).toEqual(3)
+
             expect(row.getCell(1).getColumn()).toEqual(column)
             expect(row.getCell(2).getColumn().name).toEqual('value')
 
