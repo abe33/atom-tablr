@@ -84,7 +84,7 @@ class Table extends Model
 
   getRows: -> @rows
 
-  getRow: (index) -> @rows[0]
+  getRow: (index) -> @rows[index]
 
   getRowsCount: -> @rows.length
 
