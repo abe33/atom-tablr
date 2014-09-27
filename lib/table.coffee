@@ -149,8 +149,6 @@ class Table
   #     ######  ######## ######## ########  ######
 
   getCells: ->
-    cells = []
-    @rows.forEach (row) -> cells = cells.concat(row.getCells())
-    cells
+    @rows.reduce ((cells, row) -> cells.concat row.getCells()), []
 
   getCellsCount: -> @getCells().length
