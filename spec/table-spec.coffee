@@ -322,3 +322,11 @@ describe 'Table', ->
             oldRange: {start: 0, end: 2}
             newRange: {start: 0, end: 0}
           })
+
+      describe '::removeRowsInRange', ->
+        it 'throws an error without range', ->
+          expect(-> table.removeRowsInRange()).toThrow()
+
+        it 'throws an error with an invalid range', ->
+          expect(-> table.removeRowsInRange {start: 1}).toThrow()
+          expect(-> table.removeRowsInRange [1]).toThrow()

@@ -196,6 +196,8 @@ class Table
       }
 
   removeRowsInRange: (range) ->
+    throw new Error "Can't remove rows with a range" unless range?
+
     range = @rangeFrom(range)
 
     for i in [range.start...range.end]
@@ -213,7 +215,11 @@ class Table
     row.updateCellAccessorName(oldName, newName) for row in @rows
 
   rangeFrom: (range) ->
-    return {start: range[0], end: range[1]} if Array.isArray range
+    range = {start: range[0], end: range[1]} if Array.isArray range
+
+    unless range.start? and range.end?
+      throw new Error "Invalid range #{range}"
+
     range
 
   #     ######  ######## ##       ##        ######
