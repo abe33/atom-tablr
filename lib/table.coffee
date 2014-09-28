@@ -103,7 +103,6 @@ class Table
     @columnSubscriptions[column.id].dispose()
     delete @columnSubscriptions[column.id]
 
-
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
   #    ##     ## ##     ## ##  ##  ## ##
