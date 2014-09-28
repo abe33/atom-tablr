@@ -4,7 +4,7 @@ Row = require '../lib/row'
 Cell = require '../lib/cell'
 
 describe 'Table', ->
-  [table, row, column] = []
+  [table, row, column, spy] = []
   describe 'created without state', ->
     beforeEach ->
       table = new Table
@@ -47,6 +47,14 @@ describe 'Table', ->
 
             expect(row.getCellsCount()).toEqual(3)
 
+          it 'dispatches a did-add-column event', ->
+            spy = jasmine.createSpy 'addColumn'
+
+            table.onDidAddColumn spy
+            table.addColumn 'required'
+
+            expect(spy).toHaveBeenCalled()
+
         describe 'adding a column at a given index', ->
           beforeEach ->
             column = table.addColumnAt 1, 'required', default: false
@@ -69,13 +77,19 @@ describe 'Table', ->
       describe 'removing a column', ->
         describe 'when there is alredy rows in the table', ->
           beforeEach ->
+            spy = jasmine.createSpy 'removeColumn'
+
             table.addRow key: 'foo', value: 'bar'
             table.addRow key: 'oof', value: 'rab'
 
+            table.onDidRemoveColumn spy
             table.removeColumn(column)
 
           it 'removes the column', ->
             expect(table.getColumnsCount()).toEqual(1)
+
+          it 'dispatches a did-add-column event', ->
+            expect(spy).toHaveBeenCalled()
 
           it 'removes the corresponding row cell', ->
             expect(table.getRow(0).getCellsCount()).toEqual(1)
@@ -119,6 +133,13 @@ describe 'Table', ->
             expect(table.getRow(0)).toBe(row)
             expect(row.key).toEqual('foo')
             expect(row.value).toEqual('bar')
+
+          it 'dispatches a did-add-row event', ->
+            spy = jasmine.createSpy 'addRow'
+            table.onDidAddRow spy
+            table.addRow key: 'foo', value: 'bar'
+
+            expect(spy).toHaveBeenCalled()
 
           it "uses the column default when the value isn't provided", ->
             row = table.addRow {}
@@ -176,12 +197,20 @@ describe 'Table', ->
 
       describe 'removing a row', ->
         beforeEach ->
+          spy = jasmine.createSpy 'removeRow'
+
           row = table.addRow key: 'foo', value: 'bar'
           table.addRow key: 'oof', value: 'rab'
+
+          table.onDidRemoveRow spy
 
         it 'removes the row', ->
           table.removeRow(row)
           expect(table.getRowsCount()).toEqual(1)
+
+        it 'dispatches a did-remove-row event', ->
+          table.removeRow(row)
+          expect(spy).toHaveBeenCalled()
 
         it 'throws an exception when the row is undefined', ->
           expect(-> table.removeRow()).toThrow()

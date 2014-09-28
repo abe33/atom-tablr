@@ -16,6 +16,26 @@ class Table
     @emitter = new Emitter
     @columnSubscriptions = {}
 
+  #    ######## ##     ## ######## ##    ## ########  ######
+  #    ##       ##     ## ##       ###   ##    ##    ##    ##
+  #    ##       ##     ## ##       ####  ##    ##    ##
+  #    ######   ##     ## ######   ## ## ##    ##     ######
+  #    ##        ##   ##  ##       ##  ####    ##          ##
+  #    ##         ## ##   ##       ##   ###    ##    ##    ##
+  #    ########    ###    ######## ##    ##    ##     ######
+
+  onDidAddColumn: (callback) ->
+    @emitter.on 'did-add-column', callback
+
+  onDidRemoveColumn: (callback) ->
+    @emitter.on 'did-remove-column', callback
+
+  onDidAddRow: (callback) ->
+    @emitter.on 'did-add-row', callback
+
+  onDidRemoveRow: (callback) ->
+    @emitter.on 'did-remove-row', callback
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -52,6 +72,8 @@ class Table
     else
       @columns.splice index, 0, column
 
+    @emitter.emit 'did-add-column', {column}
+
     column
 
   removeColumn: (column) ->
@@ -63,9 +85,11 @@ class Table
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
-    @unsubscribeFromColumn(@columns[index])
+    column = @columns[index]
+    @unsubscribeFromColumn(column)
     @columns.splice(index, 1)
     row.removeCellAt(index) for row in @rows
+    @emitter.emit 'did-remove-column', {column}
 
   subscribeToColumn: (column) ->
     subscriptions = @columnSubscriptions[column.id] = new CompositeDisposable
@@ -121,6 +145,8 @@ class Table
     else
       @rows.splice index, 0, row
 
+    @emitter.emit 'did-add-row', {row}
+
     row
 
   removeRow: (row) ->
@@ -132,7 +158,10 @@ class Table
     if index is -1 or index >= @rows.length
       throw new Error "Can't remove row at index #{index}"
 
+    row = @rows[index]
     @rows.splice(index, 1)
+
+    @emitter.emit 'did-remove-row', {row}
 
   extendExistingRows: (column, index) ->
     row.addCellAt index, new Cell {column} for row in @rows
