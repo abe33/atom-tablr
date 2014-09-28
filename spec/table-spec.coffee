@@ -218,6 +218,46 @@ describe 'Table', ->
               expect(table.getRow(1).key).toEqual('hello')
               expect(table.getRow(1).value).toEqual('world')
 
+      describe 'adding many rows', ->
+        beforeEach ->
+          spy = jasmine.createSpy 'changeRows'
+          table.onDidChangeRows spy
+          table.addRows [
+            { key: 'foo', value: 'bar' }
+            { key: 'oof', value: 'rab' }
+          ]
+
+        it 'adds the rows in the table', ->
+          expect(table.getRowsCount()).toEqual(2)
+
+        it 'dispatch only one did-change-rows event', ->
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls.length).toEqual(1)
+          expect(spy.calls[0].args[0]).toEqual({
+            oldRange: {start: 0, end: 0}
+            newRange: {start: 0, end: 2}
+          })
+
+        describe 'at a given index', ->
+          beforeEach ->
+            spy = jasmine.createSpy 'changeRows'
+            table.onDidChangeRows spy
+            table.addRowsAt 1, [
+              { key: 'foo', value: 'bar' }
+              { key: 'oof', value: 'rab' }
+            ]
+
+          it 'adds the rows in the table', ->
+            expect(table.getRowsCount()).toEqual(4)
+
+          it 'dispatch only one did-change-rows event', ->
+            expect(spy).toHaveBeenCalled()
+            expect(spy.calls.length).toEqual(1)
+            expect(spy.calls[0].args[0]).toEqual({
+              oldRange: {start: 1, end: 1}
+              newRange: {start: 1, end: 3}
+            })
+
       describe 'removing a row', ->
         beforeEach ->
           spy = jasmine.createSpy 'removeRow'
@@ -257,3 +297,28 @@ describe 'Table', ->
 
         it 'throws an error with an index greater that the rows count', ->
           expect(-> table.removeRowAt(2)).toThrow()
+
+      describe 'removing many rows', ->
+        beforeEach ->
+          table.addRow key: 'foo', value: 'bar'
+          table.addRow key: 'oof', value: 'rab'
+          table.addRow key: 'ofo', value: 'arb'
+
+          spy = jasmine.createSpy 'removeRows'
+
+          table.onDidChangeRows spy
+
+          table.removeRowsInRange([0,2])
+
+        it 'removes the rows from the table', ->
+          expect(table.getRowsCount()).toEqual(1)
+          expect(table.getRow(0).key).toEqual('ofo')
+          expect(table.getRow(0).value).toEqual('arb')
+
+        it 'dispatches a single did-change-rows', ->
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls.length).toEqual(1)
+          expect(spy.calls[0].args[0]).toEqual({
+            oldRange: {start: 0, end: 2}
+            newRange: {start: 0, end: 0}
+          })

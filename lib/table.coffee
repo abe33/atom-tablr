@@ -118,10 +118,14 @@ class Table
 
   getRowsCount: -> @rows.length
 
-  addRow: (values) ->
-    @addRowAt(@rows.length, values)
+  getRowsInRange: (range) ->
+    range = @rangeFrom(range)
+    @rows[range.start...range.end]
 
-  addRowAt: (index, values={}) ->
+  addRow: (values, batch=false) ->
+    @addRowAt(@rows.length, values, batch)
+
+  addRowAt: (index, values={}, batch=false) ->
     if index < 0
       throw new Error "Can't add column #{name} at index #{index}"
 
@@ -149,19 +153,35 @@ class Table
       @rows.splice index, 0, row
 
     @emitter.emit 'did-add-row', {row}
-    @emitter.emit 'did-change-rows', {
-      oldRange: {start: index, end: index}
-      newRange: {start: index, end: index+1}
-    }
+    unless batch
+      @emitter.emit 'did-change-rows', {
+        oldRange: {start: index, end: index}
+        newRange: {start: index, end: index+1}
+      }
 
     row
 
-  removeRow: (row) ->
+  addRows: (rows) ->
+    index = @rows.length
+    rows.forEach (row) => @addRow(row, true)
+    @emitter.emit 'did-change-rows', {
+      oldRange: {start: index, end: index}
+      newRange: {start: index, end: index+rows.length}
+    }
+
+  addRowsAt: (index, rows) ->
+    rows.forEach (row,i) => @addRowAt(index+i, row, true)
+    @emitter.emit 'did-change-rows', {
+      oldRange: {start: index, end: index}
+      newRange: {start: index, end: index+rows.length}
+    }
+
+  removeRow: (row, batch=false) ->
     throw new Error "Can't remove an undefined row" unless row?
 
-    @removeRowAt(@rows.indexOf(row))
+    @removeRowAt(@rows.indexOf(row), batch)
 
-  removeRowAt: (index) ->
+  removeRowAt: (index, batch=false) ->
     if index is -1 or index >= @rows.length
       throw new Error "Can't remove row at index #{index}"
 
@@ -169,9 +189,21 @@ class Table
     @rows.splice(index, 1)
 
     @emitter.emit 'did-remove-row', {row}
+    unless batch
+      @emitter.emit 'did-change-rows', {
+        oldRange: {start: index, end: index+1}
+        newRange: {start: index, end: index}
+      }
+
+  removeRowsInRange: (range) ->
+    range = @rangeFrom(range)
+
+    for i in [range.start...range.end]
+      @removeRowAt(range.start, true)
+
     @emitter.emit 'did-change-rows', {
-      oldRange: {start: index, end: index+1}
-      newRange: {start: index, end: index}
+      oldRange: range
+      newRange: {start: range.start, end: range.start}
     }
 
   extendExistingRows: (column, index) ->
@@ -179,6 +211,10 @@ class Table
 
   updateRowsColumnAccessor: ({oldName, newName}) =>
     row.updateCellAccessorName(oldName, newName) for row in @rows
+
+  rangeFrom: (range) ->
+    return {start: range[0], end: range[1]} if Array.isArray range
+    range
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
