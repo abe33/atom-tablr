@@ -141,6 +141,17 @@ describe 'Table', ->
 
             expect(spy).toHaveBeenCalled()
 
+          it 'dispatches a did-change-rows event', ->
+            spy = jasmine.createSpy 'changeRows'
+            table.onDidChangeRows spy
+            table.addRow key: 'foo', value: 'bar'
+
+            expect(spy).toHaveBeenCalled()
+            expect(spy.calls[0].args[0]).toEqual({
+              oldRange: {start: 0, end: 0}
+              newRange: {start: 0, end: 1}
+            })
+
           it "uses the column default when the value isn't provided", ->
             row = table.addRow {}
 
@@ -167,6 +178,18 @@ describe 'Table', ->
 
             it 'throws an error if the index is negative', ->
               expect(-> table.addRowAt -1, {}).toThrow()
+
+            it 'dispatches a did-change-rows event', ->
+              spy = jasmine.createSpy 'changeRows'
+              table.onDidChangeRows spy
+              table.addRowAt(1, key: 'hello', value: 'world')
+
+              expect(spy).toHaveBeenCalled()
+              expect(spy.calls[0].args[0]).toEqual({
+                oldRange: {start: 1, end: 1}
+                newRange: {start: 1, end: 2}
+              })
+
 
         describe 'with an array', ->
           it 'creates a row with a cell for each value', ->
@@ -211,6 +234,17 @@ describe 'Table', ->
         it 'dispatches a did-remove-row event', ->
           table.removeRow(row)
           expect(spy).toHaveBeenCalled()
+
+        it 'dispatches a did-change-rows event', ->
+          spy = jasmine.createSpy 'changeRows'
+          table.onDidChangeRows spy
+          table.removeRow(row)
+
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls[0].args[0]).toEqual({
+            oldRange: {start: 0, end: 1}
+            newRange: {start: 0, end: 0}
+          })
 
         it 'throws an exception when the row is undefined', ->
           expect(-> table.removeRow()).toThrow()

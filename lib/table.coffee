@@ -36,6 +36,9 @@ class Table
   onDidRemoveRow: (callback) ->
     @emitter.on 'did-remove-row', callback
 
+  onDidChangeRows: (callback) ->
+    @emitter.on 'did-change-rows', callback
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -146,6 +149,10 @@ class Table
       @rows.splice index, 0, row
 
     @emitter.emit 'did-add-row', {row}
+    @emitter.emit 'did-change-rows', {
+      oldRange: {start: index, end: index}
+      newRange: {start: index, end: index+1}
+    }
 
     row
 
@@ -162,6 +169,10 @@ class Table
     @rows.splice(index, 1)
 
     @emitter.emit 'did-remove-row', {row}
+    @emitter.emit 'did-change-rows', {
+      oldRange: {start: index, end: index+1}
+      newRange: {start: index, end: index}
+    }
 
   extendExistingRows: (column, index) ->
     row.addCellAt index, new Cell {column} for row in @rows
