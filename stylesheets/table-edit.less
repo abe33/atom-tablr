@@ -5,4 +5,23 @@
 @import "ui-variables";
 
 .table-edit {
+  position: relative;
+
+  .scroll-view {
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    bottom: 0;
+    top: 27px;
+    left: 0;
+    right: 0;
+  }
+}
+
+.table-edit-header {
+  height: 27px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
