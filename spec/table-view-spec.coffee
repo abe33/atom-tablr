@@ -34,8 +34,8 @@ describe 'TableView', ->
 
     $('body').append(tableView)
 
-  # afterEach ->
-  #   tableView.destroy()
+  afterEach ->
+    tableView.destroy()
 
   it 'holds a table', ->
     expect(tableView.table).toEqual(table)
@@ -43,10 +43,24 @@ describe 'TableView', ->
   it 'has a scroll-view', ->
     expect(tableView.scrollView).toBeDefined()
 
+  describe 'when not scrolled yet', ->
+    it 'renders the lines at the top of the table', ->
+      expect(tableView.tableNode.find('.row')).toEqual(18)
+
   describe '::getFirstVisibleRow', ->
     it 'returns 0 when the table view is not scrolled', ->
       expect(tableView.getFirstVisibleRow()).toEqual(0)
 
+    describe 'when scrolled by 100px', ->
+      it 'returns 5', ->
+        tableView.scrollTop(100)
+        expect(tableView.getFirstVisibleRow()).toEqual(5)
+
   describe '::getLastVisibleRow', ->
     it 'returns 8 when the table view is not scrolled', ->
       expect(tableView.getLastVisibleRow()).toEqual(8)
+
+    describe 'when scrolled by 100px', ->
+      it 'returns 13', ->
+        tableView.scrollTop(100)
+        expect(tableView.getFirstVisibleRow()).toEqual(13)

@@ -13,6 +13,8 @@
     "mixto": "1.x",
     "serializable": "1.x",
     "property-accessors": "1.x",
-    "delegato": "1.x"
+    "delegato": "1.x",
+    "react-atom-fork": "0.x",
+    "reactionary-atom-fork": "0.x"
   }
 }
