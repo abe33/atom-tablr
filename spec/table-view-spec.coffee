@@ -90,7 +90,7 @@ describe 'TableView', ->
     describe 'without any columns layout data', ->
       it 'have cells that all have the same width', ->
         cells.each ->
-          expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -1)
+          expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -2)
 
     describe 'with a columns layout defined', ->
       describe 'with an array with enough values', ->
@@ -98,45 +98,45 @@ describe 'TableView', ->
           tableView.setColumnsWidths([0.2, 0.3, 0.5])
           nextAnimationFrame()
 
-          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
-          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -1)
-          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
 
       describe 'with an array with sparse values', ->
         it 'computes the other columns width', ->
           tableView.setColumnsWidths([0.2, null, 0.5])
           nextAnimationFrame()
 
-          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
-          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -1)
-          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
 
       describe 'with an array with more than one missing value', ->
         it 'divides the rest width between the missing columns', ->
           tableView.setColumnsWidths([0.2])
           nextAnimationFrame()
 
-          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
-          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.4, -1)
-          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.4, -1)
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.4, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.4, -2)
 
       describe 'with an array whose sum is greater than 1', ->
         it 'divides the rest width between the missing columns', ->
           tableView.setColumnsWidths([0.5, 0.5, 1])
           nextAnimationFrame()
 
-          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -1)
-          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -1)
-          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
 
       describe 'with a sparse array whose sum is greater or equal than 1', ->
         it 'divides the rest width between the missing columns', ->
           tableView.setColumnsWidths([0.5, 0.5])
           nextAnimationFrame()
 
-          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -1)
-          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -1)
-          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
 
 
   describe 'when scrolled by 100px', ->
