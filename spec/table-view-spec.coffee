@@ -77,6 +77,13 @@ describe 'TableView', ->
     it 'returns 8 when the table view is not scrolled', ->
       expect(tableView.getLastVisibleRow()).toEqual(8)
 
+  describe 'the rendered rows', ->
+    beforeEach ->
+      row = tableView.find('.table-edit-row').first()
+
+    it 'has as many columns as the model row', ->
+      expect(row.find('.table-edit-column').length).toEqual(2)
+
   describe 'when scrolled by 100px', ->
     beforeEach ->
       tableView.scrollTop(100)

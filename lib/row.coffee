@@ -21,6 +21,8 @@ class Row
   addCell: (cell) ->
     @addCellAt(@cells.length, cell)
 
+  eachCell: (block) -> block(cell) for cell in @cells
+
   addCellAt: (index, cell) ->
     if index < 0
       throw new Error "Can't add cell at index #{index}"
