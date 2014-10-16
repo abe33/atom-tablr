@@ -86,7 +86,7 @@ describe 'TableView', ->
   describe 'the rendered rows', ->
     beforeEach ->
       row = tableView.find('.table-edit-row').first()
-      cells = row.find('.table-edit-column')
+      cells = row.find('.table-edit-cell')
 
     it 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)

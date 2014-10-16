@@ -18,7 +18,7 @@ module.exports = React.createClass
       rowData.eachCell (cell,i) ->
         columns.push div {
           key: "cell-#{row}-#{i}"
-          className: 'table-edit-column'
+          className: 'table-edit-cell'
           style:
             width: columnsWidths[i]
         }, cell.getValue()
