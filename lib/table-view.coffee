@@ -58,13 +58,40 @@ class TableView extends View
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
   getColumnsWidths: ->
-    if @columnsWidths?
-      @columnsWidths.map (w) -> "#{Math.round w * 100}%"
-    else
-      count = @table.getColumnsCount()
-      "#{Math.round 1 / count * 100}%" for n in [0...count]
+    return @columnsWidths if @columnsWidths?
 
-  setColumnsWidths: (@columnsWidths) -> @requestUpdate(true)
+    count = @table.getColumnsCount()
+    @columnsWidths = ("#{Math.round 1 / count * 100}%" for n in [0...count])
+
+  setColumnsWidths: (columnsWidths) ->
+    restWidth = 1
+    wholeWidth = 0
+    missingIndices = []
+    widths = []
+
+    for index in [0...@table.getColumnsCount()]
+      width = columnsWidths[index]
+      if width?
+        widths[index] = width
+        wholeWidth += width
+        restWidth -= width
+      else
+        missingIndices.push index
+
+    if (missingCount = missingIndices.length)
+      if restWidth <= 0 and missingCount
+        restWidth = wholeWidth
+        wholeWidth *= 2
+
+      for index in missingIndices
+        widths[index] = restWidth / missingCount
+
+    if wholeWidth > 1
+      widths = widths.map (w) -> w * (1 / wholeWidth)
+
+    @columnsWidths = widths.map (w) -> "#{Math.round w * 100}%"
+
+    @requestUpdate(true)
 
   scrollTop: (scroll) ->
     if scroll?

@@ -102,6 +102,43 @@ describe 'TableView', ->
           expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -1)
           expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
 
+      describe 'with an array with sparse values', ->
+        it 'computes the other columns width', ->
+          tableView.setColumnsWidths([0.2, null, 0.5])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -1)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+
+      describe 'with an array with more than one missing value', ->
+        it 'divides the rest width between the missing columns', ->
+          tableView.setColumnsWidths([0.2])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.4, -1)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.4, -1)
+
+      describe 'with an array whose sum is greater than 1', ->
+        it 'divides the rest width between the missing columns', ->
+          tableView.setColumnsWidths([0.5, 0.5, 1])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -1)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -1)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+
+      describe 'with a sparse array whose sum is greater or equal than 1', ->
+        it 'divides the rest width between the missing columns', ->
+          tableView.setColumnsWidths([0.5, 0.5])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.25, -1)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -1)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
+
+
   describe 'when scrolled by 100px', ->
     beforeEach ->
       tableView.scrollTop(100)
