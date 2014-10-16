@@ -1,7 +1,3 @@
-// The ui-variables file is provided by base themes provided by Atom.
-//
-// See https://github.com/atom/atom-dark-ui/blob/master/stylesheets/ui-variables.less
-// for a full listing of what's available.
 @import "ui-variables";
 
 .table-edit {
@@ -16,6 +12,19 @@
     left: 0;
     right: 0;
   }
+}
+
+.table-edit-content {
+  position: relative;
+}
+
+.table-edit-row {
+  position: absolute;
+  overflow: hidden;
+}
+
+.table-edit-column {
+  float: left;
 }
 
 .table-edit-header {
