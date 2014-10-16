@@ -27,12 +27,11 @@ class TableView extends View
 
   getRowHeight: -> @rowHeight
 
-  setRowHeight: (@rowHeight) ->
-    @component.setState rowHeight: @getRowHeight()
+  setRowHeight: (@rowHeight) -> @requestUpdate(true)
 
   getRowOverdraw: -> @rowOverdraw or 0
 
-  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
+  setRowOverdraw: (@rowOverdraw) -> @requestUpdate(true)
 
   getFirstVisibleRow: ->
     row = Math.floor(@scrollView.scrollTop() / @getRowHeight())
@@ -53,7 +52,9 @@ class TableView extends View
 
     @scrollView.scrollTop()
 
-  requestUpdate: =>
+  requestUpdate: (forceUpdate=false) =>
+    @hasChanged = forceUpdate
+
     return if @updateRequested
 
     @updateRequested = true
@@ -65,7 +66,7 @@ class TableView extends View
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
 
-    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow
+    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
 
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
@@ -80,5 +81,6 @@ class TableView extends View
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
+    @hasChanged = false
 
   asDisposable: (subscription) -> new Disposable -> subscription.off()
