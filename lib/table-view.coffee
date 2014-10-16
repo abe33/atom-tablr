@@ -1,5 +1,5 @@
 {View} = require 'atom'
-{CompositeDisposable} = require 'event-kit'
+{CompositeDisposable, Disposable} = require 'event-kit'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
 
@@ -9,16 +9,17 @@ class TableView extends View
     @div class: 'table-edit', =>
       @table outlet: 'tableHeaderView', class: 'table-edit-header'
       @div outlet: 'scrollView', class: 'scroll-view', =>
-        @div outlet: 'tableNode', class: 'table'
 
   initialize: (@table) ->
     @subscriptions = new CompositeDisposable
     @scroll = 0
 
     props = {@table, parentView: this}
-    @component = React.renderComponent(TableComponent(props), @tableNode[0])
+    @component = React.renderComponent(TableComponent(props), @scrollView[0])
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
+
+    @subscriptions.add @asDisposable @scrollView.on 'scroll', @requestUpdate
 
   destroy: ->
     @subscriptions.dispose()
@@ -68,8 +69,11 @@ class TableView extends View
     @component.setState {
       firstRow
       lastRow
+      rowHeight: @getRowHeight()
       totalRows: @table.getRowsCount()
     }
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
+
+  asDisposable: (subscription) -> new Disposable -> subscription.off()
