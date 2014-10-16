@@ -13,11 +13,10 @@ class TableView extends View
 
   initialize: (@table) ->
     @subscriptions = new CompositeDisposable
+    @scroll = 0
 
     props = {@table, parentView: this}
     @component = React.renderComponent(TableComponent(props), @tableNode[0])
-
-    # node = @component.getDOMNode()
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
 
@@ -28,22 +27,26 @@ class TableView extends View
   getRowHeight: -> @rowHeight
 
   setRowHeight: (@rowHeight) ->
+    @component.setState rowHeight: @getRowHeight()
 
   getRowOverdraw: -> @rowOverdraw or 0
 
-  setRowOverdraw: (@rowOverdraw) ->
+  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
   getFirstVisibleRow: ->
-    scrollTop = @scrollView.scrollTop()
-    row = Math.floor(scrollTop / @getRowHeight())
+    row = Math.floor(@scrollView.scrollTop() / @getRowHeight())
 
   getLastVisibleRow: ->
-    scrollTop = @scrollView.scrollTop()
     scrollViewHeight = @scrollView.height()
 
-    row = Math.floor((scrollTop + scrollViewHeight) / @getRowHeight())
+    row = Math.floor((@scrollView.scrollTop() + scrollViewHeight) / @getRowHeight())
 
-  scrollTop: (scrollTop) -> @scrollView.scrollTop(scrollTop)
+  scrollTop: (scroll) ->
+    if scroll?
+      @scrollView.scrollTop(scroll)
+      @requestUpdate()
+
+    @scrollView.scrollTop()
 
   requestUpdate: =>
     return if @updateRequested
@@ -56,9 +59,17 @@ class TableView extends View
   update: =>
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
+
+    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow
+
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
 
-    console.log firstVisibleRow, lastVisibleRow, @rowOverdraw
+    @component.setState {
+      firstRow
+      lastRow
+      totalRows: @table.getRowsCount()
+    }
 
-    @component.setState({firstRow, lastRow})
+    @firstRenderedRow = firstRow
+    @lastRenderedRow = lastRow

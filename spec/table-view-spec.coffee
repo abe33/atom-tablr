@@ -7,7 +7,19 @@ Row = require '../lib/row'
 Cell = require '../lib/cell'
 
 describe 'TableView', ->
-  [tableView, table] = []
+  [tableView, table, nextAnimationFrame, noAnimationFrame] = []
+
+  beforeEach ->
+    spyOn(window, "setInterval").andCallFake window.fakeSetInterval
+    spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
+
+    noAnimationFrame = -> throw new Error('No animation frame requested')
+    nextAnimationFrame = noAnimationFrame
+
+    spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
+      nextAnimationFrame = ->
+        nextAnimationFrame = noAnimationFrame
+        fn()
 
   beforeEach ->
     table = new Table
@@ -27,12 +39,15 @@ describe 'TableView', ->
 
     tableView.scrollView.css
       position: 'absolute'
+      overflow: 'auto'
       top: 27
       bottom: 0
       left: 0
       right: 0
 
     $('body').append(tableView)
+
+    nextAnimationFrame()
 
   afterEach ->
     tableView.destroy()
@@ -45,22 +60,37 @@ describe 'TableView', ->
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
-      expect(tableView.tableNode.find('.row')).toEqual(18)
+      rows = tableView.find('.table-edit-row')
+      expect(rows.length).toEqual(18)
+      expect(rows.first().data('row-id')).toEqual(1)
+      expect(rows.last().data('row-id')).toEqual(18)
 
   describe '::getFirstVisibleRow', ->
     it 'returns 0 when the table view is not scrolled', ->
       expect(tableView.getFirstVisibleRow()).toEqual(0)
 
-    describe 'when scrolled by 100px', ->
-      it 'returns 5', ->
-        tableView.scrollTop(100)
-        expect(tableView.getFirstVisibleRow()).toEqual(5)
-
   describe '::getLastVisibleRow', ->
     it 'returns 8 when the table view is not scrolled', ->
       expect(tableView.getLastVisibleRow()).toEqual(8)
 
-    describe 'when scrolled by 100px', ->
+  describe 'when scrolled by 100px', ->
+    beforeEach ->
+      tableView.scrollTop(100)
+      nextAnimationFrame()
+
+    describe '::getFirstVisibleRow', ->
+      it 'returns 5', ->
+        expect(tableView.getFirstVisibleRow()).toEqual(5)
+
+    describe '::getLastVisibleRow', ->
       it 'returns 13', ->
-        tableView.scrollTop(100)
-        expect(tableView.getFirstVisibleRow()).toEqual(13)
+        expect(tableView.getLastVisibleRow()).toEqual(13)
+
+    it 'translates the content by the amount of scroll', ->
+      expect(tableView.find('.scroll-view').scrollTop()).toEqual(100)
+
+    it 'does not render new rows', ->
+      rows = tableView.find('.table-edit-row')
+      expect(rows.length).toEqual(18)
+      expect(rows.first().data('row-id')).toEqual(1)
+      expect(rows.last().data('row-id')).toEqual(18)
