@@ -34,7 +34,11 @@ describe 'TableView', ->
     table.addColumn 'foo'
 
     for i in [0...100]
-      table.addRow ["row#{i}", Math.random() * 100, Math.random() > 0.5]
+      table.addRow [
+        "row#{i}"
+        Math.random() * 100
+        if Math.random() > 0.5 then 'yes' else 'no'
+      ]
 
     tableView = new TableView(table)
     tableView.setRowHeight 20
