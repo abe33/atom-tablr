@@ -42,6 +42,10 @@ class TableView extends View
 
     row = Math.floor((@scrollView.scrollTop() + scrollViewHeight) / @getRowHeight())
 
+  getColumnsWidth: ->
+    count = @table.getColumnsCount()
+    "#{Math.round 1 / count * 100}%" for n in [0...count]
+
   scrollTop: (scroll) ->
     if scroll?
       @scrollView.scrollTop(scroll)
@@ -70,6 +74,7 @@ class TableView extends View
       firstRow
       lastRow
       rowHeight: @getRowHeight()
+      columnsWidth: @getColumnsWidth()
       totalRows: @table.getRowsCount()
     }
 

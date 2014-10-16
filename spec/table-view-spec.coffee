@@ -12,7 +12,7 @@ stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
 
 describe 'TableView', ->
-  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row] = []
+  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells] = []
 
   beforeEach ->
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
@@ -44,6 +44,7 @@ describe 'TableView', ->
 
       .table-edit {
         height: 200px;
+        width: 400px;
       }
     </style>").find('style')
 
@@ -80,9 +81,15 @@ describe 'TableView', ->
   describe 'the rendered rows', ->
     beforeEach ->
       row = tableView.find('.table-edit-row').first()
+      cells = row.find('.table-edit-column')
 
     it 'has as many columns as the model row', ->
-      expect(row.find('.table-edit-column').length).toEqual(2)
+      expect(cells.length).toEqual(2)
+
+    describe 'without any columns layout data', ->
+      it 'have cells that all have the same width', ->
+        cells.each ->
+          expect(@clientWidth).toEqual(200)
 
   describe 'when scrolled by 100px', ->
     beforeEach ->

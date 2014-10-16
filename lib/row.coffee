@@ -21,7 +21,7 @@ class Row
   addCell: (cell) ->
     @addCellAt(@cells.length, cell)
 
-  eachCell: (block) -> block(cell) for cell in @cells
+  eachCell: (block) -> block(cell,i) for cell,i in @cells
 
   addCellAt: (index, cell) ->
     if index < 0
