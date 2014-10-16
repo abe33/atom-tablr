@@ -25,6 +25,14 @@ class TableView extends View
     @subscriptions.dispose()
     @remove()
 
+  #    ########   #######  ##      ##  ######
+  #    ##     ## ##     ## ##  ##  ## ##    ##
+  #    ##     ## ##     ## ##  ##  ## ##
+  #    ########  ##     ## ##  ##  ##  ######
+  #    ##   ##   ##     ## ##  ##  ##       ##
+  #    ##    ##  ##     ## ##  ##  ## ##    ##
+  #    ##     ##  #######   ###  ###   ######
+
   getRowHeight: -> @rowHeight
 
   setRowHeight: (@rowHeight) -> @requestUpdate(true)
@@ -51,6 +59,14 @@ class TableView extends View
       @requestUpdate()
 
     @scrollView.scrollTop()
+
+  #    ##     ## ########  ########     ###    ######## ########
+  #    ##     ## ##     ## ##     ##   ## ##      ##    ##
+  #    ##     ## ##     ## ##     ##  ##   ##     ##    ##
+  #    ##     ## ########  ##     ## ##     ##    ##    ######
+  #    ##     ## ##        ##     ## #########    ##    ##
+  #    ##     ## ##        ##     ## ##     ##    ##    ##
+  #     #######  ##        ########  ##     ##    ##    ########
 
   requestUpdate: (forceUpdate=false) =>
     @hasChanged = forceUpdate
