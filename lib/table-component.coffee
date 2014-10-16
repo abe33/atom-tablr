@@ -12,15 +12,13 @@ module.exports = React.createClass
   render: ->
     {firstRow, lastRow, rowHeight, columnsWidth} = @state
 
-    console.log columnsWidth
-
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
       columns = []
       rowData.eachCell (cell,i) ->
-        columns.push div className: 'table-edit-column', style: { width: columnsWidth[i] }, cell.getValue()
+        columns.push div key: "cell-#{row}-#{i}", className: 'table-edit-column', style: { width: columnsWidth[i] }, cell.getValue()
 
-      div className: 'table-edit-row', style: { height: "#{rowHeight}px", top: "#{row * rowHeight}px" }, 'data-row-id': row + 1, columns
+      div key: "row-#{row}", className: 'table-edit-row', style: { height: "#{rowHeight}px", top: "#{row * rowHeight}px" }, 'data-row-id': row + 1, columns
 
     div className: 'table-edit-content', style: { height: @getTableHeight() }, rows
 
