@@ -70,13 +70,13 @@ describe 'TableView', ->
       expect(rows.first().data('row-id')).toEqual(1)
       expect(rows.last().data('row-id')).toEqual(18)
 
-  describe '::getFirstVisibleRow', ->
-    it 'returns 0 when the table view is not scrolled', ->
-      expect(tableView.getFirstVisibleRow()).toEqual(0)
+    describe '::getFirstVisibleRow', ->
+      it 'returns 0', ->
+        expect(tableView.getFirstVisibleRow()).toEqual(0)
 
-  describe '::getLastVisibleRow', ->
-    it 'returns 8 when the table view is not scrolled', ->
-      expect(tableView.getLastVisibleRow()).toEqual(8)
+    describe '::getLastVisibleRow', ->
+      it 'returns 8', ->
+        expect(tableView.getLastVisibleRow()).toEqual(8)
 
   describe 'the rendered rows', ->
     beforeEach ->
@@ -89,7 +89,7 @@ describe 'TableView', ->
     describe 'without any columns layout data', ->
       it 'have cells that all have the same width', ->
         cells.each ->
-          expect(@clientWidth).toEqual(200)
+          expect(@clientWidth).toEqual(tableView.width() / 2)
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
@@ -131,3 +131,5 @@ describe 'TableView', ->
       expect(rows.length).toEqual(28)
       expect(rows.first().data('row-id')).toEqual(6)
       expect(rows.last().data('row-id')).toEqual(33)
+
+  describe 'setColumnsWidth', ->
