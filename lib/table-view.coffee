@@ -58,10 +58,11 @@ class TableView extends View
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
   getColumnsWidths: ->
-    return @columnsWidths if @columnsWidths?
+    return @columnsPercentWidths if @columnsPercentWidths?
 
     count = @table.getColumnsCount()
-    @columnsWidths = ("#{Math.round 1 / count * 100}%" for n in [0...count])
+    @columnsWidths = (1 / count for n in [0...count])
+    @columnsPercentWidths = @columnsWidths.map @floatToPercent
 
   setColumnsWidths: (columnsWidths) ->
     restWidth = 1
@@ -89,7 +90,8 @@ class TableView extends View
     if wholeWidth > 1
       widths = widths.map (w) -> w * (1 / wholeWidth)
 
-    @columnsWidths = widths.map (w) -> "#{Math.round w * 100}%"
+    @columnsWidths = widths
+    @columnsPercentWidths = widths.map @floatToPercent
 
     @requestUpdate(true)
 
@@ -140,3 +142,5 @@ class TableView extends View
     @hasChanged = false
 
   asDisposable: (subscription) -> new Disposable -> subscription.off()
+
+  floatToPercent: (w) -> "#{Math.round w * 100}%"
