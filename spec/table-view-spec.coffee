@@ -7,7 +7,7 @@ Row = require '../lib/row'
 Cell = require '../lib/cell'
 
 describe 'TableView', ->
-  [tableView, table, nextAnimationFrame, noAnimationFrame] = []
+  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode] = []
 
   beforeEach ->
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
@@ -16,6 +16,7 @@ describe 'TableView', ->
     noAnimationFrame = -> throw new Error('No animation frame requested')
     nextAnimationFrame = noAnimationFrame
 
+    requestAnimationFrameSafe = window.requestAnimationFrame
     spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
       nextAnimationFrame = ->
         nextAnimationFrame = noAnimationFrame
@@ -34,22 +35,38 @@ describe 'TableView', ->
     tableView.setRowHeight 20
     tableView.setRowOverdraw 10
 
-    tableView.css
-      position: 'relative'
+    styleNode = $('body').append("""
+    <style>
+      .table-edit {
+        position: relative;
+      }
 
-    tableView.scrollView.css
-      position: 'absolute'
-      overflow: 'auto'
-      top: 27
-      bottom: 0
-      left: 0
-      right: 0
+      .scroll-view {
+        position: absolute;
+        overflow: auto;
+        top: 27px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .table-edit-content {
+        position: relative;
+      }
+
+      .table-edit-row {
+        position: absolute;
+      }
+    </style>
+    """).find('style')
 
     $('body').append(tableView)
 
     nextAnimationFrame()
 
   afterEach ->
+    window.requestAnimationFrame = requestAnimationFrameSafe
+    styleNode.remove()
     tableView.destroy()
 
   it 'holds a table', ->
