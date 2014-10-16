@@ -1,13 +1,18 @@
 {$} = require 'atom'
 
+path = require 'path'
+
 Table = require '../lib/table'
 TableView = require '../lib/table-view'
 Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 
+stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
+stylesheet = atom.themes.loadStylesheet(stylesheetPath)
+
 describe 'TableView', ->
-  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode] = []
+  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row] = []
 
   beforeEach ->
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
@@ -31,34 +36,16 @@ describe 'TableView', ->
       table.addRow ["row#{i}", Math.random() * 100]
 
     tableView = new TableView(table)
-    tableView.height 200
     tableView.setRowHeight 20
     tableView.setRowOverdraw 10
 
-    styleNode = $('body').append("""
-    <style>
+    styleNode = $('body').append("<style>
+      #{stylesheet}
+
       .table-edit {
-        position: relative;
+        height: 200px;
       }
-
-      .scroll-view {
-        position: absolute;
-        overflow: auto;
-        top: 27px;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
-
-      .table-edit-content {
-        position: relative;
-      }
-
-      .table-edit-row {
-        position: absolute;
-      }
-    </style>
-    """).find('style')
+    </style>").find('style')
 
     $('body').append(tableView)
 
