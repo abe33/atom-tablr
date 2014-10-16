@@ -111,3 +111,22 @@ describe 'TableView', ->
       expect(rows.length).toEqual(18)
       expect(rows.first().data('row-id')).toEqual(1)
       expect(rows.last().data('row-id')).toEqual(18)
+
+  describe 'when scrolled by 300px', ->
+    beforeEach ->
+      tableView.scrollTop(300)
+      nextAnimationFrame()
+
+    describe '::getFirstVisibleRow', ->
+      it 'returns 15', ->
+        expect(tableView.getFirstVisibleRow()).toEqual(15)
+
+    describe '::getLastVisibleRow', ->
+      it 'returns 23', ->
+        expect(tableView.getLastVisibleRow()).toEqual(23)
+
+    it 'renders new rows', ->
+      rows = tableView.find('.table-edit-row')
+      expect(rows.length).toEqual(28)
+      expect(rows.first().data('row-id')).toEqual(6)
+      expect(rows.last().data('row-id')).toEqual(33)
