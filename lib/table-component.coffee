@@ -7,10 +7,10 @@ module.exports = React.createClass
     lastRow: 0
     totalRows: 0
     rowHeight: 0
-    columnsWidth: []
+    columnsWidths: []
 
   render: ->
-    {firstRow, lastRow, rowHeight, columnsWidth} = @state
+    {firstRow, lastRow, rowHeight, columnsWidths} = @state
 
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
@@ -20,7 +20,7 @@ module.exports = React.createClass
           key: "cell-#{row}-#{i}"
           className: 'table-edit-column'
           style:
-            width: columnsWidth[i]
+            width: columnsWidths[i]
         }, cell.getValue()
 
       div {

@@ -31,9 +31,10 @@ describe 'TableView', ->
     table = new Table
     table.addColumn 'id'
     table.addColumn 'value'
+    table.addColumn 'foo'
 
     for i in [0...100]
-      table.addRow ["row#{i}", Math.random() * 100]
+      table.addRow ["row#{i}", Math.random() * 100, Math.random() > 0.5]
 
     tableView = new TableView(table)
     tableView.setRowHeight 20
@@ -84,12 +85,22 @@ describe 'TableView', ->
       cells = row.find('.table-edit-column')
 
     it 'has as many columns as the model row', ->
-      expect(cells.length).toEqual(2)
+      expect(cells.length).toEqual(3)
 
     describe 'without any columns layout data', ->
       it 'have cells that all have the same width', ->
         cells.each ->
-          expect(@clientWidth).toEqual(tableView.width() / 2)
+          expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -1)
+
+    describe 'with a columns layout defined', ->
+      describe 'with an array with enough values', ->
+        it 'modifies the columns widths', ->
+          tableView.setColumnsWidths([0.2, 0.3, 0.5])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -1)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -1)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -1)
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
@@ -131,5 +142,3 @@ describe 'TableView', ->
       expect(rows.length).toEqual(28)
       expect(rows.first().data('row-id')).toEqual(6)
       expect(rows.last().data('row-id')).toEqual(33)
-
-  describe 'setColumnsWidth', ->
