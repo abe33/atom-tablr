@@ -61,6 +61,12 @@ class TableView extends View
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
+  getColumnsAligns: ->
+    count = @table.getColumnsCount()
+    res = (@table.getColumn(col).align for col in [0...count])
+    console.log res
+    res
+
   hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
 
   getColumnsWidths: ->
@@ -173,6 +179,7 @@ class TableView extends View
       lastRow
       rowHeight: @getRowHeight()
       columnsWidths: @getColumnsWidths()
+      columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
     }
 

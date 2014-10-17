@@ -8,9 +8,10 @@ module.exports = React.createClass
     totalRows: 0
     rowHeight: 0
     columnsWidths: []
+    columnsAligns: []
 
   render: ->
-    {firstRow, lastRow, rowHeight, columnsWidths} = @state
+    {firstRow, lastRow, rowHeight, columnsWidths, columnsAligns} = @state
 
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
@@ -21,6 +22,7 @@ module.exports = React.createClass
           className: 'table-edit-cell'
           style:
             width: columnsWidths[i]
+            'text-align': columnsAligns[i] ? 'left'
         }, cell.getValue()
 
       div {

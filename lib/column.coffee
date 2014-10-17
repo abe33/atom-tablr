@@ -5,7 +5,7 @@ Identifiable = require './mixins/identifiable'
 module.exports =
 class Column
   Identifiable.includeInto(this)
-  PropertyAccessors.includeInto(this)  
+  PropertyAccessors.includeInto(this)
 
   @::accessor 'width', get: -> @options.width
   @::accessor 'align', get: -> @options.align
@@ -35,5 +35,16 @@ class Column
       option: 'width'
       oldValue: oldWidth
       newValue: newWidth
+      column: this
+    }
+
+  setAlign: (newAlign) ->
+    oldAlign = @align
+    @options.align = newAlign
+
+    @emitter.emit 'did-change-option', {
+      option: 'align'
+      oldValue: oldAlign
+      newValue: newAlign
       column: this
     }
