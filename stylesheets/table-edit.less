@@ -2,20 +2,20 @@
 
 .table-edit {
   position: relative;
+  -webkit-flex-direction: column;
+  display: -webkit-flex;
 
   .scroll-view {
     overflow-y: auto;
     overflow-x: hidden;
-    position: absolute;
-    bottom: 0;
-    top: 27px;
-    left: 0;
-    right: 0;
+    display: -webkit-flex;
+    -webkit-flex: 1;
   }
 }
 
 .table-edit-content {
   position: relative;
+  width: 100%;
 }
 
 .table-edit-row {
@@ -31,8 +31,8 @@
 }
 
 .table-edit-header {
+  display: -webkit-flex;
   height: 27px;
-  position: absolute;
   top: 0;
   left: 0;
   right: 0;
