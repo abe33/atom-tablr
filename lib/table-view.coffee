@@ -18,8 +18,12 @@ class TableView extends View
     @component = React.renderComponent(TableComponent(props), @scrollView[0])
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
+    @subscriptions.add @table.onDidAddColumn @onColumnAdded
+    @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
 
     @subscriptions.add @asDisposable @scrollView.on 'scroll', @requestUpdate
+
+    @subscribeToColumn(column) for column in @table.getColumns()
 
   destroy: ->
     @subscriptions.dispose()
@@ -57,14 +61,33 @@ class TableView extends View
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
+  hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
+
   getColumnsWidths: ->
     return @columnsPercentWidths if @columnsPercentWidths?
 
+    if @hasColumnWithWidth()
+      @columnsWidths = @getColumnsWidthsFromModel()
+      @columnsPercentWidths = @columnsWidths.map @floatToPercent
+    else
+      count = @table.getColumnsCount()
+      (1 / count for n in [0...count]).map @floatToPercent
+
+  getColumnsWidthsFromModel: ->
     count = @table.getColumnsCount()
-    @columnsWidths = (1 / count for n in [0...count])
-    @columnsPercentWidths = @columnsWidths.map @floatToPercent
+
+    widths = (@table.getColumn(col).width for col in [0...count])
+    @normalizeColumnsWidths(widths)
 
   setColumnsWidths: (columnsWidths) ->
+    widths = @normalizeColumnsWidths(columnsWidths)
+
+    @columnsWidths = widths
+    @columnsPercentWidths = widths.map @floatToPercent
+
+    @requestUpdate(true)
+
+  normalizeColumnsWidths: (columnsWidths) ->
     restWidth = 1
     wholeWidth = 0
     missingIndices = []
@@ -90,17 +113,26 @@ class TableView extends View
     if wholeWidth > 1
       widths = widths.map (w) -> w * (1 / wholeWidth)
 
-    @columnsWidths = widths
-    @columnsPercentWidths = widths.map @floatToPercent
+    widths
 
+  onColumnAdded: ({column}) ->
+    @subscribeToColumn(column)
     @requestUpdate(true)
 
-  scrollTop: (scroll) ->
-    if scroll?
-      @scrollView.scrollTop(scroll)
-      @requestUpdate()
+  onColumnRemoved: ({column}) ->
+    @unsubscribeFromColumn(column)
+    @requestUpdate(true)
 
-    @scrollView.scrollTop()
+  subscribeToColumn: (column) ->
+    @columnSubscriptions ?= {}
+    subscription = @columnSubscriptions[column.id] = new CompositeDisposable
+
+    subscription.add column.onDidChangeName => @requestUpdate(true)
+    subscription.add column.onDidChangeOption => @requestUpdate(true)
+
+  unsubscribeFromColumn: (column) ->
+    @columnSubscriptions[column.id]?.dispose()
+    delete @columnSubscriptions[column.id]
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
@@ -109,6 +141,13 @@ class TableView extends View
   #    ##     ## ##        ##     ## #########    ##    ##
   #    ##     ## ##        ##     ## ##     ##    ##    ##
   #     #######  ##        ########  ##     ##    ##    ########
+
+  scrollTop: (scroll) ->
+    if scroll?
+      @scrollView.scrollTop(scroll)
+      @requestUpdate()
+
+    @scrollView.scrollTop()
 
   requestUpdate: (forceUpdate=false) =>
     @hasChanged = forceUpdate

@@ -142,6 +142,31 @@ describe 'TableView', ->
           expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.25, -2)
           expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
 
+      describe "by setting the width on model's columns", ->
+        it 'uses the columns data', ->
+          table.getColumn(0).setWidth(0.2)
+          table.getColumn(1).setWidth(0.3)
+          table.getColumn(2).setWidth(0.5)
+
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.2, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.3, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.5, -2)
+
+      describe "from both the model's columns and in the view", ->
+        it 'uses the view data and fallback to the columns data if available', ->
+          table.getColumn(0).setWidth(0.2)
+          table.getColumn(1).setWidth(0.3)
+          table.getColumn(2).setWidth(0.5)
+
+          tableView.setColumnsWidths([0.8])
+          nextAnimationFrame()
+
+          expect(cells.first().width()).toBeCloseTo(tableView.width() * 0.8, -2)
+          expect(cells.eq(1).width()).toBeCloseTo(tableView.width() * 0.1, -2)
+          expect(cells.last().width()).toBeCloseTo(tableView.width() * 0.1, -2)
+
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
