@@ -8,20 +8,20 @@ class TableView extends View
   @content: ->
     @div class: 'table-edit', =>
       @table outlet: 'tableHeaderView', class: 'table-edit-header'
-      @div outlet: 'scrollView', class: 'scroll-view', =>
+      @div outlet: 'body', class: 'scroll-view', =>
 
   initialize: (@table) ->
     @subscriptions = new CompositeDisposable
     @scroll = 0
 
     props = {@table, parentView: this}
-    @component = React.renderComponent(TableComponent(props), @scrollView[0])
+    @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
     @subscriptions.add @table.onDidAddColumn @onColumnAdded
     @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
 
-    @subscriptions.add @asDisposable @scrollView.on 'scroll', @requestUpdate
+    @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
 
     @subscribeToColumn(column) for column in @table.getColumns()
 
@@ -46,12 +46,12 @@ class TableView extends View
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate(true)
 
   getFirstVisibleRow: ->
-    row = Math.floor(@scrollView.scrollTop() / @getRowHeight())
+    row = Math.floor(@body.scrollTop() / @getRowHeight())
 
   getLastVisibleRow: ->
-    scrollViewHeight = @scrollView.height()
+    scrollViewHeight = @body.height()
 
-    row = Math.floor((@scrollView.scrollTop() + scrollViewHeight) / @getRowHeight())
+    row = Math.floor((@body.scrollTop() + scrollViewHeight) / @getRowHeight())
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -151,10 +151,10 @@ class TableView extends View
 
   scrollTop: (scroll) ->
     if scroll?
-      @scrollView.scrollTop(scroll)
+      @body.scrollTop(scroll)
       @requestUpdate()
 
-    @scrollView.scrollTop()
+    @body.scrollTop()
 
   requestUpdate: (forceUpdate=false) =>
     @hasChanged = forceUpdate
@@ -175,7 +175,7 @@ class TableView extends View
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
 
-    @component.setState {
+    @bodyComponent.setState {
       firstRow
       lastRow
       rowHeight: @getRowHeight()
