@@ -45,7 +45,9 @@ class Row
     @accessor cell.getColumn().name,
       configurable: true
       get: -> cell.getValue()
-      set: (value) -> cell.setValue(value)
+      set: (value) ->
+        cell.setValue(value)
+        @table.rowUpdated(this)
 
   destroyCellAccessor: (cell) ->
     delete @[cell.getColumn().name]

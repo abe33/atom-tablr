@@ -6,9 +6,10 @@ class Cell
 
   constructor: ({@value, @column}) ->
     @initID()
-    
+
     @value ||= @column.options.default
     @value = null if typeof @value is 'undefined'
 
   getColumn: -> @column
   getValue: -> @value
+  setValue: (@value) ->

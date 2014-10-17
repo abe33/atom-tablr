@@ -221,6 +221,13 @@ class Table
 
     range
 
+  rowUpdated: (row) ->
+    index = @rows.indexOf(row)
+    @emitter.emit 'did-change-rows', {
+      oldRange: {start: index, end: index}
+      newRange: {start: index, end: index}
+    }
+
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
   #    ##       ##       ##       ##       ##

@@ -29,7 +29,7 @@ describe 'TableView', ->
 
   beforeEach ->
     table = new Table
-    table.addColumn 'id'
+    table.addColumn 'key'
     table.addColumn 'value'
     table.addColumn 'foo'
 
@@ -239,3 +239,57 @@ describe 'TableView', ->
       expect(rows.length).toEqual(28)
       expect(rows.first().data('row-id')).toEqual(6)
       expect(rows.last().data('row-id')).toEqual(33)
+
+  describe 'when the table rows are modified', ->
+    describe 'by adding one at the end', ->
+      it 'does not render new rows', ->
+        table.addRow ['foo', 'bar', 'baz']
+
+        nextAnimationFrame()
+
+        rows = tableView.find('.table-edit-row')
+        expect(rows.length).toEqual(18)
+        expect(rows.first().data('row-id')).toEqual(1)
+        expect(rows.last().data('row-id')).toEqual(18)
+
+    describe 'by adding one at the begining', ->
+      it 'updates the rows', ->
+        rows = tableView.find('.table-edit-row')
+        expect(rows.first().find('.table-edit-cell').first().text()).toEqual('row0')
+
+        table.addRowAt 0, ['foo', 'bar', 'baz']
+
+        nextAnimationFrame()
+
+        rows = tableView.find('.table-edit-row')
+        expect(rows.length).toEqual(18)
+        expect(rows.first().data('row-id')).toEqual(1)
+        expect(rows.first().find('.table-edit-cell').first().text()).toEqual('foo')
+        expect(rows.last().data('row-id')).toEqual(18)
+
+    describe 'by adding one in the middle', ->
+      it 'updates the rows', ->
+        rows = tableView.find('.table-edit-row')
+        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('row6')
+
+        table.addRowAt 6, ['foo', 'bar', 'baz']
+
+        nextAnimationFrame()
+
+        rows = tableView.find('.table-edit-row')
+        expect(rows.length).toEqual(18)
+        expect(rows.first().data('row-id')).toEqual(1)
+        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
+        expect(rows.last().data('row-id')).toEqual(18)
+
+    describe 'by updating the content of a row', ->
+      it 'update the rows', ->
+        rows = tableView.find('.table-edit-row')
+        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('row6')
+
+        table.getRow(6).key = 'foo'
+
+        nextAnimationFrame()
+
+        rows = tableView.find('.table-edit-row')
+        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
