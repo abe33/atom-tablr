@@ -146,7 +146,6 @@ describe 'TableView', ->
         it 'uses the columns data', ->
           table.getColumn(0).setWidth(0.2)
           table.getColumn(1).setWidth(0.3)
-          table.getColumn(2).setWidth(0.5)
 
           nextAnimationFrame()
 
@@ -158,7 +157,6 @@ describe 'TableView', ->
         it 'uses the view data and fallback to the columns data if available', ->
           table.getColumn(0).setWidth(0.2)
           table.getColumn(1).setWidth(0.3)
-          table.getColumn(2).setWidth(0.5)
 
           tableView.setColumnsWidths([0.8])
           nextAnimationFrame()
