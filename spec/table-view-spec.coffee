@@ -176,6 +176,28 @@ describe 'TableView', ->
           expect(cells.eq(1).css('text-align')).toEqual('center')
           expect(cells.last().css('text-align')).toEqual('left')
 
+      describe 'with alignements defined in the view', ->
+        it 'sets the cells text-alignement with the view data', ->
+          tableView.setColumnsAligns(['right', 'center'])
+          nextAnimationFrame()
+
+          expect(cells.first().css('text-align')).toEqual('right')
+          expect(cells.eq(1).css('text-align')).toEqual('center')
+          expect(cells.last().css('text-align')).toEqual('left')
+
+      describe 'with both alignements defined on the view and models', ->
+        it 'sets the cells text-alignement with the view data', ->
+          table.getColumn(0).setAlign('left')
+          table.getColumn(1).setAlign('right')
+          table.getColumn(2).setAlign('center')
+
+          tableView.setColumnsAligns(['right', 'center'])
+          nextAnimationFrame()
+
+          expect(cells.first().css('text-align')).toEqual('right')
+          expect(cells.eq(1).css('text-align')).toEqual('center')
+          expect(cells.last().css('text-align')).toEqual('center')
+
 
   describe 'when scrolled by 100px', ->
     beforeEach ->

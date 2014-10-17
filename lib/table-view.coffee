@@ -62,10 +62,11 @@ class TableView extends View
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
   getColumnsAligns: ->
-    count = @table.getColumnsCount()
-    res = (@table.getColumn(col).align for col in [0...count])
-    console.log res
-    res
+    [0...@table.getColumnsCount()].map (col) =>
+      @columnsAligns?[col] ? @table.getColumn(col).align
+
+  setColumnsAligns: (@columnsAligns) ->
+    @requestUpdate(true)
 
   hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
 
