@@ -57,16 +57,19 @@ describe 'TableView', ->
 
     nextAnimationFrame()
 
-  afterEach ->
-    window.requestAnimationFrame = requestAnimationFrameSafe
-    styleNode.remove()
-    tableView.destroy()
-
   it 'holds a table', ->
     expect(tableView.table).toEqual(table)
 
+  #     ######   #######  ##    ## ######## ######## ##    ## ########
+  #    ##    ## ##     ## ###   ##    ##    ##       ###   ##    ##
+  #    ##       ##     ## ####  ##    ##    ##       ####  ##    ##
+  #    ##       ##     ## ## ## ##    ##    ######   ## ## ##    ##
+  #    ##       ##     ## ##  ####    ##    ##       ##  ####    ##
+  #    ##    ## ##     ## ##   ###    ##    ##       ##   ###    ##
+  #     ######   #######  ##    ##    ##    ######## ##    ##    ##
+
   it 'has a scroll-view', ->
-    expect(tableView.scrollView).toBeDefined()
+    expect(tableView.find('.scroll-view').length).toEqual(1)
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
@@ -293,3 +296,27 @@ describe 'TableView', ->
 
         rows = tableView.find('.table-edit-row')
         expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
+
+  #    ##     ## ########    ###    ########  ######## ########
+  #    ##     ## ##         ## ##   ##     ## ##       ##     ##
+  #    ##     ## ##        ##   ##  ##     ## ##       ##     ##
+  #    ######### ######   ##     ## ##     ## ######   ########
+  #    ##     ## ##       ######### ##     ## ##       ##   ##
+  #    ##     ## ##       ##     ## ##     ## ##       ##    ##
+  #    ##     ## ######## ##     ## ########  ######## ##     ##
+
+  it 'has a header', ->
+    expect(tableView.find('.table-edit-header').length).toEqual(1)
+
+  describe 'header', ->
+    it 'has as many cell as there is columns in the table', ->
+      cells = tableView.find('.table-edit-header-cell')
+      expect(cells.length).toEqual(3)
+      expect(cells.first().text()).toEqual('key')
+      expect(cells.eq(1).text()).toEqual('value')
+      expect(cells.last().text()).toEqual('foo')
+
+  afterEach ->
+    window.requestAnimationFrame = requestAnimationFrameSafe
+    styleNode.remove()
+    tableView.destroy()

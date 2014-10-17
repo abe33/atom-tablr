@@ -2,12 +2,13 @@
 {CompositeDisposable, Disposable} = require 'event-kit'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
+TableHeaderComponent = require './table-header-component'
 
 module.exports =
 class TableView extends View
   @content: ->
     @div class: 'table-edit', =>
-      @table outlet: 'tableHeaderView', class: 'table-edit-header'
+      @div outlet: 'head', class: 'table-edit-header', =>
       @div outlet: 'body', class: 'scroll-view', =>
 
   initialize: (@table) ->
@@ -16,6 +17,7 @@ class TableView extends View
 
     props = {@table, parentView: this}
     @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
+    @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
     @subscriptions.add @table.onDidAddColumn @onColumnAdded
@@ -182,6 +184,10 @@ class TableView extends View
       columnsWidths: @getColumnsWidths()
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
+    }
+    @headComponent.setState {
+      columnsWidths: @getColumnsWidths()
+      columnsAligns: @getColumnsAligns()
     }
 
     @firstRenderedRow = firstRow
