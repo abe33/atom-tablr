@@ -320,6 +320,17 @@ describe 'TableView', ->
       expect(cells.eq(1).text()).toEqual('value')
       expect(cells.last().text()).toEqual('foo')
 
+    it 'has cells that have the same width as the body cells', ->
+      tableView.setColumnsWidths([0.2, 0.3, 0.5])
+      nextAnimationFrame()
+
+      cells = tableView.find('.table-edit-header-cell')
+      rowCells = tableView.find('.table-edit-row:first-child .table-edit-cell')
+
+      expect(cells.first().width()).toBeCloseTo(rowCells.first().width(), -2)
+      expect(cells.eq(1).width()).toBeCloseTo(rowCells.eq(1).width(), -2)
+      expect(cells.last().width()).toBeCloseTo(rowCells.last().width(), -2)
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
