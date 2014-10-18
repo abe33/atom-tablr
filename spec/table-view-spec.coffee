@@ -51,6 +51,10 @@ describe 'TableView', ->
         height: 200px;
         width: 400px;
       }
+
+      .table-edit-header {
+        height: 27px;
+      }
     </style>").find('style')
 
     $('body').append(tableView)
