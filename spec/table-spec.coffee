@@ -21,13 +21,13 @@ describe 'Table', ->
     it 'raises an exception', ->
       expect(-> table.addRow {}).toThrow()
 
-  #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
-  #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
-  #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
-  #    ##       ##     ## ##       ##     ## ## ### ## ## ## ##  ######
-  #    ##       ##     ## ##       ##     ## ##     ## ##  ####       ##
-  #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
-  #     ######   #######  ########  #######  ##     ## ##    ##  ######
+  #     ######   #######  ##        ######
+  #    ##    ## ##     ## ##       ##    ##
+  #    ##       ##     ## ##       ##
+  #    ##       ##     ## ##        ######
+  #    ##       ##     ## ##             ##
+  #    ##    ## ##     ## ##       ##    ##
+  #     ######   #######  ########  ######
 
   describe 'with columns added to the table', ->
     beforeEach ->
@@ -346,4 +346,18 @@ describe 'Table', ->
         expect(-> table.removeRowsInRange {start: 1}).toThrow()
         expect(-> table.removeRowsInRange [1]).toThrow()
 
-    describe '', ->
+  #    ##     ## ##    ## ########   #######
+  #    ##     ## ###   ## ##     ## ##     ##
+  #    ##     ## ####  ## ##     ## ##     ##
+  #    ##     ## ## ## ## ##     ## ##     ##
+  #    ##     ## ##  #### ##     ## ##     ##
+  #    ##     ## ##   ### ##     ## ##     ##
+  #     #######  ##    ## ########   #######
+
+  xdescribe 'transactions', ->
+    it 'reverts a column addition', ->
+      table.addColumn('key')
+
+      table.undo()
+
+      expect(table.getColumnsCount()).toEqual(0)
