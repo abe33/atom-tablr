@@ -138,7 +138,7 @@ class Table
   addRow: (values, batch=false) ->
     @addRowAt(@rows.length, values, batch)
 
-  addRowAt: (index, values={}, batch=false) ->
+  addRowAt: (index, values={}, batch=false, transaction=true) ->
     if index < 0
       throw new Error "Can't add column #{name} at index #{index}"
 
@@ -172,29 +172,35 @@ class Table
         newRange: {start: index, end: index+1}
       }
 
+    if not batch and transaction
+      @transaction
+        undo: -> @removeRowAt(index, false, false)
+        redo: -> @addRowAt(index, values, false, false)
+
     row
 
-  addRows: (rows) ->
-    index = @rows.length
-    rows.forEach (row) => @addRow(row, true)
+  addRows: (rows, transaction=true) ->
+    @addRowsAt(@rows.length, rows, transaction)
+
+  addRowsAt: (index, rows, transaction=true) ->
+    rows.forEach (row,i) => @addRowAt(index+i, row, true)
+
     @emitter.emit 'did-change-rows', {
       oldRange: {start: index, end: index}
       newRange: {start: index, end: index+rows.length}
     }
 
-  addRowsAt: (index, rows) ->
-    rows.forEach (row,i) => @addRowAt(index+i, row, true)
-    @emitter.emit 'did-change-rows', {
-      oldRange: {start: index, end: index}
-      newRange: {start: index, end: index+rows.length}
-    }
+    if transaction
+      @transaction
+        undo: -> @removeRowsInRange({start: index, end: index+rows.length}, false)
+        redo: -> @addRowsAt(index, rows, false)
 
   removeRow: (row, batch=false) ->
     throw new Error "Can't remove an undefined row" unless row?
 
     @removeRowAt(@rows.indexOf(row), batch)
 
-  removeRowAt: (index, batch=false) ->
+  removeRowAt: (index, batch=false, transaction=true) ->
     if index is -1 or index >= @rows.length
       throw new Error "Can't remove row at index #{index}"
 
@@ -208,16 +214,30 @@ class Table
         newRange: {start: index, end: index}
       }
 
-  removeRowsInRange: (range) ->
+    if not batch and transaction
+      values = row.getValues()
+      @transaction
+        undo: -> @addRowAt(index, values, false, false)
+        redo: -> @removeRowAt(index, false, false)
+
+  removeRowsInRange: (range, transaction=true) ->
     range = @rangeFrom(range)
 
+    rowsValues = []
+
     for i in [range.start...range.end]
+      rowsValues.push @rows[range.start].getValues()
       @removeRowAt(range.start, true)
 
     @emitter.emit 'did-change-rows', {
       oldRange: range
       newRange: {start: range.start, end: range.start}
     }
+
+    if transaction
+      @transaction
+        undo: -> @addRowsAt(range.start, rowsValues, false)
+        redo: -> @removeRowsInRange(range, false)
 
   extendExistingRows: (column, index) ->
     row.addCellAt index, new Cell {column} for row in @rows

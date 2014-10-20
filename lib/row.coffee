@@ -12,6 +12,8 @@ class Row
 
     @createCellAccessor(cell) for cell in @cells
 
+  getValues: ->  @cells.map (cell) -> cell.getValue()
+
   getCells: -> @cells
 
   getCell: (index) -> @cells[index]
