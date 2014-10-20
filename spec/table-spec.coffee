@@ -354,10 +354,15 @@ describe 'Table', ->
   #    ##     ## ##   ### ##     ## ##     ##
   #     #######  ##    ## ########   #######
 
-  xdescribe 'transactions', ->
+  describe 'transactions', ->
     it 'reverts a column addition', ->
       table.addColumn('key')
 
       table.undo()
 
       expect(table.getColumnsCount()).toEqual(0)
+
+      table.redo()
+
+      expect(table.getColumnsCount()).toEqual(1)
+      expect(table.getColumn(0).name).toEqual('key')

@@ -1,6 +1,7 @@
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 
 Identifiable = require './mixins/identifiable'
+Transactions = require './mixins/transactions'
 Column = require './column'
 Row = require './row'
 Cell = require './cell'
@@ -8,6 +9,7 @@ Cell = require './cell'
 module.exports =
 class Table
   Identifiable.includeInto(this)
+  Transactions.includeInto(this)
 
   constructor: (options={}) ->
     @initID()
@@ -71,11 +73,16 @@ class Table
     @extendExistingRows(column, index)
 
     if index >= @columns.length
+      index = @columns.length
       @columns.push column
     else
       @columns.splice index, 0, column
 
     @emitter.emit 'did-add-column', {column}
+
+    @transaction
+      undo: -> @removeColumnAt(index)
+      redo: -> @addColumnAt(index, name, options)
 
     column
 
