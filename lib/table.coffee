@@ -60,7 +60,7 @@ class Table
   addColumn: (name, options={}) ->
     @addColumnAt(@columns.length, name, options)
 
-  addColumnAt: (index, name, options={}) ->
+  addColumnAt: (index, name, options={}, transaction=true) ->
     if index < 0
       throw new Error "Can't add column #{name} at index #{index}"
 
@@ -80,9 +80,10 @@ class Table
 
     @emitter.emit 'did-add-column', {column}
 
-    @transaction
-      undo: -> @removeColumnAt(index)
-      redo: -> @addColumnAt(index, name, options)
+    if transaction
+      @transaction
+        undo: -> @removeColumnAt(index, false)
+        redo: -> @addColumnAt(index, name, options, false)
 
     column
 
@@ -91,7 +92,7 @@ class Table
 
     @removeColumnAt(@columns.indexOf(column))
 
-  removeColumnAt: (index) ->
+  removeColumnAt: (index, transaction=true) ->
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
@@ -100,6 +101,12 @@ class Table
     @columns.splice(index, 1)
     row.removeCellAt(index) for row in @rows
     @emitter.emit 'did-remove-column', {column}
+
+    if transaction
+      {name, options} = column
+      @transaction
+        undo: -> @addColumnAt(index, name, options, false)
+        redo: -> @removeColumnAt(index, false)
 
   subscribeToColumn: (column) ->
     subscriptions = @columnSubscriptions[column.id] = new CompositeDisposable

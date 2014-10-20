@@ -361,8 +361,30 @@ describe 'Table', ->
       table.undo()
 
       expect(table.getColumnsCount()).toEqual(0)
+      expect(table.commits.length).toEqual(0)
+      expect(table.rolledbackCommits.length).toEqual(1)
 
       table.redo()
 
+      expect(table.commits.length).toEqual(1)
+      expect(table.rolledbackCommits.length).toEqual(0)
       expect(table.getColumnsCount()).toEqual(1)
       expect(table.getColumn(0).name).toEqual('key')
+
+    it 'reverts a column deletion', ->
+      column = table.addColumn('key')
+
+      table.removeColumn(column)
+
+      table.undo()
+
+      expect(table.getColumnsCount()).toEqual(1)
+      expect(table.commits.length).toEqual(1)
+      expect(table.rolledbackCommits.length).toEqual(1)
+      expect(table.getColumn(0).name).toEqual('key')
+
+      table.redo()
+
+      expect(table.commits.length).toEqual(2)
+      expect(table.rolledbackCommits.length).toEqual(0)
+      expect(table.getColumnsCount()).toEqual(0)
