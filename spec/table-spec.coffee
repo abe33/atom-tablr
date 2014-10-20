@@ -355,7 +355,7 @@ describe 'Table', ->
   #     #######  ##    ## ########   #######
 
   describe 'transactions', ->
-    it 'reverts a column addition', ->
+    it 'rolls back a column addition', ->
       table.addColumn('key')
 
       table.undo()
@@ -371,7 +371,7 @@ describe 'Table', ->
       expect(table.getColumnsCount()).toEqual(1)
       expect(table.getColumn(0).name).toEqual('key')
 
-    it 'reverts a column deletion', ->
+    it 'rolls back a column deletion', ->
       column = table.addColumn('key')
 
       table.removeColumn(column)
