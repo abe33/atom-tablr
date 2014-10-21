@@ -7,10 +7,11 @@ class Column
   Identifiable.includeInto(this)
   PropertyAccessors.includeInto(this)
 
+  @::accessor 'name', get: -> @options.name
   @::accessor 'width', get: -> @options.width
   @::accessor 'align', get: -> @options.align
 
-  constructor: ({@name, @options}={options: {}}) ->
+  constructor: (@options={}) ->
     @initID()
 
     @emitter = new Emitter
@@ -23,28 +24,20 @@ class Column
 
   setName: (newName) ->
     oldName = @name
-    @name = newName
-
+    @setOption 'name', newName
     @emitter.emit 'did-change-name', {oldName, newName, column: this}
 
-  setWidth: (newWidth) ->
-    oldWidth = @width
-    @options.width = newWidth
+  setWidth: (newWidth) -> @setOption 'width', newWidth
+
+  setAlign: (newAlign) -> @setOption 'align', newAlign
+
+  setOption: (name, newValue) ->
+    oldValue = @[name]
+    @options[name] = newValue
 
     @emitter.emit 'did-change-option', {
-      option: 'width'
-      oldValue: oldWidth
-      newValue: newWidth
+      option: name
       column: this
-    }
-
-  setAlign: (newAlign) ->
-    oldAlign = @align
-    @options.align = newAlign
-
-    @emitter.emit 'did-change-option', {
-      option: 'align'
-      oldValue: oldAlign
-      newValue: newAlign
-      column: this
+      oldValue
+      newValue
     }

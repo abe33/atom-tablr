@@ -57,17 +57,23 @@ class Table
 
   getColumnsCount: -> @columns.length
 
-  addColumn: (name, options={}) ->
-    @addColumnAt(@columns.length, name, options)
+  addColumn: (name, options={}, transaction=true) ->
+    @addColumnAt(@columns.length, name, options, transaction)
 
   addColumnAt: (index, name, options={}, transaction=true) ->
     if index < 0
       throw new Error "Can't add column #{name} at index #{index}"
 
+    if typeof name is 'string'
+      options.name = name
+    else
+      [options, transaction] = [name, options]
+      {name} = options
+
     if name in @getColumnNames()
       throw new Error "Can't add column #{name} as one already exist"
 
-    column = new Column {name, options}
+    column = new Column options
 
     @subscribeToColumn(column)
     @extendExistingRows(column, index)
