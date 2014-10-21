@@ -7,9 +7,20 @@ class Column
   Identifiable.includeInto(this)
   PropertyAccessors.includeInto(this)
 
-  @::accessor 'name', get: -> @options.name
-  @::accessor 'width', get: -> @options.width
-  @::accessor 'align', get: -> @options.align
+  @::accessor 'name',
+    get: -> @options.name
+    set: (newName) ->
+      oldName = @name
+      @setOption 'name', newName
+      @emitter.emit 'did-change-name', {oldName, newName, column: this}
+
+  @::accessor 'width',
+    get: -> @options.width
+    set: (newWidth) -> @setOption 'width', newWidth
+
+  @::accessor 'align',
+    get: -> @options.align
+    set: (newAlign) -> @setOption 'align', newAlign
 
   constructor: (@options={}) ->
     @initID()
@@ -22,22 +33,14 @@ class Column
   onDidChangeOption: (callback) ->
     @emitter.on 'did-change-option', callback
 
-  setName: (newName) ->
-    oldName = @name
-    @setOption 'name', newName
-    @emitter.emit 'did-change-name', {oldName, newName, column: this}
-
-  setWidth: (newWidth) -> @setOption 'width', newWidth
-
-  setAlign: (newAlign) -> @setOption 'align', newAlign
-
-  setOption: (name, newValue) ->
+  setOption: (name, newValue, cancelEvent=false) ->
     oldValue = @[name]
     @options[name] = newValue
 
-    @emitter.emit 'did-change-option', {
-      option: name
-      column: this
-      oldValue
-      newValue
-    }
+    unless cancelEvent
+      @emitter.emit 'did-change-option', {
+        option: name
+        column: this
+        oldValue
+        newValue
+      }

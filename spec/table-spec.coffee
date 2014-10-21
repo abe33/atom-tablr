@@ -131,7 +131,7 @@ describe 'Table', ->
         row = table.addRow key: 'foo', value: 'bar'
         table.addRow key: 'oof', value: 'rab'
 
-        column.setName('content')
+        column.name = 'content'
 
       it 'changes the accessors on the existing rows', ->
         oldDescriptor = Object.getOwnPropertyDescriptor(row, 'value')

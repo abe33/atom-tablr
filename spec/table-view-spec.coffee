@@ -151,8 +151,8 @@ describe 'TableView', ->
 
       describe "by setting the width on model's columns", ->
         it 'uses the columns data', ->
-          table.getColumn(0).setWidth(0.2)
-          table.getColumn(1).setWidth(0.3)
+          table.getColumn(0).width = 0.2
+          table.getColumn(1).width = 0.3
 
           nextAnimationFrame()
 
@@ -162,8 +162,8 @@ describe 'TableView', ->
 
       describe "from both the model's columns and in the view", ->
         it 'uses the view data and fallback to the columns data if available', ->
-          table.getColumn(0).setWidth(0.2)
-          table.getColumn(1).setWidth(0.3)
+          table.getColumn(0).width = 0.2
+          table.getColumn(1).width = 0.3
 
           tableView.setColumnsWidths([0.8])
           nextAnimationFrame()
@@ -174,8 +174,8 @@ describe 'TableView', ->
 
       describe 'with alignements defined in the columns models', ->
         it 'sets the cells text-alignement using the model data', ->
-          table.getColumn(0).setAlign('right')
-          table.getColumn(1).setAlign('center')
+          table.getColumn(0).align = 'right'
+          table.getColumn(1).align = 'center'
 
           nextAnimationFrame()
 
@@ -194,9 +194,9 @@ describe 'TableView', ->
 
       describe 'with both alignements defined on the view and models', ->
         it 'sets the cells text-alignement with the view data', ->
-          table.getColumn(0).setAlign('left')
-          table.getColumn(1).setAlign('right')
-          table.getColumn(2).setAlign('center')
+          table.getColumn(0).align = 'left'
+          table.getColumn(1).align = 'right'
+          table.getColumn(2).align = 'center'
 
           tableView.setColumnsAligns(['right', 'center'])
           nextAnimationFrame()
