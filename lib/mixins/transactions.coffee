@@ -5,6 +5,8 @@ class Transactions extends Mixin
 
   transaction: (commit) ->
     @commits ?= []
+    @commits.shift() if @commits.length + 1 > @constructor.MAX_HISTORY_SIZE
+
     @rolledbackCommits = []
 
     @commits.push commit

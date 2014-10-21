@@ -11,6 +11,8 @@ class Table
   Identifiable.includeInto(this)
   Transactions.includeInto(this)
 
+  @MAX_HISTORY_SIZE: 100
+
   constructor: (options={}) ->
     @initID()
     @columns = []
@@ -149,6 +151,10 @@ class Table
   getRowsInRange: (range) ->
     range = @rangeFrom(range)
     @rows[range.start...range.end]
+
+  getFirstRow: -> @rows[0]
+
+  getLastRow: -> @rows[@rows.length - 1]
 
   addRow: (values, batch=false) ->
     @addRowAt(@rows.length, values, batch)

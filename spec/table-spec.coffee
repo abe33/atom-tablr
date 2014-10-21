@@ -363,6 +363,19 @@ describe 'Table', ->
   #     #######  ##    ## ########   #######
 
   describe 'transactions', ->
+    it 'drops old transactions when reaching the size limit', ->
+      Table.MAX_HISTORY_SIZE = 10
+
+      table.addColumn('foo')
+
+      table.addRow ["foo#{i}"] for i in [0...20]
+
+      expect(table.commits.length).toEqual(10)
+
+      table.undo()
+
+      expect(table.getLastRow().foo).toEqual('foo18')
+
     it 'rolls back a column addition', ->
       table.addColumn('key')
 
