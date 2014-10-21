@@ -270,12 +270,18 @@ class Table
 
     range
 
-  rowUpdated: (row) ->
+  rowUpdated: ({row, cell, newValue, oldValue, transaction}) ->
+    transaction ?= true
+
     index = @rows.indexOf(row)
     @emitter.emit 'did-change-rows', {
       oldRange: {start: index, end: index}
       newRange: {start: index, end: index}
     }
+    if transaction
+      @transaction
+        undo: -> row.setProperty(cell, oldValue, false)
+        redo: -> row.setProperty(cell, newValue, false)
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##

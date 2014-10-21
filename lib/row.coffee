@@ -44,12 +44,16 @@ class Row
     @cells.filter((cell) -> cell.getColumn().name is name)[0]
 
   createCellAccessor: (cell) ->
-    @accessor cell.getColumn().name,
+    name = cell.getColumn().name
+    @accessor name,
       configurable: true
       get: -> cell.getValue()
-      set: (value) ->
-        cell.setValue(value)
-        @table.rowUpdated(this)
+      set: (newValue) -> @setProperty(cell, newValue)
+
+  setProperty: (cell, newValue, transaction=true) ->
+    oldValue = cell.getValue()
+    cell.setValue(newValue)
+    @table.rowUpdated({row: this, cell, oldValue, newValue, transaction})
 
   destroyCellAccessor: (cell) ->
     delete @[cell.getColumn().name]
