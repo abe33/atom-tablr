@@ -40,6 +40,14 @@ describe 'Table', ->
     it 'returns the created column', ->
       expect(column).toEqual(table.getColumn(1))
 
+    it 'creates the column with a single object', ->
+      column = table.addColumn(name: 'foo', default: 'empty')
+      expect(table.getColumnsCount()).toEqual(3)
+      expect(column).toEqual(table.getColumn(2))
+
+    it 'raises an exception if the column does not have a name', ->
+      expect(-> table.addColumn({})).toThrow()
+
     it 'raises an exception when adding a column whose name already exist in table', ->
       expect(-> table.addColumn('key')).toThrow()
 

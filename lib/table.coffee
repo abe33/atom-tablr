@@ -70,6 +70,9 @@ class Table
       [options, transaction] = [name, options]
       {name} = options
 
+    unless name?
+      throw new Error "Can't add column without a name"
+
     if name in @getColumnNames()
       throw new Error "Can't add column #{name} as one already exist"
 
@@ -89,7 +92,7 @@ class Table
     if transaction
       @transaction
         undo: -> @removeColumnAt(index, false)
-        redo: -> @addColumnAt(index, name, options, false)
+        redo: -> @addColumnAt(index, options, false)
 
     column
 
