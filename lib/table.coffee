@@ -121,10 +121,16 @@ class Table
     subscriptions = @columnSubscriptions[column.id] = new CompositeDisposable
 
     subscriptions.add column.onDidChangeName @updateRowsColumnAccessor
+    subscriptions.add column.onDidChangeOption @registerColumnTransaction
 
   unsubscribeFromColumn: (column) ->
     @columnSubscriptions[column.id].dispose()
     delete @columnSubscriptions[column.id]
+
+  registerColumnTransaction: (change) =>
+    @transaction
+      undo: -> change.column.setOption(change.option, change.oldValue, true)
+      redo: -> change.column.setOption(change.option, change.newValue, true)
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##

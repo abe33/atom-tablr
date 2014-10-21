@@ -400,7 +400,7 @@ describe 'Table', ->
     describe 'with columns in the table', ->
       beforeEach ->
         table.addColumn('key')
-        table.addColumn('value', default: 'empty')
+        column = table.addColumn('value', default: 'empty')
 
       it 'rolls back a row addition', ->
         table.addRow ['foo', 'bar']
@@ -483,3 +483,20 @@ describe 'Table', ->
         expect(table.commits.length).toEqual(4)
         expect(table.rolledbackCommits.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
+
+      it 'rolls back a change in a column', ->
+        column.name = 'foo'
+
+        table.undo()
+
+        expect(column.name).toEqual('value')
+
+        expect(table.commits.length).toEqual(2)
+        expect(table.rolledbackCommits.length).toEqual(1)
+
+        table.redo()
+
+        expect(column.name).toEqual('foo')
+
+        expect(table.commits.length).toEqual(3)
+        expect(table.rolledbackCommits.length).toEqual(0)
