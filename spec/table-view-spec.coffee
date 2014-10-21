@@ -331,6 +331,14 @@ describe 'TableView', ->
       expect(cells.eq(1).width()).toBeCloseTo(rowCells.eq(1).width(), -2)
       expect(cells.last().width()).toBeCloseTo(rowCells.last().width(), -2)
 
+  #     ######   #######  ##    ## ######## ########   #######  ##
+  #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
+  #    ##       ##     ## ####  ##    ##    ##     ## ##     ## ##
+  #    ##       ##     ## ## ## ##    ##    ########  ##     ## ##
+  #    ##       ##     ## ##  ####    ##    ##   ##   ##     ## ##
+  #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
+  #     ######   #######  ##    ##    ##    ##     ##  #######  ########
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
