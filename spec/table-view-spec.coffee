@@ -36,8 +36,8 @@ describe 'TableView', ->
     for i in [0...100]
       table.addRow [
         "row#{i}"
-        Math.random() * 100
-        if Math.random() > 0.5 then 'yes' else 'no'
+        i * 100
+        if i % 2 is 0 then 'yes' else 'no'
       ]
 
     tableView = new TableView(table)
@@ -338,6 +338,51 @@ describe 'TableView', ->
   #    ##       ##     ## ##  ####    ##    ##   ##   ##     ## ##
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
+
+  it 'has a cell under focus', ->
+    activeCell = tableView.getActiveCell()
+    expect(activeCell).toBeDefined()
+    expect(activeCell.getValue()).toEqual('row0')
+
+  describe '::moveRight', ->
+    it 'moves the active cell cursor to the right', ->
+      tableView.moveRight()
+
+      expect(tableView.getActiveCell().getValue()).toEqual(0)
+
+      tableView.moveRight()
+
+      expect(tableView.getActiveCell().getValue()).toEqual('yes')
+
+    it 'moves the active cell to the next row when on last cell of a row', ->
+      tableView.moveRight()
+      tableView.moveRight()
+      tableView.moveRight()
+      expect(tableView.getActiveCell().getValue()).toEqual('row1')
+
+    it 'moves the active cell to the first row when on last cell of last row', ->
+      tableView.activeCellPosition.row = 99
+      tableView.activeCellPosition.column = 2
+
+      tableView.moveRight()
+      expect(tableView.getActiveCell().getValue()).toEqual('row0')
+
+  describe '::moveLeft', ->
+    it 'moves the active cell to the last cell when on the first cell', ->
+      tableView.moveLeft()
+      expect(tableView.getActiveCell().getValue()).toEqual('no')
+
+    it 'moves the active cell cursor to the left', ->
+      tableView.moveRight()
+      tableView.moveLeft()
+      expect(tableView.getActiveCell().getValue()).toEqual('row0')
+
+    it 'moves the active cell cursor to the upper row', ->
+      tableView.moveRight()
+      tableView.moveRight()
+      tableView.moveRight()
+      tableView.moveLeft()
+      expect(tableView.getActiveCell().getValue()).toEqual('yes')
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

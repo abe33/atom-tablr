@@ -1,4 +1,4 @@
-{View} = require 'atom'
+{View, Point} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
@@ -12,8 +12,9 @@ class TableView extends View
       @div outlet: 'body', class: 'scroll-view', =>
 
   initialize: (@table) ->
-    @subscriptions = new CompositeDisposable
     @scroll = 0
+    @activeCellPosition = new Point
+    @subscriptions = new CompositeDisposable
 
     props = {@table, parentView: this}
     @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
@@ -142,6 +143,48 @@ class TableView extends View
   unsubscribeFromColumn: (column) ->
     @columnSubscriptions[column.id]?.dispose()
     delete @columnSubscriptions[column.id]
+
+  #     ######  ######## ##       ##        ######
+  #    ##    ## ##       ##       ##       ##    ##
+  #    ##       ##       ##       ##       ##
+  #    ##       ######   ##       ##        ######
+  #    ##       ##       ##       ##             ##
+  #    ##    ## ##       ##       ##       ##    ##
+  #     ######  ######## ######## ########  ######
+
+  getActiveCell: ->
+    @table.cellAtPosition(@activeCellPosition)
+
+  #     ######   #######  ##    ## ######## ########   #######  ##
+  #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
+  #    ##       ##     ## ####  ##    ##    ##     ## ##     ## ##
+  #    ##       ##     ## ## ## ##    ##    ########  ##     ## ##
+  #    ##       ##     ## ##  ####    ##    ##   ##   ##     ## ##
+  #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
+  #     ######   #######  ##    ##    ##    ##     ##  #######  ########
+
+  moveRight: ->
+    if @activeCellPosition.column + 1 < @table.getColumnsCount()
+      @activeCellPosition.column++
+    else
+      @activeCellPosition.column = 0
+
+      if @activeCellPosition.row + 1 < @table.getRowsCount()
+        @activeCellPosition.row++
+      else
+        @activeCellPosition.row = 0
+
+  moveLeft: ->
+    if @activeCellPosition.column - 1 >= 0
+      @activeCellPosition.column--
+    else
+      @activeCellPosition.column = @table.getColumnsCount() - 1
+
+      if @activeCellPosition.row - 1 >= 0
+        @activeCellPosition.row--
+      else
+        @activeCellPosition.row = @table.getRowsCount() - 1
+
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
