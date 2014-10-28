@@ -1,5 +1,5 @@
+{Point} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
-
 Identifiable = require './mixins/identifiable'
 Transactions = require './mixins/transactions'
 Column = require './column'
@@ -301,3 +301,19 @@ class Table
     @rows.reduce ((cells, row) -> cells.concat row.getCells()), []
 
   getCellsCount: -> @getCells().length
+
+  cellAtPosition: (position) ->
+    unless position?
+      throw new Error "Table::cellAtPosition called without a position"
+
+    position = Point.fromObject(position)
+    @getRow(position.row)?.getCell(position.column)
+
+  positionOfCell: (cell) ->
+    unless cell?
+      throw new Error "Table::positionOfCell called without a cell"
+
+    row = @rows.indexOf(cell.row)
+    column = cell.row.cells.indexOf(cell)
+
+    {row, column}

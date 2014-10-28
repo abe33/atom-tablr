@@ -45,6 +45,7 @@ class Row
 
   createCellAccessor: (cell) ->
     name = cell.getColumn().name
+    cell.row = this
     @accessor name,
       configurable: true
       get: -> cell.getValue()

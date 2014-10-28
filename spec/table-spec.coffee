@@ -1,3 +1,4 @@
+{Point} = require 'atom'
 Table = require '../lib/table'
 Column = require '../lib/column'
 Row = require '../lib/row'
@@ -353,6 +354,51 @@ describe 'Table', ->
       it 'throws an error with an invalid range', ->
         expect(-> table.removeRowsInRange {start: 1}).toThrow()
         expect(-> table.removeRowsInRange [1]).toThrow()
+
+  #     ######  ######## ##       ##        ######
+  #    ##    ## ##       ##       ##       ##    ##
+  #    ##       ##       ##       ##       ##
+  #    ##       ######   ##       ##        ######
+  #    ##       ##       ##       ##             ##
+  #    ##    ## ##       ##       ##       ##    ##
+  #     ######  ######## ######## ########  ######
+
+  describe '::cellAtPosition', ->
+    beforeEach ->
+      table.addColumn('name')
+      table.addColumn('age')
+
+      table.addRow(['John Doe', 30])
+      table.addRow(['Jane Doe', 30])
+
+    it 'returns the cell at the given position array', ->
+      expect(table.cellAtPosition([1,0]).getValue()).toEqual('Jane Doe')
+
+    it 'returns the cell at the given position object', ->
+      expect(table.cellAtPosition(row: 1, column: 0).getValue()).toEqual('Jane Doe')
+
+    it 'throws an error without a position', ->
+      expect(-> table.cellAtPosition()).toThrow()
+
+    it 'returns undefined with a position out of bounds', ->
+      expect(table.cellAtPosition(row: 2, column: 0)).toBeUndefined()
+      expect(table.cellAtPosition(row: 0, column: 2)).toBeUndefined()
+
+  describe '::positionOfCell', ->
+    beforeEach ->
+      table.addColumn('name')
+      table.addColumn('age')
+
+      table.addRow(['John Doe', 30])
+      table.addRow(['Jane Doe', 30])
+
+    it 'returns the position of the cell', ->
+      cell = table.cellAtPosition([1,1])
+
+      expect(table.positionOfCell(cell)).toEqual(row: 1, column: 1)
+
+    it 'throws an error without a cell', ->
+      expect(-> table.positionOfCell()).toThrow()
 
   #    ##     ## ##    ## ########   #######
   #    ##     ## ###   ## ##     ## ##     ##
