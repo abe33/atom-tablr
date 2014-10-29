@@ -339,10 +339,15 @@ describe 'TableView', ->
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
-  it 'has a cell under focus', ->
+  it 'has an active cell', ->
     activeCell = tableView.getActiveCell()
     expect(activeCell).toBeDefined()
     expect(activeCell.getValue()).toEqual('row0')
+
+  it 'renders the active cell using a class', ->
+    expect(tableView.find('.table-edit-row.active').length).toEqual(1)
+    expect(tableView.find('.table-edit-cell.active').length).toEqual(1)
+    expect(tableView.find('.table-edit-header-cell.active').length).toEqual(1)
 
   describe '::moveRight', ->
     it 'moves the active cell cursor to the right', ->

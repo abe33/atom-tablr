@@ -7,13 +7,16 @@ module.exports = React.createClass
     columnsAligns: []
 
   render: ->
-    {table} = @props
+    {table, parentView} = @props
     {columnsWidths, columnsAligns} = @state
 
     cells = []
     for column,index in table.getColumns()
+      classes = ['table-edit-header-cell']
+      classes.push 'active' if parentView.isActiveColumn(index)
+      
       cells.push div {
-        className: 'table-edit-header-cell'
+        className: classes.join(' ')
         style:
           width: columnsWidths[index]
           'text-align': columnsAligns[index] ? 'left'

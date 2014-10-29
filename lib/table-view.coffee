@@ -56,6 +56,8 @@ class TableView extends View
 
     row = Math.floor((@body.scrollTop() + scrollViewHeight) / @getRowHeight())
 
+  isActiveRow: (row) -> @activeCellPosition.row is row
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -63,6 +65,8 @@ class TableView extends View
   #    ##       ##     ## ##       ##     ## ##     ## ##  ####       ##
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
+
+  isActiveColumn: (column) -> @activeCellPosition.column is column
 
   getColumnsAligns: ->
     [0...@table.getColumnsCount()].map (col) =>
@@ -154,6 +158,8 @@ class TableView extends View
 
   getActiveCell: ->
     @table.cellAtPosition(@activeCellPosition)
+
+  isActiveCell: (cell) -> @getActiveCell() is cell
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##

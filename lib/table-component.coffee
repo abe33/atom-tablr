@@ -12,22 +12,28 @@ module.exports = React.createClass
 
   render: ->
     {firstRow, lastRow, rowHeight, columnsWidths, columnsAligns} = @state
+    {parentView} = @props
 
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
       columns = []
       rowData.eachCell (cell,i) ->
+        classes = ['table-edit-cell']
+        classes.push 'active' if parentView.isActiveCell(cell)
         columns.push div {
           key: "cell-#{row}-#{i}"
-          className: 'table-edit-cell'
+          className: classes.join(' ')
           style:
             width: columnsWidths[i]
             'text-align': columnsAligns[i] ? 'left'
         }, cell.getValue()
 
+      classes = ['table-edit-row']
+      classes.push 'active' if parentView.isActiveRow(row)
+
       div {
         key: "row-#{row}"
-        className: 'table-edit-row'
+        className: classes.join(' ')
         'data-row-id': row + 1
         style:
           height: "#{rowHeight}px"
