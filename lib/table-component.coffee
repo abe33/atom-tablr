@@ -19,7 +19,10 @@ module.exports = React.createClass
       columns = []
       rowData.eachCell (cell,i) ->
         classes = ['table-edit-cell']
-        classes.push 'active' if parentView.isActiveCell(cell)
+        if parentView.isActiveCell(cell)
+          classes.push 'active'
+        else if parentView.isActiveColumn(i)
+          classes.push 'active-column'
         columns.push div {
           key: "cell-#{row}-#{i}"
           className: classes.join(' ')
