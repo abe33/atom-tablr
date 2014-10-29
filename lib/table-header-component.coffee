@@ -14,8 +14,9 @@ module.exports = React.createClass
     for column,index in table.getColumns()
       classes = ['table-edit-header-cell']
       classes.push 'active' if parentView.isActiveColumn(index)
-      
+
       cells.push div {
+        key: "header-cell-#{index}"
         className: classes.join(' ')
         style:
           width: columnsWidths[index]
