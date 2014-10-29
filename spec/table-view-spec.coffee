@@ -360,8 +360,8 @@ describe 'TableView', ->
     expect(activeCell.getValue()).toEqual('row0')
 
   it 'renders the active cell using a class', ->
-    expect(tableView.find('.table-edit-header-cell.active').length).toEqual(1)
-    expect(tableView.find('.table-edit-row.active').length).toEqual(1)
+    expect(tableView.find('.table-edit-header-cell.active-column').length).toEqual(1)
+    expect(tableView.find('.table-edit-row.active-row').length).toEqual(1)
     expect(tableView.find('.table-edit-cell.active').length).toEqual(1)
     expect(tableView.find('.table-edit-cell.active-column').length)
     .toBeGreaterThan(1)

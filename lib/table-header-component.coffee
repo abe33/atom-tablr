@@ -13,7 +13,7 @@ module.exports = React.createClass
     cells = []
     for column,index in table.getColumns()
       classes = ['table-edit-header-cell']
-      classes.push 'active' if parentView.isActiveColumn(index)
+      classes.push 'active-column' if parentView.isActiveColumn(index)
 
       cells.push div {
         key: "header-cell-#{index}"

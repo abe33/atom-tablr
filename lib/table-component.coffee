@@ -32,7 +32,7 @@ module.exports = React.createClass
         }, cell.getValue()
 
       classes = ['table-edit-row']
-      classes.push 'active' if parentView.isActiveRow(row)
+      classes.push 'active-row' if parentView.isActiveRow(row)
 
       div {
         key: "row-#{row}"
