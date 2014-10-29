@@ -31,7 +31,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
     @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
-    @subscriptions.add @asDisposable @on 'mousedown', =>
+    @subscriptions.add @asDisposable @on 'mousedown', (e) =>
+      e.preventDefault()
       @hiddenInput.focus() unless document.activeElement is @hiddenInput.element
 
     @subscribeToColumn(column) for column in @table.getColumns()
