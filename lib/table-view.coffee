@@ -274,4 +274,4 @@ class TableView extends View
 
   asDisposable: (subscription) -> new Disposable -> subscription.off()
 
-  floatToPercent: (w) -> "#{Math.round w * 100}%"
+  floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
