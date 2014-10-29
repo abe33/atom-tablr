@@ -367,6 +367,13 @@ describe 'TableView', ->
     .toBeGreaterThan(1)
 
   describe '::moveRight', ->
+    it 'requests an update', ->
+      spyOn(tableView, 'requestUpdate')
+      tableView.moveRight()
+
+      expect(tableView.requestUpdate).toHaveBeenCalled()
+      expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
+
     it 'is triggered on core:move-right', ->
       spyOn(tableView, 'moveRight')
 
@@ -397,6 +404,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('row0')
 
   describe '::moveLeft', ->
+    it 'requests an update', ->
+      spyOn(tableView, 'requestUpdate')
+      tableView.moveLeft()
+
+      expect(tableView.requestUpdate).toHaveBeenCalled()
+      expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
+
     it 'is triggered on core:move-left', ->
       spyOn(tableView, 'moveLeft')
 
@@ -421,6 +435,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('yes')
 
   describe '::moveUp', ->
+    it 'requests an update', ->
+      spyOn(tableView, 'requestUpdate')
+      tableView.moveUp()
+
+      expect(tableView.requestUpdate).toHaveBeenCalled()
+      expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
+
     it 'is triggered on core:move-up', ->
       spyOn(tableView, 'moveUp')
 
@@ -439,6 +460,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('row9')
 
   describe '::moveDown', ->
+    it 'requests an update', ->
+      spyOn(tableView, 'requestUpdate')
+      tableView.moveDown()
+
+      expect(tableView.requestUpdate).toHaveBeenCalled()
+      expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
+
     it 'is triggered on core:move-down', ->
       spyOn(tableView, 'moveDown')
 
