@@ -8,6 +8,7 @@ module.exports =
 class TableView extends View
   @content: ->
     @div class: 'table-edit', =>
+      @input type: 'text', class: 'hidden-input', outlet: 'hiddenInput'
       @div outlet: 'head', class: 'table-edit-header', =>
       @div outlet: 'body', class: 'scroll-view', =>
 
@@ -25,6 +26,13 @@ class TableView extends View
     @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
 
     @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
+
+    @subscriptions.add @asDisposable @on 'core:move-left', => @moveLeft()
+    @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
+    @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
+    @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
+    @subscriptions.add @asDisposable @on 'mousedown', =>
+      @hiddenInput.focus() unless document.activeElement is @hiddenInput.element
 
     @subscribeToColumn(column) for column in @table.getColumns()
 

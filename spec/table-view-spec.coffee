@@ -339,6 +339,21 @@ describe 'TableView', ->
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
+  it 'gains focus when mouse is pressed on the table view', ->
+    tableView.mousedown()
+
+    expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+  it 'does not focus the hidden input twice when multiple press occurs', ->
+    spyOn(tableView.hiddenInput, 'focus').andCallThrough()
+
+    tableView.mousedown()
+    tableView.mousedown()
+
+    expect(tableView.hiddenInput.focus).toHaveBeenCalled()
+    expect(tableView.hiddenInput.focus.calls.length).toEqual(1)
+    expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
   it 'has an active cell', ->
     activeCell = tableView.getActiveCell()
     expect(activeCell).toBeDefined()
@@ -352,6 +367,13 @@ describe 'TableView', ->
     .toBeGreaterThan(1)
 
   describe '::moveRight', ->
+    it 'is triggered on core:move-right', ->
+      spyOn(tableView, 'moveRight')
+
+      tableView.trigger('core:move-right')
+
+      expect(tableView.moveRight).toHaveBeenCalled()
+
     it 'moves the active cell cursor to the right', ->
       tableView.moveRight()
 
@@ -375,6 +397,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('row0')
 
   describe '::moveLeft', ->
+    it 'is triggered on core:move-left', ->
+      spyOn(tableView, 'moveLeft')
+
+      tableView.trigger('core:move-left')
+
+      expect(tableView.moveLeft).toHaveBeenCalled()
+
     it 'moves the active cell to the last cell when on the first cell', ->
       tableView.moveLeft()
       expect(tableView.getActiveCell().getValue()).toEqual('no')
@@ -392,6 +421,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('yes')
 
   describe '::moveUp', ->
+    it 'is triggered on core:move-up', ->
+      spyOn(tableView, 'moveUp')
+
+      tableView.trigger('core:move-up')
+
+      expect(tableView.moveUp).toHaveBeenCalled()
+
     it 'moves the active cell to the last row when on the first row', ->
       tableView.moveUp()
       expect(tableView.getActiveCell().getValue()).toEqual('row99')
@@ -403,6 +439,13 @@ describe 'TableView', ->
       expect(tableView.getActiveCell().getValue()).toEqual('row9')
 
   describe '::moveDown', ->
+    it 'is triggered on core:move-down', ->
+      spyOn(tableView, 'moveDown')
+
+      tableView.trigger('core:move-down')
+
+      expect(tableView.moveDown).toHaveBeenCalled()
+
     it 'moves the active cell to the row below', ->
       tableView.moveDown()
       expect(tableView.getActiveCell().getValue()).toEqual('row1')
