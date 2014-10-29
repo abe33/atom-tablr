@@ -25,7 +25,7 @@ module.exports =
       tableView.addClass('demo overlay from-top').height(300)
       atom.workspaceView.append(tableView)
 
-      tableView.on 'core:cancel', -> console.log 'canceled'
+      tableView.on 'core:cancel', -> tableView.destroy()
 
   deactivate: ->
 
