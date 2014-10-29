@@ -40,6 +40,16 @@
   float: left;
   text-overflow: ellipsis;
   overflow: hidden;
+  height: 100%;
+}
+
+.table-edit-row.active, .table-edit-cell.active-column, .table-edit-header-cell.active {
+  background: @background-color-highlight;
+}
+
+
+.table-edit-cell.active {
+  background: @background-color-highlight;
 }
 
 .table-edit-header {
