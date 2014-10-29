@@ -391,6 +391,28 @@ describe 'TableView', ->
       tableView.moveLeft()
       expect(tableView.getActiveCell().getValue()).toEqual('yes')
 
+  describe '::moveUp', ->
+    it 'moves the active cell to the last row when on the first row', ->
+      tableView.moveUp()
+      expect(tableView.getActiveCell().getValue()).toEqual('row99')
+
+    it 'moves the active cell on the upper row', ->
+      tableView.activeCellPosition.row = 10
+
+      tableView.moveUp()
+      expect(tableView.getActiveCell().getValue()).toEqual('row9')
+
+  describe '::moveDown', ->
+    it 'moves the active cell to the row below', ->
+      tableView.moveDown()
+      expect(tableView.getActiveCell().getValue()).toEqual('row1')
+
+    it 'moves the active cell to the first row when on the last row', ->
+      tableView.activeCellPosition.row = 99
+
+      tableView.moveDown()
+      expect(tableView.getActiveCell().getValue()).toEqual('row0')
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()

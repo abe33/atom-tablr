@@ -191,6 +191,18 @@ class TableView extends View
       else
         @activeCellPosition.row = @table.getRowsCount() - 1
 
+  moveUp: ->
+    if @activeCellPosition.row - 1 >= 0
+      @activeCellPosition.row--
+    else
+      @activeCellPosition.row = @table.getRowsCount() - 1
+
+  moveDown: ->
+    if @activeCellPosition.row + 1 < @table.getRowsCount()
+      @activeCellPosition.row++
+    else
+      @activeCellPosition.row = 0
+
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
