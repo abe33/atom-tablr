@@ -67,6 +67,25 @@ class TableView extends View
 
   isActiveRow: (row) -> @activeCellPosition.row is row
 
+  makeRowVisible: (row) ->
+    rowHeight = @getRowHeight()
+    scrollViewHeight = @body.height()
+    currentScrollTop = @body.scrollTop()
+
+    scrollTopAsFirstVisibleRow = row * rowHeight
+    scrollTopAsLastVisibleRow = row * rowHeight - (scrollViewHeight - rowHeight)
+
+    return if scrollTopAsFirstVisibleRow >= currentScrollTop and
+              scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
+
+    difAsFirstVisibleRow = Math.abs(currentScrollTop - scrollTopAsFirstVisibleRow)
+    difAsLastVisibleRow = Math.abs(currentScrollTop - scrollTopAsLastVisibleRow)
+
+    if difAsLastVisibleRow < difAsFirstVisibleRow
+      @body.scrollTop(scrollTopAsLastVisibleRow)
+    else
+      @body.scrollTop(scrollTopAsFirstVisibleRow)
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -190,6 +209,7 @@ class TableView extends View
         @activeCellPosition.row = 0
 
     @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
 
   moveLeft: ->
     if @activeCellPosition.column - 1 >= 0
@@ -203,6 +223,7 @@ class TableView extends View
         @activeCellPosition.row = @table.getRowsCount() - 1
 
     @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
 
   moveUp: ->
     if @activeCellPosition.row - 1 >= 0
@@ -211,6 +232,7 @@ class TableView extends View
       @activeCellPosition.row = @table.getRowsCount() - 1
 
     @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
 
   moveDown: ->
     if @activeCellPosition.row + 1 < @table.getRowsCount()
@@ -219,6 +241,7 @@ class TableView extends View
       @activeCellPosition.row = 0
 
     @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
 
 
   #    ##     ## ########  ########     ###    ######## ########

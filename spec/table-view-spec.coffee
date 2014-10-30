@@ -484,6 +484,12 @@ describe 'TableView', ->
       tableView.moveDown()
       expect(tableView.getActiveCell().getValue()).toEqual('row0')
 
+  describe '::makeRowVisible', ->
+    it 'scrolls the view until the passed-on row become visible', ->
+      tableView.makeRowVisible(50)
+
+      expect(tableView.body.scrollTop()).toEqual(847)
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
