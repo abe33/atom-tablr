@@ -27,6 +27,8 @@ module.exports =
 
       tableView.on 'core:cancel', -> tableView.destroy()
 
+      tableView.focus()
+
   deactivate: ->
 
   serialize: ->
