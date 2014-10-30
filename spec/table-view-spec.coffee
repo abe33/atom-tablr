@@ -374,6 +374,12 @@ describe 'TableView', ->
       expect(tableView.requestUpdate).toHaveBeenCalled()
       expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
 
+    it 'attempts to make the active row visible', ->
+      spyOn(tableView, 'makeRowVisible')
+      tableView.moveRight()
+
+      expect(tableView.makeRowVisible).toHaveBeenCalled()
+
     it 'is triggered on core:move-right', ->
       spyOn(tableView, 'moveRight')
 
@@ -411,6 +417,12 @@ describe 'TableView', ->
       expect(tableView.requestUpdate).toHaveBeenCalled()
       expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
 
+    it 'attempts to make the active row visible', ->
+      spyOn(tableView, 'makeRowVisible')
+      tableView.moveLeft()
+
+      expect(tableView.makeRowVisible).toHaveBeenCalled()
+
     it 'is triggered on core:move-left', ->
       spyOn(tableView, 'moveLeft')
 
@@ -442,6 +454,12 @@ describe 'TableView', ->
       expect(tableView.requestUpdate).toHaveBeenCalled()
       expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
 
+    it 'attempts to make the active row visible', ->
+      spyOn(tableView, 'makeRowVisible')
+      tableView.moveUp()
+
+      expect(tableView.makeRowVisible).toHaveBeenCalled()
+
     it 'is triggered on core:move-up', ->
       spyOn(tableView, 'moveUp')
 
@@ -466,6 +484,12 @@ describe 'TableView', ->
 
       expect(tableView.requestUpdate).toHaveBeenCalled()
       expect(tableView.requestUpdate.calls[0].args[0]).toBeTruthy()
+
+    it 'attempts to make the active row visible', ->
+      spyOn(tableView, 'makeRowVisible')
+      tableView.moveDown()
+
+      expect(tableView.makeRowVisible).toHaveBeenCalled()
 
     it 'is triggered on core:move-down', ->
       spyOn(tableView, 'moveDown')
