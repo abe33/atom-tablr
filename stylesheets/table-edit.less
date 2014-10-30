@@ -41,15 +41,23 @@
   text-overflow: ellipsis;
   overflow: hidden;
   height: 100%;
+  padding: 3px 6px;
 }
 
-.table-edit-row.active-row, .table-edit-cell.active-column, .table-edit-header-cell.active-column {
-  background: @background-color-highlight;
+.table-edit-row.active-row {
+  background: fadeout(@background-color-success, 95%)
+}
+.table-edit-cell.active-column, .table-edit-header-cell.active-column {
+  background: fadeout(@background-color-error, 95%)
 }
 
+.table-edit-header-cell.active-column {
+  color: @text-color-selected;
+}
 
 .table-edit-cell.active {
-  background: @background-color-highlight;
+  background: fadeout(@background-color-warning, 90%);
+  color: @text-color-selected;
 }
 
 .table-edit-header {
