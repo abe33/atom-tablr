@@ -8,8 +8,8 @@ module.exports =
 
       table = new Table
       table.addColumn 'key'
-      table.addColumn 'value'
-      table.addColumn 'foo'
+      table.addColumn 'value', align: 'right'
+      table.addColumn 'foo', align: 'right'
 
       for i in [0...100]
         table.addRow [
