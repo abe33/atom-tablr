@@ -2,13 +2,13 @@
 module.exports =
 
   activate: (state) ->
-    atom.workspaceView.command 'table-edit:demo', => @open()
+    atom.workspaceView.command 'table-edit:demo', => @openDemo()
 
   deactivate: ->
 
   serialize: ->
 
-  open: ->
+  openDemo: ->
     Table = require './table'
     TableView = require './table-view'
 
