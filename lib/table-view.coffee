@@ -33,7 +33,12 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
       e.preventDefault()
+
+      if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
+        @activateCellAtPosition position
+
       @focus()
+
 
     @subscribeToColumn(column) for column in @table.getColumns()
 
@@ -188,6 +193,39 @@ class TableView extends View
     @table.cellAtPosition(@activeCellPosition)
 
   isActiveCell: (cell) -> @getActiveCell() is cell
+
+  activateCell: (cell) ->
+    @activateCellAtPosition(@table.positionOfCell(cell))
+
+  activateCellAtPosition: (position) ->
+    return unless position?
+
+    position = Point.fromObject(position)
+
+    @activeCellPosition = position
+    @requestUpdate(true)
+    @makeRowVisible(position.row)
+
+  cellPositionAtScreenPosition: (x,y) ->
+    return unless x? and y?
+
+    bodyWidth = @body.width()
+    bodyOffset = @body.offset()
+    bodyScrollTop = @body.scrollTop()
+
+    x -= bodyOffset.left
+    y -= bodyOffset.top
+
+    row = Math.floor((bodyScrollTop + y) / @getRowHeight())
+
+    columnsWidths = @getColumnsWidthsFromModel()
+    column = -1
+    pad = 0
+    while pad <= x
+      pad += columnsWidths[column+1] * bodyWidth
+      column++
+
+    {row, column}
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##

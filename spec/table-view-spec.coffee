@@ -344,6 +344,19 @@ describe 'TableView', ->
 
     expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
 
+  it 'activates the cell under the mouse when pressed', ->
+    cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
+    offset = cell.offset()
+    event = $.Event "mousedown", {
+      which: 1
+      pageX: offset.left + 5
+      pageY: offset.top + 5
+    }
+
+    cell.trigger(event)
+
+    expect(tableView.getActiveCell().getValue()).toEqual('no')
+
   it 'does not focus the hidden input twice when multiple press occurs', ->
     spyOn(tableView.hiddenInput, 'focus').andCallThrough()
 
