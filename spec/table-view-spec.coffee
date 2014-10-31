@@ -349,7 +349,7 @@ describe 'TableView', ->
     offset = cell.offset()
     event = $.Event "mousedown", {
       which: 1
-      pageX: offset.left + 5
+      pageX: offset.left + 50
       pageY: offset.top + 5
     }
 
