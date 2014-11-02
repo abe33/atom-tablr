@@ -10,6 +10,7 @@
     overflow-x: hidden;
     display: -webkit-flex;
     -webkit-flex: 1;
+    border: 1px solid @background-color-highlight;
   }
 
   .hidden-input {
@@ -25,6 +26,10 @@
   }
 }
 
+.table-edit-header {
+  border: 1px solid @background-color-highlight;
+}
+
 .table-edit-content, .table-edit-header-row {
   position: relative;
   width: 100%;
@@ -34,14 +39,25 @@
   position: absolute;
   overflow: hidden;
   width: 100%;
+  border-top: 1px solid @background-color-highlight;
+
+  &:first-child {
+    border-top: none;
+  }
 }
 
 .table-edit-cell, .table-edit-header-cell {
   float: left;
+  font-size: 13px;
   text-overflow: ellipsis;
   overflow: hidden;
   height: 100%;
-  padding: 3px 6px;
+  padding: 4px 6px;
+  border-left: 1px solid @background-color-highlight;
+
+  &:first-child {
+    border-left: none;
+  }
 }
 
 .table-edit-row.active-row {
