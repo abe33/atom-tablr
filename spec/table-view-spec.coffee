@@ -525,7 +525,7 @@ describe 'TableView', ->
     it 'scrolls the view until the passed-on row become visible', ->
       tableView.makeRowVisible(50)
 
-      expect(tableView.body.scrollTop()).toEqual(847)
+      expect(tableView.body.scrollTop()).toEqual(849)
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
