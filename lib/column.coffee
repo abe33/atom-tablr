@@ -1,6 +1,7 @@
 {Emitter} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 Identifiable = require './mixins/identifiable'
+CellComponent = require './cell-component'
 
 module.exports =
 class Column
@@ -23,7 +24,7 @@ class Column
     set: (newAlign) -> @setOption 'align', newAlign
 
   @::accessor 'componentClass',
-    get: -> @options.componentClass
+    get: -> @options.componentClass or CellComponent
     set: (newComponentClass) -> @setOption 'componentClass', newComponentClass
 
   constructor: (@options={}) ->

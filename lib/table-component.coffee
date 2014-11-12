@@ -1,6 +1,5 @@
 React = require 'react-atom-fork'
 {div} = require 'reactionary-atom-fork'
-CellComponent = require './cell-component'
 
 module.exports = React.createClass
   getInitialState: ->
@@ -20,7 +19,6 @@ module.exports = React.createClass
       cells = []
 
       rowData.eachCell (cell,i) ->
-        componentClass = cell.column.componentClass or CellComponent
 
         classes = ['table-edit-cell']
         if parentView.isActiveCell(cell)
@@ -28,7 +26,7 @@ module.exports = React.createClass
         else if parentView.isActiveColumn(i)
           classes.push 'active-column'
 
-        cells.push new componentClass({
+        cells.push new cell.column.componentClass({
           parentView
           row
           cell
