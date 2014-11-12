@@ -3,6 +3,7 @@ module.exports =
 
   activate: (state) ->
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
+    @openDemo()
 
   deactivate: ->
 

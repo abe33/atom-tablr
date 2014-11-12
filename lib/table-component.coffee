@@ -1,5 +1,6 @@
 React = require 'react-atom-fork'
 {div} = require 'reactionary-atom-fork'
+CellComponent = require './cell-component'
 
 module.exports = React.createClass
   getInitialState: ->
@@ -16,20 +17,17 @@ module.exports = React.createClass
 
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
-      columns = []
+      cells = []
+
       rowData.eachCell (cell,i) ->
-        classes = ['table-edit-cell']
-        if parentView.isActiveCell(cell)
-          classes.push 'active'
-        else if parentView.isActiveColumn(i)
-          classes.push 'active-column'
-        columns.push div {
-          key: "cell-#{row}-#{i}"
-          className: classes.join(' ')
-          style:
-            width: columnsWidths[i]
-            'text-align': columnsAligns[i] ? 'left'
-        }, cell.getValue()
+        cells.push new CellComponent({
+          parentView
+          row
+          cell
+          index: i
+          columnWidth: columnsWidths[i]
+          columnAlign: columnsAligns[i]
+        })
 
       classes = ['table-edit-row']
       classes.push 'active-row' if parentView.isActiveRow(row)
@@ -41,7 +39,7 @@ module.exports = React.createClass
         style:
           height: "#{rowHeight}px"
           top: "#{row * rowHeight}px"
-      }, columns
+      }, cells
 
     div {
       className: 'table-edit-content'
