@@ -21,10 +21,18 @@ module.exports = React.createClass
 
       rowData.eachCell (cell,i) ->
         componentClass = cell.column.componentClass or CellComponent
+
+        classes = ['table-edit-cell']
+        if parentView.isActiveCell(cell)
+          classes.push 'active'
+        else if parentView.isActiveColumn(i)
+          classes.push 'active-column'
+
         cells.push new componentClass({
           parentView
           row
           cell
+          classes
           index: i
           columnWidth: columnsWidths[i]
           columnAlign: columnsAligns[i]

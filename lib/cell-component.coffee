@@ -6,13 +6,7 @@ module.exports = React.createClass
     {}
 
   render: ->
-    {row, cell, index, columnWidth, columnAlign, parentView} = @props
-
-    classes = ['table-edit-cell']
-    if parentView.isActiveCell(cell)
-      classes.push 'active'
-    else if parentView.isActiveColumn(index)
-      classes.push 'active-column'
+    {row, cell, index, columnWidth, columnAlign, classes} = @props
 
     div {
       key: "cell-#{row}-#{index}"
