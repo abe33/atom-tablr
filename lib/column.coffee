@@ -22,6 +22,10 @@ class Column
     get: -> @options.align
     set: (newAlign) -> @setOption 'align', newAlign
 
+  @::accessor 'componentClass',
+    get: -> @options.componentClass
+    set: (newComponentClass) -> @setOption 'componentClass', newComponentClass
+
   constructor: (@options={}) ->
     @initID()
 

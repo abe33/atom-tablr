@@ -7,6 +7,7 @@ TableView = require '../lib/table-view'
 Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
+CustomCellComponent = require './fixtures/custom-cell-component'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
@@ -205,6 +206,13 @@ describe 'TableView', ->
           expect(cells.eq(1).css('text-align')).toEqual('center')
           expect(cells.last().css('text-align')).toEqual('center')
 
+    describe 'with a custom cell renderer defined on a column', ->
+      it 'uses the provided renderer to render the columns cells', ->
+        table.getColumn(2).componentClass = CustomCellComponent
+
+        nextAnimationFrame()
+
+        expect(tableView.find('.table-edit-row:first-child .table-edit-cell:last-child').text()).toEqual('foo: yes')
 
   describe 'when scrolled by 100px', ->
     beforeEach ->

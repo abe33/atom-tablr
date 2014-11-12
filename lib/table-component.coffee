@@ -20,7 +20,8 @@ module.exports = React.createClass
       cells = []
 
       rowData.eachCell (cell,i) ->
-        cells.push new CellComponent({
+        componentClass = cell.column.componentClass or CellComponent
+        cells.push new componentClass({
           parentView
           row
           cell
