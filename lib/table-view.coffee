@@ -1,4 +1,4 @@
-{View, Point} = require 'atom'
+{View, Point, TextEditorView} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
@@ -27,6 +27,7 @@ class TableView extends View
 
     @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
 
+    @subscriptions.add @asDisposable @on 'core:confirm', => @startEdit()
     @subscriptions.add @asDisposable @on 'core:move-left', => @moveLeft()
     @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
@@ -206,6 +207,17 @@ class TableView extends View
     @requestUpdate(true)
     @makeRowVisible(position.row)
 
+  cellScreenPosition: (position) ->
+    position = Point.fromObject(position)
+    widths = @getColumnsWidths()
+    pad = 0
+    widths.map (v) ->
+      res = pad + v
+      pad += v
+      res
+
+    top: position.top * @getRowHeight(), left: widths[position.left]
+
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
@@ -283,6 +295,33 @@ class TableView extends View
 
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
+
+  #    ######## ########  #### ########
+  #    ##       ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ######   ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ######## ########  ####    ##
+
+  startEdit: =>
+    @createEditView() unless @editView?
+
+    activeCell = @find('.table-edit-cell.active')
+    activeCellOffset = @cellScreenPosition(@activateCellAtPosition)
+
+    console.log activeCellOffset
+
+    @editView.css(
+      top: activeCellOffset.top + 'px'
+      left: activeCellOffset.left + 'px'
+    )
+    .width(activeCell.width())
+    .height(activeCell.height())
+
+  createEditView: ->
+    @editView = new TextEditorView({})
+    @find('.table-edit-content').append(@editView)
 
 
   #    ##     ## ########  ########     ###    ######## ########

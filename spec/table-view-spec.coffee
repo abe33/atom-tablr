@@ -535,6 +535,29 @@ describe 'TableView', ->
 
       expect(tableView.body.scrollTop()).toEqual(849)
 
+  #    ######## ########  #### ########
+  #    ##       ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ######   ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ##       ##     ##  ##     ##
+  #    ######## ########  ####    ##
+
+  describe '::startEdit', ->
+    it 'opens a text editor above the active cell', ->
+      tableView.startEdit()
+      cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
+      cellOffset = cell.offset()
+
+      editor = tableView.find('.editor:visible')
+      editorOffset = editor.offset()
+
+      expect(editor.length).toEqual(1)
+      expect(editorOffset.top).toEqual(cellOffset.top)
+      expect(editorOffset.left).toEqual(cellOffset.left)
+      expect(editor.width()).toEqual(cell.width())
+      expect(editor.height()).toEqual(cell.height())
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
