@@ -339,7 +339,7 @@ class TableView extends View
   startEdit: =>
     @createEditView() unless @editView?
 
-    activeCell = @find('.table-edit-cell.active')
+    activeCell = @table.cellAtPosition(@activeCellPosition)
     activeCellRect = @cellScreenRect(@activeCellPosition)
 
     @editView.css(
@@ -349,6 +349,8 @@ class TableView extends View
     .width(activeCellRect.width)
     .height(activeCellRect.height)
     .focus()
+
+    @editView.getModel().getBuffer().setText(activeCell.getValue())
 
   createEditView: ->
     @editView = new TextEditorView({})
