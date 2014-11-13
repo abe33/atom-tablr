@@ -553,10 +553,10 @@ describe 'TableView', ->
       editorOffset = editor.offset()
 
       expect(editor.length).toEqual(1)
-      expect(editorOffset.top).toEqual(cellOffset.top)
-      expect(editorOffset.left).toEqual(cellOffset.left)
-      expect(editor.width()).toEqual(cell.width())
-      expect(editor.height()).toEqual(cell.height())
+      expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
+      expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
+      expect(editor.outerWidth()).toEqual(cell.outerWidth())
+      expect(editor.outerHeight()).toEqual(cell.outerHeight())
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

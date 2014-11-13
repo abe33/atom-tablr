@@ -40,6 +40,9 @@ class TableView extends View
 
       @focus()
 
+    @subscriptions.add @asDisposable @on 'editor:attached', (e) ->
+      e.stopImmediatePropagation()
+      return false
 
     @subscribeToColumn(column) for column in @table.getColumns()
 
@@ -127,6 +130,19 @@ class TableView extends View
     widths = (@table.getColumn(col).width for col in [0...count])
     @normalizeColumnsWidths(widths)
 
+  getColumnsScreenWidths: ->
+    @getColumnsWidthsFromModel().map (v) => v * @body.width()
+
+  getColumnsScreenMargins: ->
+    widths = @getColumnsWidthsFromModel()
+    pad = 0
+    margins = widths.map (v) =>
+      res = pad
+      pad += v * @body.width()
+      res
+
+    margins
+
   setColumnsWidths: (columnsWidths) ->
     widths = @normalizeColumnsWidths(columnsWidths)
 
@@ -207,16 +223,32 @@ class TableView extends View
     @requestUpdate(true)
     @makeRowVisible(position.row)
 
-  cellScreenPosition: (position) ->
-    position = Point.fromObject(position)
-    widths = @getColumnsWidths()
-    pad = 0
-    widths.map (v) ->
-      res = pad + v
-      pad += v
-      res
+  cellScreenRect: (position) ->
+    {top, left} = @cellScreenPosition(position)
+    widths = @getColumnsScreenWidths()
 
-    top: position.top * @getRowHeight(), left: widths[position.left]
+    width = widths[position.column]
+    height = @getRowHeight()
+
+    {top, left, width, height}
+
+  cellScreenPosition: (position) ->
+    {top, left} = @cellScrollPosition(position)
+
+    contentOffset = @body.offset()
+
+    {
+      top: top + contentOffset.top - @body.scrollTop(),
+      left: left + contentOffset.left
+    }
+
+  cellScrollPosition: (position) ->
+    position = Point.fromObject(position)
+    margins = @getColumnsScreenMargins()
+    {
+      top: position.row * @getRowHeight()
+      left: margins[position.column]
+    }
 
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
@@ -308,21 +340,18 @@ class TableView extends View
     @createEditView() unless @editView?
 
     activeCell = @find('.table-edit-cell.active')
-    activeCellOffset = @cellScreenPosition(@activateCellAtPosition)
-
-    console.log activeCellOffset
+    activeCellRect = @cellScreenRect(@activeCellPosition)
 
     @editView.css(
-      top: activeCellOffset.top + 'px'
-      left: activeCellOffset.left + 'px'
+      top: activeCellRect.top + 'px'
+      left: activeCellRect.left + 'px'
     )
-    .width(activeCell.width())
-    .height(activeCell.height())
+    .width(activeCellRect.width)
+    .height(activeCellRect.height)
 
   createEditView: ->
     @editView = new TextEditorView({})
-    @find('.table-edit-content').append(@editView)
-
+    @append(@editView)
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
