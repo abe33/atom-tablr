@@ -544,8 +544,10 @@ describe 'TableView', ->
   #    ######## ########  ####    ##
 
   describe '::startEdit', ->
-    it 'opens a text editor above the active cell', ->
+    beforeEach ->
       tableView.startEdit()
+
+    it 'opens a text editor above the active cell', ->
       cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
       cellOffset = cell.offset()
 
@@ -557,6 +559,10 @@ describe 'TableView', ->
       expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
       expect(editor.outerWidth()).toEqual(cell.outerWidth())
       expect(editor.outerHeight()).toEqual(cell.outerHeight())
+
+    it 'gives the focus to the editor', ->
+      editor = tableView.find('.editor:visible')
+      expect(editor.is('.is-focused')).toBeTruthy()
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

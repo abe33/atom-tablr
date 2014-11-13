@@ -348,6 +348,7 @@ class TableView extends View
     )
     .width(activeCellRect.width)
     .height(activeCellRect.height)
+    .focus()
 
   createEditView: ->
     @editView = new TextEditorView({})
