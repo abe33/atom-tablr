@@ -335,7 +335,7 @@ class TableView extends View
   startEdit: =>
     @createEditView() unless @editView?
 
-    activeCell = @table.cellAtPosition(@activeCellPosition)
+    activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
 
     @editView.css(
