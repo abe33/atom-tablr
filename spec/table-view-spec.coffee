@@ -557,10 +557,10 @@ describe 'TableView', ->
       editorOffset = editor.offset()
 
       expect(editor.length).toEqual(1)
-      expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
-      expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
-      expect(editor.outerWidth()).toEqual(cell.outerWidth())
-      expect(editor.outerHeight()).toEqual(cell.outerHeight())
+      expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
+      expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
+      expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -1)
+      expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -1)
 
     it 'gives the focus to the editor', ->
       expect(editor.is('.is-focused')).toBeTruthy()
