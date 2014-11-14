@@ -557,8 +557,8 @@ describe 'TableView', ->
       editorOffset = editor.offset()
 
       expect(editor.length).toEqual(1)
-      expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
-      expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
+      expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
+      expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
       expect(editor.outerWidth()).toEqual(cell.outerWidth())
       expect(editor.outerHeight()).toEqual(cell.outerHeight())
 
