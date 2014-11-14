@@ -35,6 +35,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
       e.preventDefault()
 
+      @stopEdit() if @isEditing()
+
       if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
         @activateCellAtPosition position
 
@@ -332,8 +334,12 @@ class TableView extends View
   #    ##       ##     ##  ##     ##
   #    ######## ########  ####    ##
 
+  isEditing: -> @editing
+
   startEdit: =>
     @createEditView() unless @editView?
+
+    @editing = true
 
     activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
@@ -351,6 +357,7 @@ class TableView extends View
     @editView.setText(activeCell.getValue().toString())
 
   stopEdit: ->
+    @editing = false
     @editView.hide()
     @focus()
 

@@ -618,6 +618,20 @@ describe 'TableView', ->
           expect(tableView.getActiveCell().getValue()).toEqual('row0')
           expect(tableView.getActiveCell().setValue).not.toHaveBeenCalled()
 
+    describe 'clicking on another cell', ->
+      beforeEach ->
+        cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
+        offset = cell.offset()
+        event = $.Event "mousedown", {
+          which: 1
+          pageX: offset.left + 50
+          pageY: offset.top + 5
+        }
+
+        cell.trigger(event)
+
+      it 'closes the editor', ->
+        expect(tableView.isEditing()).toBeFalsy()
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
