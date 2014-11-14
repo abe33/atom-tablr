@@ -40,10 +40,6 @@ class TableView extends View
 
       @focus()
 
-    @subscriptions.add @asDisposable @on 'editor:attached', (e) ->
-      e.stopImmediatePropagation()
-      return false
-
     @subscribeToColumn(column) for column in @table.getColumns()
 
   destroy: ->
@@ -351,7 +347,7 @@ class TableView extends View
     .show()
 
     @editView.find('.hidden-input').focus()
-    
+
     @editView.getModel().getBuffer().setText(activeCell.getValue().toString())
 
   stopEdit: ->
