@@ -7,3 +7,7 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
+
+'.table-edit atom-text-editor':
+  'enter': 'core:confirm'
+  'cmd-enter': 'editor:newline'
