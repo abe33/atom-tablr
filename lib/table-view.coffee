@@ -348,7 +348,7 @@ class TableView extends View
 
     @editView.find('.hidden-input').focus()
 
-    @editView.getModel().getBuffer().setText(activeCell.getValue().toString())
+    @editView.setText(activeCell.getValue().toString())
 
   stopEdit: ->
     @editView.hide()

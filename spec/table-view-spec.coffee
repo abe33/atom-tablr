@@ -548,7 +548,7 @@ describe 'TableView', ->
 
     beforeEach ->
       tableView.startEdit()
-      editor = tableView.find('.editor')
+      editor = tableView.find('.editor').view()
 
     it 'opens a text editor above the active cell', ->
       cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
@@ -566,7 +566,7 @@ describe 'TableView', ->
       expect(editor.is('.is-focused')).toBeTruthy()
 
     it 'fills the editor with the cell value', ->
-      expect(editor.element.getModel().getBuffer().getText()).toEqual('row0')
+      expect(editor.getText()).toEqual('row0')
 
   describe 'with an editor opened', ->
     [editor] = []
