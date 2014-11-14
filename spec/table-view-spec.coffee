@@ -573,7 +573,7 @@ describe 'TableView', ->
 
     beforeEach ->
       tableView.startEdit()
-      editor = tableView.find('.editor')
+      editor = tableView.find('.editor').view()
 
     describe 'core:cancel', ->
       beforeEach ->
@@ -584,6 +584,40 @@ describe 'TableView', ->
 
       it 'gives the focus back to the table view', ->
         expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+      it 'leaves the cell value as is', ->
+        expect(tableView.getActiveCell().getValue()).toEqual('row0')
+
+    describe 'core:confirm', ->
+      describe 'when the content of the editor has changed', ->
+        beforeEach ->
+          editor.setText('foobar')
+          editor.trigger('core:confirm')
+
+        it 'closes the editor', ->
+          expect(tableView.find('.editor:visible').length).toEqual(0)
+
+        it 'gives the focus back to the table view', ->
+          expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+        it 'changes the cell value', ->
+          expect(tableView.getActiveCell().getValue()).toEqual('foobar')
+
+      describe 'when the content of the editor did not changed', ->
+        beforeEach ->
+          spyOn(tableView.getActiveCell(), 'setValue').andCallThrough()
+          editor.trigger('core:confirm')
+
+        it 'closes the editor', ->
+          expect(tableView.find('.editor:visible').length).toEqual(0)
+
+        it 'gives the focus back to the table view', ->
+          expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+        it 'leaves the cell value as is', ->
+          expect(tableView.getActiveCell().getValue()).toEqual('row0')
+          expect(tableView.getActiveCell().setValue).not.toHaveBeenCalled()
+
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

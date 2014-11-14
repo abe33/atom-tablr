@@ -363,7 +363,18 @@ class TableView extends View
     @subscriptions.add @asDisposable editorView.on 'core:cancel', (e) =>
       @stopEdit()
       e.stopImmediatePropagation()
-      false
+      return false
+
+    @subscriptions.add @asDisposable editorView.on 'core:confirm', (e) =>
+      @stopEdit()
+      e.stopImmediatePropagation()
+
+      activeCell = @getActiveCell()
+      newValue = @editView.getText()
+      activeCell.setValue(newValue) unless newValue is activeCell.getValue()
+
+      return false
+
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
