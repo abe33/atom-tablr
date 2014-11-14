@@ -34,11 +34,14 @@ class Row
     else
       @cells.splice index, 0, cell
 
+    cell.row = this
     @createCellAccessor(cell)
 
   removeCellAt: (index) ->
-    @destroyCellAccessor(@cells[index])
+    cell = @cells[index]
+    @destroyCellAccessor(cell)
     @cells.splice(index, 1)
+    delete cell.row
 
   cellByColumnName: (name) ->
     @cells.filter((cell) -> cell.getColumn().name is name)[0]
@@ -52,8 +55,9 @@ class Row
       set: (newValue) -> @setProperty(cell, newValue)
 
   setProperty: (cell, newValue, transaction=true) ->
-    oldValue = cell.getValue()
-    cell.setValue(newValue)
+    cell.setValue(newValue, transaction)
+
+  cellUpdated: (cell, oldValue, newValue, transaction=true) ->
     @table.rowUpdated({row: this, cell, oldValue, newValue, transaction})
 
   destroyCellAccessor: (cell) ->

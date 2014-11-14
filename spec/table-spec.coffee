@@ -583,3 +583,27 @@ describe 'Table', ->
         expect(table.rolledbackCommits.length).toEqual(0)
 
         expect(row.key).toEqual('hello')
+
+      it 'rolls back a change in a cell data', ->
+        table.addRows [
+          ['foo', 'bar']
+          ['bar', 'baz']
+        ]
+
+        cell = table.cellAtPosition([0, 0])
+
+        cell.setValue 'hello'
+
+        table.undo()
+
+        expect(table.commits.length).toEqual(3)
+        expect(table.rolledbackCommits.length).toEqual(1)
+
+        expect(cell.getValue()).toEqual('foo')
+
+        table.redo()
+
+        expect(table.commits.length).toEqual(4)
+        expect(table.rolledbackCommits.length).toEqual(0)
+
+        expect(cell.getValue()).toEqual('hello')

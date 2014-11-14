@@ -12,4 +12,8 @@ class Cell
 
   getColumn: -> @column
   getValue: -> @value
-  setValue: (@value) ->
+  setValue: (newValue, transaction=true) ->
+    oldValue = @value
+    @value = newValue
+
+    @row?.cellUpdated(this, oldValue, newValue, transaction)
