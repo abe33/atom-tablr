@@ -568,6 +568,23 @@ describe 'TableView', ->
     it 'fills the editor with the cell value', ->
       expect(editor.element.getModel().getBuffer().getText()).toEqual('row0')
 
+  describe 'with an editor opened', ->
+    [editor] = []
+
+    beforeEach ->
+      tableView.startEdit()
+      editor = tableView.find('.editor')
+
+    describe 'core:cancel', ->
+      beforeEach ->
+        editor.trigger('core:cancel')
+
+      it 'closes the editor', ->
+        expect(tableView.find('.editor:visible').length).toEqual(0)
+
+      it 'gives the focus back to the table view', ->
+        expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()

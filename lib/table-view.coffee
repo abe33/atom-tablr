@@ -15,12 +15,12 @@ class TableView extends View
   initialize: (@table) ->
     @scroll = 0
     @activeCellPosition = new Point
-    @subscriptions = new CompositeDisposable
 
     props = {@table, parentView: this}
     @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
     @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
 
+    @subscriptions = new CompositeDisposable
     @subscriptions.add @table.onDidChangeRows @requestUpdate
     @subscriptions.add @table.onDidAddColumn @onColumnAdded
     @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
@@ -348,13 +348,26 @@ class TableView extends View
     )
     .width(activeCellRect.width)
     .height(activeCellRect.height)
-    .focus()
+    .show()
 
-    @editView.getModel().getBuffer().setText(activeCell.getValue())
+    @editView.find('.hidden-input').focus()
+    
+    @editView.getModel().getBuffer().setText(activeCell.getValue().toString())
+
+  stopEdit: ->
+    @editView.hide()
+    @focus()
 
   createEditView: ->
     @editView = new TextEditorView({})
+    @subscribeToTextEditor(@editView)
     @append(@editView)
+
+  subscribeToTextEditor: (editorView) ->
+    @subscriptions.add @asDisposable editorView.on 'core:cancel', (e) =>
+      @stopEdit()
+      e.stopImmediatePropagation()
+      false
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
