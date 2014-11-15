@@ -1,6 +1,11 @@
 
 module.exports =
 
+  config:
+    undefinedDisplay:
+      type: 'string'
+      default: ''
+
   activate: (state) ->
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
     @openDemo()

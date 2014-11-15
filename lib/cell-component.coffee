@@ -14,4 +14,4 @@ module.exports = React.createClass
       style:
         width: columnWidth
         'text-align': columnAlign ? 'left'
-    }, cell.getValue()
+    }, cell.getValue() ? atom.config.get('table-edit.undefinedDisplay')

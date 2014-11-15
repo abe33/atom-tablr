@@ -91,7 +91,7 @@ describe 'TableView', ->
       it 'returns 8', ->
         expect(tableView.getLastVisibleRow()).toEqual(8)
 
-  describe 'the rendered rows', ->
+  describe 'once rendered', ->
     beforeEach ->
       row = tableView.find('.table-edit-row').first()
       cells = row.find('.table-edit-cell')
@@ -99,8 +99,15 @@ describe 'TableView', ->
     it 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)
 
+    it 'renders undefined cells based on a config', ->
+      atom.config.set('table-edit.undefinedDisplay', 'foo')
+
+      tableView.getActiveCell().setValue(undefined)
+      nextAnimationFrame()
+      expect(cells.first().text()).toEqual('foo')
+
     describe 'without any columns layout data', ->
-      it 'have cells that all have the same width', ->
+      it 'has cells that all have the same width', ->
         cells.each ->
           expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -2)
 
