@@ -28,6 +28,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
 
     @subscriptions.add @asDisposable @on 'core:confirm', => @startEdit()
+    @subscriptions.add @asDisposable @on 'core:undo', => @table.undo()
+    @subscriptions.add @asDisposable @on 'core:redo', => @table.redo()
     @subscriptions.add @asDisposable @on 'core:move-left', => @moveLeft()
     @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()

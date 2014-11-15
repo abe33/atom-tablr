@@ -542,6 +542,23 @@ describe 'TableView', ->
 
       expect(tableView.body.scrollTop()).toEqual(849)
 
+  describe 'core:undo', ->
+    it 'triggers an undo on the table', ->
+      spyOn(table, 'undo')
+
+      tableView.trigger('core:undo')
+
+      expect(table.undo).toHaveBeenCalled()
+
+  describe 'core:redo', ->
+    it 'triggers an redo on the table', ->
+      spyOn(table, 'redo')
+
+      tableView.trigger('core:redo')
+
+      expect(table.redo).toHaveBeenCalled()
+
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
