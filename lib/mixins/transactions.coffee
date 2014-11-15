@@ -24,3 +24,9 @@ class Transactions extends Mixin
     commit = @redoStack.pop()
     commit.redo.call(this)
     @undoStack.push(commit)
+
+  clearUndoStack: ->
+    @undoStack.length = 0
+
+  clearRedoStack: ->
+    @redoStack.length = 0

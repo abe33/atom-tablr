@@ -607,3 +607,37 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(0)
 
         expect(cell.getValue()).toEqual('hello')
+
+      describe '::clearUndoStack', ->
+        it 'removes all the transactions in the undo stack', ->
+          table.addRows [
+            ['foo', 'bar']
+            ['bar', 'baz']
+          ]
+
+          cell = table.cellAtPosition([0, 0])
+
+          cell.setValue 'hello'
+
+          table.undo()
+
+          table.clearUndoStack()
+
+          expect(table.undoStack.length).toEqual(0)
+
+      describe '::clearRedoStack', ->
+        it 'removes all the transactions in the redo stack', ->
+          table.addRows [
+            ['foo', 'bar']
+            ['bar', 'baz']
+          ]
+
+          cell = table.cellAtPosition([0, 0])
+
+          cell.setValue 'hello'
+
+          table.undo()
+
+          table.clearRedoStack()
+
+          expect(table.redoStack.length).toEqual(0)
