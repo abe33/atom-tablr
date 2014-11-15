@@ -558,7 +558,6 @@ describe 'TableView', ->
 
       expect(table.redo).toHaveBeenCalled()
 
-
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
@@ -566,6 +565,22 @@ describe 'TableView', ->
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
   #    ######## ########  ####    ##
+
+  describe 'pressing a key when the table view has focus', ->
+    beforeEach ->
+      event = $.Event "textInput", {
+        originalEvent:
+          data: 'x'
+      }
+
+      tableView.hiddenInput.trigger(event)
+
+    it 'starts the edition of the active cell', ->
+      expect(tableView.isEditing()).toBeTruthy()
+
+    it 'fills the editor with the input data', ->
+      editor = tableView.find('.editor').view()
+      expect(editor.getText()).toEqual('x')
 
   describe '::startEdit', ->
     [editor] = []

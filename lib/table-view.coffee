@@ -25,6 +25,11 @@ class TableView extends View
     @subscriptions.add @table.onDidAddColumn @onColumnAdded
     @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
 
+    @subscriptions.add @asDisposable @hiddenInput.on 'textInput', (e) =>
+      unless @isEditing()
+        @startEdit()
+        @editView.setText(e.originalEvent.data)
+
     @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
 
     @subscriptions.add @asDisposable @on 'core:confirm', => @startEdit()
