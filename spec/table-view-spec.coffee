@@ -568,6 +568,25 @@ describe 'TableView', ->
     it 'fills the editor with the cell value', ->
       expect(editor.getText()).toEqual('row0')
 
+    it 'cleans the buffer history', ->
+      expect(editor.getModel().getBuffer().history.undoStack.length).toEqual(0)
+      expect(editor.getModel().getBuffer().history.redoStack.length).toEqual(0)
+
+  describe '::stopEdit', ->
+    beforeEach ->
+      tableView.startEdit()
+      tableView.stopEdit()
+
+    it 'closes the editor', ->
+      expect(tableView.isEditing()).toBeFalsy()
+      expect(tableView.find('.editor:visible').length).toEqual(0)
+
+    it 'gives the focus back to the table view', ->
+      expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+    it 'leaves the cell value as is', ->
+      expect(tableView.getActiveCell().getValue()).toEqual('row0')
+
   describe 'with an editor opened', ->
     [editor] = []
 
@@ -580,13 +599,7 @@ describe 'TableView', ->
         editor.trigger('core:cancel')
 
       it 'closes the editor', ->
-        expect(tableView.find('.editor:visible').length).toEqual(0)
-
-      it 'gives the focus back to the table view', ->
-        expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
-
-      it 'leaves the cell value as is', ->
-        expect(tableView.getActiveCell().getValue()).toEqual('row0')
+        expect(tableView.isEditing()).toBeFalsy
 
     describe 'core:confirm', ->
       describe 'when the content of the editor has changed', ->

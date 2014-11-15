@@ -356,6 +356,9 @@ class TableView extends View
 
     @editView.setText(activeCell.getValue().toString())
 
+    @editView.getModel().getBuffer().history.clearUndoStack()
+    @editView.getModel().getBuffer().history.clearRedoStack()
+
   stopEdit: ->
     @editing = false
     @editView.hide()
