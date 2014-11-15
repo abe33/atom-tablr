@@ -10,4 +10,7 @@
 
 '.table-edit atom-text-editor':
   'enter': 'core:confirm'
-  'cmd-enter': 'editor:newline'
+  'ctrl-enter': 'editor:newline'
+  'tab': 'table-edit:move-right'
+  'shift-tab': 'table-edit:move-left'
+  'ctrl-tab': 'editor:indent'
