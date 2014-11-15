@@ -619,11 +619,31 @@ describe 'TableView', ->
       editor = tableView.find('.editor').view()
 
     describe 'core:cancel', ->
-      beforeEach ->
-        editor.trigger('core:cancel')
-
       it 'closes the editor', ->
+        editor.trigger('core:cancel')
         expect(tableView.isEditing()).toBeFalsy
+
+    describe 'table-edit:move-right', ->
+      it 'confirms the current edit and moves the active cursor to the right', ->
+        previousActiveCell = tableView.getActiveCell()
+        spyOn(tableView, 'moveRight')
+        editor.setText('Foo Bar')
+        editor.trigger('table-edit:move-right')
+
+        expect(tableView.isEditing()).toBeFalsy()
+        expect(previousActiveCell.getValue()).toEqual('Foo Bar')
+        expect(tableView.moveRight).toHaveBeenCalled()
+
+    describe 'table-edit:move-left', ->
+      it 'confirms the current edit and moves the active cursor to the left', ->
+        previousActiveCell = tableView.getActiveCell()
+        spyOn(tableView, 'moveLeft')
+        editor.setText('Foo Bar')
+        editor.trigger('table-edit:move-left')
+
+        expect(tableView.isEditing()).toBeFalsy()
+        expect(previousActiveCell.getValue()).toEqual('Foo Bar')
+        expect(tableView.moveLeft).toHaveBeenCalled()
 
     describe 'core:confirm', ->
       describe 'when the content of the editor has changed', ->

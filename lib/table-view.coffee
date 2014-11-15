@@ -361,6 +361,12 @@ class TableView extends View
     @editView.getModel().getBuffer().history.clearUndoStack()
     @editView.getModel().getBuffer().history.clearRedoStack()
 
+  confirmEdit: ->
+    @stopEdit()
+    activeCell = @getActiveCell()
+    newValue = @editView.getText()
+    activeCell.setValue(newValue) unless newValue is activeCell.getValue()
+
   stopEdit: ->
     @editing = false
     @editView.hide()
@@ -372,21 +378,23 @@ class TableView extends View
     @append(@editView)
 
   subscribeToTextEditor: (editorView) ->
+    @subscriptions.add @asDisposable editorView.on 'table-edit:move-right', (e) =>
+      @confirmEdit()
+      @moveRight()
+
+    @subscriptions.add @asDisposable editorView.on 'table-edit:move-left', (e) =>
+      @confirmEdit()
+      @moveLeft()
+
     @subscriptions.add @asDisposable editorView.on 'core:cancel', (e) =>
       @stopEdit()
       e.stopImmediatePropagation()
       return false
 
     @subscriptions.add @asDisposable editorView.on 'core:confirm', (e) =>
-      @stopEdit()
+      @confirmEdit()
       e.stopImmediatePropagation()
-
-      activeCell = @getActiveCell()
-      newValue = @editView.getText()
-      activeCell.setValue(newValue) unless newValue is activeCell.getValue()
-
       return false
-
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
