@@ -4,23 +4,23 @@ module.exports =
 class Transactions extends Mixin
 
   transaction: (commit) ->
-    @commits ?= []
-    @commits.shift() if @commits.length + 1 > @constructor.MAX_HISTORY_SIZE
+    @undoStack ?= []
+    @undoStack.shift() if @undoStack.length + 1 > @constructor.MAX_HISTORY_SIZE
 
-    @rolledbackCommits = []
+    @redoStack = []
 
-    @commits.push commit
+    @undoStack.push commit
 
   undo: ->
-    return unless @commits?.length > 0
+    return unless @undoStack?.length > 0
 
-    commit = @commits.pop()
+    commit = @undoStack.pop()
     commit.undo.call(this)
-    @rolledbackCommits.push(commit)
+    @redoStack.push(commit)
 
   redo: ->
-    return unless @rolledbackCommits?.length > 0
+    return unless @redoStack?.length > 0
 
-    commit = @rolledbackCommits.pop()
+    commit = @redoStack.pop()
     commit.redo.call(this)
-    @commits.push(commit)
+    @undoStack.push(commit)

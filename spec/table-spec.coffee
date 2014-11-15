@@ -416,7 +416,7 @@ describe 'Table', ->
 
       table.addRow ["foo#{i}"] for i in [0...20]
 
-      expect(table.commits.length).toEqual(10)
+      expect(table.undoStack.length).toEqual(10)
 
       table.undo()
 
@@ -428,13 +428,13 @@ describe 'Table', ->
       table.undo()
 
       expect(table.getColumnsCount()).toEqual(0)
-      expect(table.commits.length).toEqual(0)
-      expect(table.rolledbackCommits.length).toEqual(1)
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
 
       table.redo()
 
-      expect(table.commits.length).toEqual(1)
-      expect(table.rolledbackCommits.length).toEqual(0)
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnsCount()).toEqual(1)
       expect(table.getColumn(0).name).toEqual('key')
 
@@ -446,14 +446,14 @@ describe 'Table', ->
       table.undo()
 
       expect(table.getColumnsCount()).toEqual(1)
-      expect(table.commits.length).toEqual(1)
-      expect(table.rolledbackCommits.length).toEqual(1)
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(1)
       expect(table.getColumn(0).name).toEqual('key')
 
       table.redo()
 
-      expect(table.commits.length).toEqual(2)
-      expect(table.rolledbackCommits.length).toEqual(0)
+      expect(table.undoStack.length).toEqual(2)
+      expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnsCount()).toEqual(0)
 
     describe 'with columns in the table', ->
@@ -467,13 +467,13 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(0)
-        expect(table.commits.length).toEqual(2)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(2)
+        expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -487,13 +487,13 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(0)
-        expect(table.commits.length).toEqual(2)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(2)
+        expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(2)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -508,15 +508,15 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(1)
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
 
         table.redo()
 
-        expect(table.commits.length).toEqual(4)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(4)
+        expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
       it 'rolls back a batched rows deletion', ->
@@ -530,8 +530,8 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(2)
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
         expect(table.getRow(1).key).toEqual('bar')
@@ -539,8 +539,8 @@ describe 'Table', ->
 
         table.redo()
 
-        expect(table.commits.length).toEqual(4)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(4)
+        expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
       it 'rolls back a change in a column', ->
@@ -550,15 +550,15 @@ describe 'Table', ->
 
         expect(column.name).toEqual('value')
 
-        expect(table.commits.length).toEqual(2)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(2)
+        expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
         expect(column.name).toEqual('foo')
 
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(0)
 
       it 'rolls back a change in a row data', ->
         table.addRows [
@@ -572,15 +572,15 @@ describe 'Table', ->
 
         table.undo()
 
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(1)
 
         expect(row.key).toEqual('foo')
 
         table.redo()
 
-        expect(table.commits.length).toEqual(4)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(4)
+        expect(table.redoStack.length).toEqual(0)
 
         expect(row.key).toEqual('hello')
 
@@ -596,14 +596,14 @@ describe 'Table', ->
 
         table.undo()
 
-        expect(table.commits.length).toEqual(3)
-        expect(table.rolledbackCommits.length).toEqual(1)
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(1)
 
         expect(cell.getValue()).toEqual('foo')
 
         table.redo()
 
-        expect(table.commits.length).toEqual(4)
-        expect(table.rolledbackCommits.length).toEqual(0)
+        expect(table.undoStack.length).toEqual(4)
+        expect(table.redoStack.length).toEqual(0)
 
         expect(cell.getValue()).toEqual('hello')
