@@ -30,6 +30,8 @@ module.exports =
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
+    table.clearUndoStack()
+
     tableView = new TableView(table)
     tableView.setRowHeight 30
     tableView.setRowOverdraw 4
