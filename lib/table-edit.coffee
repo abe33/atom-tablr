@@ -35,6 +35,7 @@ module.exports =
     tableView = new TableView(table)
     tableView.setRowHeight 30
     tableView.setRowOverdraw 4
+    tableView.setRowHeightAt(3, 90)
 
     tableView.addClass('demo overlay from-top').height(300)
     atom.workspaceView.append(tableView)
