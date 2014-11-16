@@ -8,6 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
+{mousedown, textInput} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
@@ -387,13 +388,7 @@ describe 'TableView', ->
   it 'activates the cell under the mouse when pressed', ->
     cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
     offset = cell.offset()
-    event = $.Event "mousedown", {
-      which: 1
-      pageX: offset.left + 50
-      pageY: offset.top + 5
-    }
-
-    cell.trigger(event)
+    mousedown(cell, offset.left + 50, offset.top + 5)
 
     expect(tableView.getActiveCell().getValue()).toEqual('no')
 
@@ -593,12 +588,7 @@ describe 'TableView', ->
 
   describe 'pressing a key when the table view has focus', ->
     beforeEach ->
-      event = $.Event "textInput", {
-        originalEvent:
-          data: 'x'
-      }
-
-      tableView.hiddenInput.trigger(event)
+      textInput(tableView.hiddenInput, 'x')
 
     it 'starts the edition of the active cell', ->
       expect(tableView.isEditing()).toBeTruthy()
@@ -727,13 +717,7 @@ describe 'TableView', ->
       beforeEach ->
         cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
         offset = cell.offset()
-        event = $.Event "mousedown", {
-          which: 1
-          pageX: offset.left + 50
-          pageY: offset.top + 5
-        }
-
-        cell.trigger(event)
+        mousedown(cell, offset.left + 50, offset.top + 5)
 
       it 'closes the editor', ->
         expect(tableView.isEditing()).toBeFalsy()
