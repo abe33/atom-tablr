@@ -335,6 +335,12 @@ describe 'TableView', ->
 
       expect(cells.first().outerHeight()).toEqual(100)
 
+    it 'offsets the cells after the modified one', ->
+      row = tableView.find('.table-edit-row:nth-child(4)')
+
+      expect(row.css('top')).toEqual('140px')
+
+
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##
   #    ##     ## ##        ##   ##  ##     ## ##       ##     ##

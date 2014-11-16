@@ -78,8 +78,8 @@ class TableView extends View
   getRowHeightAt: (index) -> @rowHeights[index] ? @rowHeight
 
   setRowHeightAt: (index, height) ->
-    @computeRowOffsets()
     @rowHeights[index] = height
+    @computeRowOffsets()
     @requestUpdate(true)
 
   getRowOffsetAt: (index) -> @rowOffsets[index]
