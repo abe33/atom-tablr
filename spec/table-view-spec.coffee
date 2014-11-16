@@ -582,6 +582,14 @@ describe 'TableView', ->
       editor = tableView.find('.editor').view()
       expect(editor.getText()).toEqual('x')
 
+  describe 'double clicking on a cell', ->
+    beforeEach ->
+      cell = tableView.find('.table-edit-row:last-child .table-edit-cell:last-child')
+      cell.trigger('dblclick')
+
+    it 'starts the edition of the cell', ->
+      expect(tableView.isEditing()).toBeTruthy()
+
   describe '::startEdit', ->
     [editor] = []
 

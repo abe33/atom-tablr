@@ -30,8 +30,6 @@ class TableView extends View
         @startEdit()
         @editView.setText(e.originalEvent.data)
 
-    @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
-
     @subscriptions.add @asDisposable @on 'core:confirm', => @startEdit()
     @subscriptions.add @asDisposable @on 'core:undo', => @table.undo()
     @subscriptions.add @asDisposable @on 'core:redo', => @table.redo()
@@ -40,6 +38,12 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
     @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
+      e.preventDefault()
+      @focus()
+
+    @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
+    @subscriptions.add @asDisposable @body.on 'dblclick', (e) => @startEdit()
+    @subscriptions.add @asDisposable @body.on 'mousedown', (e) =>
       e.preventDefault()
 
       @stopEdit() if @isEditing()
