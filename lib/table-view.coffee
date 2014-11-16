@@ -127,6 +127,11 @@ class TableView extends View
 
     @rowOffsets = offsets
 
+  findRowAtScreenPosition: (y) ->
+    for i in [0...@table.getRowsCount()]
+      offset = @getRowOffsetAt(i)
+      return i - 1 if y < offset
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -292,7 +297,7 @@ class TableView extends View
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    row = Math.floor((bodyScrollTop + y) / @getRowHeight())
+    row = @findRowAtScreenPosition(y)
 
     columnsWidths = @getColumnsWidthsFromModel()
     column = -1

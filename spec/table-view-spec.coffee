@@ -341,6 +341,13 @@ describe 'TableView', ->
 
       expect(row.css('top')).toEqual('140px')
 
+    it 'activates the cell under the mouse when pressed', ->
+      cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(2)')
+      offset = cell.offset()
+      mousedown(cell, offset.left + 50, offset.top + 5)
+
+      expect(tableView.getActiveCell().getValue()).toEqual(300)
+
 
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##
