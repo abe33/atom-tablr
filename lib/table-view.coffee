@@ -15,6 +15,8 @@ class TableView extends View
   initialize: (@table) ->
     @scroll = 0
     @activeCellPosition = new Point
+    @rowHeights = {}
+    @rowOffsets = null
 
     props = {@table, parentView: this}
     @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
@@ -69,7 +71,18 @@ class TableView extends View
 
   getRowHeight: -> @rowHeight
 
-  setRowHeight: (@rowHeight) -> @requestUpdate(true)
+  setRowHeight: (@rowHeight) ->
+    @computeRowOffsets()
+    @requestUpdate(true)
+
+  getRowHeightAt: (index) -> @rowHeights[index] ? @rowHeight
+
+  setRowHeightAt: (index, height) ->
+    @computeRowOffsets()
+    @rowHeights[index] = height
+    @requestUpdate(true)
+
+  getRowOffsetAt: (index) -> @rowOffsets[index]
 
   getRowOverdraw: -> @rowOverdraw or 0
 
@@ -103,6 +116,16 @@ class TableView extends View
       @body.scrollTop(scrollTopAsLastVisibleRow)
     else
       @body.scrollTop(scrollTopAsFirstVisibleRow)
+
+  computeRowOffsets: ->
+    offsets = []
+    offset = 0
+
+    for i in [0...@table.getRowsCount()]
+      offsets.push offset
+      offset += @getRowHeightAt(i)
+
+    @rowOffsets = offsets
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##

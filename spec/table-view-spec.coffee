@@ -56,6 +56,15 @@ describe 'TableView', ->
       .table-edit-header {
         height: 27px;
       }
+
+      .table-edit-row {
+        border: 0;
+      }
+
+      .table-edit-cell {
+        border: none;
+        padding: 0;
+      }
     </style>").find('style')
 
     $('body').append(tableView)
@@ -315,6 +324,16 @@ describe 'TableView', ->
 
         rows = tableView.find('.table-edit-row')
         expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
+
+  describe 'setting a custom height for a row', ->
+    beforeEach ->
+      tableView.setRowHeightAt(2, 100)
+      nextAnimationFrame()
+
+    it "renders the row's cells with the provided height", ->
+      cells = tableView.find('.table-edit-row:nth-child(3) .table-edit-cell')
+
+      expect(cells.first().outerHeight()).toEqual(100)
 
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##

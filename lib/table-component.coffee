@@ -11,7 +11,7 @@ module.exports = React.createClass
     columnsAligns: []
 
   render: ->
-    {firstRow, lastRow, rowHeight, columnsWidths, columnsAligns} = @state
+    {firstRow, lastRow, columnsWidths, columnsAligns} = @state
     {parentView} = @props
 
     rows = for row in [firstRow...lastRow]
@@ -44,8 +44,8 @@ module.exports = React.createClass
         className: classes.join(' ')
         'data-row-id': row + 1
         style:
-          height: "#{rowHeight}px"
-          top: "#{row * rowHeight}px"
+          height: "#{parentView.getRowHeightAt(row)}px"
+          top: "#{parentView.getRowOffsetAt(row)}px"
       }, cells
 
     div {
