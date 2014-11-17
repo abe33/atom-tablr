@@ -348,6 +348,19 @@ describe 'TableView', ->
 
       expect(tableView.getActiveCell().getValue()).toEqual(300)
 
+    describe 'when scrolled by 300px', ->
+      beforeEach ->
+        tableView.scrollTop(300)
+        nextAnimationFrame()
+
+      it 'activates the cell under the mouse when pressed', ->
+        cell = tableView.find('.table-edit-row[data-row-id=15] .table-edit-cell:nth-child(2)')
+        offset = cell.offset()
+        mousedown(cell, offset.left + 50, offset.top + 5)
+
+        expect(tableView.getActiveCell().getValue()).toEqual(1400)
+
+
 
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##

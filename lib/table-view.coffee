@@ -89,12 +89,12 @@ class TableView extends View
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate(true)
 
   getFirstVisibleRow: ->
-    row = Math.floor(@body.scrollTop() / @getRowHeight())
+    @findRowAtScreenPosition(@body.scrollTop())
 
   getLastVisibleRow: ->
     scrollViewHeight = @body.height()
 
-    row = Math.floor((@body.scrollTop() + scrollViewHeight) / @getRowHeight())
+    @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight)
 
   isActiveRow: (row) -> @activeCellPosition.row is row
 
@@ -297,7 +297,7 @@ class TableView extends View
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    row = @findRowAtScreenPosition(y)
+    row = @findRowAtScreenPosition(y + bodyScrollTop)
 
     columnsWidths = @getColumnsWidthsFromModel()
     column = -1
