@@ -365,6 +365,18 @@ describe 'TableView', ->
 
         expect(tableView.getActiveCell().getValue()).toEqual(1400)
 
+    describe 'when scrolled all way down to the bottom edge', ->
+      beforeEach ->
+        tableView.scrollTop(2000)
+        nextAnimationFrame()
+
+      it 'activates the cell under the mouse when pressed', ->
+        cell = tableView.find('.table-edit-row:last-child .table-edit-cell:nth-child(2)')
+        offset = cell.offset()
+        mousedown(cell, offset.left + 50, offset.top + 5)
+
+        expect(tableView.getActiveCell().getValue()).toEqual(9900)
+
 
 
   #    ##     ## ########    ###    ########  ######## ########

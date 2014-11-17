@@ -94,7 +94,7 @@ class TableView extends View
   getLastVisibleRow: ->
     scrollViewHeight = @body.height()
 
-    @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight)
+    @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
 
   isActiveRow: (row) -> @activeCellPosition.row is row
 
@@ -103,8 +103,10 @@ class TableView extends View
     scrollViewHeight = @body.height()
     currentScrollTop = @body.scrollTop()
 
-    scrollTopAsFirstVisibleRow = row * rowHeight
-    scrollTopAsLastVisibleRow = row * rowHeight - (scrollViewHeight - rowHeight)
+    rowOffset = @getRowOffsetAt(row)
+
+    scrollTopAsFirstVisibleRow = rowOffset
+    scrollTopAsLastVisibleRow = rowOffset - (scrollViewHeight - rowHeight)
 
     return if scrollTopAsFirstVisibleRow >= currentScrollTop and
               scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
@@ -131,6 +133,8 @@ class TableView extends View
     for i in [0...@table.getRowsCount()]
       offset = @getRowOffsetAt(i)
       return i - 1 if y < offset
+
+    return @table.getRowsCount() - 1
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -462,6 +466,7 @@ class TableView extends View
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
 
+    console.log firstVisibleRow, lastVisibleRow
     return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
 
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
