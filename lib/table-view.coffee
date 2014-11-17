@@ -269,7 +269,7 @@ class TableView extends View
     widths = @getColumnsScreenWidths()
 
     width = widths[position.column]
-    height = @getRowHeight()
+    height = @getRowHeightAt(position.row)
 
     {top, left, width, height}
 
@@ -387,6 +387,8 @@ class TableView extends View
     activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
 
+    console.log activeCellRect
+
     @editView.css(
       top: activeCellRect.top + 'px'
       left: activeCellRect.left + 'px'
@@ -466,7 +468,6 @@ class TableView extends View
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
 
-    console.log firstVisibleRow, lastVisibleRow
     return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
 
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw

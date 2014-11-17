@@ -353,6 +353,13 @@ describe 'TableView', ->
 
       expect(tableView.getActiveCell().getValue()).toEqual(300)
 
+    it 'gives the size of the cell to the editor when starting an edit', ->
+      tableView.activateCellAtPosition(row: 2, column: 0)
+      nextAnimationFrame()
+      tableView.startEdit()
+
+      expect(tableView.find('.table-edit-cell.active').outerHeight()).toEqual(100)
+
     describe 'when scrolled by 300px', ->
       beforeEach ->
         tableView.scrollTop(300)
