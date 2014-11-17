@@ -331,6 +331,11 @@ describe 'TableView', ->
       tableView.setRowHeightAt(2, 100)
       nextAnimationFrame()
 
+    it 'sets the proper height on the table body content', ->
+      bodyContent = tableView.find('.table-edit-content')
+
+      expect(bodyContent.outerHeight()).toBeCloseTo(2080)
+
     it "renders the row's cells with the provided height", ->
       cells = tableView.find('.table-edit-row:nth-child(3) .table-edit-cell')
 
