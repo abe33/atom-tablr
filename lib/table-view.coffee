@@ -476,7 +476,6 @@ class TableView extends View
     @bodyComponent.setState {
       firstRow
       lastRow
-      rowHeight: @getRowHeight()
       columnsWidths: @getColumnsWidths()
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()

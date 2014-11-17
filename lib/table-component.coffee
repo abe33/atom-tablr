@@ -6,7 +6,6 @@ module.exports = React.createClass
     firstRow: 0
     lastRow: 0
     totalRows: 0
-    rowHeight: 0
     columnsWidths: []
     columnsAligns: []
 
