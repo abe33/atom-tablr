@@ -422,6 +422,23 @@ describe 'TableView', ->
       expect(cells.eq(1).width()).toBeCloseTo(rowCells.eq(1).width(), -2)
       expect(cells.last().width()).toBeCloseTo(rowCells.last().width(), -2)
 
+  #     ######   ##     ## ######## ######## ######## ########
+  #    ##    ##  ##     ##    ##       ##    ##       ##     ##
+  #    ##        ##     ##    ##       ##    ##       ##     ##
+  #    ##   #### ##     ##    ##       ##    ######   ########
+  #    ##    ##  ##     ##    ##       ##    ##       ##   ##
+  #    ##    ##  ##     ##    ##       ##    ##       ##    ##
+  #     ######    #######     ##       ##    ######## ##     ##
+
+  describe 'gutter', ->
+    it 'is rendered only when the flag is enabled', ->
+      expect(tableView.find('.table-edit-gutter').length).toEqual(0)
+
+      tableView.showGutter()
+      nextAnimationFrame()
+
+      expect(tableView.find('.table-edit-gutter').length).toEqual(1)
+
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
   #    ##       ##     ## ####  ##    ##    ##     ## ##     ## ##

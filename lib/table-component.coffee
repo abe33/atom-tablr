@@ -1,6 +1,8 @@
 React = require 'react-atom-fork'
 {div} = require 'reactionary-atom-fork'
 
+GutterComponent = require './gutter-component'
+
 module.exports = React.createClass
   getInitialState: ->
     firstRow: 0
@@ -10,7 +12,7 @@ module.exports = React.createClass
     columnsAligns: []
 
   render: ->
-    {firstRow, lastRow, columnsWidths, columnsAligns} = @state
+    {firstRow, lastRow, columnsWidths, columnsAligns, gutter} = @state
     {parentView} = @props
 
     rows = for row in [firstRow...lastRow]
@@ -47,11 +49,19 @@ module.exports = React.createClass
           top: "#{parentView.getRowOffsetAt(row)}px"
       }, cells
 
+    content = [div className: 'table-edit-rows', rows]
+
+    if gutter
+      gutterProps = {parentView}
+      gutterProps[k] = v for k,v of @state
+      gutterComponent = new GutterComponent(gutterProps)
+      content.push gutterComponent
+
     div {
       className: 'table-edit-content'
       style:
         height: @getTableHeight()
-    }, rows
+    }, content
 
   getTableHeight: ->
     lastIndex = Math.max(0, @state.totalRows - 1)

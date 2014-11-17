@@ -1,16 +1,21 @@
 {View, Point, TextEditorView} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
+PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
 
 module.exports =
 class TableView extends View
+  PropertyAccessors.includeInto(this)
+
   @content: ->
     @div class: 'table-edit', =>
       @input type: 'text', class: 'hidden-input', outlet: 'hiddenInput'
       @div outlet: 'head', class: 'table-edit-header', =>
       @div outlet: 'body', class: 'scroll-view', =>
+
+  gutter: false
 
   initialize: (@table) ->
     @scroll = 0
@@ -60,6 +65,14 @@ class TableView extends View
   destroy: ->
     @subscriptions.dispose()
     @remove()
+
+  showGutter: ->
+    @gutter = true
+    @requestUpdate(true)
+
+  hideGutter: ->
+    @gutter = false
+    @requestUpdate(true)
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -474,6 +487,7 @@ class TableView extends View
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
 
     @bodyComponent.setState {
+      @gutter
       firstRow
       lastRow
       columnsWidths: @getColumnsWidths()
@@ -481,6 +495,7 @@ class TableView extends View
       totalRows: @table.getRowsCount()
     }
     @headComponent.setState {
+      @gutter
       columnsWidths: @getColumnsWidths()
       columnsAligns: @getColumnsAligns()
     }
