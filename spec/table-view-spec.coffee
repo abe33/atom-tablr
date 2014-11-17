@@ -358,7 +358,16 @@ describe 'TableView', ->
       nextAnimationFrame()
       tableView.startEdit()
 
-      expect(tableView.find('.table-edit-cell.active').outerHeight()).toEqual(100)
+      expect(tableView.find('.editor').outerHeight()).toEqual(100)
+
+    it 'uses the offset to position the editor', ->
+      tableView.activateCellAtPosition(row: 3, column: 0)
+      nextAnimationFrame()
+      tableView.startEdit()
+
+      expect(tableView.find('.editor').offset().top)
+      .toEqual(tableView.find('.table-edit-cell.active').offset().top)
+
 
     describe 'when scrolled by 300px', ->
       beforeEach ->

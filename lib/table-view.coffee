@@ -287,7 +287,7 @@ class TableView extends View
     position = Point.fromObject(position)
     margins = @getColumnsScreenMargins()
     {
-      top: position.row * @getRowHeight()
+      top: @getRowOffsetAt(position.row)
       left: margins[position.column]
     }
 
