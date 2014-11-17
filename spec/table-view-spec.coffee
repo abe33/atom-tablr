@@ -368,7 +368,6 @@ describe 'TableView', ->
       expect(tableView.find('.editor').offset().top)
       .toEqual(tableView.find('.table-edit-cell.active').offset().top)
 
-
     describe 'when scrolled by 300px', ->
       beforeEach ->
         tableView.scrollTop(300)
@@ -392,8 +391,6 @@ describe 'TableView', ->
         mousedown(cell, offset.left + 50, offset.top + 5)
 
         expect(tableView.getActiveCell().getValue()).toEqual(9900)
-
-
 
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##
