@@ -54,13 +54,28 @@
 
 .table-edit-gutter {
   display: -webkit-flex;
+  position: relative;
 }
 
 .table-edit-gutter-filler, .table-edit-header-filler {
   visibility: hidden;
 }
+
+.table-edit-header-filler + * {
+  border-left: 1px solid @background-color-highlight;
+  margin-left: -1px
+}
+
 .table-edit-row-number {
   position: absolute;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid @background-color-highlight;
+  border-right: 1px solid @background-color-highlight;
+
+  &:nth-child(2) {
+    border-top: none;
+  }
 }
 
 .table-edit-row-number, .table-edit-gutter-filler, .table-edit-header-filler {
@@ -85,11 +100,13 @@
   }
 }
 
-.table-edit-cell, .table-edit-header-cell {
-  float: left;
+.table-edit-cell, .table-edit-header-cell, .table-edit-row-number {
   font-size: 13px;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.table-edit-cell, .table-edit-header-cell {
+  float: left;
   height: 100%;
   padding: 4px 6px;
   border-left: 1px solid @background-color-highlight;
@@ -99,25 +116,26 @@
   }
 }
 
-.table-edit-row.active-row {
-  background: fadeout(@background-color-success, 95%)
+.table-edit-header {
+  display: -webkit-flex;
+  top: 0;
+  left: 0;
+  right: 0;
 }
-.table-edit-cell.active-column, .table-edit-header-cell.active-column {
-  background: fadeout(@background-color-error, 95%)
+
+.active-row {
+  background: fadeout(@background-color-success, 95%);
+}
+
+.active-column {
+  background: fadeout(@background-color-error, 95%);
 }
 
 .table-edit-header-cell.active-column {
   color: @text-color-selected;
 }
 
-.table-edit-cell.active {
+.active {
   background: fadeout(@background-color-warning, 90%);
   color: @text-color-selected;
-}
-
-.table-edit-header {
-  display: -webkit-flex;
-  top: 0;
-  left: 0;
-  right: 0;
 }

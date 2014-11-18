@@ -14,6 +14,7 @@ module.exports = React.createClass
   render: ->
     {firstRow, lastRow, columnsWidths, columnsAligns, gutter} = @state
     {parentView} = @props
+    height = @getTableHeight()
 
     rows = for row in [firstRow...lastRow]
       rowData = @props.table.getRow(row)
@@ -52,15 +53,14 @@ module.exports = React.createClass
     content = [div className: 'table-edit-rows', rows]
 
     if gutter
-      gutterProps = {parentView}
+      gutterProps = {parentView, height}
       gutterProps[k] = v for k,v of @state
       gutterComponent = new GutterComponent(gutterProps)
       content.unshift gutterComponent
 
     div {
       className: 'table-edit-content'
-      style:
-        height: @getTableHeight()
+      style: {height}
     }, content
 
   getTableHeight: ->
