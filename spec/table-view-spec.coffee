@@ -1,4 +1,4 @@
-{$} = require 'atom'
+{$} = require 'space-pen'
 
 path = require 'path'
 
@@ -46,7 +46,7 @@ describe 'TableView', ->
     tableView.setRowHeight 20
     tableView.setRowOverdraw 10
 
-    styleNode = $('body').append("<style>
+    styleNode = $('body').prepend("<style>
       #{stylesheet}
 
       .table-edit {
@@ -68,7 +68,7 @@ describe 'TableView', ->
       }
     </style>").find('style')
 
-    $('body').append(tableView)
+    $('body').prepend(tableView)
 
     nextAnimationFrame()
 
@@ -404,6 +404,11 @@ describe 'TableView', ->
     expect(tableView.find('.table-edit-header').length).toEqual(1)
 
   describe 'header', ->
+    header = null
+
+    beforeEach ->
+      header = tableView.head
+
     it 'has as many cell as there is columns in the table', ->
       cells = tableView.find('.table-edit-header-cell')
       expect(cells.length).toEqual(3)
@@ -422,6 +427,14 @@ describe 'TableView', ->
       expect(cells.eq(1).width()).toBeCloseTo(rowCells.eq(1).width(), -2)
       expect(cells.last().width()).toBeCloseTo(rowCells.last().width(), -2)
 
+    describe 'when the gutter is enabled', ->
+      beforeEach ->
+        tableView.showGutter()
+        nextAnimationFrame()
+
+      it 'contains a filler div to figurate the gutter width', ->
+        expect(header.find('.table-edit-header-filler').length).toEqual(1)
+
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
   #    ##        ##     ##    ##       ##    ##       ##     ##
@@ -438,6 +451,22 @@ describe 'TableView', ->
       nextAnimationFrame()
 
       expect(tableView.find('.table-edit-gutter').length).toEqual(1)
+
+    describe 'rows numbers', ->
+      [content, gutter] = []
+
+      beforeEach ->
+        tableView.showGutter()
+        nextAnimationFrame()
+        content = tableView.find('.table-edit-content')
+        gutter = tableView.find('.table-edit-gutter')
+
+      it 'contains a filler div to set the gutter width', ->
+        expect(gutter.find('.table-edit-gutter-filler').length).toEqual(1)
+
+      it 'matches the count of rows in the body', ->
+        expect(gutter.find('.table-edit-row-number').length)
+        .toEqual(content.find('.table-edit-row').length)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##

@@ -55,7 +55,7 @@ module.exports = React.createClass
       gutterProps = {parentView}
       gutterProps[k] = v for k,v of @state
       gutterComponent = new GutterComponent(gutterProps)
-      content.push gutterComponent
+      content.unshift gutterComponent
 
     div {
       className: 'table-edit-content'

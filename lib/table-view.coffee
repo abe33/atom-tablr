@@ -1,4 +1,4 @@
-{View, Point, TextEditorView} = require 'atom'
+{Point, TextEditorView, View} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
@@ -486,7 +486,7 @@ class TableView extends View
     firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
 
-    @bodyComponent.setState {
+    state = {
       @gutter
       firstRow
       lastRow
@@ -494,11 +494,9 @@ class TableView extends View
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
     }
-    @headComponent.setState {
-      @gutter
-      columnsWidths: @getColumnsWidths()
-      columnsAligns: @getColumnsAligns()
-    }
+
+    @bodyComponent.setState state
+    @headComponent.setState state
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow

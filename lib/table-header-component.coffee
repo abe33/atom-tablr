@@ -8,7 +8,7 @@ module.exports = React.createClass
 
   render: ->
     {table, parentView} = @props
-    {columnsWidths, columnsAligns} = @state
+    {columnsWidths, columnsAligns, gutter, totalRows} = @state
 
     cells = []
     for column,index in table.getColumns()
@@ -23,4 +23,10 @@ module.exports = React.createClass
           'text-align': columnsAligns[index] ? 'left'
       }, column.name
 
-    div className: 'table-edit-header-row', cells
+    row = div className: 'table-edit-header-row', cells
+
+    content = [row]
+    if gutter
+      content.unshift div className: 'table-edit-header-filler', totalRows
+
+    div className: 'table-edit-header-content', content
