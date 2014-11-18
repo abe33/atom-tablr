@@ -74,6 +74,9 @@ class TableView extends View
     @gutter = false
     @requestUpdate(true)
 
+  getRows: ->
+    @rows ?= @body.find('.table-edit-rows')
+
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
   #    ##     ## ##     ## ##  ##  ## ##
@@ -185,14 +188,16 @@ class TableView extends View
     @normalizeColumnsWidths(widths)
 
   getColumnsScreenWidths: ->
-    @getColumnsWidthsFromModel().map (v) => v * @body.width()
+    width = @getRows().width()
+    @getColumnsWidthsFromModel().map (v) => v * width
 
   getColumnsScreenMargins: ->
     widths = @getColumnsWidthsFromModel()
     pad = 0
+    width = @getRows().width()
     margins = widths.map (v) =>
       res = pad
-      pad += v * @body.width()
+      pad += v * width
       res
 
     margins
@@ -289,10 +294,11 @@ class TableView extends View
   cellScreenPosition: (position) ->
     {top, left} = @cellScrollPosition(position)
 
-    contentOffset = @body.offset()
+    content = @getRows()
+    contentOffset = content.offset()
 
     {
-      top: top + contentOffset.top - @body.scrollTop(),
+      top: top + contentOffset.top,
       left: left + contentOffset.left
     }
 
@@ -307,14 +313,15 @@ class TableView extends View
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    bodyWidth = @body.width()
-    bodyOffset = @body.offset()
-    bodyScrollTop = @body.scrollTop()
+    content = @getRows()
+
+    bodyWidth = content.width()
+    bodyOffset = content.offset()
 
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    row = @findRowAtScreenPosition(y + bodyScrollTop)
+    row = @findRowAtScreenPosition(y)
 
     columnsWidths = @getColumnsWidthsFromModel()
     column = -1
@@ -399,8 +406,6 @@ class TableView extends View
 
     activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
-
-    console.log activeCellRect
 
     @editView.css(
       top: activeCellRect.top + 'px'

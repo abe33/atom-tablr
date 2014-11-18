@@ -366,7 +366,7 @@ describe 'TableView', ->
       tableView.startEdit()
 
       expect(tableView.find('.editor').offset().top)
-      .toEqual(tableView.find('.table-edit-cell.active').offset().top)
+      .toBeCloseTo(tableView.find('.table-edit-cell.active').offset().top, -2)
 
     describe 'when scrolled by 300px', ->
       beforeEach ->
@@ -467,6 +467,26 @@ describe 'TableView', ->
       it 'matches the count of rows in the body', ->
         expect(gutter.find('.table-edit-row-number').length)
         .toEqual(content.find('.table-edit-row').length)
+
+      describe 'when an editor is opened', ->
+        [editor] = []
+
+        beforeEach ->
+          tableView.startEdit()
+          editor = tableView.find('.editor').view()
+
+        it 'opens a text editor above the active cell', ->
+          cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
+          cellOffset = cell.offset()
+
+          editorOffset = editor.offset()
+
+          expect(editor.length).toEqual(1)
+          expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
+          expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
+          expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
+          expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
+
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
