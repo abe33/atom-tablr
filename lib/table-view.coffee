@@ -95,6 +95,8 @@ class TableView extends View
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
+  getLastRow: -> @table.getRowsCount() - 1
+
   getRowHeight: -> @rowHeight
 
   setRowHeight: (@rowHeight) ->
@@ -169,6 +171,8 @@ class TableView extends View
   #    ##       ##     ## ##       ##     ## ##     ## ##  ####       ##
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
+
+  getLastColumn: -> @table.getColumnsCount() - 1
 
   isActiveColumn: (column) -> @activeCellPosition.column is column
 
@@ -371,12 +375,12 @@ class TableView extends View
     if @activeCellPosition.column - 1 >= 0
       @activeCellPosition.column--
     else
-      @activeCellPosition.column = @table.getColumnsCount() - 1
+      @activeCellPosition.column = @getLastColumn()
 
       if @activeCellPosition.row - 1 >= 0
         @activeCellPosition.row--
       else
-        @activeCellPosition.row = @table.getRowsCount() - 1
+        @activeCellPosition.row = @getLastRow()
 
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
@@ -385,7 +389,7 @@ class TableView extends View
     if @activeCellPosition.row - 1 >= 0
       @activeCellPosition.row--
     else
-      @activeCellPosition.row = @table.getRowsCount() - 1
+      @activeCellPosition.row = @getLastRow()
 
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
@@ -404,7 +408,7 @@ class TableView extends View
     if @activeCellPosition.row + amount < @table.getRowsCount()
       @activeCellPosition.row += amount
     else
-      @activeCellPosition.row = @table.getRowsCount() - 1
+      @activeCellPosition.row = @getLastRow()
 
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
