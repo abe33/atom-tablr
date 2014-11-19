@@ -44,6 +44,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
     @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
+    @subscriptions.add @asDisposable @on 'core:page-up', => @pageUp()
+    @subscriptions.add @asDisposable @on 'core:page-down', => @pageDown()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
       e.preventDefault()
       @focus()
@@ -62,6 +64,9 @@ class TableView extends View
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
+
+    @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
+    @subscriptions.add @asDisposable atom.config.observe 'table-edit.pageMovesAmount', (@configPageMovesAmount) =>
 
     @subscribeToColumn(column) for column in @table.getColumns()
 
@@ -393,6 +398,28 @@ class TableView extends View
 
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
+
+  pageDown: ->
+    amount = @getPageMovesAmount()
+    if @activeCellPosition.row + amount < @table.getRowsCount()
+      @activeCellPosition.row += amount
+    else
+      @activeCellPosition.row = @table.getRowsCount() - 1
+
+    @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
+
+  pageUp: ->
+    amount = @getPageMovesAmount()
+    if @activeCellPosition.row - amount >= 0
+      @activeCellPosition.row -= amount
+    else
+      @activeCellPosition.row = 0
+
+    @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
+
+  getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##

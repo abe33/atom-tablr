@@ -703,6 +703,56 @@ describe 'TableView', ->
 
       expect(table.redo).toHaveBeenCalled()
 
+  describe 'core:page-down', ->
+    beforeEach ->
+      atom.config.set 'table-edit.pageMovesAmount', 20
+
+    it 'moves the active cell 20 rows below', ->
+      tableView.trigger('core:page-down')
+
+      expect(tableView.activeCellPosition.row).toEqual(20)
+
+    it 'stops to the last row without looping', ->
+      tableView.activeCellPosition.row = 90
+
+      tableView.trigger('core:page-down')
+
+      expect(tableView.activeCellPosition.row).toEqual(99)
+
+    describe 'with a custom amount on the instance', ->
+      it 'moves the active cell 30 rows below', ->
+        tableView.pageMovesAmount = 30
+
+        tableView.trigger('core:page-down')
+
+        expect(tableView.activeCellPosition.row).toEqual(30)
+
+      it 'keeps using its own amount even when the config change', ->
+        tableView.pageMovesAmount = 30
+        atom.config.set 'table-edit.pageMovesAmount', 50
+
+        tableView.trigger('core:page-down')
+
+        expect(tableView.activeCellPosition.row).toEqual(30)
+
+  describe 'core:page-up', ->
+    beforeEach ->
+      atom.config.set 'table-edit.pageMovesAmount', 20
+
+    it 'moves the active cell 20 rows up', ->
+      tableView.activeCellPosition.row = 20
+
+      tableView.trigger('core:page-up')
+
+      expect(tableView.activeCellPosition.row).toEqual(0)
+
+    it 'stops to the first cell without looping', ->
+      tableView.activeCellPosition.row = 10
+
+      tableView.trigger('core:page-up')
+
+      expect(tableView.activeCellPosition.row).toEqual(0)
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

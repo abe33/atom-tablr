@@ -6,6 +6,9 @@ module.exports =
     undefinedDisplay:
       type: 'string'
       default: ''
+    pageMovesAmount:
+      type: 'integer'
+      default: 20
 
   activate: (state) ->
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
