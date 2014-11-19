@@ -752,6 +752,28 @@ describe 'TableView', ->
 
       expect(tableView.activeCellPosition.row).toEqual(0)
 
+  describe 'core:move-to-top', ->
+    beforeEach ->
+      atom.config.set 'table-edit.pageMovesAmount', 20
+
+    it 'moves the active cell to the first row', ->
+      tableView.activeCellPosition.row = 50
+
+      tableView.trigger('core:move-to-top')
+
+      expect(tableView.activeCellPosition.row).toEqual(0)
+
+  describe 'core:move-to-bottom', ->
+    beforeEach ->
+      atom.config.set 'table-edit.pageMovesAmount', 20
+
+    it 'moves the active cell to the first row', ->
+      tableView.activeCellPosition.row = 50
+
+      tableView.trigger('core:move-to-bottom')
+
+      expect(tableView.activeCellPosition.row).toEqual(99)
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

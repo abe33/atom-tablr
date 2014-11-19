@@ -44,6 +44,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
     @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
     @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
+    @subscriptions.add @asDisposable @on 'core:move-to-top', => @moveToTop()
+    @subscriptions.add @asDisposable @on 'core:move-to-bottom', => @moveToBottom()
     @subscriptions.add @asDisposable @on 'core:page-up', => @pageUp()
     @subscriptions.add @asDisposable @on 'core:page-down', => @pageDown()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
@@ -400,6 +402,21 @@ class TableView extends View
     else
       @activeCellPosition.row = 0
 
+    @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
+
+  moveToTop: ->
+    return if @activeCellPosition.row is 0
+
+    @activeCellPosition.row = 0
+    @requestUpdate(true)
+    @makeRowVisible(@activeCellPosition.row)
+
+  moveToBottom: ->
+    end = @getLastRow()
+    return if @activeCellPosition.row is end
+
+    @activeCellPosition.row = end
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
 
