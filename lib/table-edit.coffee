@@ -1,3 +1,4 @@
+[Table, TableView] = []
 
 module.exports =
 
@@ -8,15 +9,23 @@ module.exports =
 
   activate: (state) ->
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
-    @openDemo()
+    atom.workspaceView.command 'table-edit:demo-with-gutter', => @openDemoWithGutter()
+
+    @openDemoWithGutter()
 
   deactivate: ->
 
   serialize: ->
 
-  openDemo: ->
-    Table = require './table'
-    TableView = require './table-view'
+  openDemo: -> @getTableView()
+
+  openDemoWithGutter: ->
+    tableView = @getTableView()
+    tableView.showGutter()
+
+  getTableView: ->
+    Table ?= require './table'
+    TableView ?= require './table-view'
 
     table = new Table
     table.addColumn 'key'
@@ -36,7 +45,6 @@ module.exports =
     tableView.setRowHeight 30
     tableView.setRowOverdraw 4
     tableView.setRowHeightAt(3, 90)
-    tableView.showGutter()
 
     tableView.addClass('demo overlay from-top').height(300)
     atom.workspaceView.append(tableView)
@@ -44,3 +52,5 @@ module.exports =
     tableView.on 'core:cancel', -> tableView.destroy()
 
     tableView.focus()
+
+    tableView
