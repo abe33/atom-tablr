@@ -15,9 +15,8 @@ class TableView extends View
       @div outlet: 'head', class: 'table-edit-header', =>
       @div outlet: 'body', class: 'scroll-view', =>
 
-  gutter: false
-
   initialize: (@table) ->
+    @gutter = false
     @scroll = 0
     @activeCellPosition = new Point
     @rowHeights = {}
@@ -66,11 +65,30 @@ class TableView extends View
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
+      @requestUpdate(true)
 
     @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.pageMovesAmount', (@configPageMovesAmount) =>
+      @requestUpdate(true)
+
+    @configRowHeight = atom.config.get('table-edit.rowHeight')
+    @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowHeight', (@configRowHeight) =>
+      @computeRowOffsets()
+      @requestUpdate(true)
+
+    @configRowOverdraw = atom.config.get('table-edit.rowOverdraw')
+    @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowOverdraw', (@configRowOverdraw) =>
+      @requestUpdate(true)
 
     @subscribeToColumn(column) for column in @table.getColumns()
+
+  attach: (target) ->
+    @onAttach()
+    target.append(this)
+
+  onAttach: ->
+    @computeRowOffsets()
+    @requestUpdate(true)
 
   destroy: ->
     @subscriptions.dispose()
@@ -99,13 +117,13 @@ class TableView extends View
 
   getLastRow: -> @table.getRowsCount() - 1
 
-  getRowHeight: -> @rowHeight
+  getRowHeight: -> @rowHeight ? @configRowHeight
 
   setRowHeight: (@rowHeight) ->
     @computeRowOffsets()
     @requestUpdate(true)
 
-  getRowHeightAt: (index) -> @rowHeights[index] ? @rowHeight
+  getRowHeightAt: (index) -> @rowHeights[index] ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
     @rowHeights[index] = height
@@ -114,7 +132,7 @@ class TableView extends View
 
   getRowOffsetAt: (index) -> @rowOffsets[index]
 
-  getRowOverdraw: -> @rowOverdraw or 0
+  getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
 
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate(true)
 
@@ -129,7 +147,7 @@ class TableView extends View
   isActiveRow: (row) -> @activeCellPosition.row is row
 
   makeRowVisible: (row) ->
-    rowHeight = @getRowHeight()
+    rowHeight = @getRowHeightAt(row)
     scrollViewHeight = @body.height()
     currentScrollTop = @body.scrollTop()
 
@@ -541,8 +559,9 @@ class TableView extends View
 
     return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
 
-    firstRow = Math.max 0, firstVisibleRow - @rowOverdraw
-    lastRow = Math.min @table.getRowsCount(), lastVisibleRow + @rowOverdraw
+    rowOverdraw = @getRowOverdraw()
+    firstRow = Math.max 0, firstVisibleRow - rowOverdraw
+    lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
 
     state = {
       @gutter

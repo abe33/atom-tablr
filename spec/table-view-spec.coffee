@@ -42,9 +42,10 @@ describe 'TableView', ->
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
+    atom.config.set 'table-edit.rowHeight', 20
+    atom.config.set 'table-edit.rowOverdraw', 10
+
     tableView = new TableView(table)
-    tableView.setRowHeight 20
-    tableView.setRowOverdraw 10
 
     styleNode = $('body').prepend("<style>
       #{stylesheet}
@@ -69,7 +70,7 @@ describe 'TableView', ->
     </style>").find('style')
 
     $('body').prepend(tableView)
-
+    tableView.onAttach()
     nextAnimationFrame()
 
   it 'holds a table', ->
