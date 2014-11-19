@@ -116,6 +116,15 @@ describe 'TableView', ->
       nextAnimationFrame()
       expect(cells.first().text()).toEqual('foo')
 
+    it 'renders undefined cells based on the view property', ->
+      tableView.undefinedDisplay = 'bar'
+      atom.config.set('table-edit.undefinedDisplay', 'foo')
+
+      tableView.getActiveCell().setValue(undefined)
+      nextAnimationFrame()
+      expect(cells.first().text()).toEqual('bar')
+
+
     describe 'without any columns layout data', ->
       it 'has cells that all have the same width', ->
         cells.each ->

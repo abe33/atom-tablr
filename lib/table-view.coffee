@@ -60,6 +60,9 @@ class TableView extends View
 
       @focus()
 
+    @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
+    @subscriptions.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
+
     @subscribeToColumn(column) for column in @table.getColumns()
 
   destroy: ->
@@ -76,6 +79,8 @@ class TableView extends View
 
   getRows: ->
     @rows ?= @body.find('.table-edit-rows')
+
+  getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##

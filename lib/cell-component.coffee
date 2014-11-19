@@ -6,7 +6,7 @@ module.exports = React.createClass
     {}
 
   render: ->
-    {row, cell, index, columnWidth, columnAlign, classes} = @props
+    {parentView, row, cell, index, columnWidth, columnAlign, classes} = @props
 
     div {
       key: "cell-#{row}-#{index}"
@@ -14,4 +14,4 @@ module.exports = React.createClass
       style:
         width: columnWidth
         'text-align': columnAlign ? 'left'
-    }, cell.getValue() ? atom.config.get('table-edit.undefinedDisplay')
+    }, cell.getValue() ? parentView.getUndefinedDisplay()
