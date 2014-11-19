@@ -496,7 +496,6 @@ describe 'TableView', ->
           expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
           expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
 
-
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
   #    ##       ##     ## ####  ##    ##    ##     ## ##     ## ##
