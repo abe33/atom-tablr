@@ -938,6 +938,10 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[10,1], [10,1]])
 
+    it 'can spans on several rows and columns', ->
+      tableView.setSelection([[2,0],[3,2]])
+
+      expect(tableView.getSelection()).toEqual([[2,0],[3,2]])
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

@@ -536,6 +536,10 @@ class TableView extends View
 
   getSelection: -> @selection
 
+  setSelection: (selection) ->
+    @selection = Range.fromObject(selection)
+    @requestUpdate(true)
+
   setSelectionFromActiveCell: ->
     @selection = new Range(@activeCellPosition, @activeCellPosition)
 
