@@ -943,6 +943,14 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[2,0],[3,2]])
 
+    it 'marks the cells covered by the selection with a selected class', ->
+      tableView.setSelection([[2,0],[3,2]])
+
+      nextAnimationFrame()
+
+      expect(tableView.find('.selected').length).toEqual(6)
+
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()

@@ -536,6 +536,17 @@ class TableView extends View
 
   getSelection: -> @selection
 
+  isSelectedCell: (cell) ->
+    @iseSelectedPosition(@table.positionOfCell(cell))
+
+  isSelectedPosition: (position) ->
+    position = Point.fromObject(position)
+
+    position.row >= @selection.start.row and
+    position.row <= @selection.end.row and
+    position.column >= @selection.start.column and
+    position.column <= @selection.end.column
+
   setSelection: (selection) ->
     @selection = Range.fromObject(selection)
     @requestUpdate(true)
