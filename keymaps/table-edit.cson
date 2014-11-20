@@ -9,8 +9,8 @@
 # https://atom.io/docs/latest/advanced/keymaps
 
 '.table-edit':
-  'tab': 'table-edit:move-right'
-  'shift-tab': 'table-edit:move-left'
+  'tab': 'core:move-right'
+  'shift-tab': 'core:move-left'
 
 '.table-edit atom-text-editor':
   'enter': 'core:confirm'
