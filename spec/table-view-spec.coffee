@@ -975,6 +975,38 @@ describe 'TableView', ->
       nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
+  describe 'core:select-up', ->
+    beforeEach ->
+      tableView.activateCellAtPosition([2,0])
+
+    it 'expands the selection by one cell to the top', ->
+      tableView.trigger('core:select-up')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[1,0],[2,0]])
+
+    it 'stops at the first row', ->
+      tableView.trigger('core:select-up')
+      tableView.trigger('core:select-up')
+      tableView.trigger('core:select-up')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
+
+  describe 'core:select-down', ->
+    beforeEach ->
+      tableView.activateCellAtPosition([97,0])
+
+    it 'expands the selection by one cell to the bottom', ->
+      tableView.trigger('core:select-down')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[97,0],[98,0]])
+
+    it 'stops at the last row', ->
+      tableView.trigger('core:select-down')
+      tableView.trigger('core:select-down')
+      tableView.trigger('core:select-down')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[97,0],[99,0]])
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()

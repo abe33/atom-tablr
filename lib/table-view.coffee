@@ -49,6 +49,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:page-down', => @pageDown()
     @subscriptions.add @asDisposable @on 'core:select-right', => @expandSelectionRight()
     @subscriptions.add @asDisposable @on 'core:select-left', => @expandSelectionLeft()
+    @subscriptions.add @asDisposable @on 'core:select-up', => @expandSelectionUp()
+    @subscriptions.add @asDisposable @on 'core:select-down', => @expandSelectionDown()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
       e.preventDefault()
       @focus()
@@ -564,6 +566,14 @@ class TableView extends View
 
   expandSelectionLeft: ->
     @selection.start.column = Math.max(@selection.start.column - 1, 0)
+    @requestUpdate()
+
+  expandSelectionUp: ->
+    @selection.start.row = Math.max(@selection.start.row - 1, 0)
+    @requestUpdate()
+
+  expandSelectionDown: ->
+    @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
     @requestUpdate()
 
   #    ##     ## ########  ########     ###    ######## ########
