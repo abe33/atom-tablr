@@ -135,7 +135,24 @@
   color: @text-color-selected;
 }
 
-.active {
-  background: fadeout(@background-color-warning, 90%);
-  color: @text-color-selected;
+.table-edit-cell {
+  &.selected {
+    background: @background-color-highlight;
+  }
+
+  &.active {
+    background: fadeout(@background-color-warning, 90%);
+    color: @text-color-selected;
+    position: relative;
+
+    &:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      border: 1px solid fadeout(@background-color-warning, 75%);
+    }
+  }
 }
