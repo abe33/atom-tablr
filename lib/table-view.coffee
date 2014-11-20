@@ -80,6 +80,7 @@ class TableView extends View
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowOverdraw', (@configRowOverdraw) =>
       @requestUpdate(true)
 
+    @setSelectionFromActiveCell()
     @subscribeToColumn(column) for column in @table.getColumns()
 
   attach: (target) ->
@@ -388,8 +389,7 @@ class TableView extends View
       else
         @activeCellPosition.row = 0
 
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   moveLeft: ->
     if @activeCellPosition.column - 1 >= 0
@@ -402,8 +402,7 @@ class TableView extends View
       else
         @activeCellPosition.row = @getLastRow()
 
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   moveUp: ->
     if @activeCellPosition.row - 1 >= 0
@@ -411,8 +410,7 @@ class TableView extends View
     else
       @activeCellPosition.row = @getLastRow()
 
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   moveDown: ->
     if @activeCellPosition.row + 1 < @table.getRowsCount()
@@ -420,23 +418,20 @@ class TableView extends View
     else
       @activeCellPosition.row = 0
 
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   moveToTop: ->
     return if @activeCellPosition.row is 0
 
     @activeCellPosition.row = 0
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   moveToBottom: ->
     end = @getLastRow()
     return if @activeCellPosition.row is end
 
     @activeCellPosition.row = end
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   pageDown: ->
     amount = @getPageMovesAmount()
@@ -445,8 +440,7 @@ class TableView extends View
     else
       @activeCellPosition.row = @getLastRow()
 
-    @requestUpdate(true)
-    @makeRowVisible(@activeCellPosition.row)
+    @afterActiveCellMove()
 
   pageUp: ->
     amount = @getPageMovesAmount()
@@ -455,6 +449,10 @@ class TableView extends View
     else
       @activeCellPosition.row = 0
 
+    @afterActiveCellMove()
+
+  afterActiveCellMove: ->
+    @setSelectionFromActiveCell()
     @requestUpdate(true)
     @makeRowVisible(@activeCellPosition.row)
 
@@ -536,8 +534,10 @@ class TableView extends View
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
 
-  getSelection: ->
-    new Range(@activeCellPosition, @activeCellPosition)
+  getSelection: -> @selection
+
+  setSelectionFromActiveCell: ->
+    @selection = new Range(@activeCellPosition, @activeCellPosition)
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##

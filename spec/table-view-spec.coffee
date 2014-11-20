@@ -931,6 +931,13 @@ describe 'TableView', ->
     expect(tableView.getSelection()).toEqual([[0,0], [0,0]])
 
   describe 'selection', ->
+    it 'follows the active cell when it moves', ->
+      tableView.pageMovesAmount = 10
+      tableView.pageDown()
+      tableView.moveRight()
+
+      expect(tableView.getSelection()).toEqual([[10,1], [10,1]])
+
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
