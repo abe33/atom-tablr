@@ -946,6 +946,12 @@ describe 'TableView', ->
 
       expect(tableView.find('.selected').length).toEqual(6)
 
+  describe '::setSelection', ->
+    it 'change the active cell so that the upper left cell is active', ->
+      tableView.setSelection([[4,0],[6,2]])
+
+      expect(tableView.activeCellPosition).toEqual([4,0])
+
   describe 'core:select-right', ->
     it 'expands the selection by one cell on the right', ->
       tableView.trigger('core:select-right')
