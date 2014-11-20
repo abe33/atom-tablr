@@ -562,20 +562,50 @@ class TableView extends View
     ])
 
   expandSelectionRight: ->
-    @selection.end.column = Math.min(@selection.end.column + 1, @getLastColumn())
+    if @selectionExpandedLeft()
+      @selection.start.column = Math.min(@selection.start.column + 1, @getLastColumn())
+    else
+      @selection.end.column = Math.min(@selection.end.column + 1, @getLastColumn())
+
     @requestUpdate()
 
   expandSelectionLeft: ->
-    @selection.start.column = Math.max(@selection.start.column - 1, 0)
+    if @selectionExpandedRight()
+      @selection.end.column = Math.max(@selection.end.column - 1, 0)
+    else
+      @selection.start.column = Math.max(@selection.start.column - 1, 0)
+
     @requestUpdate()
 
   expandSelectionUp: ->
-    @selection.start.row = Math.max(@selection.start.row - 1, 0)
+    if @selectionExpandedDown()
+      @selection.end.row = Math.max(@selection.end.row - 1, 0)
+    else
+      @selection.start.row = Math.max(@selection.start.row - 1, 0)
     @requestUpdate()
 
   expandSelectionDown: ->
-    @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
+    if @selectionExpandedUp()
+      @selection.start.row = Math.min(@selection.start.row + 1, @getLastRow())
+    else
+      @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
     @requestUpdate()
+
+  selectionExpandedRight: ->
+    @activeCellPosition.column is @selection.start.column and
+    @activeCellPosition.column isnt @selection.end.column
+
+  selectionExpandedLeft: ->
+    @activeCellPosition.column is @selection.end.column and
+    @activeCellPosition.column isnt @selection.start.column
+
+  selectionExpandedUp: ->
+    @activeCellPosition.row is @selection.end.row and
+    @activeCellPosition.row isnt @selection.start.row
+
+  selectionExpandedDown: ->
+    @activeCellPosition.row is @selection.start.row and
+    @activeCellPosition.row isnt @selection.end.row
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##

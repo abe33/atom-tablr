@@ -955,15 +955,23 @@ describe 'TableView', ->
   describe 'core:select-right', ->
     it 'expands the selection by one cell on the right', ->
       tableView.trigger('core:select-right')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[0,0],[0,1]])
 
     it 'stops at the last column', ->
       tableView.trigger('core:select-right')
       tableView.trigger('core:select-right')
       tableView.trigger('core:select-right')
-      nextAnimationFrame()
+
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
+    describe 'then triggering core:select-left', ->
+      it 'collapse the selection back to the left', ->
+        tableView.activateCellAtPosition([0,1])
+
+        tableView.trigger('core:select-right')
+        tableView.trigger('core:select-left')
+
+        expect(tableView.getSelection()).toEqual([[0,1],[0,1]])
 
   describe 'core:select-left', ->
     beforeEach ->
@@ -971,15 +979,22 @@ describe 'TableView', ->
 
     it 'expands the selection by one cell on the left', ->
       tableView.trigger('core:select-left')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[0,1],[0,2]])
 
     it 'stops at the first column', ->
       tableView.trigger('core:select-left')
       tableView.trigger('core:select-left')
       tableView.trigger('core:select-left')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
+    describe 'then triggering core:select-right', ->
+      it 'collapse the selection back to the right', ->
+        tableView.activateCellAtPosition([0,1])
+
+        tableView.trigger('core:select-left')
+        tableView.trigger('core:select-right')
+
+        expect(tableView.getSelection()).toEqual([[0,1],[0,1]])
 
   describe 'core:select-up', ->
     beforeEach ->
@@ -987,15 +1002,22 @@ describe 'TableView', ->
 
     it 'expands the selection by one cell to the top', ->
       tableView.trigger('core:select-up')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[1,0],[2,0]])
 
     it 'stops at the first row', ->
       tableView.trigger('core:select-up')
       tableView.trigger('core:select-up')
       tableView.trigger('core:select-up')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
+
+    describe 'then triggering core:select-down', ->
+      it 'collapse the selection back to the bottom', ->
+        tableView.activateCellAtPosition([1,0])
+
+        tableView.trigger('core:select-up')
+        tableView.trigger('core:select-down')
+
+        expect(tableView.getSelection()).toEqual([[1,0],[1,0]])
 
   describe 'core:select-down', ->
     beforeEach ->
@@ -1003,15 +1025,22 @@ describe 'TableView', ->
 
     it 'expands the selection by one cell to the bottom', ->
       tableView.trigger('core:select-down')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[97,0],[98,0]])
 
     it 'stops at the last row', ->
       tableView.trigger('core:select-down')
       tableView.trigger('core:select-down')
       tableView.trigger('core:select-down')
-      nextAnimationFrame()
       expect(tableView.getSelection()).toEqual([[97,0],[99,0]])
+
+    describe 'then triggering core:select-up', ->
+      it 'collapse the selection back to the bottom', ->
+        tableView.activateCellAtPosition([1,0])
+
+        tableView.trigger('core:select-down')
+        tableView.trigger('core:select-up')
+
+        expect(tableView.getSelection()).toEqual([[1,0],[1,0]])
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
