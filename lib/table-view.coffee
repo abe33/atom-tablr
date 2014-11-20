@@ -65,20 +65,20 @@ class TableView extends View
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
-      @requestUpdate(true)
+      @requestUpdate()
 
     @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.pageMovesAmount', (@configPageMovesAmount) =>
-      @requestUpdate(true)
+      @requestUpdate()
 
     @configRowHeight = atom.config.get('table-edit.rowHeight')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowHeight', (@configRowHeight) =>
       @computeRowOffsets()
-      @requestUpdate(true)
+      @requestUpdate()
 
     @configRowOverdraw = atom.config.get('table-edit.rowOverdraw')
     @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowOverdraw', (@configRowOverdraw) =>
-      @requestUpdate(true)
+      @requestUpdate()
 
     @setSelectionFromActiveCell()
     @subscribeToColumn(column) for column in @table.getColumns()
@@ -89,7 +89,7 @@ class TableView extends View
 
   onAttach: ->
     @computeRowOffsets()
-    @requestUpdate(true)
+    @requestUpdate()
 
   destroy: ->
     @subscriptions.dispose()
@@ -97,11 +97,11 @@ class TableView extends View
 
   showGutter: ->
     @gutter = true
-    @requestUpdate(true)
+    @requestUpdate()
 
   hideGutter: ->
     @gutter = false
-    @requestUpdate(true)
+    @requestUpdate()
 
   getRows: ->
     @rows ?= @body.find('.table-edit-rows')
@@ -122,20 +122,20 @@ class TableView extends View
 
   setRowHeight: (@rowHeight) ->
     @computeRowOffsets()
-    @requestUpdate(true)
+    @requestUpdate()
 
   getRowHeightAt: (index) -> @rowHeights[index] ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
     @rowHeights[index] = height
     @computeRowOffsets()
-    @requestUpdate(true)
+    @requestUpdate()
 
   getRowOffsetAt: (index) -> @rowOffsets[index]
 
   getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
 
-  setRowOverdraw: (@rowOverdraw) -> @requestUpdate(true)
+  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
   getFirstVisibleRow: ->
     @findRowAtScreenPosition(@body.scrollTop())
@@ -202,7 +202,7 @@ class TableView extends View
       @columnsAligns?[col] ? @table.getColumn(col).align
 
   setColumnsAligns: (@columnsAligns) ->
-    @requestUpdate(true)
+    @requestUpdate()
 
   hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
 
@@ -243,7 +243,7 @@ class TableView extends View
     @columnsWidths = widths
     @columnsPercentWidths = widths.map @floatToPercent
 
-    @requestUpdate(true)
+    @requestUpdate()
 
   normalizeColumnsWidths: (columnsWidths) ->
     restWidth = 1
@@ -275,18 +275,18 @@ class TableView extends View
 
   onColumnAdded: ({column}) ->
     @subscribeToColumn(column)
-    @requestUpdate(true)
+    @requestUpdate()
 
   onColumnRemoved: ({column}) ->
     @unsubscribeFromColumn(column)
-    @requestUpdate(true)
+    @requestUpdate()
 
   subscribeToColumn: (column) ->
     @columnSubscriptions ?= {}
     subscription = @columnSubscriptions[column.id] = new CompositeDisposable
 
-    subscription.add column.onDidChangeName => @requestUpdate(true)
-    subscription.add column.onDidChangeOption => @requestUpdate(true)
+    subscription.add column.onDidChangeName => @requestUpdate()
+    subscription.add column.onDidChangeOption => @requestUpdate()
 
   unsubscribeFromColumn: (column) ->
     @columnSubscriptions[column.id]?.dispose()
@@ -314,7 +314,7 @@ class TableView extends View
     position = Point.fromObject(position)
 
     @activeCellPosition = position
-    @requestUpdate(true)
+    @requestUpdate()
     @makeRowVisible(position.row)
 
   cellScreenRect: (position) ->
@@ -453,7 +453,7 @@ class TableView extends View
 
   afterActiveCellMove: ->
     @setSelectionFromActiveCell()
-    @requestUpdate(true)
+    @requestUpdate()
     @makeRowVisible(@activeCellPosition.row)
 
   getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
@@ -549,7 +549,7 @@ class TableView extends View
 
   setSelection: (selection) ->
     @selection = Range.fromObject(selection)
-    @requestUpdate(true)
+    @requestUpdate()
 
   setSelectionFromActiveCell: ->
     @selection = new Range(@activeCellPosition, @activeCellPosition)
@@ -565,13 +565,11 @@ class TableView extends View
   scrollTop: (scroll) ->
     if scroll?
       @body.scrollTop(scroll)
-      @requestUpdate()
+      @requestUpdate(false)
 
     @body.scrollTop()
 
-  requestUpdate: (forceUpdate=false) =>
-    @hasChanged = forceUpdate
-
+  requestUpdate: (@hasChanged=true) =>
     return if @updateRequested
 
     @updateRequested = true
