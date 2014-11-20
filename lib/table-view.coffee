@@ -1,4 +1,4 @@
-{Point, TextEditorView, View} = require 'atom'
+{Point, Range, TextEditorView, View} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
@@ -527,6 +527,17 @@ class TableView extends View
       @confirmEdit()
       e.stopImmediatePropagation()
       return false
+
+  #     ######  ######## ##       ########  ######  ########
+  #    ##    ## ##       ##       ##       ##    ##    ##
+  #    ##       ##       ##       ##       ##          ##
+  #     ######  ######   ##       ######   ##          ##
+  #          ## ##       ##       ##       ##          ##
+  #    ##    ## ##       ##       ##       ##    ##    ##
+  #     ######  ######## ######## ########  ######     ##
+
+  getSelection: ->
+    new Range(@activeCellPosition, @activeCellPosition)
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##

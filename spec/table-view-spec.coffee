@@ -919,6 +919,19 @@ describe 'TableView', ->
       it 'closes the editor', ->
         expect(tableView.isEditing()).toBeFalsy()
 
+  #     ######  ######## ##       ########  ######  ########
+  #    ##    ## ##       ##       ##       ##    ##    ##
+  #    ##       ##       ##       ##       ##          ##
+  #     ######  ######   ##       ######   ##          ##
+  #          ## ##       ##       ##       ##          ##
+  #    ##    ## ##       ##       ##       ##    ##    ##
+  #     ######  ######## ######## ########  ######     ##
+
+  it 'has a selection', ->
+    expect(tableView.getSelection()).toEqual([[0,0], [0,0]])
+
+  describe 'selection', ->
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
