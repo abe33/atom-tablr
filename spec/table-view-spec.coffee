@@ -946,6 +946,34 @@ describe 'TableView', ->
 
       expect(tableView.find('.selected').length).toEqual(6)
 
+  describe 'core:select-right', ->
+    it 'expands the selection by one cell on the right', ->
+      tableView.trigger('core:select-right')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[0,0],[0,1]])
+
+    it 'stops at the last column', ->
+      tableView.trigger('core:select-right')
+      tableView.trigger('core:select-right')
+      tableView.trigger('core:select-right')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
+  describe 'core:select-left', ->
+    beforeEach ->
+      tableView.activateCellAtPosition([0,2])
+
+    it 'expands the selection by one cell on the left', ->
+      tableView.trigger('core:select-left')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[0,1],[0,2]])
+
+    it 'stops at the first column', ->
+      tableView.trigger('core:select-left')
+      tableView.trigger('core:select-left')
+      tableView.trigger('core:select-left')
+      nextAnimationFrame()
+      expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

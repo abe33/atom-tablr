@@ -47,6 +47,8 @@ class TableView extends View
     @subscriptions.add @asDisposable @on 'core:move-to-bottom', => @moveToBottom()
     @subscriptions.add @asDisposable @on 'core:page-up', => @pageUp()
     @subscriptions.add @asDisposable @on 'core:page-down', => @pageDown()
+    @subscriptions.add @asDisposable @on 'core:select-right', => @expandSelectionRight()
+    @subscriptions.add @asDisposable @on 'core:select-left', => @expandSelectionLeft()
     @subscriptions.add @asDisposable @on 'mousedown', (e) =>
       e.preventDefault()
       @focus()
@@ -314,8 +316,7 @@ class TableView extends View
     position = Point.fromObject(position)
 
     @activeCellPosition = position
-    @requestUpdate()
-    @makeRowVisible(position.row)
+    @afterActiveCellMove()
 
   cellScreenRect: (position) ->
     {top, left} = @cellScreenPosition(position)
@@ -552,7 +553,18 @@ class TableView extends View
     @requestUpdate()
 
   setSelectionFromActiveCell: ->
-    @selection = new Range(@activeCellPosition, @activeCellPosition)
+    @selection = Range.fromObject([
+      [@activeCellPosition.row, @activeCellPosition.column]
+      [@activeCellPosition.row, @activeCellPosition.column]
+    ])
+
+  expandSelectionRight: ->
+    @selection.end.column = Math.min(@selection.end.column + 1, @getLastColumn())
+    @requestUpdate()
+
+  expandSelectionLeft: ->
+    @selection.start.column = Math.max(@selection.start.column - 1, 0)
+    @requestUpdate()
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
