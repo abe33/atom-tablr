@@ -53,6 +53,10 @@ class TableView extends View
     sub @, 'core:select-left', => @expandSelectionLeft()
     sub @, 'core:select-up', => @expandSelectionUp()
     sub @, 'core:select-down', => @expandSelectionDown()
+    sub @, 'table-edit:select-to-end-of-line', => @expandSelectionToEndOfLine()
+    sub @, 'table-edit:select-to-beginning-of-line', => @expandSelectionToBeginningOfLine()
+    sub @, 'table-edit:select-to-end-of-table', => @expandSelectionToEndOfTable()
+    sub @, 'table-edit:select-to-beginning-of-table', => @expandSelectionToBeginningOfTable()
     sub @, 'mousedown', (e) => e.preventDefault(); @focus()
 
     sub @body, 'scroll', @requestUpdate
@@ -590,6 +594,27 @@ class TableView extends View
     else
       @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
     @requestUpdate()
+
+  expandSelectionToEndOfLine: ->
+    @selection.start.column = @activeCellPosition.column
+    @selection.end.column = @getLastColumn()
+    @requestUpdate()
+
+  expandSelectionToBeginningOfLine: ->
+    @selection.start.column = 0
+    @selection.end.column = @activeCellPosition.column
+    @requestUpdate()
+
+  expandSelectionToEndOfTable: ->
+    @selection.start.row = @activeCellPosition.row
+    @selection.end.row = @getLastRow()
+    @requestUpdate()
+
+  expandSelectionToBeginningOfTable: ->
+    @selection.start.row = 0
+    @selection.end.row = @activeCellPosition.row
+    @requestUpdate()
+
 
   selectionExpandedRight: ->
     @activeCellPosition.column is @selection.start.column and

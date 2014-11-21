@@ -1042,6 +1042,72 @@ describe 'TableView', ->
 
         expect(tableView.getSelection()).toEqual([[1,0],[1,0]])
 
+  describe 'table-edit:select-to-end-of-line', ->
+    it 'expands the selection to the end of the current row', ->
+      tableView.trigger('table-edit:select-to-end-of-line')
+
+      expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
+    describe 'then triggering table-edit:select-to-beginning-of-line', ->
+      it 'expands the selection to the beginning of the current row', ->
+        tableView.activateCellAtPosition([0,1])
+
+        tableView.trigger('table-edit:select-to-end-of-line')
+        tableView.trigger('table-edit:select-to-beginning-of-line')
+
+        expect(tableView.getSelection()).toEqual([[0,0],[0,1]])
+
+  describe 'table-edit:select-to-beginning-of-line', ->
+    it 'expands the selection to the beginning of the current row', ->
+      tableView.activateCellAtPosition([0,2])
+
+      tableView.trigger('table-edit:select-to-beginning-of-line')
+
+      expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
+    describe 'table-edit:select-to-end-of-line', ->
+      it 'expands the selection to the end of the current row', ->
+        tableView.activateCellAtPosition([0,1])
+
+        tableView.trigger('table-edit:select-to-beginning-of-line')
+        tableView.trigger('table-edit:select-to-end-of-line')
+
+        expect(tableView.getSelection()).toEqual([[0,1],[0,2]])
+
+  describe 'table-edit:select-to-end-of-table', ->
+    it 'expands the selection to the end of the table', ->
+      tableView.trigger('table-edit:select-to-end-of-table')
+
+      expect(tableView.getSelection()).toEqual([[0,0],[99,0]])
+
+    describe 'then triggering table-edit:select-to-beginning-of-table', ->
+      it 'expands the selection to the beginning of the table', ->
+        tableView.activateCellAtPosition([1,0])
+
+        tableView.trigger('table-edit:select-to-end-of-table')
+        tableView.trigger('table-edit:select-to-beginning-of-table')
+
+        expect(tableView.getSelection()).toEqual([[0,0],[1,0]])
+
+  describe 'table-edit:select-to-beginning-of-table', ->
+    it 'expands the selection to the beginning of the table', ->
+      tableView.activateCellAtPosition([2,0])
+
+      tableView.trigger('table-edit:select-to-beginning-of-table')
+
+      expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
+
+    describe 'table-edit:select-to-end-of-table', ->
+      it 'expands the selection to the end of the table', ->
+        tableView.activateCellAtPosition([1,0])
+
+        tableView.trigger('table-edit:select-to-beginning-of-table')
+        tableView.trigger('table-edit:select-to-end-of-table')
+
+        expect(tableView.getSelection()).toEqual([[1,0],[99,0]])
+
+
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
