@@ -26,38 +26,38 @@ class TableView extends View
     @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
     @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
 
-    @subscriptions = new CompositeDisposable
-    @subscriptions.add @table.onDidChangeRows @requestUpdate
-    @subscriptions.add @table.onDidAddColumn @onColumnAdded
-    @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
+    subs = @subscriptions = new CompositeDisposable
+    sub = (o,e,c) => subs.add @asDisposable o.on e, c
 
-    @subscriptions.add @asDisposable @hiddenInput.on 'textInput', (e) =>
+    subs.add @table.onDidChangeRows @requestUpdate
+    subs.add @table.onDidAddColumn @onColumnAdded
+    subs.add @table.onDidRemoveColumn @onColumnRemoved
+
+    sub @hiddenInput, 'textInput', (e) =>
       unless @isEditing()
         @startEdit()
         @editView.setText(e.originalEvent.data)
 
-    @subscriptions.add @asDisposable @on 'core:confirm', => @startEdit()
-    @subscriptions.add @asDisposable @on 'core:undo', => @table.undo()
-    @subscriptions.add @asDisposable @on 'core:redo', => @table.redo()
-    @subscriptions.add @asDisposable @on 'core:move-left', => @moveLeft()
-    @subscriptions.add @asDisposable @on 'core:move-right', => @moveRight()
-    @subscriptions.add @asDisposable @on 'core:move-up', => @moveUp()
-    @subscriptions.add @asDisposable @on 'core:move-down', => @moveDown()
-    @subscriptions.add @asDisposable @on 'core:move-to-top', => @moveToTop()
-    @subscriptions.add @asDisposable @on 'core:move-to-bottom', => @moveToBottom()
-    @subscriptions.add @asDisposable @on 'core:page-up', => @pageUp()
-    @subscriptions.add @asDisposable @on 'core:page-down', => @pageDown()
-    @subscriptions.add @asDisposable @on 'core:select-right', => @expandSelectionRight()
-    @subscriptions.add @asDisposable @on 'core:select-left', => @expandSelectionLeft()
-    @subscriptions.add @asDisposable @on 'core:select-up', => @expandSelectionUp()
-    @subscriptions.add @asDisposable @on 'core:select-down', => @expandSelectionDown()
-    @subscriptions.add @asDisposable @on 'mousedown', (e) =>
-      e.preventDefault()
-      @focus()
+    sub @, 'core:confirm', => @startEdit()
+    sub @, 'core:undo', => @table.undo()
+    sub @, 'core:redo', => @table.redo()
+    sub @, 'core:move-left', => @moveLeft()
+    sub @, 'core:move-right', => @moveRight()
+    sub @, 'core:move-up', => @moveUp()
+    sub @, 'core:move-down', => @moveDown()
+    sub @, 'core:move-to-top', => @moveToTop()
+    sub @, 'core:move-to-bottom', => @moveToBottom()
+    sub @, 'core:page-up', => @pageUp()
+    sub @, 'core:page-down', => @pageDown()
+    sub @, 'core:select-right', => @expandSelectionRight()
+    sub @, 'core:select-left', => @expandSelectionLeft()
+    sub @, 'core:select-up', => @expandSelectionUp()
+    sub @, 'core:select-down', => @expandSelectionDown()
+    sub @, 'mousedown', (e) => e.preventDefault(); @focus()
 
-    @subscriptions.add @asDisposable @body.on 'scroll', @requestUpdate
-    @subscriptions.add @asDisposable @body.on 'dblclick', (e) => @startEdit()
-    @subscriptions.add @asDisposable @body.on 'mousedown', (e) =>
+    sub @body, 'scroll', @requestUpdate
+    sub @body, 'dblclick', (e) => @startEdit()
+    sub @body, 'mousedown', (e) =>
       e.preventDefault()
 
       @stopEdit() if @isEditing()
@@ -68,20 +68,20 @@ class TableView extends View
       @focus()
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
-    @subscriptions.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
+    subs.add @asDisposable atom.config.observe 'table-edit.undefinedDisplay', (@configUndefinedDisplay) =>
       @requestUpdate()
 
     @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
-    @subscriptions.add @asDisposable atom.config.observe 'table-edit.pageMovesAmount', (@configPageMovesAmount) =>
+    subs.add @asDisposable atom.config.observe 'table-edit.pageMovesAmount', (@configPageMovesAmount) =>
       @requestUpdate()
 
     @configRowHeight = atom.config.get('table-edit.rowHeight')
-    @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowHeight', (@configRowHeight) =>
+    subs.add @asDisposable atom.config.observe 'table-edit.rowHeight', (@configRowHeight) =>
       @computeRowOffsets()
       @requestUpdate()
 
     @configRowOverdraw = atom.config.get('table-edit.rowOverdraw')
-    @subscriptions.add @asDisposable atom.config.observe 'table-edit.rowOverdraw', (@configRowOverdraw) =>
+    subs.add @asDisposable atom.config.observe 'table-edit.rowOverdraw', (@configRowOverdraw) =>
       @requestUpdate()
 
     @setSelectionFromActiveCell()
