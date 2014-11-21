@@ -11,6 +11,10 @@
 '.table-edit':
   'tab': 'core:move-right'
   'shift-tab': 'core:move-left'
+  'cmd-shift-right': 'table-edit:select-to-end-of-line'
+  'cmd-shift-left': 'table-edit:select-to-beginning-of-line'
+  'cmd-shift-up': 'table-edit:select-to-beginning-of-table'
+  'cmd-shift-down': 'table-edit:select-to-end-of-table'
 
 '.table-edit atom-text-editor':
   'enter': 'core:confirm'
