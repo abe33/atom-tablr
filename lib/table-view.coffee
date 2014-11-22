@@ -131,6 +131,8 @@ class TableView extends View
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
+  isActiveRow: (row) -> @activeCellPosition.row is row
+
   isSelectedRow: (row) ->
     row >= @selection.start.row and row <= @selection.end.row
 
@@ -162,8 +164,6 @@ class TableView extends View
     scrollViewHeight = @body.height()
 
     @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
-
-  isActiveRow: (row) -> @activeCellPosition.row is row
 
   makeRowVisible: (row) ->
     rowHeight = @getRowHeightAt(row)
@@ -322,6 +322,8 @@ class TableView extends View
     @table.cellAtPosition(@activeCellPosition)
 
   isActiveCell: (cell) -> @getActiveCell() is cell
+
+  isSelectedCell: (cell) -> @iseSelectedPosition(@table.positionOfCell(cell))
 
   activateCell: (cell) ->
     @activateCellAtPosition(@table.positionOfCell(cell))
@@ -551,11 +553,6 @@ class TableView extends View
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
 
-  getSelection: -> @selection
-
-  isSelectedCell: (cell) ->
-    @iseSelectedPosition(@table.positionOfCell(cell))
-
   isSelectedPosition: (position) ->
     position = Point.fromObject(position)
 
@@ -563,6 +560,8 @@ class TableView extends View
     position.row <= @selection.end.row and
     position.column >= @selection.start.column and
     position.column <= @selection.end.column
+
+  getSelection: -> @selection
 
   setSelection: (selection) ->
     @selection = Range.fromObject(selection)
