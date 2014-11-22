@@ -8,6 +8,7 @@ module.exports = React.createClass
     rows = for row in [firstRow...lastRow]
       classes = ['table-edit-row-number']
       classes.push 'active-row' if parentView.isActiveRow(row)
+      classes.push 'selected' if parentView.isSelectedRow(row)
 
       div {
         className: classes.join(' ')

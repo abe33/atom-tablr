@@ -946,6 +946,14 @@ describe 'TableView', ->
 
       expect(tableView.find('.selected').length).toEqual(6)
 
+    it 'marks the row number with a selected class', ->
+      tableView.showGutter()
+      tableView.setSelection([[2,0],[3,2]])
+
+      nextAnimationFrame()
+
+      expect(tableView.find('.table-edit-row-number.selected').length).toEqual(2)
+
   describe '::setSelection', ->
     it 'change the active cell so that the upper left cell is active', ->
       tableView.setSelection([[4,0],[6,2]])

@@ -131,6 +131,9 @@ class TableView extends View
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
+  isSelectedRow: (row) ->
+    row >= @selection.start.row and row <= @selection.end.row
+
   getLastRow: -> @table.getRowsCount() - 1
 
   getRowHeight: -> @rowHeight ? @configRowHeight
