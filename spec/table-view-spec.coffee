@@ -1106,8 +1106,6 @@ describe 'TableView', ->
 
         expect(tableView.getSelection()).toEqual([[1,0],[99,0]])
 
-
-
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
