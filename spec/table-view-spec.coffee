@@ -1153,7 +1153,7 @@ describe 'TableView', ->
       endCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(3)')
       startOffset = startCell.offset()
       endOffset = endCell.offset()
-      
+
       mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
       mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
 
