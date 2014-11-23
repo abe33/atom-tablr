@@ -85,6 +85,9 @@ class TableView extends View
         e.stopPropagation()
         e.preventDefault()
         @endDrag(e)
+      'click': (e) =>
+        e.stopPropagation()
+        e.preventDefault()
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
     @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
