@@ -713,6 +713,7 @@ class TableView extends View
   endDrag: (e) ->
     return unless @dragging
 
+    @drag(e)
     @dragging = false
 
   #    ##     ## ########  ########     ###    ######## ########
