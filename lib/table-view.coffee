@@ -648,6 +648,15 @@ class TableView extends View
     @activeCellPosition.row is @selection.start.row and
     @activeCellPosition.row isnt @selection.end.row
 
+  selectionSpansManyCells: ->
+    @selectionSpansManyColumns() or @selectionSpansManyRows()
+
+  selectionSpansManyColumns: ->
+    @selection.start.column isnt @selection.end.column
+
+  selectionSpansManyRows: ->
+    @selection.start.rows isnt @selection.end.rows
+
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
   #    ##     ## ##     ## ##     ##  ##   ##     ##    ##

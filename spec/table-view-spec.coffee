@@ -960,6 +960,12 @@ describe 'TableView', ->
 
       expect(tableView.activeCellPosition).toEqual([4,0])
 
+  describe '::selectionSpansManyCells', ->
+    it 'returns true when the selection as at least two cells', ->
+      tableView.setSelection([[4,0],[6,2]])
+
+      expect(tableView.selectionSpansManyCells()).toBeTruthy()
+
   describe 'core:select-right', ->
     it 'expands the selection by one cell on the right', ->
       tableView.trigger('core:select-right')
