@@ -59,6 +59,7 @@ class TableView extends View
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
       'mousedown': (e) =>
+        e.stopPropagation()
         e.preventDefault()
         @focus()
 
@@ -66,6 +67,7 @@ class TableView extends View
       'scroll': => @requestUpdate()
       'dblclick': (e) => @startEdit()
       'mousedown': (e) =>
+        e.stopPropagation()
         e.preventDefault()
 
         @stopEdit() if @isEditing()
@@ -76,9 +78,11 @@ class TableView extends View
         @startDrag(e)
         @focus()
       'mousemove': (e) =>
+        e.stopPropagation()
         e.preventDefault()
         @drag(e)
       'mouseup': (e) =>
+        e.stopPropagation()
         e.preventDefault()
         @endDrag(e)
 
