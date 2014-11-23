@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, textInput} = require './helpers/events'
+{mousedown, mousemove, mouseup, textInput} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
@@ -1146,6 +1146,23 @@ describe 'TableView', ->
         tableView.trigger('table-edit:select-to-end-of-table')
 
         expect(tableView.getSelection()).toEqual([[1,0],[99,0]])
+
+  describe 'dragging the mouse pressed over cell', ->
+    it 'creates a selection with the cells from the mouse movements', ->
+      startCell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
+      endCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(3)')
+      startOffset = startCell.offset()
+      endOffset = endCell.offset()
+      
+      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
+      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+
+      expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
+
+      mousedown(endCell, endOffset.left + 50, endOffset.top + 5)
+      mousemove(startCell, startOffset.left + 50, startOffset.top + 5)
+
+      expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

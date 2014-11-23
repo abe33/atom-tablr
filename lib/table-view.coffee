@@ -58,7 +58,9 @@ class TableView extends View
       'table-edit:select-to-beginning-of-line': => @expandSelectionToBeginningOfLine()
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
-      'mousedown': (e) => e.preventDefault(); @focus()
+      'mousedown': (e) =>
+        e.preventDefault()
+        @focus()
 
     @subscribeTo @body,
       'scroll': => @requestUpdate()
@@ -71,7 +73,14 @@ class TableView extends View
         if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
           @activateCellAtPosition position
 
+        @startDrag(e)
         @focus()
+      'mousemove': (e) =>
+        e.preventDefault()
+        @drag(e)
+      'mouseup': (e) =>
+        e.preventDefault()
+        @endDrag(e)
 
     @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
     @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
@@ -656,6 +665,51 @@ class TableView extends View
 
   selectionSpansManyRows: ->
     @selection.start.rows isnt @selection.end.rows
+
+  #    ########    ####    ########
+  #    ##     ##  ##  ##   ##     ##
+  #    ##     ##   ####    ##     ##
+  #    ##     ##  ####     ##     ##
+  #    ##     ## ##  ## ## ##     ##
+  #    ##     ## ##   ##   ##     ##
+  #    ########   ####  ## ########
+
+  startDrag: (e) ->
+    return if @dragging
+
+    @dragging = true
+
+  drag: (e) ->
+    if @dragging
+      {pageX, pageY} = e
+      position = @cellPositionAtScreenPosition pageX, pageY
+
+      if position.row < @activeCellPosition.row
+        @selection.start.row = position.row
+        @selection.end.row = @activeCellPosition.row
+      else if position.row > @activeCellPosition.row
+        @selection.end.row = position.row
+        @selection.start.row = @activeCellPosition.row
+      else
+        @selection.end.row = @activeCellPosition.row
+        @selection.start.row = @activeCellPosition.row
+
+      if position.column < @activeCellPosition.column
+        @selection.start.column = position.column
+        @selection.end.column = @activeCellPosition.column
+      else if position.column > @activeCellPosition.column
+        @selection.end.column = position.column
+        @selection.start.column = @activeCellPosition.column
+      else
+        @selection.end.column = @activeCellPosition.column
+        @selection.start.column = @activeCellPosition.column
+
+      @requestUpdate()
+
+  endDrag: (e) ->
+    return unless @dragging
+
+    @dragging = false
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
