@@ -1018,6 +1018,14 @@ describe 'TableView', ->
       tableView.trigger('core:select-up')
       expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
 
+    it 'scrolls the view to make the added row visible', ->
+      tableView.scrollTop(200)
+      tableView.activateCellAtPosition([10,0])
+
+      tableView.trigger('core:select-up')
+
+      expect(tableView.body.scrollTop()).toEqual(180)
+
     describe 'then triggering core:select-down', ->
       it 'collapse the selection back to the bottom', ->
         tableView.activateCellAtPosition([1,0])
@@ -1040,6 +1048,13 @@ describe 'TableView', ->
       tableView.trigger('core:select-down')
       tableView.trigger('core:select-down')
       expect(tableView.getSelection()).toEqual([[97,0],[99,0]])
+
+    it 'scrolls the view to make the added row visible', ->
+      tableView.activateCellAtPosition([8,0])
+
+      tableView.trigger('core:select-down')
+
+      expect(tableView.body.scrollTop()).not.toEqual(0)
 
     describe 'then triggering core:select-up', ->
       it 'collapse the selection back to the bottom', ->
@@ -1088,6 +1103,11 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[0,0],[99,0]])
 
+    it 'scrolls the view to make the added row visible', ->
+      tableView.trigger('table-edit:select-to-end-of-table')
+
+      expect(tableView.body.scrollTop()).not.toEqual(0)
+
     describe 'then triggering table-edit:select-to-beginning-of-table', ->
       it 'expands the selection to the beginning of the table', ->
         tableView.activateCellAtPosition([1,0])
@@ -1104,6 +1124,13 @@ describe 'TableView', ->
       tableView.trigger('table-edit:select-to-beginning-of-table')
 
       expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
+
+    it 'scrolls the view to make the added row visible', ->
+      tableView.activateCellAtPosition([99,0])
+
+      tableView.trigger('table-edit:select-to-beginning-of-table')
+
+      expect(tableView.body.scrollTop()).toEqual(0)
 
     describe 'table-edit:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->

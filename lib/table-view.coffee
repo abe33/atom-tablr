@@ -591,17 +591,21 @@ class TableView extends View
     @requestUpdate()
 
   expandSelectionUp: ->
-    if @selectionExpandedDown()
+    row = if @selectionExpandedDown()
       @selection.end.row = Math.max(@selection.end.row - 1, 0)
     else
       @selection.start.row = Math.max(@selection.start.row - 1, 0)
+
+    @makeRowVisible(row)
     @requestUpdate()
 
   expandSelectionDown: ->
-    if @selectionExpandedUp()
+    row = if @selectionExpandedUp()
       @selection.start.row = Math.min(@selection.start.row + 1, @getLastRow())
     else
       @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
+
+    @makeRowVisible(row)
     @requestUpdate()
 
   expandSelectionToEndOfLine: ->
@@ -617,13 +621,16 @@ class TableView extends View
   expandSelectionToEndOfTable: ->
     @selection.start.row = @activeCellPosition.row
     @selection.end.row = @getLastRow()
+
+    @makeRowVisible(@selection.end.row)
     @requestUpdate()
 
   expandSelectionToBeginningOfTable: ->
     @selection.start.row = 0
     @selection.end.row = @activeCellPosition.row
-    @requestUpdate()
 
+    @makeRowVisible(@selection.start.row)
+    @requestUpdate()
 
   selectionExpandedRight: ->
     @activeCellPosition.column is @selection.start.column and
