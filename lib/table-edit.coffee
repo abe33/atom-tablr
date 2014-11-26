@@ -44,7 +44,7 @@ module.exports =
     for i in [0...100]
       table.addRow [
         "row#{i}"
-        i * 100
+        Math.random() * 100
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
@@ -60,6 +60,8 @@ module.exports =
     tableView.attach(atom.workspaceView)
 
     tableView.on 'core:cancel', -> tableView.destroy()
+    
+    tableView.sortBy('value')
 
     tableView.focus()
 
