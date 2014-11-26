@@ -14,8 +14,8 @@ module.exports = React.createClass
         className: classes.join(' ')
         key: "row-number-#{row}"
         style:
-          height: "#{parentView.getRowHeightAt(row)}px"
-          top: "#{parentView.getRowOffsetAt(row)}px"
+          height: "#{parentView.getScreenRowHeightAt(row)}px"
+          top: "#{parentView.getScreenRowOffsetAt(row)}px"
       }, row + 1
 
     rows.unshift div className: 'table-edit-gutter-filler', totalRows
