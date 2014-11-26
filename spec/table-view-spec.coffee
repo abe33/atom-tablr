@@ -1181,7 +1181,20 @@ describe 'TableView', ->
       it 'sorts the rows accordingly', ->
         expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row99')
 
+      it 'leaves the active cell position as it was before', ->
+        expect(tableView.activeCellPosition).toEqual([0,0])
+        expect(tableView.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
 
+    describe 'opening an editor', ->
+      beforeEach ->
+        tableView.startEdit()
+
+      it 'opens the editor at the cell position', ->
+        editorOffset = tableView.find('.editor').offset()
+        cellOffset = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').offset()
+
+        expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
+        expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe

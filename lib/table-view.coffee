@@ -180,11 +180,11 @@ class TableView extends View
     @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
 
   makeRowVisible: (row) ->
-    rowHeight = @getRowHeightAt(row)
+    rowHeight = @getScreenRowHeightAt(row)
     scrollViewHeight = @body.height()
     currentScrollTop = @body.scrollTop()
 
-    rowOffset = @getRowOffsetAt(row)
+    rowOffset = @getScreenRowOffsetAt(row)
 
     scrollTopAsFirstVisibleRow = rowOffset
     scrollTopAsLastVisibleRow = rowOffset - (scrollViewHeight - rowHeight)
@@ -363,7 +363,7 @@ class TableView extends View
   #     ######  ######## ######## ########  ######
 
   getActiveCell: ->
-    @table.cellAtPosition(@activeCellPosition)
+    @table.cellAtPosition(@modelPosition(@activeCellPosition))
 
   isActiveCell: (cell) -> @getActiveCell() is cell
 
@@ -385,7 +385,7 @@ class TableView extends View
     widths = @getColumnsScreenWidths()
 
     width = widths[position.column]
-    height = @getRowHeightAt(position.row)
+    height = @getScreenRowHeightAt(position.row)
 
     {top, left, width, height}
 
@@ -429,6 +429,16 @@ class TableView extends View
       column++
 
     {row, column}
+
+  screenPosition: (position) ->
+    {row, column} = Point.fromObject(position)
+
+    {row: @modelRowToScreenRow(row), column}
+
+  modelPosition: (position) ->
+    {row, column} = Point.fromObject(position)
+
+    {row: @screenRowToModelRow(row), column}
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
