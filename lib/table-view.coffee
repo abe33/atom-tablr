@@ -367,7 +367,7 @@ class TableView extends View
 
   isActiveCell: (cell) -> @getActiveCell() is cell
 
-  isSelectedCell: (cell) -> @iseSelectedPosition(@table.positionOfCell(cell))
+  isSelectedCell: (cell) -> @isSelectedPosition(@table.positionOfCell(cell))
 
   activateCell: (cell) ->
     @activateCellAtPosition(@table.positionOfCell(cell))
