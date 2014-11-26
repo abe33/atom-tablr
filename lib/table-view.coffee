@@ -22,10 +22,6 @@ class TableView extends View
     @rowHeights = {}
     @rowOffsets = null
 
-    props = {@table, parentView: this}
-    @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
-    @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
-
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add @table.onDidChangeRows @requestUpdate
@@ -89,10 +85,7 @@ class TableView extends View
         e.stopPropagation()
         e.preventDefault()
 
-    @configUndefinedDisplay = atom.config.get('table-edit.undefinedDisplay')
-    @configPageMovesAmount = atom.config.get('table-edit.pageMovesAmount')
-    @configRowHeight = atom.config.get('table-edit.rowHeight')
-    @configRowOverdraw = atom.config.get('table-edit.rowOverdraw')
+    @updateScreenRows()
 
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
@@ -105,6 +98,10 @@ class TableView extends View
 
     @setSelectionFromActiveCell()
     @subscribeToColumn(column) for column in @table.getColumns()
+
+    props = {@table, parentView: this}
+    @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
+    @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
 
   attach: (target) ->
     @onAttach()
@@ -152,26 +149,27 @@ class TableView extends View
   isSelectedRow: (row) ->
     row >= @selection.start.row and row <= @selection.end.row
 
-  getLastRow: -> @table.getRowsCount() - 1
-
   getRowHeight: -> @rowHeight ? @configRowHeight
 
   setRowHeight: (@rowHeight) ->
     @computeRowOffsets()
     @requestUpdate()
 
-  getRowHeightAt: (index) -> @rowHeights[index] ? @getRowHeight()
+  getRowHeightAt: (index) ->
+    @rowHeights[index] ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
     @rowHeights[index] = height
     @computeRowOffsets()
     @requestUpdate()
 
-  getRowOffsetAt: (index) -> @rowOffsets[index]
+  getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 
   getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
 
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
+
+  getLastRow: -> @table.getRowsCount() - 1
 
   getFirstVisibleRow: ->
     @findRowAtScreenPosition(@body.scrollTop())
@@ -202,22 +200,52 @@ class TableView extends View
     else
       @body.scrollTop(scrollTopAsFirstVisibleRow)
 
+  getScreenRows: -> @screenRows
+
+  getScreenRow: (row) -> @table.getRow(@screenRowToModelRow(row))
+
+  getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
+
+  getScreenRowOffsetAt: (row) -> @rowOffsets[row]
+
+  screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
+
+  modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
+
   computeRowOffsets: ->
     offsets = []
     offset = 0
 
     for i in [0...@table.getRowsCount()]
       offsets.push offset
-      offset += @getRowHeightAt(i)
+      offset += @getScreenRowHeightAt(i)
 
     @rowOffsets = offsets
 
   findRowAtScreenPosition: (y) ->
     for i in [0...@table.getRowsCount()]
-      offset = @getRowOffsetAt(i)
+      offset = @getScreenRowOffsetAt(i)
       return i - 1 if y < offset
 
     return @table.getRowsCount() - 1
+
+  updateScreenRows: ->
+    rows = @table.getRows()
+    @screenRows = rows.concat()
+    @screenRows.sort(@compareRows(@order, @direction)) if @order?
+    @screenToModelRowsMap = (rows.indexOf(row) for row in @screenRows)
+    @modelToScreenRowsMap = (@screenRows.indexOf(row) for row in rows)
+    @computeRowOffsets()
+
+  compareRows: (order, direction) -> (a,b) ->
+    a = a[order]
+    b = b[order]
+    if a > b
+      direction
+    else if a < b
+      -direction
+    else
+      0
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -718,6 +746,18 @@ class TableView extends View
 
     @drag(e)
     @dragging = false
+
+  #     ######   #######  ########  ######## #### ##    ##  ######
+  #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
+  #    ##       ##     ## ##     ##    ##     ##  ####  ## ##
+  #     ######  ##     ## ########     ##     ##  ## ## ## ##   ####
+  #          ## ##     ## ##   ##      ##     ##  ##  #### ##    ##
+  #    ##    ## ##     ## ##    ##     ##     ##  ##   ### ##    ##
+  #     ######   #######  ##     ##    ##    #### ##    ##  ######
+
+  sortBy: (@order, @direction=1) ->
+    @updateScreenRows()
+    @requestUpdate()
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##

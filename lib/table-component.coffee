@@ -17,7 +17,7 @@ module.exports = React.createClass
     height = @getTableHeight()
 
     rows = for row in [firstRow...lastRow]
-      rowData = @props.table.getRow(row)
+      rowData = parentView.getScreenRow(row)
       cells = []
 
       rowData.eachCell (cell,i) ->
@@ -49,8 +49,8 @@ module.exports = React.createClass
         className: classes.join(' ')
         'data-row-id': row + 1
         style:
-          height: "#{parentView.getRowHeightAt(row)}px"
-          top: "#{parentView.getRowOffsetAt(row)}px"
+          height: "#{parentView.getScreenRowHeightAt(row)}px"
+          top: "#{parentView.getScreenRowOffsetAt(row)}px"
       }, cells
 
     content = [div className: 'table-edit-rows', rows]

@@ -1164,6 +1164,25 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
+  #     ######   #######  ########  ######## #### ##    ##  ######
+  #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
+  #    ##       ##     ## ##     ##    ##     ##  ####  ## ##
+  #     ######  ##     ## ########     ##     ##  ## ## ## ##   ####
+  #          ## ##     ## ##   ##      ##     ##  ##  #### ##    ##
+  #    ##    ## ##     ## ##    ##     ##     ##  ##   ### ##    ##
+  #     ######   #######  ##     ##    ##    #### ##    ##  ######
+
+  describe 'sorting', ->
+    describe 'when a column have been set as the table order', ->
+      beforeEach ->
+        tableView.sortBy 'value', -1
+        nextAnimationFrame()
+
+      it 'sorts the rows accordingly', ->
+        expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row99')
+
+
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
