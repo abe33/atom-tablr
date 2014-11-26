@@ -123,7 +123,7 @@ class TableView extends View
     @gutter = false
     @requestUpdate()
 
-  getRows: ->
+  getRowsContainer: ->
     @rows ?= @body.find('.table-edit-rows')
 
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
@@ -285,13 +285,13 @@ class TableView extends View
     @normalizeColumnsWidths(widths)
 
   getColumnsScreenWidths: ->
-    width = @getRows().width()
+    width = @getRowsContainer().width()
     @getColumnsWidthsFromModel().map (v) => v * width
 
   getColumnsScreenMargins: ->
     widths = @getColumnsWidthsFromModel()
     pad = 0
-    width = @getRows().width()
+    width = @getRowsContainer().width()
     margins = widths.map (v) =>
       res = pad
       pad += v * width
@@ -392,7 +392,7 @@ class TableView extends View
   cellScreenPosition: (position) ->
     {top, left} = @cellScrollPosition(position)
 
-    content = @getRows()
+    content = @getRowsContainer()
     contentOffset = content.offset()
 
     {
@@ -411,7 +411,7 @@ class TableView extends View
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    content = @getRows()
+    content = @getRowsContainer()
 
     bodyWidth = content.width()
     bodyOffset = content.offset()
