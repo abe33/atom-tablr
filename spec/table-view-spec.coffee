@@ -368,14 +368,14 @@ describe 'TableView', ->
       nextAnimationFrame()
       tableView.startEdit()
 
-      expect(tableView.find('.editor').outerHeight()).toEqual(100)
+      expect(tableView.find('atom-text-editor').outerHeight()).toEqual(100)
 
     it 'uses the offset to position the editor', ->
       tableView.activateCellAtPosition(row: 3, column: 0)
       nextAnimationFrame()
       tableView.startEdit()
 
-      expect(tableView.find('.editor').offset().top)
+      expect(tableView.find('atom-text-editor').offset().top)
       .toBeCloseTo(tableView.find('.table-edit-cell.active').offset().top, -2)
 
     describe 'when scrolled by 300px', ->
@@ -483,7 +483,7 @@ describe 'TableView', ->
 
         beforeEach ->
           tableView.startEdit()
-          editor = tableView.find('.editor').view()
+          editor = tableView.find('atom-text-editor').view()
 
         it 'opens a text editor above the active cell', ->
           cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
@@ -787,7 +787,7 @@ describe 'TableView', ->
       expect(tableView.isEditing()).toBeTruthy()
 
     it 'fills the editor with the input data', ->
-      editor = tableView.find('.editor').view()
+      editor = tableView.find('atom-text-editor').view()
       expect(editor.getText()).toEqual('x')
 
   describe 'double clicking on a cell', ->
@@ -803,7 +803,7 @@ describe 'TableView', ->
 
     beforeEach ->
       tableView.startEdit()
-      editor = tableView.find('.editor').view()
+      editor = tableView.find('atom-text-editor').view()
 
     it 'opens a text editor above the active cell', ->
       cell = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child')
@@ -834,7 +834,7 @@ describe 'TableView', ->
 
     it 'closes the editor', ->
       expect(tableView.isEditing()).toBeFalsy()
-      expect(tableView.find('.editor:visible').length).toEqual(0)
+      expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
 
     it 'gives the focus back to the table view', ->
       expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
@@ -847,7 +847,7 @@ describe 'TableView', ->
 
     beforeEach ->
       tableView.startEdit()
-      editor = tableView.find('.editor').view()
+      editor = tableView.find('atom-text-editor').view()
 
     describe 'core:cancel', ->
       it 'closes the editor', ->
@@ -883,7 +883,7 @@ describe 'TableView', ->
           editor.trigger('core:confirm')
 
         it 'closes the editor', ->
-          expect(tableView.find('.editor:visible').length).toEqual(0)
+          expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
           expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
@@ -897,7 +897,7 @@ describe 'TableView', ->
           editor.trigger('core:confirm')
 
         it 'closes the editor', ->
-          expect(tableView.find('.editor:visible').length).toEqual(0)
+          expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
           expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
@@ -1190,7 +1190,7 @@ describe 'TableView', ->
         tableView.startEdit()
 
       it 'opens the editor at the cell position', ->
-        editorOffset = tableView.find('.editor').offset()
+        editorOffset = tableView.find('atom-text-editor').offset()
         cellOffset = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').offset()
 
         expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
