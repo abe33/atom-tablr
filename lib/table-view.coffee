@@ -117,6 +117,10 @@ class TableView extends View
     @requestUpdate()
 
   destroy: ->
+    @off()
+    @body.off()
+    @hiddenInput.off()
+
     @subscriptions.dispose()
     @remove()
 
@@ -134,12 +138,11 @@ class TableView extends View
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
 
   subscribeTo: (object, events) ->
-    for event, callback of events
-      @subscriptions.add @asDisposable object.on event, callback
+    object.on event, callback for event, callback of events
 
   observeConfig: (configs) ->
     for config, callback of configs
-      @subscriptions.add @asDisposable atom.config.observe config, callback
+      @subscriptions.add atom.config.observe config, callback
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -820,7 +823,5 @@ class TableView extends View
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
     @hasChanged = false
-
-  asDisposable: (subscription) -> new Disposable -> subscription.off()
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
