@@ -1188,27 +1188,27 @@ describe 'TableView', ->
       it 'sets the proper height on the table rows container', ->
         expect(tableView.find('.table-edit-rows').height()).toEqual(2000)
 
-    describe 'opening an editor', ->
-      beforeEach ->
-        tableView.startEdit()
+      describe 'opening an editor', ->
+        beforeEach ->
+          tableView.startEdit()
 
-      it 'opens the editor at the cell position', ->
-        editorOffset = tableView.find('atom-text-editor').offset()
-        cellOffset = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').offset()
+        it 'opens the editor at the cell position', ->
+          editorOffset = tableView.find('atom-text-editor').offset()
+          cellOffset = tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').offset()
 
-        expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
-        expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
+          expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
+          expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
 
-    describe '::resetSort', ->
-      beforeEach ->
-        tableView.resetSort()
-        nextAnimationFrame()
+      describe '::resetSort', ->
+        beforeEach ->
+          tableView.resetSort()
+          nextAnimationFrame()
 
-      it 'clears the value for table order', ->
-        expect(tableView.order).toBeNull()
+        it 'clears the value for table order', ->
+          expect(tableView.order).toBeNull()
 
-      it 'reorder the table in its initial order', ->
-        expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
+        it 'reorder the table in its initial order', ->
+          expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
