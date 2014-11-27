@@ -1,9 +1,12 @@
-{Point, Range, TextEditorView, View} = require 'atom'
+{Point, Range} = require 'atom'
+{View} = require 'space-pen'
+{TextEditorView} = require 'atom-space-pen-views'
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
+
 
 module.exports =
 class TableView extends View
@@ -34,7 +37,7 @@ class TableView extends View
           @startEdit()
           @editView.setText(e.originalEvent.data)
 
-    @subscribeTo this,
+    @subscriptions.add atom.commands.add '.table-edit',
       'core:confirm': => @startEdit()
       'core:undo': => @table.undo()
       'core:redo': => @table.redo()
@@ -54,6 +57,8 @@ class TableView extends View
       'table-edit:select-to-beginning-of-line': => @expandSelectionToBeginningOfLine()
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
+
+    @subscribeTo this,
       'mousedown': (e) =>
         e.stopPropagation()
         e.preventDefault()
@@ -449,7 +454,7 @@ class TableView extends View
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
   focus: ->
-    @hiddenInput.focus() unless document.activeElement is @hiddenInput.element
+    @hiddenInput.focus() unless document.activeElement is @hiddenInput[0]
 
   moveRight: ->
     if @activeCellPosition.column + 1 < @table.getColumnsCount()
@@ -557,7 +562,7 @@ class TableView extends View
     .height(activeCellRect.height)
     .show()
 
-    @editView.find('.hidden-input').focus()
+    @editView.focus()
 
     @editView.setText(activeCell.getValue().toString())
 
@@ -581,23 +586,22 @@ class TableView extends View
     @append(@editView)
 
   subscribeToTextEditor: (editorView) ->
-    @subscriptions.add @asDisposable editorView.on 'table-edit:move-right', (e) =>
-      @confirmEdit()
-      @moveRight()
-
-    @subscriptions.add @asDisposable editorView.on 'table-edit:move-left', (e) =>
-      @confirmEdit()
-      @moveLeft()
-
-    @subscriptions.add @asDisposable editorView.on 'core:cancel', (e) =>
-      @stopEdit()
-      e.stopImmediatePropagation()
-      return false
-
-    @subscriptions.add @asDisposable editorView.on 'core:confirm', (e) =>
-      @confirmEdit()
-      e.stopImmediatePropagation()
-      return false
+    @subscriptions.add atom.commands.add '.table-edit atom-text-editor',
+      'table-edit:move-right': (e) =>
+        @confirmEdit()
+        @moveRight()
+      'table-edit:move-left': (e) =>
+        @confirmEdit()
+        @moveLeft()
+      'core:cancel': (e) =>
+        @stopEdit()
+        e.stopImmediatePropagation()
+        return false
+      'core:confirm': (e) =>
+        console.log 'core:confirm'
+        @confirmEdit()
+        e.stopImmediatePropagation()
+        return false
 
   #     ######  ######## ##       ########  ######  ########
   #    ##    ## ##       ##       ##       ##    ##    ##
