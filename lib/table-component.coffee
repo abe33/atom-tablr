@@ -71,4 +71,4 @@ module.exports = React.createClass
     lastIndex = Math.max(0, @state.totalRows - 1)
     return 0 if lastIndex is 0
 
-    @props.parentView.getRowOffsetAt(lastIndex) + @props.parentView.getRowHeightAt(lastIndex)
+    @props.parentView.getScreenRowOffsetAt(lastIndex) + @props.parentView.getScreenRowHeightAt(lastIndex)

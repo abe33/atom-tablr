@@ -1185,6 +1185,9 @@ describe 'TableView', ->
         expect(tableView.activeCellPosition).toEqual([0,0])
         expect(tableView.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
 
+      it 'sets the proper height on the table rows container', ->
+        expect(tableView.find('.table-edit-rows').height()).toEqual(2000)
+
     describe 'opening an editor', ->
       beforeEach ->
         tableView.startEdit()
