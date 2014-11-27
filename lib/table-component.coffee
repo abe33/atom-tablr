@@ -28,8 +28,9 @@ module.exports = React.createClass
         else if parentView.isActiveColumn(i)
           classes.push 'active-column'
 
-        if parentView.isSelectedPosition([row, i])
-          classes.push 'selected'
+        classes.push 'selected' if parentView.isSelectedPosition([row, i])
+
+        classes.push 'order' if parentView.order is cell.getColumn().name
 
         cells.push new cell.column.componentClass({
           parentView
