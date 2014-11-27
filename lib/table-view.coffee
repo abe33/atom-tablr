@@ -598,7 +598,6 @@ class TableView extends View
         e.stopImmediatePropagation()
         return false
       'core:confirm': (e) =>
-        console.log 'core:confirm'
         @confirmEdit()
         e.stopImmediatePropagation()
         return false
