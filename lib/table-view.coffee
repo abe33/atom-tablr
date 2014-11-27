@@ -772,6 +772,11 @@ class TableView extends View
     @updateScreenRows()
     @requestUpdate()
 
+  resetSort: ->
+    @order = null
+    @updateScreenRows()
+    @requestUpdate()
+
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##
   #    ##     ## ##     ## ##     ##  ##   ##     ##    ##

@@ -1199,6 +1199,17 @@ describe 'TableView', ->
         expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
         expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
 
+    describe '::resetSort', ->
+      beforeEach ->
+        tableView.resetSort()
+        nextAnimationFrame()
+
+      it 'clears the value for table order', ->
+        expect(tableView.order).toBeNull()
+
+      it 'reorder the table in its initial order', ->
+        expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
+
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
     styleNode.remove()
