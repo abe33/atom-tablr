@@ -772,6 +772,11 @@ class TableView extends View
     @updateScreenRows()
     @requestUpdate()
 
+  toggleSortDirection: ->
+    @direction *= -1
+    @updateScreenRows()
+    @requestUpdate()
+
   resetSort: ->
     @order = null
     @updateScreenRows()

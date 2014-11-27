@@ -1199,6 +1199,14 @@ describe 'TableView', ->
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
 
+      describe '::toggleSortDirection', ->
+        it 'changes the direction of the table sort', ->
+          tableView.toggleSortDirection()
+          nextAnimationFrame()
+
+          expect(tableView.direction).toEqual(1)
+          expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
+
       describe '::resetSort', ->
         beforeEach ->
           tableView.resetSort()
