@@ -200,10 +200,7 @@ class TableView extends View
     return if scrollTopAsFirstVisibleRow >= currentScrollTop and
               scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
 
-    difAsFirstVisibleRow = Math.abs(currentScrollTop - scrollTopAsFirstVisibleRow)
-    difAsLastVisibleRow = Math.abs(currentScrollTop - scrollTopAsLastVisibleRow)
-
-    if difAsLastVisibleRow < difAsFirstVisibleRow
+    if rowOffset > currentScrollTop
       @body.scrollTop(scrollTopAsLastVisibleRow)
     else
       @body.scrollTop(scrollTopAsFirstVisibleRow)
