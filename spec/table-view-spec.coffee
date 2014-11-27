@@ -555,7 +555,7 @@ describe 'TableView', ->
     it 'is triggered on core:move-right', ->
       spyOn(tableView, 'moveRight')
 
-      tableView.trigger('core:move-right')
+      atom.commands.dispatch(tableView.element, 'core:move-right')
 
       expect(tableView.moveRight).toHaveBeenCalled()
 
@@ -597,7 +597,7 @@ describe 'TableView', ->
     it 'is triggered on core:move-left', ->
       spyOn(tableView, 'moveLeft')
 
-      tableView.trigger('core:move-left')
+      atom.commands.dispatch(tableView.element, 'core:move-left')
 
       expect(tableView.moveLeft).toHaveBeenCalled()
 
@@ -633,7 +633,7 @@ describe 'TableView', ->
     it 'is triggered on core:move-up', ->
       spyOn(tableView, 'moveUp')
 
-      tableView.trigger('core:move-up')
+      atom.commands.dispatch(tableView.element, 'core:move-up')
 
       expect(tableView.moveUp).toHaveBeenCalled()
 
@@ -663,7 +663,7 @@ describe 'TableView', ->
     it 'is triggered on core:move-down', ->
       spyOn(tableView, 'moveDown')
 
-      tableView.trigger('core:move-down')
+      atom.commands.dispatch(tableView.element, 'core:move-down')
 
       expect(tableView.moveDown).toHaveBeenCalled()
 
@@ -687,7 +687,7 @@ describe 'TableView', ->
     it 'triggers an undo on the table', ->
       spyOn(table, 'undo')
 
-      tableView.trigger('core:undo')
+      atom.commands.dispatch(tableView.element, 'core:undo')
 
       expect(table.undo).toHaveBeenCalled()
 
@@ -695,7 +695,7 @@ describe 'TableView', ->
     it 'triggers an redo on the table', ->
       spyOn(table, 'redo')
 
-      tableView.trigger('core:redo')
+      atom.commands.dispatch(tableView.element, 'core:redo')
 
       expect(table.redo).toHaveBeenCalled()
 
@@ -704,14 +704,14 @@ describe 'TableView', ->
       atom.config.set 'table-edit.pageMovesAmount', 20
 
     it 'moves the active cell 20 rows below', ->
-      tableView.trigger('core:page-down')
+      atom.commands.dispatch(tableView.element, 'core:page-down')
 
       expect(tableView.activeCellPosition.row).toEqual(20)
 
     it 'stops to the last row without looping', ->
       tableView.activeCellPosition.row = 90
 
-      tableView.trigger('core:page-down')
+      atom.commands.dispatch(tableView.element, 'core:page-down')
 
       expect(tableView.activeCellPosition.row).toEqual(99)
 
@@ -719,7 +719,7 @@ describe 'TableView', ->
       it 'moves the active cell 30 rows below', ->
         tableView.pageMovesAmount = 30
 
-        tableView.trigger('core:page-down')
+        atom.commands.dispatch(tableView.element, 'core:page-down')
 
         expect(tableView.activeCellPosition.row).toEqual(30)
 
@@ -727,7 +727,7 @@ describe 'TableView', ->
         tableView.pageMovesAmount = 30
         atom.config.set 'table-edit.pageMovesAmount', 50
 
-        tableView.trigger('core:page-down')
+        atom.commands.dispatch(tableView.element, 'core:page-down')
 
         expect(tableView.activeCellPosition.row).toEqual(30)
 
@@ -738,14 +738,14 @@ describe 'TableView', ->
     it 'moves the active cell 20 rows up', ->
       tableView.activeCellPosition.row = 20
 
-      tableView.trigger('core:page-up')
+      atom.commands.dispatch(tableView.element, 'core:page-up')
 
       expect(tableView.activeCellPosition.row).toEqual(0)
 
     it 'stops to the first cell without looping', ->
       tableView.activeCellPosition.row = 10
 
-      tableView.trigger('core:page-up')
+      atom.commands.dispatch(tableView.element, 'core:page-up')
 
       expect(tableView.activeCellPosition.row).toEqual(0)
 
@@ -756,7 +756,7 @@ describe 'TableView', ->
     it 'moves the active cell to the first row', ->
       tableView.activeCellPosition.row = 50
 
-      tableView.trigger('core:move-to-top')
+      atom.commands.dispatch(tableView.element, 'core:move-to-top')
 
       expect(tableView.activeCellPosition.row).toEqual(0)
 
@@ -767,7 +767,7 @@ describe 'TableView', ->
     it 'moves the active cell to the first row', ->
       tableView.activeCellPosition.row = 50
 
-      tableView.trigger('core:move-to-bottom')
+      atom.commands.dispatch(tableView.element, 'core:move-to-bottom')
 
       expect(tableView.activeCellPosition.row).toEqual(99)
 
@@ -851,7 +851,7 @@ describe 'TableView', ->
 
     describe 'core:cancel', ->
       it 'closes the editor', ->
-        editor.trigger('core:cancel')
+        atom.commands.dispatch(editor.element, 'core:cancel')
         expect(tableView.isEditing()).toBeFalsy
 
     describe 'table-edit:move-right', ->
@@ -859,7 +859,7 @@ describe 'TableView', ->
         previousActiveCell = tableView.getActiveCell()
         spyOn(tableView, 'moveRight')
         editor.setText('Foo Bar')
-        editor.trigger('table-edit:move-right')
+        atom.commands.dispatch(editor.element, 'table-edit:move-right')
 
         expect(tableView.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
@@ -870,7 +870,7 @@ describe 'TableView', ->
         previousActiveCell = tableView.getActiveCell()
         spyOn(tableView, 'moveLeft')
         editor.setText('Foo Bar')
-        editor.trigger('table-edit:move-left')
+        atom.commands.dispatch(editor.element, 'table-edit:move-left')
 
         expect(tableView.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
@@ -880,7 +880,7 @@ describe 'TableView', ->
       describe 'when the content of the editor has changed', ->
         beforeEach ->
           editor.setText('foobar')
-          editor.trigger('core:confirm')
+          atom.commands.dispatch(editor.element, 'core:confirm')
 
         it 'closes the editor', ->
           expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
@@ -894,7 +894,7 @@ describe 'TableView', ->
       describe 'when the content of the editor did not changed', ->
         beforeEach ->
           spyOn(tableView.getActiveCell(), 'setValue').andCallThrough()
-          editor.trigger('core:confirm')
+          atom.commands.dispatch(editor.element, 'core:confirm')
 
         it 'closes the editor', ->
           expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
@@ -968,13 +968,13 @@ describe 'TableView', ->
 
   describe 'core:select-right', ->
     it 'expands the selection by one cell on the right', ->
-      tableView.trigger('core:select-right')
+      atom.commands.dispatch(tableView.element, 'core:select-right')
       expect(tableView.getSelection()).toEqual([[0,0],[0,1]])
 
     it 'stops at the last column', ->
-      tableView.trigger('core:select-right')
-      tableView.trigger('core:select-right')
-      tableView.trigger('core:select-right')
+      atom.commands.dispatch(tableView.element, 'core:select-right')
+      atom.commands.dispatch(tableView.element, 'core:select-right')
+      atom.commands.dispatch(tableView.element, 'core:select-right')
 
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
@@ -982,8 +982,8 @@ describe 'TableView', ->
       it 'collapse the selection back to the left', ->
         tableView.activateCellAtPosition([0,1])
 
-        tableView.trigger('core:select-right')
-        tableView.trigger('core:select-left')
+        atom.commands.dispatch(tableView.element, 'core:select-right')
+        atom.commands.dispatch(tableView.element, 'core:select-left')
 
         expect(tableView.getSelection()).toEqual([[0,1],[0,1]])
 
@@ -992,21 +992,21 @@ describe 'TableView', ->
       tableView.activateCellAtPosition([0,2])
 
     it 'expands the selection by one cell on the left', ->
-      tableView.trigger('core:select-left')
+      atom.commands.dispatch(tableView.element, 'core:select-left')
       expect(tableView.getSelection()).toEqual([[0,1],[0,2]])
 
     it 'stops at the first column', ->
-      tableView.trigger('core:select-left')
-      tableView.trigger('core:select-left')
-      tableView.trigger('core:select-left')
+      atom.commands.dispatch(tableView.element, 'core:select-left')
+      atom.commands.dispatch(tableView.element, 'core:select-left')
+      atom.commands.dispatch(tableView.element, 'core:select-left')
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
     describe 'then triggering core:select-right', ->
       it 'collapse the selection back to the right', ->
         tableView.activateCellAtPosition([0,1])
 
-        tableView.trigger('core:select-left')
-        tableView.trigger('core:select-right')
+        atom.commands.dispatch(tableView.element, 'core:select-left')
+        atom.commands.dispatch(tableView.element, 'core:select-right')
 
         expect(tableView.getSelection()).toEqual([[0,1],[0,1]])
 
@@ -1015,20 +1015,20 @@ describe 'TableView', ->
       tableView.activateCellAtPosition([2,0])
 
     it 'expands the selection by one cell to the top', ->
-      tableView.trigger('core:select-up')
+      atom.commands.dispatch(tableView.element, 'core:select-up')
       expect(tableView.getSelection()).toEqual([[1,0],[2,0]])
 
     it 'stops at the first row', ->
-      tableView.trigger('core:select-up')
-      tableView.trigger('core:select-up')
-      tableView.trigger('core:select-up')
+      atom.commands.dispatch(tableView.element, 'core:select-up')
+      atom.commands.dispatch(tableView.element, 'core:select-up')
+      atom.commands.dispatch(tableView.element, 'core:select-up')
       expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
 
     it 'scrolls the view to make the added row visible', ->
       tableView.scrollTop(200)
       tableView.activateCellAtPosition([10,0])
 
-      tableView.trigger('core:select-up')
+      atom.commands.dispatch(tableView.element, 'core:select-up')
 
       expect(tableView.body.scrollTop()).toEqual(180)
 
@@ -1036,8 +1036,8 @@ describe 'TableView', ->
       it 'collapse the selection back to the bottom', ->
         tableView.activateCellAtPosition([1,0])
 
-        tableView.trigger('core:select-up')
-        tableView.trigger('core:select-down')
+        atom.commands.dispatch(tableView.element, 'core:select-up')
+        atom.commands.dispatch(tableView.element, 'core:select-down')
 
         expect(tableView.getSelection()).toEqual([[1,0],[1,0]])
 
@@ -1046,19 +1046,19 @@ describe 'TableView', ->
       tableView.activateCellAtPosition([97,0])
 
     it 'expands the selection by one cell to the bottom', ->
-      tableView.trigger('core:select-down')
+      atom.commands.dispatch(tableView.element, 'core:select-down')
       expect(tableView.getSelection()).toEqual([[97,0],[98,0]])
 
     it 'stops at the last row', ->
-      tableView.trigger('core:select-down')
-      tableView.trigger('core:select-down')
-      tableView.trigger('core:select-down')
+      atom.commands.dispatch(tableView.element, 'core:select-down')
+      atom.commands.dispatch(tableView.element, 'core:select-down')
+      atom.commands.dispatch(tableView.element, 'core:select-down')
       expect(tableView.getSelection()).toEqual([[97,0],[99,0]])
 
     it 'scrolls the view to make the added row visible', ->
       tableView.activateCellAtPosition([8,0])
 
-      tableView.trigger('core:select-down')
+      atom.commands.dispatch(tableView.element, 'core:select-down')
 
       expect(tableView.body.scrollTop()).not.toEqual(0)
 
@@ -1066,14 +1066,14 @@ describe 'TableView', ->
       it 'collapse the selection back to the bottom', ->
         tableView.activateCellAtPosition([1,0])
 
-        tableView.trigger('core:select-down')
-        tableView.trigger('core:select-up')
+        atom.commands.dispatch(tableView.element, 'core:select-down')
+        atom.commands.dispatch(tableView.element, 'core:select-up')
 
         expect(tableView.getSelection()).toEqual([[1,0],[1,0]])
 
   describe 'table-edit:select-to-end-of-line', ->
     it 'expands the selection to the end of the current row', ->
-      tableView.trigger('table-edit:select-to-end-of-line')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-line')
 
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
@@ -1081,8 +1081,8 @@ describe 'TableView', ->
       it 'expands the selection to the beginning of the current row', ->
         tableView.activateCellAtPosition([0,1])
 
-        tableView.trigger('table-edit:select-to-end-of-line')
-        tableView.trigger('table-edit:select-to-beginning-of-line')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-line')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-line')
 
         expect(tableView.getSelection()).toEqual([[0,0],[0,1]])
 
@@ -1090,7 +1090,7 @@ describe 'TableView', ->
     it 'expands the selection to the beginning of the current row', ->
       tableView.activateCellAtPosition([0,2])
 
-      tableView.trigger('table-edit:select-to-beginning-of-line')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-line')
 
       expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
 
@@ -1098,19 +1098,19 @@ describe 'TableView', ->
       it 'expands the selection to the end of the current row', ->
         tableView.activateCellAtPosition([0,1])
 
-        tableView.trigger('table-edit:select-to-beginning-of-line')
-        tableView.trigger('table-edit:select-to-end-of-line')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-line')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-line')
 
         expect(tableView.getSelection()).toEqual([[0,1],[0,2]])
 
   describe 'table-edit:select-to-end-of-table', ->
     it 'expands the selection to the end of the table', ->
-      tableView.trigger('table-edit:select-to-end-of-table')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-table')
 
       expect(tableView.getSelection()).toEqual([[0,0],[99,0]])
 
     it 'scrolls the view to make the added row visible', ->
-      tableView.trigger('table-edit:select-to-end-of-table')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-table')
 
       expect(tableView.body.scrollTop()).not.toEqual(0)
 
@@ -1118,8 +1118,8 @@ describe 'TableView', ->
       it 'expands the selection to the beginning of the table', ->
         tableView.activateCellAtPosition([1,0])
 
-        tableView.trigger('table-edit:select-to-end-of-table')
-        tableView.trigger('table-edit:select-to-beginning-of-table')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-table')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-table')
 
         expect(tableView.getSelection()).toEqual([[0,0],[1,0]])
 
@@ -1127,14 +1127,14 @@ describe 'TableView', ->
     it 'expands the selection to the beginning of the table', ->
       tableView.activateCellAtPosition([2,0])
 
-      tableView.trigger('table-edit:select-to-beginning-of-table')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-table')
 
       expect(tableView.getSelection()).toEqual([[0,0],[2,0]])
 
     it 'scrolls the view to make the added row visible', ->
       tableView.activateCellAtPosition([99,0])
 
-      tableView.trigger('table-edit:select-to-beginning-of-table')
+      atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-table')
 
       expect(tableView.body.scrollTop()).toEqual(0)
 
@@ -1142,8 +1142,8 @@ describe 'TableView', ->
       it 'expands the selection to the end of the table', ->
         tableView.activateCellAtPosition([1,0])
 
-        tableView.trigger('table-edit:select-to-beginning-of-table')
-        tableView.trigger('table-edit:select-to-end-of-table')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-beginning-of-table')
+        atom.commands.dispatch(tableView.element, 'table-edit:select-to-end-of-table')
 
         expect(tableView.getSelection()).toEqual([[1,0],[99,0]])
 
