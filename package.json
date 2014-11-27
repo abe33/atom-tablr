@@ -15,7 +15,8 @@
     "property-accessors": "1.x",
     "delegato": "1.x",
     "react-atom-fork": "0.x",
-    "space-pen": "3.x",
-    "reactionary-atom-fork": "0.x"
+    "space-pen": "4.x",
+    "reactionary-atom-fork": "0.x",
+    "atom-space-pen-views": "^0"
   }
 }
