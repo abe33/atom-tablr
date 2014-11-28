@@ -2,6 +2,8 @@ React = require 'react-atom-fork'
 {div} = require 'reactionary-atom-fork'
 
 GutterComponent = require './gutter-component'
+SelectionComponent = require './selection-component'
+SelectionHandleComponent = require './selection-handle-component'
 
 module.exports = React.createClass
   getInitialState: ->
@@ -56,11 +58,16 @@ module.exports = React.createClass
 
     content = [div className: 'table-edit-rows', rows]
 
+    subComponentProps = {parentView, height}
+    subComponentProps[k] = v for k,v of @state
+
     if gutter
-      gutterProps = {parentView, height}
-      gutterProps[k] = v for k,v of @state
-      gutterComponent = new GutterComponent(gutterProps)
+      gutterComponent = new GutterComponent(subComponentProps)
       content.unshift gutterComponent
+
+    if parentView.selectionSpansManyCells()
+      rows.push new SelectionComponent(subComponentProps)
+      rows.push new SelectionHandleComponent(subComponentProps)
 
     div {
       className: 'table-edit-content'

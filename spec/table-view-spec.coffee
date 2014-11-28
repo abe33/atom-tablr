@@ -953,6 +953,39 @@ describe 'TableView', ->
       nextAnimationFrame()
 
       expect(tableView.find('.table-edit-row-number.selected').length).toEqual(2)
+  describe 'when the selection spans only one cell', ->
+    it 'does not render the selection box', ->
+      expect(tableView.find('.selection-box').length).toEqual(0)
+      expect(tableView.find('.selection-box-handle').length).toEqual(0)
+
+  describe 'when the selection spans many cells', ->
+    [selectionBox, selectionBoxHandle] = []
+
+    beforeEach ->
+      tableView.setSelection([[2,0],[3,2]])
+      nextAnimationFrame()
+      selectionBox = tableView.find('.selection-box')
+      selectionBoxHandle = tableView.find('.selection-box-handle')
+
+    it 'renders the selection box', ->
+      expect(selectionBox.length).toEqual(1)
+      expect(selectionBoxHandle.length).toEqual(1)
+
+    it 'positions the selection box over the cells', ->
+      cells = tableView.find('.table-edit-cell.selected')
+      firstCell = cells.first()
+      lastCell = cells.last()
+      expect(selectionBox.offset()).toEqual(firstCell.offset())
+      expect(selectionBox.outerWidth()).toEqual(tableView.find('.table-edit-rows').width())
+      expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())
+
+    it 'positions the selection box handle at the bottom right corner', ->
+      cells = tableView.find('.table-edit-cell.selected')
+      lastCell = cells.last()
+      lastCellOffset = lastCell.offset()
+
+      expect(parseFloat selectionBoxHandle.css('top')).toBeCloseTo(parseFloat(lastCell.parent().css('top')) + lastCell.height(), -1)
+      expect(parseFloat selectionBoxHandle.css('left')).toBeCloseTo(lastCellOffset.left + lastCell.width(), -1)
 
   describe '::setSelection', ->
     it 'change the active cell so that the upper left cell is active', ->

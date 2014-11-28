@@ -620,6 +620,21 @@ class TableView extends View
 
   getSelection: -> @selection
 
+  selectionScrollRect: ->
+    {top, left} = @cellScrollPosition(@selection.start)
+    width = 0
+    height = 0
+
+    widths = @getColumnsWidthsFromModel()
+
+    for col in [@selection.start.column..@selection.end.column]
+      width += widths[col] * 100
+
+    for row in [@selection.start.row..@selection.end.row]
+      height += @getScreenRowHeightAt(row)
+
+    {top, left, width, height}
+
   setSelection: (selection) ->
     @selection = Range.fromObject(selection)
     @activeCellPosition = Point.fromObject(@selection.start)
@@ -712,7 +727,7 @@ class TableView extends View
     @selection.start.column isnt @selection.end.column
 
   selectionSpansManyRows: ->
-    @selection.start.rows isnt @selection.end.rows
+    @selection.start.row isnt @selection.end.row
 
   #    ########    ####    ########
   #    ##     ##  ##  ##   ##     ##
