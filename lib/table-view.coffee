@@ -132,9 +132,6 @@ class TableView extends View
     @gutter = false
     @requestUpdate()
 
-  getRowsContainer: ->
-    @rows ?= @body.find('.table-edit-rows')
-
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
 
   subscribeTo: (object, events) ->
@@ -216,6 +213,9 @@ class TableView extends View
   screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
 
   modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
+
+  getRowsContainer: ->
+    @rowsContainer ?= @body.find('.table-edit-rows')
 
   computeRowOffsets: ->
     offsets = []
