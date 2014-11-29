@@ -58,16 +58,16 @@ class TableView extends View
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
 
+    stopPropagationAndDefault = (f) -> (e) ->
+      e.stopPropagation()
+      e.preventDefault()
+      f?(e)
+
     @subscribeTo this,
-      'mousedown': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
-        @focus()
+      'mousedown': stopPropagationAndDefault (e) => @focus()
 
     @subscribeTo @head,
-      'mousedown': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
+      'mousedown': stopPropagationAndDefault (e) =>
 
         if column = @columnAtScreenPosition(e.pageX, e.pageY)
           if column.name is @order
@@ -81,10 +81,7 @@ class TableView extends View
     @subscribeTo @body,
       'scroll': => @requestUpdate()
       'dblclick': (e) => @startEdit()
-      'mousedown': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
-
+      'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
 
         if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
@@ -92,17 +89,9 @@ class TableView extends View
 
         @startDrag(e)
         @focus()
-      'mousemove': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
-        @drag(e)
-      'mouseup': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
-        @endDrag(e)
-      'click': (e) =>
-        e.stopPropagation()
-        e.preventDefault()
+      'mousemove': stopPropagationAndDefault (e) => @drag(e)
+      'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
+      'click': stopPropagationAndDefault()
 
     @updateScreenRows()
 
