@@ -70,7 +70,13 @@ class TableView extends View
         e.preventDefault()
 
         if column = @columnAtScreenPosition(e.pageX, e.pageY)
-          @sortBy(column.name)
+          if column.name is @order
+            if @direction is -1
+              @resetSort()
+            else
+              @toggleSortDirection()
+          else
+            @sortBy(column.name)
 
     @subscribeTo @body,
       'scroll': => @requestUpdate()
