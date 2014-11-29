@@ -445,6 +445,16 @@ describe 'TableView', ->
       it 'contains a filler div to figurate the gutter width', ->
         expect(header.find('.table-edit-header-filler').length).toEqual(1)
 
+
+    describe 'clicking on a header cell', ->
+      beforeEach ->
+        column = tableView.find('.table-edit-header-cell:last-child')
+        offset = column.offset()
+        mousedown(column, offset.left + 50, offset.top + 5)
+
+      it 'should change the sort order to use the clicked column', ->
+        expect(tableView.order).toEqual('foo')
+
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
   #    ##        ##     ##    ##       ##    ##       ##     ##

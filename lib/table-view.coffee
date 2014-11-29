@@ -64,6 +64,14 @@ class TableView extends View
         e.preventDefault()
         @focus()
 
+    @subscribeTo @head,
+      'mousedown': (e) =>
+        e.stopPropagation()
+        e.preventDefault()
+
+        if column = @columnAtScreenPosition(e.pageX, e.pageY)
+          @sortBy(column.name)
+
     @subscribeTo @body,
       'scroll': => @requestUpdate()
       'dblclick': (e) => @startEdit()
@@ -311,6 +319,29 @@ class TableView extends View
     @columnsPercentWidths = widths.map @floatToPercent
 
     @requestUpdate()
+
+  getColumnsContainer: ->
+    @columnsContainer ?= @head.find('.table-edit-header-row')
+
+  columnAtScreenPosition: (x,y) ->
+    return unless x? and y?
+
+    content = @getColumnsContainer()
+
+    bodyWidth = content.width()
+    bodyOffset = content.offset()
+
+    x -= bodyOffset.left
+    y -= bodyOffset.top
+
+    columnsWidths = @getColumnsWidthsFromModel()
+    column = -1
+    pad = 0
+    while pad <= x
+      pad += columnsWidths[column+1] * bodyWidth
+      column++
+
+    @table.getColumn(column)
 
   normalizeColumnsWidths: (columnsWidths) ->
     restWidth = 1
