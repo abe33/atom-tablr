@@ -9,5 +9,6 @@ module.exports = React.createClass
 
     div className: 'selection-box-handle', style: {
       top: (top + height) + 'px'
-      left: (left + width) + '%'
+      left: width + '%'
+      transform: "translate(#{left + 'px'}, 0)"
     }
