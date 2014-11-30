@@ -1225,6 +1225,24 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
+  describe 'dragging the selection box handle', ->
+    [handle, handleOffset] = []
+
+    beforeEach ->
+      tableView.setSelection([[2,0],[2,1]])
+      nextAnimationFrame()
+      handle = tableView.find('.selection-box-handle')
+      handleOffset = handle.offset()
+
+      mousedown(handle, handleOffset.left + 2, handleOffset.top + 2)
+
+    describe 'to the right', ->
+      beforeEach ->
+        mousemove(handle, handleOffset.left + 50, handleOffset.top + 2)
+
+      it 'expands the selection to the right', ->
+        expect(tableView.getSelection()).toEqual([[2,0],[2,2]])
+
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
   #    ##       ##     ## ##     ##    ##     ##  ####  ## ##

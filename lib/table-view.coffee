@@ -93,6 +93,9 @@ class TableView extends View
       'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
       'click': stopPropagationAndDefault()
 
+    @subscribeTo @body, '.selection-box-handle',
+      'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
+
     @updateScreenRows()
 
     @observeConfig
@@ -137,8 +140,12 @@ class TableView extends View
 
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
 
-  subscribeTo: (object, events) ->
-    object.on event, callback for event, callback of events
+  subscribeTo: (object, selector, events) ->
+    [events, selector] = [selector, null] if typeof selector is 'object'
+    if selector
+      object.on event, selector, callback for event, callback of events
+    else
+      object.on event, callback for event, callback of events
 
   observeConfig: (configs) ->
     for config, callback of configs
