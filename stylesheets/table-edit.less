@@ -50,11 +50,13 @@
 
 .table-edit-header-row {
   -webkit-flex: 1;
+  cursor: pointer;
 }
 
 .table-edit-gutter {
   display: -webkit-flex;
   position: relative;
+  cursor: cell;
 }
 
 .table-edit-gutter-filler, .table-edit-header-filler {
@@ -79,6 +81,17 @@
   margin-top: -3px;
   margin-left: -3px;
   background: @background-color-info;
+
+  &:before {
+    content: '';
+    position: absolute;
+    display: block;
+    top: -4px;
+    bottom: -4px;
+    left: -4px;
+    right: -4px;
+    cursor: nwse-resize;
+  }
 }
 
 .table-edit-row-number {
@@ -100,6 +113,7 @@
 
 .table-edit-rows {
   position: relative;
+  cursor: cell;
   display: -webkit-flex;
   -webkit-flex: 1;
 }
