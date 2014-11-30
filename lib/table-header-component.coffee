@@ -14,7 +14,14 @@ module.exports = React.createClass
     for column,index in table.getColumns()
       classes = ['table-edit-header-cell']
       classes.push 'active-column' if parentView.isActiveColumn(index)
-      classes.push 'order' if parentView.order is column.name
+
+      if parentView.order is column.name
+        classes.push 'order'
+
+        if parentView.direction is 1
+          classes.push 'ascending'
+        else
+          classes.push 'descending'
 
       cells.push div {
         key: "header-cell-#{index}"

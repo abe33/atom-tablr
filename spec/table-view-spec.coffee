@@ -1249,6 +1249,17 @@ describe 'TableView', ->
       it 'sets the proper height on the table rows container', ->
         expect(tableView.find('.table-edit-rows').height()).toEqual(2000)
 
+      it 'decorates the table cells with a class', ->
+        expect(tableView.find('.table-edit-cell.order').length).toBeGreaterThan(1)
+
+      it 'decorates the table header cell with a class', ->
+        expect(tableView.find('.table-edit-header-cell.order.descending').length).toEqual(1)
+
+        tableView.toggleSortDirection()
+        nextAnimationFrame()
+
+        expect(tableView.find('.table-edit-header-cell.order.ascending').length).toEqual(1)
+
       describe 'opening an editor', ->
         beforeEach ->
           tableView.startEdit()
