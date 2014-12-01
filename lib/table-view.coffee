@@ -187,12 +187,12 @@ class TableView extends View
   getLastRow: -> @table.getRowsCount() - 1
 
   getFirstVisibleRow: ->
-    @findRowAtScreenPosition(@body.scrollTop())
+    @findRowAtPosition(@body.scrollTop())
 
   getLastVisibleRow: ->
     scrollViewHeight = @body.height()
 
-    @findRowAtScreenPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
+    @findRowAtPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
 
   makeRowVisible: (row) ->
     rowHeight = @getScreenRowHeightAt(row)
@@ -237,12 +237,21 @@ class TableView extends View
 
     @rowOffsets = offsets
 
-  findRowAtScreenPosition: (y) ->
+  findRowAtPosition: (y) ->
     for i in [0...@table.getRowsCount()]
       offset = @getScreenRowOffsetAt(i)
       return i - 1 if y < offset
 
     return @table.getRowsCount() - 1
+
+  findRowAtScreenPosition: (y) ->
+    content = @getRowsContainer()
+
+    bodyOffset = content.offset()
+
+    y -= bodyOffset.top
+
+    @findRowAtPosition(y)
 
   updateScreenRows: ->
     rows = @table.getRows()
@@ -457,7 +466,7 @@ class TableView extends View
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    row = @findRowAtScreenPosition(y)
+    row = @findRowAtPosition(y)
 
     columnsWidths = @getColumnsWidthsFromModel()
     column = -1
