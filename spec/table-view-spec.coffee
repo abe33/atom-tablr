@@ -506,6 +506,17 @@ describe 'TableView', ->
         expect(gutter.find('.table-edit-row-number').length)
         .toEqual(content.find('.table-edit-row').length)
 
+      describe 'clicking on a gutter cell', ->
+        beforeEach ->
+          cell = gutter.find('.table-edit-row-number').first()
+          cellOffset = cell.offset()
+          mousedown(cell, cellOffset.left + 5, cellOffset.top + 5)
+          nextAnimationFrame()
+
+        it 'selects the whole line', ->
+          expect(tableView.activeCellPosition).toEqual([0,0])
+          expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+
       describe 'when an editor is opened', ->
         [editor] = []
 

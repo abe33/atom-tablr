@@ -93,6 +93,11 @@ class TableView extends View
       'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
       'click': stopPropagationAndDefault()
 
+    @subscribeTo @body, '.table-edit-gutter',
+      'mousedown': stopPropagationAndDefault (e) =>
+        row = @findRowAtScreenPosition(e.pageY)
+        @setSelection(@getRowRange(row)) if row?
+
     @subscribeTo @body, '.selection-box-handle',
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
 
@@ -177,6 +182,8 @@ class TableView extends View
     @rowHeights[index] = height
     @computeRowOffsets()
     @requestUpdate()
+
+  getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 
