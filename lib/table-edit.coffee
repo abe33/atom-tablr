@@ -41,7 +41,7 @@ module.exports =
     table.addColumn 'value', align: 'right'
     table.addColumn 'foo', align: 'right'
 
-    for i in [0...100]
+    for i in [0...1000]
       table.addRow [
         "row#{i}"
         Math.random() * 100
@@ -60,7 +60,7 @@ module.exports =
     tableView.attach(atom.workspaceView)
 
     tableView.on 'core:cancel', -> tableView.destroy()
-    
+
     tableView.sortBy('value')
 
     tableView.focus()
