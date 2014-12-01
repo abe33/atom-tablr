@@ -506,16 +506,38 @@ describe 'TableView', ->
         expect(gutter.find('.table-edit-row-number').length)
         .toEqual(content.find('.table-edit-row').length)
 
-      describe 'clicking on a gutter cell', ->
+      fdescribe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
-          cell = gutter.find('.table-edit-row-number').first()
+          cell = gutter.find('.table-edit-row-number').eq(2)
           cellOffset = cell.offset()
           mousedown(cell, cellOffset.left + 5, cellOffset.top + 5)
           nextAnimationFrame()
 
         it 'selects the whole line', ->
-          expect(tableView.activeCellPosition).toEqual([0,0])
-          expect(tableView.getSelection()).toEqual([[0,0],[0,2]])
+          expect(tableView.activeCellPosition).toEqual([2,0])
+          expect(tableView.getSelection()).toEqual([[2,0],[2,2]])
+
+        describe 'then dragging the mouse down', ->
+          beforeEach ->
+            cell = gutter.find('.table-edit-row-number').eq(4)
+            cellOffset = cell.offset()
+            mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+            nextAnimationFrame()
+
+          it 'expands the selection with the covered rows', ->
+            expect(tableView.activeCellPosition).toEqual([2,0])
+            expect(tableView.getSelection()).toEqual([[2,0],[4,2]])
+
+          describe 'then dragging the mouse up', ->
+            beforeEach ->
+              cell = gutter.find('.table-edit-row-number').first()
+              cellOffset = cell.offset()
+              mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+              nextAnimationFrame()
+
+            it 'changes the selection using the active cell as pivot', ->
+              expect(tableView.activeCellPosition).toEqual([2,0])
+              expect(tableView.getSelection()).toEqual([[0,0],[2,2]])
 
       describe 'when an editor is opened', ->
         [editor] = []

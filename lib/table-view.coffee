@@ -94,9 +94,10 @@ class TableView extends View
       'click': stopPropagationAndDefault()
 
     @subscribeTo @body, '.table-edit-gutter',
-      'mousedown': stopPropagationAndDefault (e) =>
-        row = @findRowAtScreenPosition(e.pageY)
-        @setSelection(@getRowRange(row)) if row?
+      'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
+      'mousemove': stopPropagationAndDefault (e) => @gutterDrag(e)
+      'mouseup': stopPropagationAndDefault (e) => @endGutterDrag(e)
+      'click': stopPropagationAndDefault()
 
     @subscribeTo @body, '.selection-box-handle',
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
@@ -686,7 +687,7 @@ class TableView extends View
 
   setSelection: (selection) ->
     @selection = Range.fromObject(selection)
-    @activeCellPosition = Point.fromObject(@selection.start)
+    @activeCellPosition = @selection.start.copy()
     @requestUpdate()
 
   setSelectionFromActiveCell: ->
@@ -822,6 +823,35 @@ class TableView extends View
     return unless @dragging
 
     @drag(e)
+    @dragging = false
+
+  startGutterDrag: (e) ->
+    return if @dragging
+
+    @dragging = true
+    row = @findRowAtScreenPosition(e.pageY)
+    @setSelection(@getRowRange(row)) if row?
+
+  gutterDrag: (e) ->
+    if @dragging
+      row = @findRowAtScreenPosition(e.pageY)
+
+      if row < @activeCellPosition.row
+        @selection.start.row = row
+        @selection.end.row = @activeCellPosition.row
+      else if row > @activeCellPosition.row
+        @selection.end.row = row
+        @selection.start.row = @activeCellPosition.row
+      else
+        @selection.end.row = @activeCellPosition.row
+        @selection.start.row = @activeCellPosition.row
+
+      @requestUpdate()
+
+  endGutterDrag: (e) ->
+    return unless @dragging
+
+    @gutterDrag(e)
     @dragging = false
 
   #     ######   #######  ########  ######## #### ##    ##  ######
