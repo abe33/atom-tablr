@@ -1258,6 +1258,32 @@ describe 'TableView', ->
 
       expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
+    it 'scrolls the view when the selection reach the last row', ->
+      startCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(1)')
+      endCell = tableView.find('.table-edit-row:nth-child(10) .table-edit-cell:nth-child(3)')
+      startOffset = startCell.offset()
+      endOffset = endCell.offset()
+
+      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
+      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+
+      expect(tableView.body.scrollTop()).toBeGreaterThan(0)
+
+    it 'scrolls the view when the selection reach the first row', ->
+      tableView.scrollTop(300)
+      nextAnimationFrame()
+
+      startCell = tableView.find('.table-edit-row:nth-child(12) .table-edit-cell:nth-child(1)')
+      endCell = tableView.find('.table-edit-row:nth-child(9) .table-edit-cell:nth-child(3)')
+      startOffset = startCell.offset()
+      endOffset = endCell.offset()
+
+      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
+      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+
+      expect(tableView.body.scrollTop()).toBeLessThan(300)
+
+
   describe 'dragging the selection box handle', ->
     [handle, handleOffset] = []
 

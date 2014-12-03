@@ -817,6 +817,11 @@ class TableView extends View
         @selection.end.column = @activeCellPosition.column
         @selection.start.column = @activeCellPosition.column
 
+      if position.row >= @getLastVisibleRow() - 1
+        @makeRowVisible(position.row + 1)
+      else if position.row <= @getFirstVisibleRow() + 1
+        @makeRowVisible(position.row - 1)
+
       @requestUpdate()
 
   endDrag: (e) ->
