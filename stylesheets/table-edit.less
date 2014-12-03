@@ -21,9 +21,17 @@
     border: none;
   }
 
-  .editor {
+  atom-text-editor {
     position: fixed;
     margin: 1px;
+
+    &::shadow .gutter {
+      display: none;
+    }
+  }
+
+  &.with-editor-gutter atom-text-editor::shadow .gutter {
+    display: block;
   }
 
   &.demo {
