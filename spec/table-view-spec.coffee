@@ -506,7 +506,7 @@ describe 'TableView', ->
         expect(gutter.find('.table-edit-row-number').length)
         .toEqual(content.find('.table-edit-row').length)
 
-      fdescribe 'pressing the mouse on a gutter cell', ->
+      describe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
           cell = gutter.find('.table-edit-row-number').eq(2)
           cellOffset = cell.offset()
