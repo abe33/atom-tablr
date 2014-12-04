@@ -913,7 +913,7 @@ class TableView extends View
     if @dragging
       {pageY} = e
       rowY = @rowScreenPosition(row)
-      newRowHeight = pageY - rowY + dragOffset + handleHeight
+      newRowHeight = Math.max(pageY - rowY + dragOffset + handleHeight, @getMinimumRowHeight())
       rulerTop = @getScreenRowOffsetAt(row) + newRowHeight
       @getRowResizeRuler().css(top: rulerTop)
 

@@ -599,10 +599,15 @@ describe 'TableView', ->
           expect(ruler.is(':visible')).toBeFalsy()
 
         it 'stops the resize when the height is lower than the minimum row height', ->
+          ruler = tableView.find('.row-resize-ruler')
           handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
+          mousemove(handle, x, y + -20)
+
+          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height() - 10)
+
           mouseup(handle, x, y + -20)
 
           expect(tableView.getRowHeightAt(2)).toEqual(10)
