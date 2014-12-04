@@ -528,6 +528,16 @@ describe 'TableView', ->
             expect(tableView.activeCellPosition).toEqual([2,0])
             expect(tableView.getSelection()).toEqual([[2,0],[4,2]])
 
+          describe 'until reaching the bottom of the view', ->
+            beforeEach ->
+              cell = gutter.find('.table-edit-row-number').eq(10)
+              cellOffset = cell.offset()
+              mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+              nextAnimationFrame()
+
+            it 'scrolls the view', ->
+              expect(tableView.body.scrollTop()).toBeGreaterThan(0)
+
           describe 'then dragging the mouse up', ->
             beforeEach ->
               cell = gutter.find('.table-edit-row-number').first()
@@ -538,6 +548,22 @@ describe 'TableView', ->
             it 'changes the selection using the active cell as pivot', ->
               expect(tableView.activeCellPosition).toEqual([2,0])
               expect(tableView.getSelection()).toEqual([[0,0],[2,2]])
+
+      describe 'dragging the mouse over gutter cells and reaching the top of the view', ->
+        it 'scrolls the view', ->
+          tableView.scrollTop(300)
+          nextAnimationFrame()
+
+          startCell = tableView.find('.table-edit-row-number:nth-child(12)')
+          endCell = tableView.find('.table-edit-row-number:nth-child(9)')
+          startOffset = startCell.offset()
+          endOffset = endCell.offset()
+
+          mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
+          mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+
+          expect(tableView.body.scrollTop()).toBeLessThan(300)
+
 
       describe 'when an editor is opened', ->
         [editor] = []

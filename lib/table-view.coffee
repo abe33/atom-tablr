@@ -851,6 +851,11 @@ class TableView extends View
         @selection.end.row = @activeCellPosition.row
         @selection.start.row = @activeCellPosition.row
 
+      if row >= @getLastVisibleRow() - 1
+        @makeRowVisible(row + 1)
+      else if row <= @getFirstVisibleRow() + 1
+        @makeRowVisible(row - 1)
+
       @requestUpdate()
 
   endGutterDrag: (e) ->
