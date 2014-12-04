@@ -7,6 +7,10 @@ React = require 'react-atom-fork'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
 
+stopPropagationAndDefault = (f) -> (e) ->
+  e.stopPropagation()
+  e.preventDefault()
+  f?(e)
 
 module.exports =
 class TableView extends View
@@ -58,17 +62,11 @@ class TableView extends View
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
 
-    stopPropagationAndDefault = (f) -> (e) ->
-      e.stopPropagation()
-      e.preventDefault()
-      f?(e)
-
     @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
 
     @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
-
         if column = @columnAtScreenPosition(e.pageX, e.pageY)
           if column.name is @order
             if @direction is -1
@@ -89,18 +87,15 @@ class TableView extends View
 
         @startDrag(e)
         @focus()
-      'mousemove': stopPropagationAndDefault (e) => @drag(e)
-      'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
       'click': stopPropagationAndDefault()
 
     @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
-      'mousemove': stopPropagationAndDefault (e) => @gutterDrag(e)
-      'mouseup': stopPropagationAndDefault (e) => @endGutterDrag(e)
       'click': stopPropagationAndDefault()
 
     @subscribeTo @body, '.selection-box-handle',
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
+      'click': stopPropagationAndDefault()
 
     @updateScreenRows()
 
@@ -149,9 +144,11 @@ class TableView extends View
   subscribeTo: (object, selector, events) ->
     [events, selector] = [selector, null] if typeof selector is 'object'
     if selector
-      object.on event, selector, callback for event, callback of events
+      for event, callback of events
+        @subscriptions.add @asDisposable object.on event, selector, callback
     else
-      object.on event, callback for event, callback of events
+      for event, callback of events
+        @subscriptions.add @asDisposable object.on event, callback
 
   observeConfig: (configs) ->
     for config, callback of configs
@@ -792,6 +789,13 @@ class TableView extends View
 
     @dragging = true
 
+    @body.on 'mousemove', stopPropagationAndDefault (e) => @drag(e)
+    @body.on 'mouseup', stopPropagationAndDefault (e) => @endDrag(e)
+
+    @dragSubscription = new Disposable =>
+      @body.off 'mousemove'
+      @body.off 'mouseup'
+
   drag: (e) ->
     if @dragging
       {pageX, pageY} = e
@@ -829,11 +833,20 @@ class TableView extends View
 
     @drag(e)
     @dragging = false
+    @dragSubscription.dispose()
 
   startGutterDrag: (e) ->
     return if @dragging
 
     @dragging = true
+
+    @body.on 'mousemove', stopPropagationAndDefault (e) => @gutterDrag(e)
+    @body.on 'mouseup', stopPropagationAndDefault (e) => @endGutterDrag(e)
+
+    @dragSubscription = new Disposable =>
+      @body.off 'mousemove'
+      @body.off 'mouseup'
+
     row = @findRowAtScreenPosition(e.pageY)
     @setSelection(@getRowRange(row)) if row?
 
@@ -861,6 +874,7 @@ class TableView extends View
   endGutterDrag: (e) ->
     return unless @dragging
 
+    @dragSubscription.dispose()
     @gutterDrag(e)
     @dragging = false
 
@@ -936,3 +950,5 @@ class TableView extends View
     @hasChanged = false
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
+
+  asDisposable: (o) -> new Disposable -> o?.off()
