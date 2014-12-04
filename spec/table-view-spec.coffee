@@ -417,12 +417,15 @@ describe 'TableView', ->
     beforeEach ->
       header = tableView.head
 
-    it 'has as many cell as there is columns in the table', ->
+    it 'has as many cells as there is columns in the table', ->
       cells = tableView.find('.table-edit-header-cell')
       expect(cells.length).toEqual(3)
       expect(cells.first().text()).toEqual('key')
       expect(cells.eq(1).text()).toEqual('value')
       expect(cells.last().text()).toEqual('foo')
+
+    it 'has cells that contains a resize handle', ->
+      expect(tableView.find('.column-resize-handle').length).toEqual(tableView.find('.table-edit-header-cell').length)
 
     it 'has cells that have the same width as the body cells', ->
       tableView.setColumnsWidths([0.2, 0.3, 0.5])

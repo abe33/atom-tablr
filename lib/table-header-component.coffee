@@ -23,13 +23,15 @@ module.exports = React.createClass
         else
           classes.push 'descending'
 
+      resizeHandle = div className: 'column-resize-handle'
+
       cells.push div {
         key: "header-cell-#{index}"
         className: classes.join(' ')
         style:
           width: columnsWidths[index]
           'text-align': columnsAligns[index] ? 'left'
-      }, column.name
+      }, column.name, resizeHandle
 
     row = div className: 'table-edit-header-row', cells
 
