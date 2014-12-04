@@ -903,8 +903,6 @@ class TableView extends View
   endRowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
     return unless @dragging
 
-    console.log(row, handleHeight, dragOffset)
-
     {pageY} = e
     rowY = @rowScreenPosition(row)
     @setRowHeightAt(row, pageY - rowY + dragOffset + handleHeight)
