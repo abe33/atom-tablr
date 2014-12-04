@@ -1,4 +1,4 @@
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 
 objectCenterCoordinates = (obj) ->
   {top, left} = obj.offset()
