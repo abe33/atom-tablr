@@ -221,6 +221,10 @@
 
 .active-column {
   background: fadeout(@background-color-error, 95%);
+
+  &.order {
+    background: screen(fadeout(@background-color-error, 90%), fadeout(@background-color-info, 90%));
+  }
 }
 
 .table-edit-header-cell.active-column {
