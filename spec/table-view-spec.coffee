@@ -358,8 +358,7 @@ describe 'TableView', ->
 
     it 'activates the cell under the mouse when pressed', ->
       cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(2)')
-      offset = cell.offset()
-      mousedown(cell, offset.left + 50, offset.top + 5)
+      mousedown(cell)
 
       expect(tableView.getActiveCell().getValue()).toEqual(300)
 
@@ -385,8 +384,7 @@ describe 'TableView', ->
 
       it 'activates the cell under the mouse when pressed', ->
         cell = tableView.find('.table-edit-row[data-row-id=15] .table-edit-cell:nth-child(2)')
-        offset = cell.offset()
-        mousedown(cell, offset.left + 50, offset.top + 5)
+        mousedown(cell)
 
         expect(tableView.getActiveCell().getValue()).toEqual(1400)
 
@@ -397,8 +395,7 @@ describe 'TableView', ->
 
       it 'activates the cell under the mouse when pressed', ->
         cell = tableView.find('.table-edit-row:last-child .table-edit-cell:nth-child(2)')
-        offset = cell.offset()
-        mousedown(cell, offset.left + 50, offset.top + 5)
+        mousedown(cell)
 
         expect(tableView.getActiveCell().getValue()).toEqual(9900)
 
@@ -446,12 +443,11 @@ describe 'TableView', ->
         expect(header.find('.table-edit-header-filler').length).toEqual(1)
 
     describe 'clicking on a header cell', ->
-      [column, offset] = []
+      [column] = []
 
       beforeEach ->
         column = tableView.find('.table-edit-header-cell:last-child')
-        offset = column.offset()
-        mousedown(column, offset.left + 50, offset.top + 5)
+        mousedown(column)
 
       it 'should change the sort order to use the clicked column', ->
         expect(tableView.order).toEqual('foo')
@@ -459,7 +455,7 @@ describe 'TableView', ->
 
       describe 'a second time', ->
         beforeEach ->
-          mousedown(column, offset.left + 50, offset.top + 5)
+          mousedown(column)
 
         it 'toggles the sort direction', ->
           expect(tableView.order).toEqual('foo')
@@ -467,8 +463,8 @@ describe 'TableView', ->
 
       describe 'a third time', ->
         beforeEach ->
-          mousedown(column, offset.left + 50, offset.top + 5)
-          mousedown(column, offset.left + 50, offset.top + 5)
+          mousedown(column)
+          mousedown(column)
 
         it 'removes the sorting order', ->
           expect(tableView.order).toBeNull()
@@ -513,8 +509,7 @@ describe 'TableView', ->
       describe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
           cell = gutter.find('.table-edit-row-number').eq(2)
-          cellOffset = cell.offset()
-          mousedown(cell, cellOffset.left + 5, cellOffset.top + 5)
+          mousedown(cell)
           nextAnimationFrame()
 
         it 'selects the whole line', ->
@@ -524,8 +519,7 @@ describe 'TableView', ->
         describe 'then dragging the mouse down', ->
           beforeEach ->
             cell = gutter.find('.table-edit-row-number').eq(4)
-            cellOffset = cell.offset()
-            mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+            mousemove(cell)
             nextAnimationFrame()
 
           it 'expands the selection with the covered rows', ->
@@ -535,8 +529,7 @@ describe 'TableView', ->
           describe 'until reaching the bottom of the view', ->
             beforeEach ->
               cell = gutter.find('.table-edit-row-number').eq(10)
-              cellOffset = cell.offset()
-              mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+              mousemove(cell)
               nextAnimationFrame()
 
             it 'scrolls the view', ->
@@ -545,8 +538,7 @@ describe 'TableView', ->
           describe 'then dragging the mouse up', ->
             beforeEach ->
               cell = gutter.find('.table-edit-row-number').first()
-              cellOffset = cell.offset()
-              mousemove(cell, cellOffset.left + 5, cellOffset.top + 5)
+              mousemove(cell)
               nextAnimationFrame()
 
             it 'changes the selection using the active cell as pivot', ->
@@ -560,11 +552,9 @@ describe 'TableView', ->
 
           startCell = tableView.find('.table-edit-row-number:nth-child(12)')
           endCell = tableView.find('.table-edit-row-number:nth-child(9)')
-          startOffset = startCell.offset()
-          endOffset = endCell.offset()
 
-          mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
-          mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+          mousedown(startCell)
+          mousemove(endCell)
 
           expect(tableView.body.scrollTop()).toBeLessThan(300)
 
@@ -603,8 +593,7 @@ describe 'TableView', ->
 
   it 'activates the cell under the mouse when pressed', ->
     cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
-    offset = cell.offset()
-    mousedown(cell, offset.left + 50, offset.top + 5)
+    mousedown(cell)
 
     expect(tableView.getActiveCell().getValue()).toEqual('no')
 
@@ -1000,8 +989,7 @@ describe 'TableView', ->
     describe 'clicking on another cell', ->
       beforeEach ->
         cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
-        offset = cell.offset()
-        mousedown(cell, offset.left + 50, offset.top + 5)
+        mousedown(cell)
 
       it 'closes the editor', ->
         expect(tableView.isEditing()).toBeFalsy()
@@ -1275,27 +1263,23 @@ describe 'TableView', ->
     it 'creates a selection with the cells from the mouse movements', ->
       startCell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
       endCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(3)')
-      startOffset = startCell.offset()
-      endOffset = endCell.offset()
 
-      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
-      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+      mousedown(startCell)
+      mousemove(endCell)
 
       expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
-      mousedown(endCell, endOffset.left + 50, endOffset.top + 5)
-      mousemove(startCell, startOffset.left + 50, startOffset.top + 5)
+      mousedown(endCell)
+      mousemove(startCell)
 
       expect(tableView.getSelection()).toEqual([[3,0],[6,2]])
 
     it 'scrolls the view when the selection reach the last row', ->
       startCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(1)')
       endCell = tableView.find('.table-edit-row:nth-child(10) .table-edit-cell:nth-child(3)')
-      startOffset = startCell.offset()
-      endOffset = endCell.offset()
 
-      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
-      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+      mousedown(startCell)
+      mousemove(endCell)
 
       expect(tableView.body.scrollTop()).toBeGreaterThan(0)
 
@@ -1305,14 +1289,11 @@ describe 'TableView', ->
 
       startCell = tableView.find('.table-edit-row:nth-child(12) .table-edit-cell:nth-child(1)')
       endCell = tableView.find('.table-edit-row:nth-child(9) .table-edit-cell:nth-child(3)')
-      startOffset = startCell.offset()
-      endOffset = endCell.offset()
 
-      mousedown(startCell, startOffset.left + 50, startOffset.top + 5)
-      mousemove(endCell, endOffset.left + 50, endOffset.top + 5)
+      mousedown(startCell)
+      mousemove(endCell)
 
       expect(tableView.body.scrollTop()).toBeLessThan(300)
-
 
   describe 'dragging the selection box handle', ->
     [handle, handleOffset] = []
@@ -1321,12 +1302,12 @@ describe 'TableView', ->
       tableView.setSelection([[2,0],[2,1]])
       nextAnimationFrame()
       handle = tableView.find('.selection-box-handle')
-      handleOffset = handle.offset()
 
-      mousedown(handle, handleOffset.left + 2, handleOffset.top + 2)
+      mousedown(handle)
 
     describe 'to the right', ->
       beforeEach ->
+        handleOffset = handle.offset()
         mousemove(handle, handleOffset.left + 50, handleOffset.top + 2)
 
       it 'expands the selection to the right', ->

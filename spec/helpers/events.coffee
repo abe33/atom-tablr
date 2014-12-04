@@ -1,7 +1,12 @@
 {$} = require 'atom'
 
+objectCenterCoordinates = (obj) ->
+  {top, left} = obj.offset()
+  {x: left + obj.width() / 2, y: top + obj.height() / 2}
+
 module.exports =
   mousedown: (obj, x, y) ->
+    {x,y} = objectCenterCoordinates(obj) unless x? and y?
     event = $.Event "mousedown", {
       which: 1
       pageX: x
@@ -11,6 +16,7 @@ module.exports =
     obj.trigger(event)
 
   mousemove: (obj, x, y) ->
+    {x,y} = objectCenterCoordinates(obj) unless x? and y?
     event = $.Event "mousemove", {
       which: 1
       pageX: x
@@ -20,6 +26,7 @@ module.exports =
     obj.trigger(event)
 
   mouseup: (obj, x, y) ->
+    {x,y} = objectCenterCoordinates(obj) unless x? and y?
     event = $.Event "mouseup", {
       which: 1
       pageX: x
@@ -35,3 +42,5 @@ module.exports =
     }
 
     obj.trigger(event)
+
+  objectCenterCoordinates: objectCenterCoordinates
