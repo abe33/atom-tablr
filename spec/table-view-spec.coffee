@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, mousemove, mouseup, textInput} = require './helpers/events'
+{mousedown, mousemove, mouseup, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
@@ -558,6 +558,15 @@ describe 'TableView', ->
 
           expect(tableView.body.scrollTop()).toBeLessThan(300)
 
+      describe 'dragging the resize handler of a row number', ->
+        it 'resize the row on mouse up', ->
+          handle = tableView.find('.table-edit-row-number .resize-handle').eq(2)
+          {x, y} = objectCenterCoordinates(handle)
+
+          mousedown(handle)
+          mouseup(handle, x, y + 50)
+
+          expect(tableView.getRowHeightAt(2)).toBeCloseTo(70)
 
       describe 'when an editor is opened', ->
         [editor] = []

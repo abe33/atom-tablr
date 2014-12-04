@@ -1,5 +1,5 @@
 {Point, Range} = require 'atom'
-{View} = require 'space-pen'
+{View, $} = require 'space-pen'
 {TextEditorView} = require 'atom-space-pen-views'
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
@@ -91,6 +91,10 @@ class TableView extends View
 
     @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
+      'click': stopPropagationAndDefault()
+
+    @subscribeTo @body, '.table-edit-gutter .resize-handle',
+      'mousedown': stopPropagationAndDefault (e) => @startRowResizeDrag(e)
       'click': stopPropagationAndDefault()
 
     @subscribeTo @body, '.selection-box-handle',
@@ -241,6 +245,14 @@ class TableView extends View
       offset += @getScreenRowHeightAt(i)
 
     @rowOffsets = offsets
+
+  rowScreenPosition: (row) ->
+    top = @getScreenRowOffsetAt(row)
+
+    content = @getRowsContainer()
+    contentOffset = content.offset()
+
+    top + contentOffset.top
 
   findRowAtPosition: (y) ->
     for i in [0...@table.getRowsCount()]
@@ -862,6 +874,37 @@ class TableView extends View
 
     @dragSubscription.dispose()
     @gutterDrag(e)
+    @dragging = false
+
+  startRowResizeDrag: (e) ->
+    return if @dragging
+
+    @dragging = true
+
+    row = @findRowAtScreenPosition(e.pageY)
+    handle = $(e.target)
+    handleHeight = handle.height()
+    dragOffset = handle.offset().top - e.pageY
+
+    options = {row, handle, handleHeight, dragOffset}
+
+    @body.on 'mousemove', stopPropagationAndDefault (e) => @rowResizeDrag(e, options)
+    @body.on 'mouseup', stopPropagationAndDefault (e) => @endRowResizeDrag(e, options)
+
+    @initializeDragDisposable()
+
+  rowResizeDrag: (e) ->
+
+  endRowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
+    return unless @dragging
+
+    console.log(row, handleHeight, dragOffset)
+
+    {pageY} = e
+    rowY = @rowScreenPosition(row)
+    @setRowHeightAt(row, pageY - rowY + dragOffset + handleHeight)
+
+    @dragSubscription.dispose()
     @dragging = false
 
   scrollDuringDrag: (row) ->
