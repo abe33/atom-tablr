@@ -506,6 +506,10 @@ describe 'TableView', ->
         expect(gutter.find('.table-edit-row-number').length)
         .toEqual(content.find('.table-edit-row').length)
 
+      it 'contains resize handlers for each row', ->
+        expect(gutter.find('.table-edit-row-number .resize-handle').length)
+        .toEqual(content.find('.table-edit-row').length)
+
       describe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
           cell = gutter.find('.table-edit-row-number').eq(2)

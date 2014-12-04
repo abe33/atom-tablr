@@ -10,13 +10,15 @@ module.exports = React.createClass
       classes.push 'active-row' if parentView.isActiveRow(row)
       classes.push 'selected' if parentView.isSelectedRow(row)
 
+      resizeHandle = div className: 'resize-handle'
+
       div {
         className: classes.join(' ')
         key: "row-number-#{row}"
         style:
           height: "#{parentView.getScreenRowHeightAt(row)}px"
           top: "#{parentView.getScreenRowOffsetAt(row)}px"
-      }, row + 1
+      }, row + 1, resizeHandle
 
     rows.unshift div className: 'table-edit-gutter-filler', totalRows
 
