@@ -791,41 +791,34 @@ class TableView extends View
 
     @body.on 'mousemove', stopPropagationAndDefault (e) => @drag(e)
     @body.on 'mouseup', stopPropagationAndDefault (e) => @endDrag(e)
-
-    @dragSubscription = new Disposable =>
-      @body.off 'mousemove'
-      @body.off 'mouseup'
+    @initializeDragDisposable()
 
   drag: (e) ->
     if @dragging
       {pageX, pageY} = e
-      position = @cellPositionAtScreenPosition pageX, pageY
+      {row, column} = @cellPositionAtScreenPosition pageX, pageY
 
-      if position.row < @activeCellPosition.row
-        @selection.start.row = position.row
+      if row < @activeCellPosition.row
+        @selection.start.row = row
         @selection.end.row = @activeCellPosition.row
-      else if position.row > @activeCellPosition.row
-        @selection.end.row = position.row
+      else if row > @activeCellPosition.row
+        @selection.end.row = row
         @selection.start.row = @activeCellPosition.row
       else
         @selection.end.row = @activeCellPosition.row
         @selection.start.row = @activeCellPosition.row
 
-      if position.column < @activeCellPosition.column
-        @selection.start.column = position.column
+      if column < @activeCellPosition.column
+        @selection.start.column = column
         @selection.end.column = @activeCellPosition.column
-      else if position.column > @activeCellPosition.column
-        @selection.end.column = position.column
+      else if column > @activeCellPosition.column
+        @selection.end.column = column
         @selection.start.column = @activeCellPosition.column
       else
         @selection.end.column = @activeCellPosition.column
         @selection.start.column = @activeCellPosition.column
 
-      if position.row >= @getLastVisibleRow() - 1
-        @makeRowVisible(position.row + 1)
-      else if position.row <= @getFirstVisibleRow() + 1
-        @makeRowVisible(position.row - 1)
-
+      @scrollDuringDrag(row)
       @requestUpdate()
 
   endDrag: (e) ->
@@ -842,10 +835,7 @@ class TableView extends View
 
     @body.on 'mousemove', stopPropagationAndDefault (e) => @gutterDrag(e)
     @body.on 'mouseup', stopPropagationAndDefault (e) => @endGutterDrag(e)
-
-    @dragSubscription = new Disposable =>
-      @body.off 'mousemove'
-      @body.off 'mouseup'
+    @initializeDragDisposable()
 
     row = @findRowAtScreenPosition(e.pageY)
     @setSelection(@getRowRange(row)) if row?
@@ -864,11 +854,7 @@ class TableView extends View
         @selection.end.row = @activeCellPosition.row
         @selection.start.row = @activeCellPosition.row
 
-      if row >= @getLastVisibleRow() - 1
-        @makeRowVisible(row + 1)
-      else if row <= @getFirstVisibleRow() + 1
-        @makeRowVisible(row - 1)
-
+      @scrollDuringDrag(row)
       @requestUpdate()
 
   endGutterDrag: (e) ->
@@ -877,6 +863,17 @@ class TableView extends View
     @dragSubscription.dispose()
     @gutterDrag(e)
     @dragging = false
+
+  scrollDuringDrag: (row) ->
+    if row >= @getLastVisibleRow() - 1
+      @makeRowVisible(row + 1)
+    else if row <= @getFirstVisibleRow() + 1
+      @makeRowVisible(row - 1)
+
+  initializeDragDisposable: ->
+    @dragSubscription = new Disposable =>
+      @body.off 'mousemove'
+      @body.off 'mouseup'
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
