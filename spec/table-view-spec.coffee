@@ -504,7 +504,7 @@ describe 'TableView', ->
         .toEqual(content.find('.table-edit-row').length)
 
       it 'contains resize handlers for each row', ->
-        expect(gutter.find('.table-edit-row-number .resize-handle').length)
+        expect(gutter.find('.table-edit-row-number .row-resize-handle').length)
         .toEqual(content.find('.table-edit-row').length)
 
       describe 'pressing the mouse on a gutter cell', ->
@@ -561,7 +561,7 @@ describe 'TableView', ->
 
       describe 'dragging the resize handler of a row number', ->
         it 'resize the row on mouse up', ->
-          handle = tableView.find('.table-edit-row-number .resize-handle').eq(2)
+          handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -570,7 +570,7 @@ describe 'TableView', ->
           expect(tableView.getRowHeightAt(2)).toEqual(70)
 
         it 'stops the resize when the height is lower than the minimum row height', ->
-          handle = tableView.find('.table-edit-row-number .resize-handle').eq(2)
+          handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)

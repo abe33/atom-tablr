@@ -10,7 +10,7 @@ module.exports = React.createClass
       classes.push 'active-row' if parentView.isActiveRow(row)
       classes.push 'selected' if parentView.isSelectedRow(row)
 
-      resizeHandle = div className: 'resize-handle'
+      resizeHandle = div className: 'row-resize-handle'
 
       div {
         className: classes.join(' ')

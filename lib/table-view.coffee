@@ -93,7 +93,7 @@ class TableView extends View
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.table-edit-gutter .resize-handle',
+    @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startRowResizeDrag(e)
       'click': stopPropagationAndDefault()
 
