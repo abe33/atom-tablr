@@ -69,6 +69,8 @@ module.exports = React.createClass
       rows.push new SelectionComponent(subComponentProps)
       rows.push new SelectionHandleComponent(subComponentProps)
 
+    content.push div className: 'row-resize-ruler'
+
     div {
       className: 'table-edit-content'
       style: {height}

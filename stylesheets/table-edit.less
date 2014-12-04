@@ -150,6 +150,20 @@
   }
 }
 
+.row-resize-ruler {
+  position: absolute;
+  display: none;
+  height: 1px;
+  min-width: 1px;
+  left: 0;
+  right: 0;
+  background: @background-color-info;
+
+  &.visible {
+    display: block;
+  }
+}
+
 .table-edit-cell, .table-edit-header-cell, .table-edit-row-number, .table-edit-gutter-filler, .table-edit-header-filler {
   font-size: 13px;
 }

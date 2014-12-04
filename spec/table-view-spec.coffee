@@ -569,6 +569,35 @@ describe 'TableView', ->
 
           expect(tableView.getRowHeightAt(2)).toEqual(70)
 
+        it 'displays a ruler when the drag have begun', ->
+          ruler = tableView.find('.row-resize-ruler')
+
+          expect(ruler.is(':visible')).toBeFalsy()
+
+          handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
+          mousedown(handle)
+
+          expect(ruler.is(':visible')).toBeTruthy()
+          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height())
+
+        it 'moves the handle during the drag', ->
+          ruler = tableView.find('.row-resize-ruler')
+          handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
+          {x, y} = objectCenterCoordinates(handle)
+
+          mousedown(handle)
+          mousemove(handle, x, y + 50)
+
+          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height() + 50)
+
+        it 'hides the ruler on drag end', ->
+          ruler = tableView.find('.row-resize-ruler')
+          handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
+          mousedown(handle)
+          mouseup(handle)
+
+          expect(ruler.is(':visible')).toBeFalsy()
+
         it 'stops the resize when the height is lower than the minimum row height', ->
           handle = tableView.find('.table-edit-row-number .row-resize-handle').eq(2)
           {x, y} = objectCenterCoordinates(handle)

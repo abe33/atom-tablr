@@ -232,6 +232,9 @@ class TableView extends View
 
   getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
 
+  setScreenRowHeightAt: (row, height) ->
+    @setRowHeightAt(@screenRowToModelRow(row), height)
+
   getScreenRowOffsetAt: (row) -> @rowOffsets[row]
 
   screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
@@ -240,6 +243,9 @@ class TableView extends View
 
   getRowsContainer: ->
     @rowsContainer ?= @body.find('.table-edit-rows')
+
+  getRowResizeRuler: ->
+    @rowResizeRuler ?= @body.find('.row-resize-ruler')
 
   computeRowOffsets: ->
     offsets = []
@@ -887,25 +893,38 @@ class TableView extends View
     @dragging = true
 
     row = @findRowAtScreenPosition(e.pageY)
+
     handle = $(e.target)
     handleHeight = handle.height()
-    dragOffset = handle.offset().top - e.pageY
+    handleOffset = handle.offset()
+    dragOffset = handleOffset.top - e.pageY
 
     options = {row, handle, handleHeight, dragOffset}
 
     @body.on 'mousemove', stopPropagationAndDefault (e) => @rowResizeDrag(e, options)
     @body.on 'mouseup', stopPropagationAndDefault (e) => @endRowResizeDrag(e, options)
 
+    rulerTop = @getScreenRowOffsetAt(row) + @getScreenRowHeightAt(row)
+
+    @getRowResizeRuler().addClass('visible').css(top: rulerTop)
     @initializeDragDisposable()
 
-  rowResizeDrag: (e) ->
+  rowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
+    if @dragging
+      {pageY} = e
+      rowY = @rowScreenPosition(row)
+      newRowHeight = pageY - rowY + dragOffset + handleHeight
+      rulerTop = @getScreenRowOffsetAt(row) + newRowHeight
+      @getRowResizeRuler().css(top: rulerTop)
 
   endRowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
     return unless @dragging
 
     {pageY} = e
     rowY = @rowScreenPosition(row)
-    @setRowHeightAt(row, pageY - rowY + dragOffset + handleHeight)
+    newRowHeight = pageY - rowY + dragOffset + handleHeight
+    @setScreenRowHeightAt(row, newRowHeight)
+    @getRowResizeRuler().removeClass('visible')
 
     @dragSubscription.dispose()
     @dragging = false
