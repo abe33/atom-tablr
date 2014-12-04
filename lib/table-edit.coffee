@@ -12,6 +12,9 @@ module.exports =
     rowHeight:
       type: 'integer'
       default: 24
+    minimumRowHeight:
+      type: 'integer'
+      default: 16
     rowOverdraw:
       type: 'integer'
       default: 10

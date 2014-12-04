@@ -44,6 +44,7 @@ describe 'TableView', ->
 
     atom.config.set 'table-edit.rowHeight', 20
     atom.config.set 'table-edit.rowOverdraw', 10
+    atom.config.set 'table-edit.minimumRowHeight', 10
 
     tableView = new TableView(table)
 
@@ -566,7 +567,16 @@ describe 'TableView', ->
           mousedown(handle)
           mouseup(handle, x, y + 50)
 
-          expect(tableView.getRowHeightAt(2)).toBeCloseTo(70)
+          expect(tableView.getRowHeightAt(2)).toEqual(70)
+
+        it 'stops the resize when the height is lower than the minimum row height', ->
+          handle = tableView.find('.table-edit-row-number .resize-handle').eq(2)
+          {x, y} = objectCenterCoordinates(handle)
+
+          mousedown(handle)
+          mouseup(handle, x, y + -20)
+
+          expect(tableView.getRowHeightAt(2)).toEqual(10)
 
       describe 'when an editor is opened', ->
         [editor] = []

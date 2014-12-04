@@ -107,6 +107,7 @@ class TableView extends View
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
         @requestUpdate()
       'table-edit.pageMovesAmount': (@configPageMovesAmount) => @requestUpdate()
+      'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
       'table-edit.rowHeight': (@configRowHeight) =>
         @computeRowOffsets()
         @requestUpdate()
@@ -173,6 +174,8 @@ class TableView extends View
 
   getRowHeight: -> @rowHeight ? @configRowHeight
 
+  getMinimumRowHeight: -> @minimumRowHeight ? @configMinimumRowHeight
+
   setRowHeight: (@rowHeight) ->
     @computeRowOffsets()
     @requestUpdate()
@@ -181,6 +184,8 @@ class TableView extends View
     @rowHeights[index] ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
+    minHeight = @getMinimumRowHeight()
+    height = minHeight if height < minHeight
     @rowHeights[index] = height
     @computeRowOffsets()
     @requestUpdate()
