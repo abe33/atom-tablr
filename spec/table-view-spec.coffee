@@ -453,7 +453,7 @@ describe 'TableView', ->
         column = tableView.find('.table-edit-header-cell:last-child')
         mousedown(column)
 
-      it 'should change the sort order to use the clicked column', ->
+      it 'changes the sort order to use the clicked column', ->
         expect(tableView.order).toEqual('foo')
         expect(tableView.direction).toEqual(1)
 
