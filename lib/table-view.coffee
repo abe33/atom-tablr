@@ -19,8 +19,9 @@ class TableView extends View
   @content: ->
     @div class: 'table-edit', =>
       @input type: 'text', class: 'hidden-input', outlet: 'hiddenInput'
-      @div outlet: 'head', class: 'table-edit-header', =>
-      @div outlet: 'body', class: 'scroll-view', =>
+      @div outlet: 'head', class: 'table-edit-header'
+      @div outlet: 'body', class: 'scroll-view'
+      @div outlet: 'columnResizeRuler', class: 'column-resize-ruler'
 
   initialize: (@table) ->
     @gutter = false
@@ -953,10 +954,14 @@ class TableView extends View
       @head.off 'mousemove'
       @head.off 'mouseup'
 
-  columnResizeDrag: (e, initial) ->
+    @columnResizeRuler.addClass('visible').css(left: pageX - @head.offset().left)
 
+  columnResizeDrag: ({pageX}) ->
+    @columnResizeRuler.css(left: pageX - @head.offset().left)
 
   endColumnResizeDrag: ({pageX}, {startX, leftCellIndex, rightCellIndex}) ->
+    return unless @dragging
+
     moveX = pageX - startX
     columnsScreenWidths = @getColumnsScreenWidths()
     columnsWidths = @getColumnsWidths().concat()
@@ -964,7 +969,6 @@ class TableView extends View
     leftCellWidth = columnsScreenWidths[leftCellIndex]
     rightCellWidth = columnsScreenWidths[rightCellIndex]
     columnsWidth = @getColumnsContainer().width()
-
 
     leftCellRatio = (leftCellWidth + moveX) / columnsWidth
     rightCellRatio = (rightCellWidth - moveX) / columnsWidth
@@ -974,6 +978,7 @@ class TableView extends View
 
     @setColumnsWidths(columnsWidths)
 
+    @columnResizeRuler.removeClass('visible')
     @dragSubscription.dispose()
     @dragging = false
 

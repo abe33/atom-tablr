@@ -489,6 +489,39 @@ describe 'TableView', ->
         expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
         expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50)
 
+      it 'displays a ruler when starting the drag', ->
+        ruler = tableView.find('.column-resize-ruler')
+
+        expect(ruler.length).toEqual(1)
+        expect(ruler.is(':visible')).toBeFalsy()
+
+        handle = header.find('.column-resize-handle').eq(1)
+        {x} = objectCenterCoordinates(handle)
+
+        mousedown(handle)
+
+        expect(ruler.is(':visible')).toBeTruthy()
+        expect(ruler.css('left')).toEqual(x + 'px')
+
+      it 'moves the ruler during drag', ->
+        ruler = tableView.find('.column-resize-ruler')
+        handle = header.find('.column-resize-handle').eq(1)
+        {x,y} = objectCenterCoordinates(handle)
+
+        mousedown(handle)
+        mousemove(handle, x + 50, y)
+
+        expect(ruler.css('left')).toEqual((x + 50) + 'px')
+
+      it 'moves the ruler during drag', ->
+        ruler = tableView.find('.column-resize-ruler')
+        handle = header.find('.column-resize-handle').eq(1)
+
+        mousedown(handle)
+        mouseup(handle)
+
+        expect(ruler.is(':visible')).toBeFalsy()
+
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
   #    ##        ##     ##    ##       ##    ##       ##     ##

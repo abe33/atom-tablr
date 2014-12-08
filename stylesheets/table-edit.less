@@ -187,20 +187,31 @@
     cursor: nwse-resize;
   }
 }
-
-.row-resize-ruler {
+.ruler {
   position: absolute;
   display: none;
-  height: 1px;
+  min-height: 1px;
   min-width: 1px;
-  left: 0;
-  right: 0;
   background: @background-color-info;
 
   &.visible {
     display: block;
   }
 }
+.row-resize-ruler {
+  .ruler;
+  height: 1px;
+  left: 0;
+  right: 0;
+}
+
+.column-resize-ruler {
+  .ruler;
+  width: 1px;
+  top: 0;
+  bottom: 0;
+}
+
 
 //   ########   #######  ##      ##  ######
 //   ##     ## ##     ## ##  ##  ## ##    ##
