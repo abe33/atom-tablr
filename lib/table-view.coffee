@@ -898,10 +898,10 @@ class TableView extends View
     handleOffset = handle.offset()
     dragOffset = handleOffset.top - e.pageY
 
-    options = {row, handle, handleHeight, dragOffset}
+    initial = {row, handle, handleHeight, dragOffset}
 
-    @body.on 'mousemove', stopPropagationAndDefault (e) => @rowResizeDrag(e, options)
-    @body.on 'mouseup', stopPropagationAndDefault (e) => @endRowResizeDrag(e, options)
+    @body.on 'mousemove', stopPropagationAndDefault (e) => @rowResizeDrag(e, initial)
+    @body.on 'mouseup', stopPropagationAndDefault (e) => @endRowResizeDrag(e, initial)
 
     rulerTop = @getScreenRowOffsetAt(row) + @getScreenRowHeightAt(row)
 
