@@ -84,6 +84,10 @@
   cursor: pointer;
 }
 
+.table-edit-header-cell {
+  position: relative;
+}
+
 .table-edit-header-filler {
   .row-number-placeholder;
 }
@@ -91,6 +95,16 @@
 .table-edit-header-filler + * {
   border-left: 1px solid @background-color-highlight;
   margin-left: -1px;
+}
+
+.column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  z-index: 2;
 }
 
 //     ######   ##     ## ######## ######## ######## ########
@@ -259,7 +273,6 @@
 }
 
 .table-edit-header-cell.order {
-  position: relative;
   padding-right: 24px;
 
   &:after {
