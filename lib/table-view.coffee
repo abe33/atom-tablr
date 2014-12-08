@@ -321,14 +321,15 @@ class TableView extends View
   hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
 
   getColumnsWidths: ->
-    return @columnsPercentWidths if @columnsPercentWidths?
+    return @columnsWidths if @columnsWidths
 
     if @hasColumnWithWidth()
       @columnsWidths = @getColumnsWidthsFromModel()
-      @columnsPercentWidths = @columnsWidths.map @floatToPercent
     else
       count = @table.getColumnsCount()
-      (1 / count for n in [0...count]).map @floatToPercent
+      (1 / count for n in [0...count])
+
+  getColumnsWidthPercentages: -> @getColumnsWidths().map @floatToPercent
 
   getColumnsWidthsFromModel: ->
     count = @table.getColumnsCount()
@@ -338,10 +339,10 @@ class TableView extends View
 
   getColumnsScreenWidths: ->
     width = @getRowsContainer().width()
-    @getColumnsWidthsFromModel().map (v) => v * width
+    @getColumnsWidths().map (v) => v * width
 
   getColumnsScreenMargins: ->
-    widths = @getColumnsWidthsFromModel()
+    widths = @getColumnsWidths()
     pad = 0
     width = @getRowsContainer().width()
     margins = widths.map (v) =>
@@ -353,9 +354,7 @@ class TableView extends View
 
   setColumnsWidths: (columnsWidths) ->
     widths = @normalizeColumnsWidths(columnsWidths)
-
     @columnsWidths = widths
-    @columnsPercentWidths = widths.map @floatToPercent
 
     @requestUpdate()
 
@@ -999,7 +998,7 @@ class TableView extends View
       @gutter
       firstRow
       lastRow
-      columnsWidths: @getColumnsWidths()
+      columnsWidths: @getColumnsWidthPercentages()
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
     }
