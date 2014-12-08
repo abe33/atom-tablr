@@ -76,6 +76,10 @@ class TableView extends View
           else
             @sortBy(column.name)
 
+    @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
+      'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
+      'click': stopPropagationAndDefault()
+
     @subscribeTo @body,
       'scroll': => @requestUpdate()
       'dblclick': (e) => @startEdit()
@@ -924,6 +928,51 @@ class TableView extends View
     newRowHeight = pageY - rowY + dragOffset + handleHeight
     @setScreenRowHeightAt(row, newRowHeight)
     @getRowResizeRuler().removeClass('visible')
+
+    @dragSubscription.dispose()
+    @dragging = false
+
+  startColumnResizeDrag: ({pageX, target}) ->
+    return if @dragging
+
+    @dragging = true
+
+    handle = $(target)
+    handleWidth = handle.width()
+    handleOffset = handle.offset()
+    dragOffset = handleOffset.left - pageX
+
+    leftCellIndex = handle.parent().index()
+    rightCellIndex = handle.parent().next().index()
+
+    initial = {handle, leftCellIndex, rightCellIndex, handleWidth, dragOffset, startX: pageX}
+
+    @head.on 'mousemove', stopPropagationAndDefault (e) => @columnResizeDrag(e, initial)
+    @head.on 'mouseup', stopPropagationAndDefault (e) => @endColumnResizeDrag(e, initial)
+    @dragSubscription = new Disposable =>
+      @head.off 'mousemove'
+      @head.off 'mouseup'
+
+  columnResizeDrag: (e, initial) ->
+
+
+  endColumnResizeDrag: ({pageX}, {startX, leftCellIndex, rightCellIndex}) ->
+    moveX = pageX - startX
+    columnsScreenWidths = @getColumnsScreenWidths()
+    columnsWidths = @getColumnsWidths().concat()
+
+    leftCellWidth = columnsScreenWidths[leftCellIndex]
+    rightCellWidth = columnsScreenWidths[rightCellIndex]
+    columnsWidth = @getColumnsContainer().width()
+
+
+    leftCellRatio = (leftCellWidth + moveX) / columnsWidth
+    rightCellRatio = (rightCellWidth - moveX) / columnsWidth
+
+    columnsWidths[leftCellIndex] = leftCellRatio
+    columnsWidths[rightCellIndex] = rightCellRatio
+
+    @setColumnsWidths(columnsWidths)
 
     @dragSubscription.dispose()
     @dragging = false

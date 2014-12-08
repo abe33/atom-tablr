@@ -473,6 +473,22 @@ describe 'TableView', ->
         it 'removes the sorting order', ->
           expect(tableView.order).toBeNull()
 
+    describe 'dragging a resize handle', ->
+      it 'resizes the columns', ->
+        initialColumnWidths = tableView.getColumnsScreenWidths()
+
+        handle = header.find('.column-resize-handle').eq(1)
+        {x, y} = objectCenterCoordinates(handle)
+
+        mousedown(handle)
+        mouseup(handle, x + 50, y)
+
+        newColumnWidths = tableView.getColumnsScreenWidths()
+
+        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0])
+        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
+        expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50)
+
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
   #    ##        ##     ##    ##       ##    ##       ##     ##
