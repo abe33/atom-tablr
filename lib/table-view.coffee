@@ -65,6 +65,7 @@ class TableView extends View
 
     @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
+      'click': stopPropagationAndDefault()
 
     @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
