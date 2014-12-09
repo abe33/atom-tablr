@@ -949,11 +949,11 @@ class TableView extends View
 
     initial = {handle, leftCellIndex, rightCellIndex, handleWidth, dragOffset, startX: pageX}
 
-    @head.on 'mousemove', stopPropagationAndDefault (e) => @columnResizeDrag(e, initial)
-    @head.on 'mouseup', stopPropagationAndDefault (e) => @endColumnResizeDrag(e, initial)
+    @on 'mousemove', stopPropagationAndDefault (e) => @columnResizeDrag(e, initial)
+    @on 'mouseup', stopPropagationAndDefault (e) => @endColumnResizeDrag(e, initial)
     @dragSubscription = new Disposable =>
-      @head.off 'mousemove'
-      @head.off 'mouseup'
+      @off 'mousemove'
+      @off 'mouseup'
 
     @columnResizeRuler.addClass('visible').css(left: pageX - @head.offset().left)
 
