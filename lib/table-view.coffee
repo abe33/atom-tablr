@@ -31,9 +31,9 @@ class TableView extends View
 
     @subscriptions = new CompositeDisposable
 
-    @subscriptions.add @table.onDidChangeRows @requestUpdate
-    @subscriptions.add @table.onDidAddColumn @onColumnAdded
-    @subscriptions.add @table.onDidRemoveColumn @onColumnRemoved
+    @subscriptions.add @table.onDidChangeRows => @requestUpdate()
+    @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
+    @subscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
 
     @subscribeTo @hiddenInput,
       'textInput': (e) =>
@@ -63,6 +63,8 @@ class TableView extends View
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
       'table-edit:insert-row-before': => @insertRowBefore()
       'table-edit:insert-row-after': => @insertRowAfter()
+      'table-edit:insert-column-before': => @insertColumnBefore()
+      'table-edit:insert-column-after': => @insertColumnAfter()
 
     @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
@@ -374,6 +376,12 @@ class TableView extends View
 
   getColumnResizeRuler: ->
     @columnResizeRuler ?= @head.find('.column-resize-ruler')
+
+  insertColumnBefore: ->
+    @table.addColumnAt(@activeCellPosition.column, "untitled_0")
+
+  insertColumnAfter: ->
+    @table.addColumnAt(@activeCellPosition.column + 1, "untitled_0")
 
   columnAtScreenPosition: (x,y) ->
     return unless x? and y?
