@@ -39,4 +39,6 @@ module.exports = React.createClass
     if gutter
       content.unshift div className: 'table-edit-header-filler', totalRows
 
+    content.push div className: 'column-resize-ruler'
+
     div className: 'table-edit-header-content', content

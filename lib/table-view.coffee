@@ -21,7 +21,6 @@ class TableView extends View
       @input type: 'text', class: 'hidden-input', outlet: 'hiddenInput'
       @div outlet: 'head', class: 'table-edit-header'
       @div outlet: 'body', class: 'scroll-view'
-      @div outlet: 'columnResizeRuler', class: 'column-resize-ruler'
 
   initialize: (@table) ->
     @gutter = false
@@ -366,6 +365,9 @@ class TableView extends View
 
   getColumnsContainer: ->
     @columnsContainer ?= @head.find('.table-edit-header-row')
+
+  getColumnResizeRuler: ->
+    @columnResizeRuler ?= @head.find('.column-resize-ruler')
 
   columnAtScreenPosition: (x,y) ->
     return unless x? and y?
@@ -955,10 +957,10 @@ class TableView extends View
       @off 'mousemove'
       @off 'mouseup'
 
-    @columnResizeRuler.addClass('visible').css(left: pageX - @head.offset().left)
+    @getColumnResizeRuler().addClass('visible').css(left: pageX - @head.offset().left)
 
   columnResizeDrag: ({pageX}) ->
-    @columnResizeRuler.css(left: pageX - @head.offset().left)
+    @getColumnResizeRuler().css(left: pageX - @head.offset().left)
 
   endColumnResizeDrag: ({pageX}, {startX, leftCellIndex, rightCellIndex}) ->
     return unless @dragging
@@ -979,7 +981,7 @@ class TableView extends View
 
     @setColumnsWidths(columnsWidths)
 
-    @columnResizeRuler.removeClass('visible')
+    @getColumnResizeRuler().removeClass('visible')
     @dragSubscription.dispose()
     @dragging = false
 
