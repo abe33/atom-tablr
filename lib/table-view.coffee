@@ -380,7 +380,7 @@ class TableView extends View
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    columnsWidths = @getColumnsWidthsFromModel()
+    columnsWidths = @getColumnsWidths()
     column = -1
     pad = 0
     while pad <= x
@@ -503,7 +503,7 @@ class TableView extends View
 
     row = @findRowAtPosition(y)
 
-    columnsWidths = @getColumnsWidthsFromModel()
+    columnsWidths = @getColumnsWidths()
     column = -1
     pad = 0
     while pad <= x
@@ -702,7 +702,7 @@ class TableView extends View
     width = 0
     height = 0
 
-    widths = @getColumnsWidthsFromModel()
+    widths = @getColumnsWidths()
 
     for col in [@selection.start.column..@selection.end.column]
       width += widths[col] * 100

@@ -473,6 +473,17 @@ describe 'TableView', ->
         it 'removes the sorting order', ->
           expect(tableView.order).toBeNull()
 
+      describe 'when the columns size have been changed', ->
+        beforeEach ->
+          tableView.setColumnsWidths([0.1, 0.1, 0.8])
+          nextAnimationFrame()
+          column = tableView.find('.table-edit-header-cell:first-child')
+          mousedown(column)
+
+        it 'changes the sort order to use the clicked column', ->
+          expect(tableView.order).toEqual('key')
+          expect(tableView.direction).toEqual(1)
+
     describe 'dragging a resize handle', ->
       it 'resizes the columns', ->
         initialColumnWidths = tableView.getColumnsScreenWidths()
@@ -1172,6 +1183,20 @@ describe 'TableView', ->
       expect(parseFloat selectionBoxHandle.css('top')).toBeCloseTo(parseFloat(lastCell.parent().css('top')) + lastCell.height(), -1)
       expect(parseFloat selectionBoxHandle.css('left')).toBeCloseTo(lastCellOffset.left + lastCell.width(), -1)
 
+    describe 'when the columns widths have been changed', ->
+      beforeEach ->
+        tableView.setColumnsWidths([0.1, 0.1, 0.8])
+        tableView.setSelection([[2,0],[3,1]])
+        nextAnimationFrame()
+
+      it 'positions the selection box over the cells', ->
+        cells = tableView.find('.table-edit-cell.selected')
+        firstCell = cells.first()
+        lastCell = cells.last()
+        expect(selectionBox.offset()).toEqual(firstCell.offset())
+        expect(selectionBox.outerWidth()).toEqual(firstCell.outerWidth() + lastCell.outerWidth())
+        expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())
+
   describe '::setSelection', ->
     it 'change the active cell so that the upper left cell is active', ->
       tableView.setSelection([[4,0],[6,2]])
@@ -1400,6 +1425,20 @@ describe 'TableView', ->
       mousemove(endCell)
 
       expect(tableView.body.scrollTop()).toBeLessThan(300)
+
+  describe 'when the columns widths have been changed', ->
+    beforeEach ->
+      tableView.setColumnsWidths([0.1, 0.1, 0.8])
+      nextAnimationFrame()
+
+    it 'creates a selection with the cells from the mouse movements', ->
+      startCell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
+      endCell = tableView.find('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(2)')
+
+      mousedown(startCell)
+      mousemove(endCell)
+
+      expect(tableView.getSelection()).toEqual([[3,0],[6,1]])
 
   describe 'dragging the selection box handle', ->
     [handle, handleOffset] = []
