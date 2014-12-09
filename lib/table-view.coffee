@@ -213,6 +213,27 @@ class TableView extends View
 
     @findRowAtPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
 
+  getScreenRows: -> @screenRows
+
+  getScreenRow: (row) -> @table.getRow(@screenRowToModelRow(row))
+
+  getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
+
+  setScreenRowHeightAt: (row, height) ->
+    @setRowHeightAt(@screenRowToModelRow(row), height)
+
+  getScreenRowOffsetAt: (row) -> @rowOffsets[row]
+
+  getRowsContainer: ->
+    @rowsContainer ?= @body.find('.table-edit-rows')
+
+  getRowResizeRuler: ->
+    @rowResizeRuler ?= @body.find('.row-resize-ruler')
+
+  screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
+
+  modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
+
   makeRowVisible: (row) ->
     rowHeight = @getScreenRowHeightAt(row)
     scrollViewHeight = @body.height()
@@ -230,27 +251,6 @@ class TableView extends View
       @body.scrollTop(scrollTopAsLastVisibleRow)
     else
       @body.scrollTop(scrollTopAsFirstVisibleRow)
-
-  getScreenRows: -> @screenRows
-
-  getScreenRow: (row) -> @table.getRow(@screenRowToModelRow(row))
-
-  getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
-
-  setScreenRowHeightAt: (row, height) ->
-    @setRowHeightAt(@screenRowToModelRow(row), height)
-
-  getScreenRowOffsetAt: (row) -> @rowOffsets[row]
-
-  screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
-
-  modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
-
-  getRowsContainer: ->
-    @rowsContainer ?= @body.find('.table-edit-rows')
-
-  getRowResizeRuler: ->
-    @rowResizeRuler ?= @body.find('.row-resize-ruler')
 
   computeRowOffsets: ->
     offsets = []
