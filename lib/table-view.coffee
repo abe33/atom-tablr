@@ -61,6 +61,8 @@ class TableView extends View
       'table-edit:select-to-beginning-of-line': => @expandSelectionToBeginningOfLine()
       'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
+      'table-edit:insert-row-before': => @insertRowBefore()
+      'table-edit:insert-row-after': => @insertRowAfter()
 
     @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
@@ -229,6 +231,10 @@ class TableView extends View
 
   getRowResizeRuler: ->
     @rowResizeRuler ?= @body.find('.row-resize-ruler')
+
+  insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
+
+  insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
 
   screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
 

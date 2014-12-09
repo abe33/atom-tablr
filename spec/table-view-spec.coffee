@@ -968,6 +968,18 @@ describe 'TableView', ->
 
       expect(tableView.activeCellPosition.row).toEqual(99)
 
+  describe 'table-edit:insert-row-before', ->
+    it 'inserts a new row before the active row', ->
+      atom.commands.dispatch(tableView.element, 'table-edit:insert-row-before')
+
+      expect(table.getRow(0).getValues()).toEqual([null, null, null])
+
+  describe 'table-edit:insert-row-after', ->
+    it 'inserts a new row after the active row', ->
+      atom.commands.dispatch(tableView.element, 'table-edit:insert-row-after')
+
+      expect(table.getRow(1).getValues()).toEqual([null, null, null])
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
