@@ -957,7 +957,7 @@ class TableView extends View
       @off 'mousemove'
       @off 'mouseup'
 
-    @getColumnResizeRuler().addClass('visible').css(left: pageX - @head.offset().left)
+    @getColumnResizeRuler().addClass('visible').css(left: pageX - @head.offset().left).height(@height())
 
   columnResizeDrag: ({pageX}) ->
     @getColumnResizeRuler().css(left: pageX - @head.offset().left)

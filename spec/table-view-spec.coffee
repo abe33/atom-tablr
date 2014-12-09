@@ -502,6 +502,7 @@ describe 'TableView', ->
 
         expect(ruler.is(':visible')).toBeTruthy()
         expect(ruler.css('left')).toEqual(x + 'px')
+        expect(ruler.height()).toEqual(tableView.height())
 
       it 'moves the ruler during drag', ->
         ruler = tableView.find('.column-resize-ruler')
