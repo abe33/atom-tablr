@@ -403,14 +403,14 @@ describe 'TableView', ->
     it 'gives the size of the cell to the editor when starting an edit', ->
       tableView.activateCellAtPosition(row: 2, column: 0)
       nextAnimationFrame()
-      tableView.startEdit()
+      tableView.startCellEdit()
 
       expect(tableView.find('atom-text-editor').outerHeight()).toEqual(100)
 
     it 'uses the offset to position the editor', ->
       tableView.activateCellAtPosition(row: 3, column: 0)
       nextAnimationFrame()
-      tableView.startEdit()
+      tableView.startCellEdit()
 
       expect(tableView.find('atom-text-editor').offset().top)
       .toBeCloseTo(tableView.find('.table-edit-cell.active').offset().top, -2)
@@ -717,7 +717,7 @@ describe 'TableView', ->
         [editor] = []
 
         beforeEach ->
-          tableView.startEdit()
+          tableView.startCellEdit()
           editor = tableView.find('atom-text-editor').view()
 
         it 'opens a text editor above the active cell', ->
@@ -1122,11 +1122,11 @@ describe 'TableView', ->
     it 'starts the edition of the cell', ->
       expect(tableView.isEditing()).toBeTruthy()
 
-  describe '::startEdit', ->
+  describe '::startCellEdit', ->
     [editor] = []
 
     beforeEach ->
-      tableView.startEdit()
+      tableView.startCellEdit()
       editor = tableView.find('atom-text-editor').view()
 
     it 'opens a text editor above the active cell', ->
@@ -1153,7 +1153,7 @@ describe 'TableView', ->
 
   describe '::stopEdit', ->
     beforeEach ->
-      tableView.startEdit()
+      tableView.startCellEdit()
       tableView.stopEdit()
 
     it 'closes the editor', ->
@@ -1170,7 +1170,7 @@ describe 'TableView', ->
     [editor] = []
 
     beforeEach ->
-      tableView.startEdit()
+      tableView.startCellEdit()
       editor = tableView.find('atom-text-editor').view()
 
     describe 'core:cancel', ->
@@ -1622,7 +1622,7 @@ describe 'TableView', ->
 
       describe 'opening an editor', ->
         beforeEach ->
-          tableView.startEdit()
+          tableView.startCellEdit()
 
         it 'opens the editor at the cell position', ->
           editorOffset = tableView.find('atom-text-editor').offset()

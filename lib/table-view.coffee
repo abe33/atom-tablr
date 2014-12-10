@@ -38,11 +38,11 @@ class TableView extends View
     @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
-          @startEdit()
+          @startCellEdit()
           @editView.setText(e.originalEvent.data)
 
     @subscriptions.add atom.commands.add '.table-edit',
-      'core:confirm': => @startEdit()
+      'core:confirm': => @startCellEdit()
       'core:undo': => @table.undo()
       'core:redo': => @table.redo()
       'core:move-left': => @moveLeft()
@@ -89,7 +89,7 @@ class TableView extends View
 
     @subscribeTo @body,
       'scroll': => @requestUpdate()
-      'dblclick': (e) => @startEdit()
+      'dblclick': (e) => @startCellEdit()
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
 
@@ -667,7 +667,7 @@ class TableView extends View
 
   isEditing: -> @editing
 
-  startEdit: =>
+  startCellEdit: =>
     @createEditView() unless @editView?
 
     @editing = true
@@ -690,7 +690,7 @@ class TableView extends View
     @editView.getModel().getBuffer().history.clearUndoStack()
     @editView.getModel().getBuffer().history.clearRedoStack()
 
-  confirmEdit: ->
+  confirmCellEdit: ->
     @stopEdit()
     activeCell = @getActiveCell()
     newValue = @editView.getText()
@@ -709,17 +709,17 @@ class TableView extends View
   subscribeToTextEditor: (editorView) ->
     @subscriptions.add atom.commands.add '.table-edit atom-text-editor',
       'table-edit:move-right': (e) =>
-        @confirmEdit()
+        @confirmCellEdit()
         @moveRight()
       'table-edit:move-left': (e) =>
-        @confirmEdit()
+        @confirmCellEdit()
         @moveLeft()
       'core:cancel': (e) =>
         @stopEdit()
         e.stopImmediatePropagation()
         return false
       'core:confirm': (e) =>
-        @confirmEdit()
+        @confirmCellEdit()
         e.stopImmediatePropagation()
         return false
 
