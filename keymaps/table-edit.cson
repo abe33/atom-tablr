@@ -15,6 +15,10 @@
   'cmd-shift-left': 'table-edit:select-to-beginning-of-line'
   'cmd-shift-up': 'table-edit:select-to-beginning-of-table'
   'cmd-shift-down': 'table-edit:select-to-end-of-table'
+  'cmd-alt-up': 'table-edit:insert-row-before'
+  'cmd-alt-down': 'table-edit:insert-row-after'
+  'cmd-alt-left': 'table-edit:insert-column-before'
+  'cmd-alt-right': 'table-edit:insert-column-after'
 
 '.table-edit atom-text-editor':
   'enter': 'core:confirm'
