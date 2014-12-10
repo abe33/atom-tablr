@@ -13,6 +13,14 @@ CustomCellComponent = require './fixtures/custom-cell-component'
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
 
+compareCloseArrays = (a,b,precision=-2) ->
+  expect(a.length).toEqual(b.length)
+
+  if a.length is b.length
+    for valueA,i in a
+      valueB = b[i]
+      expect(valueA).toBeCloseTo(valueB, precision)
+
 describe 'TableView', ->
   [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells] = []
 
@@ -986,12 +994,23 @@ describe 'TableView', ->
 
       expect(table.getRow(0).getValues()).toEqual([null, 'row0', 0, 'yes'])
 
+    it 'adjusts the columns width and keeps proportions of the initial columns', ->
+      tableView.setColumnsWidths([0.1, 0.1, 0.8])
+      atom.commands.dispatch(tableView.element, 'table-edit:insert-column-before')
+
+      compareCloseArrays(tableView.getColumnsWidths(), [0.2, 0.08, 0.08, 0.64])
+
   describe 'table-edit:insert-column-after', ->
     it 'inserts a new column after the active column', ->
       atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
 
       expect(table.getRow(0).getValues()).toEqual(['row0', null, 0, 'yes'])
 
+    it 'adjusts the columns width and keeps proportions of the initial columns', ->
+      tableView.setColumnsWidths([0.1, 0.1, 0.8])
+      atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
+
+      compareCloseArrays(tableView.getColumnsWidths(), [0.08, 0.2, 0.08, 0.64])
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##

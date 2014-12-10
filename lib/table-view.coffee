@@ -342,6 +342,12 @@ class TableView extends View
       count = @table.getColumnsCount()
       (1 / count for n in [0...count])
 
+  setColumnsWidths: (columnsWidths) ->
+    widths = @normalizeColumnsWidths(columnsWidths)
+    @columnsWidths = widths
+
+    @requestUpdate()
+
   getColumnsWidthPercentages: -> @getColumnsWidths().map @floatToPercent
 
   getColumnsWidthsFromModel: ->
@@ -364,12 +370,6 @@ class TableView extends View
       res
 
     margins
-
-  setColumnsWidths: (columnsWidths) ->
-    widths = @normalizeColumnsWidths(columnsWidths)
-    @columnsWidths = widths
-
-    @requestUpdate()
 
   getColumnsContainer: ->
     @columnsContainer ?= @head.find('.table-edit-header-row')
@@ -432,6 +432,12 @@ class TableView extends View
     widths
 
   onColumnAdded: ({column}) ->
+    index = @table.getColumns().indexOf(column)
+    newColumnWidth = 1 / (@table.getColumnsCount())
+    columnsWidths = @getColumnsWidths()
+    columnsWidths.splice(index, 0, newColumnWidth)
+    @setColumnsWidths(columnsWidths)
+
     @subscribeToColumn(column)
     @requestUpdate()
 
