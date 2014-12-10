@@ -1048,6 +1048,14 @@ describe 'TableView', ->
 
       compareCloseArrays(tableView.getColumnsWidths(), [0.2, 0.08, 0.08, 0.64])
 
+    describe 'called several times', ->
+      it 'creates incremental names for columns', ->
+        atom.commands.dispatch(tableView.element, 'table-edit:insert-column-before')
+        atom.commands.dispatch(tableView.element, 'table-edit:insert-column-before')
+
+        expect(table.getColumn(0).name).toEqual('untitled_1')
+        expect(table.getColumn(1).name).toEqual('untitled_0')
+
   describe 'table-edit:insert-column-after', ->
     it 'inserts a new column after the active column', ->
       atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
@@ -1059,6 +1067,14 @@ describe 'TableView', ->
       atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
 
       compareCloseArrays(tableView.getColumnsWidths(), [0.08, 0.2, 0.08, 0.64])
+
+    describe 'called several times', ->
+      it 'creates incremental names for columns', ->
+        atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
+        atom.commands.dispatch(tableView.element, 'table-edit:insert-column-after')
+
+        expect(table.getColumn(1).name).toEqual('untitled_1')
+        expect(table.getColumn(2).name).toEqual('untitled_0')
 
   describe 'table-edit:delete-column', ->
     it 'deletes the current active column', ->

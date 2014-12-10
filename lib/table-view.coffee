@@ -387,11 +387,13 @@ class TableView extends View
   getColumnResizeRuler: ->
     @columnResizeRuler ?= @head.find('.column-resize-ruler')
 
+  getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
+
   insertColumnBefore: ->
-    @table.addColumnAt(@activeCellPosition.column, "untitled_0")
+    @table.addColumnAt(@activeCellPosition.column, @getNewColumnName())
 
   insertColumnAfter: ->
-    @table.addColumnAt(@activeCellPosition.column + 1, "untitled_0")
+    @table.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
   deleteActiveColumn: ->
     column = @table.getColumn(@activeCellPosition.column).name
