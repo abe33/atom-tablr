@@ -83,6 +83,9 @@ class TableView extends View
           else
             @sortBy(column.name)
 
+    @subscribeTo @head, '.table-edit-header-cell',
+      'dblclick': (e) => @startColumnEdit(e)
+
     @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
@@ -331,6 +334,8 @@ class TableView extends View
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
   getLastColumn: -> @table.getColumnsCount() - 1
+
+  getActiveColumn: -> @table.getColumn(@activeCellPosition.column)
 
   isActiveColumn: (column) -> @activeCellPosition.column is column
 
@@ -695,6 +700,28 @@ class TableView extends View
     activeCell = @getActiveCell()
     newValue = @editView.getText()
     activeCell.setValue(newValue) unless newValue is activeCell.getValue()
+
+  startColumnEdit: ({target}) =>
+    @createEditView() unless @editView?
+
+    @editing = true
+
+    activeColumn = @getActiveColumn()
+    activeColumnRect = target.getBoundingClientRect()
+
+    @editView.css(
+      top: activeColumnRect.top + 'px'
+      left: activeColumnRect.left + 'px'
+    )
+    .width(activeColumnRect.width)
+    .height(activeColumnRect.height)
+    .show()
+
+    @editView.focus()
+    @editView.setText(activeColumn.name)
+
+    @editView.getModel().getBuffer().history.clearUndoStack()
+    @editView.getModel().getBuffer().history.clearRedoStack()
 
   stopEdit: ->
     @editing = false

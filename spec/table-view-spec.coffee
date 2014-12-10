@@ -571,6 +571,36 @@ describe 'TableView', ->
 
         expect(ruler.is(':visible')).toBeFalsy()
 
+    describe 'double clicking on a header cell', ->
+      [editor, cell, cellOffset] = []
+
+      beforeEach ->
+        cell = header.find('.table-edit-header-cell').eq(0)
+        cellOffset = cell.offset()
+
+        cell.trigger('dblclick')
+
+        editor = tableView.find('atom-text-editor').view()
+
+      it 'starts the edition of the column name', ->
+        editorOffset = editor.offset()
+
+        expect(editor.length).toEqual(1)
+        expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
+        expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
+        expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
+        expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
+
+      it 'gives the focus to the editor', ->
+        expect(editor.is('.is-focused')).toBeTruthy()
+
+      it 'fills the editor with the cell value', ->
+        expect(editor.getText()).toEqual('key')
+
+      it 'cleans the buffer history', ->
+        expect(editor.getModel().getBuffer().history.undoStack.length).toEqual(0)
+        expect(editor.getModel().getBuffer().history.redoStack.length).toEqual(0)
+
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
   #    ##        ##     ##    ##       ##    ##       ##     ##
