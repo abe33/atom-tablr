@@ -397,10 +397,7 @@ class TableView extends View
     column = @table.getColumn(@activeCellPosition.column).name
     confirmation = atom.confirm
       message: 'Are you sure you want to delete the current active column?'
-      detailedMessage: """
-      You are deleting the column '#{column}'.
-      The values in the column won't be restored when the action is undone.
-      """
+      detailedMessage: "You are deleting the column '#{column}'."
       buttons: ['Delete Column', 'Cancel']
 
     @table.removeColumnAt(@activeCellPosition.column) if confirmation is 0

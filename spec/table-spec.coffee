@@ -441,18 +441,26 @@ describe 'Table', ->
     it 'rolls back a column deletion', ->
       column = table.addColumn('key')
 
+      table.addRow(['foo'])
+      table.addRow(['bar'])
+      table.addRow(['baz'])
+      table.clearUndoStack()
+
       table.removeColumn(column)
 
       table.undo()
 
       expect(table.getColumnsCount()).toEqual(1)
-      expect(table.undoStack.length).toEqual(1)
+      expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
       expect(table.getColumn(0).name).toEqual('key')
+      expect(table.getRow(0).getValues()).toEqual(['foo'])
+      expect(table.getRow(1).getValues()).toEqual(['bar'])
+      expect(table.getRow(2).getValues()).toEqual(['baz'])
 
       table.redo()
 
-      expect(table.undoStack.length).toEqual(2)
+      expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnsCount()).toEqual(0)
 

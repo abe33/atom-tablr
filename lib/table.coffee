@@ -55,6 +55,10 @@ class Table
 
   getColumn: (index) -> @columns[index]
 
+  getColumnValues: (index) ->
+    name = @columns[index].name
+    @rows.map (row) => row[name]
+
   getColumnNames: -> @columns.map (column) -> column.name
 
   getColumnsCount: -> @columns.length
@@ -107,6 +111,7 @@ class Table
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
+    values = @getColumnValues(index) if transaction
     column = @columns[index]
     @unsubscribeFromColumn(column)
     @columns.splice(index, 1)
@@ -115,8 +120,11 @@ class Table
 
     if transaction
       {name, options} = column
+
       @transaction
-        undo: -> @addColumnAt(index, name, options, false)
+        undo: ->
+          @addColumnAt(index, name, options, false)
+          @rows.forEach (row,i) -> row.setProperty(name, values[i], false)
         redo: -> @removeColumnAt(index, false)
 
   subscribeToColumn: (column) ->

@@ -55,6 +55,7 @@ class Row
       set: (newValue) -> @setProperty(cell, newValue)
 
   setProperty: (cell, newValue, transaction=true) ->
+    cell = @cellByColumnName(cell) if typeof cell is 'string'
     cell.setValue(newValue, transaction)
 
   cellUpdated: (cell, oldValue, newValue, transaction=true) ->
