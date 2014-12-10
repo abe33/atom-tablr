@@ -1044,6 +1044,12 @@ describe 'TableView', ->
 
       compareCloseArrays(tableView.getColumnsWidths(), [0.08, 0.2, 0.08, 0.64])
 
+  describe 'table-edit:delete-column', ->
+    it 'deletes the current active column', ->
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-column')
+
+      expect(table.getRow(0).getValues()).toEqual([0, 'yes'])
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

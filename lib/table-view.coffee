@@ -66,6 +66,7 @@ class TableView extends View
       'table-edit:delete-row': => @deleteActiveRow()
       'table-edit:insert-column-before': => @insertColumnBefore()
       'table-edit:insert-column-after': => @insertColumnAfter()
+      'table-edit:delete-column': => @deleteActiveColumn()
 
     @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
@@ -385,6 +386,9 @@ class TableView extends View
 
   insertColumnAfter: ->
     @table.addColumnAt(@activeCellPosition.column + 1, "untitled_0")
+
+  deleteActiveColumn: ->
+    @table.removeColumnAt(@activeCellPosition.column)
 
   columnAtScreenPosition: (x,y) ->
     return unless x? and y?
