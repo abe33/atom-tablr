@@ -290,6 +290,33 @@ describe 'TableView', ->
       expect(rows.first().data('row-id')).toEqual(6)
       expect(rows.last().data('row-id')).toEqual(33)
 
+  describe 'when the table columns are modified', ->
+    describe 'by adding one column', ->
+      it 'adjusts the columns widths', ->
+        table.addColumn('bar')
+
+        compareCloseArrays(tableView.getColumnsWidths(), [0.25, 0.25, 0.25, 0.25])
+
+      describe 'when columns have already a width', ->
+        it 'adjusts the columns widths and keeps the proportions of initial columns', ->
+          tableView.setColumnsWidths([0.1, 0.1, 0.8])
+          table.addColumn('bar')
+
+          compareCloseArrays(tableView.getColumnsWidths(), [0.08, 0.08, 0.64, 0.2])
+
+    describe 'by removing a column', ->
+      it 'adjusts the columns widths', ->
+        table.removeColumnAt(2)
+
+        compareCloseArrays(tableView.getColumnsWidths(), [0.5, 0.5])
+
+    describe 'when columns have already a width', ->
+      it 'adjusts the columns widths and keeps the proportions of initial columns', ->
+        tableView.setColumnsWidths([0.1, 0.1, 0.8])
+        table.removeColumnAt(2)
+
+        compareCloseArrays(tableView.getColumnsWidths(), [0.5, 0.5])
+
   describe 'when the table rows are modified', ->
     describe 'by adding one at the end', ->
       it 'does not render new rows', ->

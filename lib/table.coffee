@@ -111,7 +111,7 @@ class Table
     @unsubscribeFromColumn(column)
     @columns.splice(index, 1)
     row.removeCellAt(index) for row in @rows
-    @emitter.emit 'did-remove-column', {column}
+    @emitter.emit 'did-remove-column', {column, index}
 
     if transaction
       {name, options} = column

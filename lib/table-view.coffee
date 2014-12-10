@@ -432,15 +432,16 @@ class TableView extends View
     widths
 
   onColumnAdded: ({column}) ->
-    @calculateColumnWidthFor(column)
+    @calculateNewColumnWidthFor(column) if @columnsWidths?
     @subscribeToColumn(column)
     @requestUpdate()
 
-  onColumnRemoved: ({column}) ->
+  onColumnRemoved: ({column, index}) ->
+    @columnsWidths.splice(index, 1) if @columnsWidths?
     @unsubscribeFromColumn(column)
     @requestUpdate()
 
-  calculateColumnWidthFor: (column) ->
+  calculateNewColumnWidthFor: (column) ->
     index = @table.getColumns().indexOf(column)
     newColumnWidth = 1 / (@table.getColumnsCount())
     columnsWidths = @getColumnsWidths()
