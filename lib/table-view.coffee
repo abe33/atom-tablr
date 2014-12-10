@@ -240,7 +240,13 @@ class TableView extends View
 
   insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
 
-  deleteActiveRow: -> @table.removeRowAt(@activeCellPosition.row)
+  deleteActiveRow: ->
+    confirmation = atom.confirm
+      message: 'Are you sure you want to delete the current active row?'
+      detailedMessage: "You are deleting the row ##{@activeCellPosition.row + 1}."
+      buttons: ['Delete Row', 'Cancel']
+
+    @table.removeRowAt(@activeCellPosition.row) if confirmation is 0
 
   screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
 
@@ -388,7 +394,16 @@ class TableView extends View
     @table.addColumnAt(@activeCellPosition.column + 1, "untitled_0")
 
   deleteActiveColumn: ->
-    @table.removeColumnAt(@activeCellPosition.column)
+    column = @table.getColumn(@activeCellPosition.column).name
+    confirmation = atom.confirm
+      message: 'Are you sure you want to delete the current active column?'
+      detailedMessage: """
+      You are deleting the column '#{column}'.
+      The values in the column won't be restored when the action is undone.
+      """
+      buttons: ['Delete Column', 'Cancel']
+
+    @table.removeColumnAt(@activeCellPosition.column) if confirmation is 0
 
   columnAtScreenPosition: (x,y) ->
     return unless x? and y?

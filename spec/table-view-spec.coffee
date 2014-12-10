@@ -21,6 +21,9 @@ compareCloseArrays = (a,b,precision=-2) ->
       valueB = b[i]
       expect(valueA).toBeCloseTo(valueB, precision)
 
+mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
+
+
 describe 'TableView', ->
   [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells] = []
 
@@ -1016,9 +1019,22 @@ describe 'TableView', ->
 
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
+      mockConfirm(0)
       atom.commands.dispatch(tableView.element, 'table-edit:delete-row')
 
       expect(table.getRow(0).getValues()).toEqual(['row1', 100, 'no'])
+
+    it 'asks for a confirmation', ->
+      mockConfirm(0)
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-row')
+
+      expect(atom.confirm).toHaveBeenCalled()
+
+    it 'does not remove the row when cancelled', ->
+      mockConfirm(1)
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-row')
+
+      expect(table.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
 
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->
@@ -1046,9 +1062,22 @@ describe 'TableView', ->
 
   describe 'table-edit:delete-column', ->
     it 'deletes the current active column', ->
+      mockConfirm(0)
       atom.commands.dispatch(tableView.element, 'table-edit:delete-column')
 
       expect(table.getRow(0).getValues()).toEqual([0, 'yes'])
+
+    it 'asks for a confirmation', ->
+      mockConfirm(0)
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-column')
+
+      expect(atom.confirm).toHaveBeenCalled()
+
+    it 'does not remove the column when cancelled', ->
+      mockConfirm(1)
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-column')
+
+      expect(table.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
