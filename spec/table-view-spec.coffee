@@ -134,7 +134,6 @@ describe 'TableView', ->
       nextAnimationFrame()
       expect(cells.first().text()).toEqual('bar')
 
-
     describe 'without any columns layout data', ->
       it 'has cells that all have the same width', ->
         cells.each ->
