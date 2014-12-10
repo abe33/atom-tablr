@@ -1014,6 +1014,12 @@ describe 'TableView', ->
 
       expect(table.getRow(1).getValues()).toEqual([null, null, null])
 
+  describe 'table-edit:delete-row', ->
+    it 'deletes the current active row', ->
+      atom.commands.dispatch(tableView.element, 'table-edit:delete-row')
+
+      expect(table.getRow(0).getValues()).toEqual(['row1', 100, 'no'])
+
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->
       atom.commands.dispatch(tableView.element, 'table-edit:insert-column-before')

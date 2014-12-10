@@ -63,6 +63,7 @@ class TableView extends View
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
       'table-edit:insert-row-before': => @insertRowBefore()
       'table-edit:insert-row-after': => @insertRowAfter()
+      'table-edit:delete-row': => @deleteActiveRow()
       'table-edit:insert-column-before': => @insertColumnBefore()
       'table-edit:insert-column-after': => @insertColumnAfter()
 
@@ -237,6 +238,8 @@ class TableView extends View
   insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
 
   insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
+
+  deleteActiveRow: -> @table.removeRowAt(@activeCellPosition.row)
 
   screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
 
