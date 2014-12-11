@@ -470,7 +470,7 @@ describe 'Table', ->
         column = table.addColumn('value', default: 'empty')
 
       it 'rolls back a row addition', ->
-        table.addRow ['foo', 'bar']
+        row = table.addRow ['foo', 'bar'], height: 100
 
         table.undo()
 
@@ -485,11 +485,15 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
+        expect(table.getRow(0).height).toEqual(100)
 
       it 'rolls back a batched rows addition', ->
-        table.addRows [
+        rows = table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
+        ], [
+          {height: 50}
+          {height: 100}
         ]
 
         table.undo()
@@ -505,11 +509,14 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(2)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
+        expect(table.getRow(0).height).toEqual(50)
         expect(table.getRow(1).key).toEqual('bar')
         expect(table.getRow(1).value).toEqual('baz')
+        expect(table.getRow(1).height).toEqual(100)
 
       it 'rolls back a row deletion', ->
-        table.addRow ['foo', 'bar']
+        row = table.addRow ['foo', 'bar']
+        row.height = 100
 
         table.removeRowAt(0)
 
@@ -520,6 +527,7 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
+        expect(table.getRow(0).height).toEqual(100)
 
         table.redo()
 
@@ -528,10 +536,13 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(0)
 
       it 'rolls back a batched rows deletion', ->
-        table.addRows [
+        rows = table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
         ]
+
+        rows[0].height = 50
+        rows[1].height = 100
 
         table.removeRowsInRange([0,2])
 
@@ -542,8 +553,10 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
+        expect(table.getRow(0).height).toEqual(50)
         expect(table.getRow(1).key).toEqual('bar')
         expect(table.getRow(1).value).toEqual('baz')
+        expect(table.getRow(1).height).toEqual(100)
 
         table.redo()
 

@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 {Point} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 Identifiable = require './mixins/identifiable'
@@ -164,10 +165,16 @@ class Table
 
   getLastRow: -> @rows[@rows.length - 1]
 
-  addRow: (values, batch=false) ->
-    @addRowAt(@rows.length, values, batch)
+  addRow: (values, options, batch=false) ->
+    @addRowAt(@rows.length, values, options, batch)
 
-  addRowAt: (index, values={}, batch=false, transaction=true) ->
+  addRowAt: (index, values={}, options, batch, transaction) ->
+    [options, batch, transaction] = [{}, options, batch] if typeof options is 'boolean'
+
+    options ?= {}
+    batch ?= false
+    transaction ?= true
+
     if index < 0
       throw new Error "Can't add column #{name} at index #{index}"
 
@@ -187,7 +194,7 @@ class Table
         cell = new Cell {value, column}
         cells.push cell
 
-    row = new Row {cells, table: this}
+    row = new Row {cells, options, table: this}
 
     if index >= @rows.length
       @rows.push row
@@ -202,17 +209,23 @@ class Table
       }
 
     if not batch and transaction
+      options = _.clone(row.options)
       @transaction
         undo: -> @removeRowAt(index, false, false)
-        redo: -> @addRowAt(index, values, false, false)
+        redo: -> @addRowAt(index, values, options, false, false)
 
     row
 
-  addRows: (rows, transaction=true) ->
-    @addRowsAt(@rows.length, rows, transaction)
+  addRows: (rows, options, transaction=true) ->
+    @addRowsAt(@rows.length, rows, options, transaction)
 
-  addRowsAt: (index, rows, transaction=true) ->
-    rows.forEach (row,i) => @addRowAt(index+i, row, true)
+  addRowsAt: (index, rows, options, transaction) ->
+    [options, transaction] = [[], options] if typeof options is 'boolean'
+
+    options ?= []
+    transaction ?= true
+
+    createdRows = rows.map (row,i) => @addRowAt(index+i, row, options[i], true)
 
     @emitter.emit 'did-change-rows', {
       oldRange: {start: index, end: index}
@@ -220,9 +233,13 @@ class Table
     }
 
     if transaction
+      range = {start: index, end: index+rows.length}
+      options = @getRowsInRange(range).map (row) -> _.clone(row.options)
       @transaction
-        undo: -> @removeRowsInRange({start: index, end: index+rows.length}, false)
-        redo: -> @addRowsAt(index, rows, false)
+        undo: -> @removeRowsInRange(range, false)
+        redo: -> @addRowsAt(index, rows, options, false)
+
+    createdRows
 
   removeRow: (row, batch=false) ->
     throw new Error "Can't remove an undefined row" unless row?
@@ -245,14 +262,18 @@ class Table
 
     if not batch and transaction
       values = row.getValues()
+      options = _.clone(row.options)
       @transaction
-        undo: -> @addRowAt(index, values, false, false)
+        undo: -> @addRowAt(index, values, options, false, false)
         redo: -> @removeRowAt(index, false, false)
 
   removeRowsInRange: (range, transaction=true) ->
     range = @rangeFrom(range)
 
     rowsValues = []
+
+    if transaction
+      options = @getRowsInRange(range).map (row) -> _.clone(row.options)
 
     for i in [range.start...range.end]
       rowsValues.push @rows[range.start].getValues()
@@ -265,7 +286,7 @@ class Table
 
     if transaction
       @transaction
-        undo: -> @addRowsAt(range.start, rowsValues, false)
+        undo: -> @addRowsAt(range.start, rowsValues, options, false)
         redo: -> @removeRowsInRange(range, false)
 
   extendExistingRows: (column, index) ->

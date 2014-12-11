@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "event-kit": ">= 0.7.2",
+    "underscore-plus": "^1",
     "mixto": "1.x",
     "serializable": "1.x",
     "property-accessors": "1.x",

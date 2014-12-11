@@ -12,8 +12,8 @@ class Row
 
   constructor: ({@cells, @table, @options}={}) ->
     @options ||= {}
-    @initID()
     @cells ||= []
+    @initID()
 
     @createCellAccessor(cell) for cell in @cells
 
