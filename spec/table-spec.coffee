@@ -469,17 +469,19 @@ describe 'Table', ->
         column = table.addColumn('value', default: 'empty')
 
       it 'rolls back a row addition', ->
+        table.clearUndoStack()
+
         row = table.addRow ['foo', 'bar'], height: 100
 
         table.undo()
 
         expect(table.getRowsCount()).toEqual(0)
-        expect(table.undoStack.length).toEqual(2)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
@@ -487,6 +489,8 @@ describe 'Table', ->
         expect(table.getRow(0).height).toEqual(100)
 
       it 'rolls back a batched rows addition', ->
+        table.clearUndoStack()
+
         rows = table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
@@ -498,12 +502,12 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(0)
-        expect(table.undoStack.length).toEqual(2)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(2)
         expect(table.getRow(0).key).toEqual('foo')
@@ -517,12 +521,14 @@ describe 'Table', ->
         row = table.addRow ['foo', 'bar']
         row.height = 100
 
+        table.clearUndoStack()
+
         table.removeRowAt(0)
 
         table.undo()
 
         expect(table.getRowsCount()).toEqual(1)
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -530,7 +536,7 @@ describe 'Table', ->
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(5)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
@@ -543,12 +549,14 @@ describe 'Table', ->
         rows[0].height = 50
         rows[1].height = 100
 
+        table.clearUndoStack()
+
         table.removeRowsInRange([0,2])
 
         table.undo()
 
         expect(table.getRowsCount()).toEqual(2)
-        expect(table.undoStack.length).toEqual(5)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -559,25 +567,27 @@ describe 'Table', ->
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(6)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
       it 'rolls back a change in a column', ->
+        table.clearUndoStack()
+
         column.name = 'foo'
 
         table.undo()
 
         expect(column.name).toEqual('value')
 
-        expect(table.undoStack.length).toEqual(2)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
         expect(column.name).toEqual('foo')
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
       it 'rolls back a change in a row data', ->
@@ -586,20 +596,21 @@ describe 'Table', ->
           ['bar', 'baz']
         ]
 
-        row = table.getRow(0)
+        table.clearUndoStack()
 
+        row = table.getRow(0)
         row.key = 'hello'
 
         table.undo()
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         expect(row.key).toEqual('foo')
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
         expect(row.key).toEqual('hello')
@@ -610,19 +621,21 @@ describe 'Table', ->
           ['bar', 'baz']
         ]
 
+        table.clearUndoStack()
+
         row = table.getRow(0)
         row.height = 100
 
         table.undo()
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         expect(row.height).toEqual(undefined)
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
         expect(row.height).toEqual(100)
@@ -633,20 +646,22 @@ describe 'Table', ->
           ['bar', 'baz']
         ]
 
+        table.clearUndoStack()
+
         cell = table.cellAtPosition([0, 0])
 
         cell.setValue 'hello'
 
         table.undo()
 
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         expect(cell.getValue()).toEqual('foo')
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
         expect(cell.getValue()).toEqual('hello')
