@@ -6,7 +6,12 @@ class Row
   PropertyAccessors.includeInto(this)
   Identifiable.includeInto(this)
 
-  constructor: ({@cells, @table}={}) ->
+  @::accessor 'height',
+    get: -> @options.height
+    set: (height) -> @options.height = height
+
+  constructor: ({@cells, @table, @options}={}) ->
+    @options ||= {}
     @initID()
     @cells ||= []
 

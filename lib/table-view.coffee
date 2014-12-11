@@ -26,7 +26,6 @@ class TableView extends View
     @gutter = false
     @scroll = 0
     @activeCellPosition = new Point
-    @rowHeights = {}
     @rowOffsets = null
 
     @subscriptions = new CompositeDisposable
@@ -195,12 +194,12 @@ class TableView extends View
     @requestUpdate()
 
   getRowHeightAt: (index) ->
-    @rowHeights[index] ? @getRowHeight()
+    @table.getRow(index)?.height ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
     minHeight = @getMinimumRowHeight()
     height = minHeight if height < minHeight
-    @rowHeights[index] = height
+    @table.getRow(index)?.height = height
     @computeRowOffsets()
     @requestUpdate()
 

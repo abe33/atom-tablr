@@ -1066,6 +1066,20 @@ describe 'TableView', ->
 
       expect(table.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
 
+    describe 'when the deleted row has a custom height', ->
+      beforeEach ->
+        spyOn(tableView, 'computeRowOffsets')
+        tableView.setRowHeightAt(0, 100)
+        mockConfirm(0)
+
+      it 'removes the height entry', ->
+        atom.commands.dispatch(tableView.element, 'table-edit:delete-row')
+
+        expect(tableView.getRowHeightAt(0)).toEqual(20)
+
+      it 'updates the rows offsets', ->
+        expect(tableView.computeRowOffsets).toHaveBeenCalled()
+
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->
       atom.commands.dispatch(tableView.element, 'table-edit:insert-column-before')
