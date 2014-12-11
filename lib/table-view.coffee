@@ -30,9 +30,12 @@ class TableView extends View
 
     @subscriptions = new CompositeDisposable
 
-    @subscriptions.add @table.onDidChangeRows => @requestUpdate()
     @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @subscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    @subscriptions.add @table.onDidChangeRows => @requestUpdate()
+    @subscriptions.add @table.onDidChangeRowsOptions =>
+      @computeRowOffsets()
+      @requestUpdate()
 
     @subscribeTo @hiddenInput,
       'textInput': (e) =>
@@ -200,8 +203,6 @@ class TableView extends View
     minHeight = @getMinimumRowHeight()
     height = minHeight if height < minHeight
     @table.getRow(index)?.height = height
-    @computeRowOffsets()
-    @requestUpdate()
 
   getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
 

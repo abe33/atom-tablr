@@ -415,6 +415,26 @@ describe 'TableView', ->
       expect(tableView.find('atom-text-editor').offset().top)
       .toBeCloseTo(tableView.find('.table-edit-cell.active').offset().top, -2)
 
+    describe 'by changing the option on the row itself', ->
+      beforeEach ->
+        table.getRow(2).height = 50
+        nextAnimationFrame()
+
+      it 'sets the proper height on the table body content', ->
+        bodyContent = tableView.find('.table-edit-content')
+
+        expect(bodyContent.outerHeight()).toBeCloseTo(2030)
+
+      it "renders the row's cells with the provided height", ->
+        cells = tableView.find('.table-edit-row:nth-child(3) .table-edit-cell')
+
+        expect(cells.first().outerHeight()).toEqual(50)
+
+      it 'offsets the cells after the modified one', ->
+        row = tableView.find('.table-edit-row:nth-child(4)')
+
+        expect(row.css('top')).toEqual('90px')
+
     describe 'when scrolled by 300px', ->
       beforeEach ->
         tableView.scrollTop(300)

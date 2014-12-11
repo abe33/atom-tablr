@@ -44,6 +44,9 @@ class Table
   onDidChangeRows: (callback) ->
     @emitter.on 'did-change-rows', callback
 
+  onDidChangeRowsOptions: (callback) ->
+    @emitter.on 'did-change-rows-options', callback
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -322,9 +325,12 @@ class Table
     transaction ?= true
 
     index = @rows.indexOf(row)
-    @emitter.emit 'did-change-rows', {
-      oldRange: {start: index, end: index}
-      newRange: {start: index, end: index}
+    @emitter.emit 'did-change-rows-options', {
+      row
+      option
+      oldValue
+      newValue
+      range: {start: index, end: index}
     }
     if transaction
       @transaction
