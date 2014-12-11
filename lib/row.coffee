@@ -8,7 +8,7 @@ class Row
 
   @::accessor 'height',
     get: -> @options.height
-    set: (height) -> @options.height = height
+    set: (height) -> @setOption('height', height)
 
   constructor: ({@cells, @table, @options}={}) ->
     @options ||= {}
@@ -62,6 +62,12 @@ class Row
   setProperty: (cell, newValue, transaction=true) ->
     cell = @cellByColumnName(cell) if typeof cell is 'string'
     cell.setValue(newValue, transaction)
+
+  setOption: (name, newValue, transaction=true) ->
+    oldValue = @options[name]
+    @options[name] = newValue
+
+    @table.rowOptionUpdated({row: this, option: name, oldValue, newValue, transaction})
 
   cellUpdated: (cell, oldValue, newValue, transaction=true) ->
     @table.rowUpdated({row: this, cell, oldValue, newValue, transaction})

@@ -214,7 +214,6 @@ describe 'Table', ->
               newRange: {start: 1, end: 2}
             })
 
-
       describe 'with an array', ->
         it 'creates a row with a cell for each value', ->
           row = table.addRow ['foo', 'bar']
@@ -523,7 +522,7 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(1)
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(4)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -531,7 +530,7 @@ describe 'Table', ->
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(5)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
@@ -549,7 +548,7 @@ describe 'Table', ->
         table.undo()
 
         expect(table.getRowsCount()).toEqual(2)
-        expect(table.undoStack.length).toEqual(3)
+        expect(table.undoStack.length).toEqual(5)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0).key).toEqual('foo')
         expect(table.getRow(0).value).toEqual('bar')
@@ -560,7 +559,7 @@ describe 'Table', ->
 
         table.redo()
 
-        expect(table.undoStack.length).toEqual(4)
+        expect(table.undoStack.length).toEqual(6)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(0)
 
@@ -604,6 +603,29 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(0)
 
         expect(row.key).toEqual('hello')
+
+      it 'rolls back a change in a row options', ->
+        table.addRows [
+          ['foo', 'bar']
+          ['bar', 'baz']
+        ]
+
+        row = table.getRow(0)
+        row.height = 100
+
+        table.undo()
+
+        expect(table.undoStack.length).toEqual(3)
+        expect(table.redoStack.length).toEqual(1)
+
+        expect(row.height).toEqual(undefined)
+
+        table.redo()
+
+        expect(table.undoStack.length).toEqual(4)
+        expect(table.redoStack.length).toEqual(0)
+
+        expect(row.height).toEqual(100)
 
       it 'rolls back a change in a cell data', ->
         table.addRows [
