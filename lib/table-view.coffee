@@ -22,11 +22,13 @@ class TableView extends View
       @div outlet: 'head', class: 'table-edit-header'
       @div outlet: 'body', class: 'scroll-view'
 
+  gutter: false
+  scroll: 0
+  rowOffsets: null
+  absoluteColumnsWidths: false
+
   initialize: (@table) ->
-    @gutter = false
-    @scroll = 0
     @activeCellPosition = new Point
-    @rowOffsets = null
 
     @subscriptions = new CompositeDisposable
 
@@ -360,12 +362,22 @@ class TableView extends View
       (1 / count for n in [0...count])
 
   setColumnsWidths: (columnsWidths) ->
-    widths = @normalizeColumnsWidths(columnsWidths)
-    @columnsWidths = widths
+    unless @absoluteColumnsWidths
+      columnsWidths = @normalizeColumnsWidths(columnsWidths)
+
+    @columnsWidths = columnsWidths
 
     @requestUpdate()
 
+  getColumnsWidthsCSS: ->
+    if @absoluteColumnsWidths
+      @getColumnsWidthPixels()
+    else
+      @getColumnsWidthPercentages()
+
   getColumnsWidthPercentages: -> @getColumnsWidths().map @floatToPercent
+
+  getColumnsWidthPixels: -> @getColumnsWidths().map @floatToPixel
 
   getColumnsWidthsFromModel: ->
     count = @table.getColumnsCount()
@@ -1158,7 +1170,7 @@ class TableView extends View
       @gutter
       firstRow
       lastRow
-      columnsWidths: @getColumnsWidthPercentages()
+      columnsWidths: @getColumnsWidthsCSS()
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
     }
@@ -1171,5 +1183,7 @@ class TableView extends View
     @hasChanged = false
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
+
+  floatToPixel: (w) -> "#{w}px"
 
   asDisposable: (o) -> new Disposable -> o?.off()
