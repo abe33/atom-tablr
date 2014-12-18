@@ -42,10 +42,6 @@ describe 'TableView', ->
         nextAnimationFrame = noAnimationFrame
         fn()
 
-  # afterEach ->
-  #   styleNode.remove()
-  #   tableView.destroy()
-
   beforeEach ->
     table = new Table
     table.addColumn 'key'
