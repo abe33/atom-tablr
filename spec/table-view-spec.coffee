@@ -143,11 +143,6 @@ describe 'TableView', ->
       nextAnimationFrame()
       expect(cells.first().text()).toEqual('bar')
 
-    describe 'without any columns layout data', ->
-      it 'has cells that all have the same width', ->
-        cells.each ->
-          expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -2)
-
     describe 'with the absolute widths setting enabled', ->
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
