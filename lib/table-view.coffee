@@ -675,6 +675,8 @@ class TableView extends View
   startCellEdit: =>
     @createEditView() unless @editView?
 
+    @subscribeToCellTextEditor(@editView)
+
     @editing = true
 
     activeCell = @getActiveCell()
@@ -704,6 +706,8 @@ class TableView extends View
   startColumnEdit: ({target}) =>
     @createEditView() unless @editView?
 
+    @subscribeToColumnTextEditor(@editView)
+
     @editing = true
 
     activeColumn = @getActiveColumn()
@@ -723,18 +727,26 @@ class TableView extends View
     @editView.getModel().getBuffer().history.clearUndoStack()
     @editView.getModel().getBuffer().history.clearRedoStack()
 
+  confirmColumnEdit: ->
+    @stopEdit()
+    activeColumn = @getActiveColumn()
+    newValue = @editView.getText()
+    activeColumn.name = newValue unless newValue is activeColumn.name
+
   stopEdit: ->
     @editing = false
     @editView.hide()
+    @textEditorSubscriptions?.dispose()
+    @textEditorSubscriptions = null
     @focus()
 
   createEditView: ->
     @editView = new TextEditorView({})
-    @subscribeToTextEditor(@editView)
     @append(@editView)
 
-  subscribeToTextEditor: (editorView) ->
-    @subscriptions.add atom.commands.add '.table-edit atom-text-editor',
+  subscribeToCellTextEditor: (editorView) ->
+    @textEditorSubscriptions = new CompositeDisposable
+    @textEditorSubscriptions.add atom.commands.add '.table-edit atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmCellEdit()
         @moveRight()
@@ -747,6 +759,24 @@ class TableView extends View
         return false
       'core:confirm': (e) =>
         @confirmCellEdit()
+        e.stopImmediatePropagation()
+        return false
+
+  subscribeToColumnTextEditor: (editorView) ->
+    @textEditorSubscriptions = new CompositeDisposable
+    @textEditorSubscriptions.add atom.commands.add '.table-edit atom-text-editor',
+      'table-edit:move-right': (e) =>
+        @confirmColumnEdit()
+        @moveRight()
+      'table-edit:move-left': (e) =>
+        @confirmColumnEdit()
+        @moveLeft()
+      'core:cancel': (e) =>
+        @stopEdit()
+        e.stopImmediatePropagation()
+        return false
+      'core:confirm': (e) =>
+        @confirmColumnEdit()
         e.stopImmediatePropagation()
         return false
 

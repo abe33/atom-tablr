@@ -620,6 +620,46 @@ describe 'TableView', ->
       it 'cleans the buffer history', ->
         expect(editor.getModel().getBuffer().history.undoStack.length).toEqual(0)
         expect(editor.getModel().getBuffer().history.redoStack.length).toEqual(0)
+      describe 'core:cancel', ->
+        it 'closes the editor', ->
+          atom.commands.dispatch(editor.element, 'core:cancel')
+          expect(tableView.isEditing()).toBeFalsy()
+
+      describe 'core:confirm', ->
+        beforeEach ->
+          editor.setText('foobar')
+          atom.commands.dispatch(editor.element, 'core:confirm')
+
+        it 'closes the editor', ->
+          expect(tableView.find('atom-text-editor:visible').length).toEqual(0)
+
+        it 'gives the focus back to the table view', ->
+          expect(tableView.hiddenInput.is(':focus')).toBeTruthy()
+
+        it 'changes the cell value', ->
+          expect(tableView.table.getColumn(0).name).toEqual('foobar')
+
+      describe 'table-edit:move-right', ->
+        it 'confirms the current edit and moves the active cursor to the right', ->
+          previousActiveCell = tableView.getActiveCell()
+          spyOn(tableView, 'moveRight')
+          editor.setText('Foo Bar')
+          atom.commands.dispatch(editor.element, 'table-edit:move-right')
+
+          expect(tableView.isEditing()).toBeFalsy()
+          expect(tableView.table.getColumn(0).name).toEqual('Foo Bar')
+          expect(tableView.moveRight).toHaveBeenCalled()
+
+      describe 'table-edit:move-left', ->
+        it 'confirms the current edit and moves the active cursor to the left', ->
+          previousActiveCell = tableView.getActiveCell()
+          spyOn(tableView, 'moveLeft')
+          editor.setText('Foo Bar')
+          atom.commands.dispatch(editor.element, 'table-edit:move-left')
+
+          expect(tableView.isEditing()).toBeFalsy()
+          expect(tableView.table.getColumn(0).name).toEqual('Foo Bar')
+          expect(tableView.moveLeft).toHaveBeenCalled()
 
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
@@ -1240,7 +1280,7 @@ describe 'TableView', ->
     describe 'core:cancel', ->
       it 'closes the editor', ->
         atom.commands.dispatch(editor.element, 'core:cancel')
-        expect(tableView.isEditing()).toBeFalsy
+        expect(tableView.isEditing()).toBeFalsy()
 
     describe 'table-edit:move-right', ->
       it 'confirms the current edit and moves the active cursor to the right', ->
