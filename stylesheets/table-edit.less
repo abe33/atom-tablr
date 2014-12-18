@@ -194,6 +194,7 @@
   width: 100%;
   border-top: 1px solid @background-color-highlight;
   border-right: 1px solid @background-color-highlight;
+  pointer-events: none;
 
   &:nth-child(2) {
     border-top: none;
@@ -210,6 +211,7 @@
     bottom: 0;
     height: 4px;
     cursor: row-resize;
+    pointer-events: auto;
   }
 }
 
@@ -292,6 +294,7 @@
   cursor: cell;
   display: -webkit-flex;
   -webkit-flex: 1;
+  pointer-events: none;
 }
 
 .table-edit-row {

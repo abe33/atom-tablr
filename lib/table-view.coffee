@@ -96,6 +96,7 @@ class TableView extends View
     @subscribeTo @body,
       'scroll': => @requestUpdate()
       'dblclick': (e) => @startCellEdit()
+      'mousewheel': ({target}) -> console.log target
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
 
