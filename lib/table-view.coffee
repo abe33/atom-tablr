@@ -86,6 +86,7 @@ class TableView extends View
             @sortBy(column.name)
 
     @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
+      'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
     @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',

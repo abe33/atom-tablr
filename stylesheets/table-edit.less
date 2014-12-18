@@ -11,6 +11,19 @@
   text-align: right;
 }
 
+.cell {
+  overflow: hidden;
+  float: left;
+  text-overflow: ellipsis;
+  height: 100%;
+  padding: 2px 6px;
+  border-left: 1px solid @background-color-highlight;
+
+  &:first-child {
+    border-left: none;
+  }
+}
+
 //    ######   ######## ##    ## ######## ########     ###    ##
 //   ##    ##  ##       ###   ## ##       ##     ##   ## ##   ##
 //   ##        ##       ####  ## ##       ##     ##  ##   ##  ##
@@ -83,17 +96,13 @@
 }
 
 .table-edit-header-cell {
+  .cell;
   position: relative;
   cursor: s-resize;
-
-  &:hover {
-    .column-edit-action {
-      opacity: 1;
-    }
-  }
+  padding-right: 24px;
 
   &.order {
-    padding-right: 24px;
+    padding-right: 40px;
     cursor: n-resize;
 
     &::after {
@@ -101,7 +110,7 @@
       content: '\f0a3';
       display: inline-block;
       position: absolute;
-      right: 0;
+      right: 20px;
       top: 50%;
       width: 20px;
       height: 20px;
@@ -142,11 +151,18 @@
 
 .column-edit-action {
   position: absolute;
-  top: 0;
-  right: 8px;
   cursor: pointer;
-  opacity: 0;
+  display: block
   transition: opacity 0.2s;
+  right: 2px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  font-size: 10px;
+  line-height: 16px;
+  margin-top: -8px;
+  background: @background-color-highlight;
 
   &::before {
     content: '\f058';
@@ -300,17 +316,8 @@
 .table-edit-cell, .table-edit-header-cell, .table-edit-row-number, .table-edit-gutter-filler, .table-edit-header-filler {
   font-size: 13px;
 }
-.table-edit-cell, .table-edit-header-cell {
-  overflow: hidden;
-  float: left;
-  text-overflow: ellipsis;
-  height: 100%;
-  padding: 2px 6px;
-  border-left: 1px solid @background-color-highlight;
-
-  &:first-child {
-    border-left: none;
-  }
+.table-edit-cell {
+  .cell;
 }
 
 //     ######  ########    ###    ######## ########  ######
