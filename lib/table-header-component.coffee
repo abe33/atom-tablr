@@ -23,6 +23,7 @@ module.exports = React.createClass
         else
           classes.push 'descending'
 
+      editAction = div className: 'column-edit-action'
       resizeHandle = div className: 'column-resize-handle'
 
       cells.push div {
@@ -31,7 +32,7 @@ module.exports = React.createClass
         style:
           width: columnsWidths[index]
           'text-align': columnsAligns[index] ? 'left'
-      }, column.name, resizeHandle
+      }, column.name, editAction, resizeHandle
 
     row = div className: 'table-edit-header-row', cells
 

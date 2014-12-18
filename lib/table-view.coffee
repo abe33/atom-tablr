@@ -85,8 +85,8 @@ class TableView extends View
           else
             @sortBy(column.name)
 
-    @subscribeTo @head, '.table-edit-header-cell',
-      'dblclick': (e) => @startColumnEdit(e)
+    @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
+      'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
     @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
@@ -711,7 +711,7 @@ class TableView extends View
     @editing = true
 
     activeColumn = @getActiveColumn()
-    activeColumnRect = target.getBoundingClientRect()
+    activeColumnRect = target.parentNode.getBoundingClientRect()
 
     @editView.css(
       top: activeColumnRect.top + 'px'

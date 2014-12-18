@@ -25,9 +25,11 @@ mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 
 
 describe 'TableView', ->
-  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells] = []
+  [tableView, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   beforeEach ->
+    jasmineContent = document.body.querySelector('#jasmine-content')
+
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
     spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
 
@@ -39,6 +41,10 @@ describe 'TableView', ->
       nextAnimationFrame = ->
         nextAnimationFrame = noAnimationFrame
         fn()
+
+  # afterEach ->
+  #   styleNode.remove()
+  #   tableView.destroy()
 
   beforeEach ->
     table = new Table
@@ -59,7 +65,7 @@ describe 'TableView', ->
 
     tableView = new TableView(table)
 
-    styleNode = $('body').prepend("<style>
+    styleNode = $("<style>
       #{stylesheet}
 
       .table-edit {
@@ -79,9 +85,13 @@ describe 'TableView', ->
         border: none;
         padding: 0;
       }
-    </style>").find('style')
+    </style>")
 
-    $('body').prepend(tableView)
+    firstChild = jasmineContent.firstChild
+
+    jasmineContent.insertBefore(styleNode[0], firstChild)
+    jasmineContent.insertBefore(tableView[0], firstChild)
+
     tableView.onAttach()
     nextAnimationFrame()
 
@@ -484,6 +494,9 @@ describe 'TableView', ->
     it 'has cells that contains a resize handle', ->
       expect(tableView.find('.column-resize-handle').length).toEqual(tableView.find('.table-edit-header-cell').length)
 
+    it 'has cells that contains an edit button', ->
+      expect(tableView.find('.column-edit-action').length).toEqual(tableView.find('.table-edit-header-cell').length)
+
     it 'has cells that have the same width as the body cells', ->
       tableView.setColumnsWidths([0.2, 0.3, 0.5])
       nextAnimationFrame()
@@ -591,14 +604,15 @@ describe 'TableView', ->
 
         expect(ruler.is(':visible')).toBeFalsy()
 
-    describe 'double clicking on a header cell', ->
+    describe 'clicking on a header cell edit action button', ->
       [editor, cell, cellOffset] = []
 
       beforeEach ->
         cell = header.find('.table-edit-header-cell').eq(0)
+        action = cell.find('.column-edit-action')
         cellOffset = cell.offset()
 
-        cell.trigger('dblclick')
+        action.trigger('click')
 
         editor = tableView.find('atom-text-editor').view()
 
@@ -1753,8 +1767,3 @@ describe 'TableView', ->
 
         it 'reorder the table in its initial order', ->
           expect(tableView.find('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
-
-  afterEach ->
-    window.requestAnimationFrame = requestAnimationFrameSafe
-    styleNode.remove()
-    tableView.destroy()
