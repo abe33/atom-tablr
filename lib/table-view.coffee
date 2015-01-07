@@ -452,11 +452,11 @@ class TableView extends View
     x -= bodyOffset.left
     y -= bodyOffset.top
 
-    columnsWidths = @getColumnsWidths()
+    columnsWidths = @getColumnsScreenWidths()
     column = -1
     pad = 0
     while pad <= x
-      pad += columnsWidths[column+1] * bodyWidth
+      pad += columnsWidths[column+1]
       column++
 
     @table.getColumn(column)
@@ -584,11 +584,11 @@ class TableView extends View
 
     row = @findRowAtPosition(y)
 
-    columnsWidths = @getColumnsWidths()
+    columnsWidths = @getColumnsScreenWidths()
     column = -1
     pad = 0
     while pad <= x
-      pad += columnsWidths[column+1] * bodyWidth
+      pad += columnsWidths[column+1]
       column++
 
     {row, column}

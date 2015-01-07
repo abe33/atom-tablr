@@ -605,6 +605,19 @@ describe 'TableView', ->
         it 'removes the sorting order', ->
           expect(tableView.order).toBeNull()
 
+      describe 'when the absoluteColumnsWidths setting is enabled', ->
+        beforeEach ->
+          tableView.setAbsoluteColumnsWidths(true)
+          tableView.setColumnsWidths([100, 200, 300])
+          nextAnimationFrame()
+
+          column = tableView.find('.table-edit-header-cell:nth-child(2)')
+          mousedown(column)
+
+        it 'changes the sort order to use the clicked column', ->
+          expect(tableView.order).toEqual('value')
+          expect(tableView.direction).toEqual(1)
+
       describe 'when the columns size have been changed', ->
         beforeEach ->
           tableView.setColumnsWidths([0.1, 0.1, 0.8])
@@ -958,6 +971,17 @@ describe 'TableView', ->
     expect(tableView.find('.table-edit-cell.active').length).toEqual(1)
     expect(tableView.find('.table-edit-cell.active-column').length)
     .toBeGreaterThan(1)
+
+  describe 'when the absoluteColumnsWidths setting is enabled', ->
+    beforeEach ->
+      tableView.setAbsoluteColumnsWidths(true)
+      nextAnimationFrame()
+
+    it 'activates the cell under the mouse when pressed', ->
+      cell = tableView.find('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
+      mousedown(cell)
+
+      expect(tableView.getActiveCell().getValue()).toEqual('no')
 
   describe '::moveRight', ->
     it 'requests an update', ->
