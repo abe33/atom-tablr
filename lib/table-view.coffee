@@ -400,7 +400,7 @@ class TableView extends View
     if @absoluteColumnsWidths
       @getColumnsWidths()
     else
-      width = @getRowsContainer().width()
+      width = @getRowsWrapper().width()
       @getColumnsWidths().map (v) => v * width
 
   getColumnsScreenMargins: ->
@@ -416,6 +416,9 @@ class TableView extends View
 
   getColumnsContainer: ->
     @columnsContainer ?= @head.find('.table-edit-header-row')
+
+  getColumnsWrapper: ->
+    @columnsWrapper ?= @head.find('.table-edit-header-wrapper')
 
   getColumnResizeRuler: ->
     @columnResizeRuler ?= @head.find('.column-resize-ruler')
@@ -1100,7 +1103,9 @@ class TableView extends View
 
     leftCellWidth = columnsScreenWidths[leftCellIndex]
     rightCellWidth = columnsScreenWidths[rightCellIndex]
-    columnsWidth = @getColumnsContainer().width()
+    columnsWidth = @getColumnsWrapper().width()
+
+    console.log columnsWidth, columnsWidths, columnsScreenWidths
 
     leftCellRatio = (leftCellWidth + moveX) / columnsWidth
     rightCellRatio = (rightCellWidth - moveX) / columnsWidth

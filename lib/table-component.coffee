@@ -17,7 +17,6 @@ module.exports = React.createClass
     {firstRow, lastRow, columnsWidths, columnsAligns, gutter} = @state
     {parentView} = @props
     height = @getTableHeight()
-    width = @getTableWidth()
 
     rows = for row in [firstRow...lastRow]
       rowData = parentView.getScreenRow(row)
@@ -61,7 +60,6 @@ module.exports = React.createClass
       className: 'table-edit-rows-wrapper'
       style:
         height: "#{height}px"
-        width: "#{width}px"
     }, rows
 
     content = [div className: 'table-edit-rows', rowsWrapper]
@@ -89,6 +87,3 @@ module.exports = React.createClass
     return 0 if lastIndex is 0
 
     @props.parentView.getScreenRowOffsetAt(lastIndex) + @props.parentView.getScreenRowHeightAt(lastIndex)
-
-  getTableWidth: ->
-    @props.parentView.getColumnsScreenWidths().reduce (a,b) -> a + b
