@@ -238,14 +238,11 @@ class TableView extends View
 
   getScreenRowOffsetAt: (row) -> @rowOffsets[row]
 
-  getRowsContainer: ->
-    @rowsContainer ?= @body.find('.table-edit-rows')
+  getRowsContainer: -> @body.find('.table-edit-rows')
 
-  getRowsWrapper: ->
-    @rowsWrapper ?= @body.find('.table-edit-rows-wrapper')
+  getRowsWrapper: -> @body.find('.table-edit-rows-wrapper')
 
-  getRowResizeRuler: ->
-    @rowResizeRuler ?= @body.find('.row-resize-ruler')
+  getRowResizeRuler: -> @body.find('.row-resize-ruler')
 
   insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
 
@@ -294,7 +291,7 @@ class TableView extends View
   rowScreenPosition: (row) ->
     top = @getScreenRowOffsetAt(row)
 
-    content = @getRowsWrapper()
+    content = @getRowsContainer()
     contentOffset = content.offset()
 
     top + contentOffset.top
@@ -307,7 +304,7 @@ class TableView extends View
     return @table.getRowsCount() - 1
 
   findRowAtScreenPosition: (y) ->
-    content = @getRowsWrapper()
+    content = @getRowsContainer()
 
     bodyOffset = content.offset()
 
@@ -406,7 +403,7 @@ class TableView extends View
   getColumnsScreenMargins: ->
     widths = @getColumnsWidths()
     pad = 0
-    width = @getRowsContainer().width()
+    width = @getRowsWrapper().width()
     margins = widths.map (v) =>
       res = pad
       pad += v * width
@@ -414,14 +411,11 @@ class TableView extends View
 
     margins
 
-  getColumnsContainer: ->
-    @columnsContainer ?= @head.find('.table-edit-header-row')
+  getColumnsContainer: -> @head.find('.table-edit-header-row')
 
-  getColumnsWrapper: ->
-    @columnsWrapper ?= @head.find('.table-edit-header-wrapper')
+  getColumnsWrapper: -> @head.find('.table-edit-header-wrapper')
 
-  getColumnResizeRuler: ->
-    @columnResizeRuler ?= @head.find('.column-resize-ruler')
+  getColumnResizeRuler: -> @head.find('.column-resize-ruler')
 
   getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
 
@@ -1189,6 +1183,7 @@ class TableView extends View
       @gutter
       firstRow
       lastRow
+      @absoluteColumnsWidths
       columnsWidths: @getColumnsWidthsCSS()
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
