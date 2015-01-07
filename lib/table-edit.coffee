@@ -57,6 +57,7 @@ module.exports =
     table.clearUndoStack()
 
     tableView = new TableView(table)
+    tableView.absoluteColumnsWidths = true
     tableView.setRowHeightAt(3, 90)
     tableView.setRowHeightAt(30, 110)
     tableView.setRowHeightAt(60, 60)
