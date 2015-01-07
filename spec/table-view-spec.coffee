@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, mousemove, mouseup, textInput, objectCenterCoordinates} = require './helpers/events'
+{mousedown, mousemove, mouseup, mousewheel, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = atom.themes.loadStylesheet(stylesheetPath)
@@ -157,8 +157,7 @@ describe 'TableView', ->
 
     describe 'with the absolute widths setting enabled', ->
       beforeEach ->
-        tableView.absoluteColumnsWidths = true
-        tableView.showGutter()
+        tableView.setAbsoluteColumnsWidths(true)
         nextAnimationFrame()
 
         row = tableView.find('.table-edit-row').first()
@@ -196,7 +195,20 @@ describe 'TableView', ->
           cells.each (i) ->
             expect(@clientWidth).toBeCloseTo(widths[i], -1)
 
+        describe 'when the content is scroll horizontally', ->
+          beforeEach ->
+            tableView.getRowsContainer().scrollLeft(100)
+            mousewheel(tableView.getRowsContainer())
+            nextAnimationFrame()
+
+          it 'scrolls the header by the same amount', ->
+            expect(tableView.getColumnsContainer().scrollLeft()).toEqual(100)
+
     describe 'with the absolute widths setting disabled', ->
+      beforeEach ->
+        tableView.setAbsoluteColumnsWidths(false)
+        nextAnimationFrame()
+
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
           cells.each ->

@@ -96,9 +96,8 @@ class TableView extends View
       'click': stopPropagationAndDefault()
 
     @subscribeTo @body,
-      'scroll': => @requestUpdate()
+      'scroll': (e) => @requestUpdate()
       'dblclick': (e) => @startCellEdit()
-      'mousewheel': ({target}) -> console.log target
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
 
@@ -108,6 +107,12 @@ class TableView extends View
         @startDrag(e)
         @focus()
       'click': stopPropagationAndDefault()
+
+    @subscribeTo @body, '.table-edit-rows',
+      'mousewheel': (e) =>
+        e.stopPropagation()
+        requestAnimationFrame =>
+          @getColumnsContainer().scrollLeft(@getRowsContainer().scrollLeft())
 
     @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
@@ -356,6 +361,8 @@ class TableView extends View
   getColumnWidth: -> @columnWidth ? @configColumnWidth
 
   setColumnWidth: (@columnWidth) ->
+
+  setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
 
   getColumnsWidths: ->
     return @columnsWidths if @columnsWidths

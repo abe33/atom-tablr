@@ -35,6 +35,16 @@ module.exports =
 
     obj.trigger(event)
 
+  mousewheel: (obj, x, y) ->
+    {x,y} = objectCenterCoordinates(obj) unless x? and y?
+    event = $.Event "mousewheel", {
+      which: 1
+      pageX: x
+      pageY: y
+    }
+
+    obj.trigger(event)
+
   textInput: (obj, data) ->
     event = $.Event "textInput", {
       originalEvent:
