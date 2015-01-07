@@ -654,6 +654,26 @@ describe 'TableView', ->
 
         expect(ruler.is(':visible')).toBeFalsy()
 
+      describe 'with absolute columns widths layout', ->
+        beforeEach ->
+          tableView.absoluteColumnsWidths = true
+          tableView.setColumnsWidths([100,100,100])
+
+        it 'resizes the columns', ->
+          initialColumnWidths = tableView.getColumnsScreenWidths()
+
+          handle = header.find('.column-resize-handle').eq(1)
+          {x, y} = objectCenterCoordinates(handle)
+
+          mousedown(handle)
+          mouseup(handle, x + 50, y)
+
+          newColumnWidths = tableView.getColumnsScreenWidths()
+
+          expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0])
+          expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
+          expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50)
+
     describe 'clicking on a header cell edit action button', ->
       [editor, cell, cellOffset] = []
 

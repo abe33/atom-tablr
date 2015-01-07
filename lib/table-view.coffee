@@ -1097,15 +1097,18 @@ class TableView extends View
 
     leftCellWidth = columnsScreenWidths[leftCellIndex]
     rightCellWidth = columnsScreenWidths[rightCellIndex]
-    columnsWidth = @getColumnsWrapper().width()
 
-    console.log columnsWidth, columnsWidths, columnsScreenWidths
+    if @absoluteColumnsWidths
+      columnsWidths[leftCellIndex] = leftCellWidth + moveX
+      columnsWidths[rightCellIndex] = rightCellWidth - moveX
+    else
+      columnsWidth = @getColumnsWrapper().width()
 
-    leftCellRatio = (leftCellWidth + moveX) / columnsWidth
-    rightCellRatio = (rightCellWidth - moveX) / columnsWidth
+      leftCellRatio = (leftCellWidth + moveX) / columnsWidth
+      rightCellRatio = (rightCellWidth - moveX) / columnsWidth
 
-    columnsWidths[leftCellIndex] = leftCellRatio
-    columnsWidths[rightCellIndex] = rightCellRatio
+      columnsWidths[leftCellIndex] = leftCellRatio
+      columnsWidths[rightCellIndex] = rightCellRatio
 
     @setColumnsWidths(columnsWidths)
 
