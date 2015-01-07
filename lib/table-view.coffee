@@ -1100,7 +1100,6 @@ class TableView extends View
 
     if @absoluteColumnsWidths
       columnsWidths[leftCellIndex] = leftCellWidth + moveX
-      columnsWidths[rightCellIndex] = rightCellWidth - moveX
     else
       columnsWidth = @getColumnsWrapper().width()
 

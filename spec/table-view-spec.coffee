@@ -672,7 +672,7 @@ describe 'TableView', ->
 
           expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0])
           expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
-          expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50)
+          expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2])
 
     describe 'clicking on a header cell edit action button', ->
       [editor, cell, cellOffset] = []
