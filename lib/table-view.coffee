@@ -128,6 +128,7 @@ class TableView extends View
         @requestUpdate()
       'table-edit.pageMovesAmount': (@configPageMovesAmount) => @requestUpdate()
       'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
+      'table-edit.columnWidth': (@configColumnWidth) =>
       'table-edit.rowHeight': (@configRowHeight) =>
         @computeRowOffsets()
         @requestUpdate()
@@ -240,6 +241,9 @@ class TableView extends View
   getRowsContainer: ->
     @rowsContainer ?= @body.find('.table-edit-rows')
 
+  getRowsWrapper: ->
+    @rowsWrapper ?= @body.find('.table-edit-rows-wrapper')
+
   getRowResizeRuler: ->
     @rowResizeRuler ?= @body.find('.row-resize-ruler')
 
@@ -290,7 +294,7 @@ class TableView extends View
   rowScreenPosition: (row) ->
     top = @getScreenRowOffsetAt(row)
 
-    content = @getRowsContainer()
+    content = @getRowsWrapper()
     contentOffset = content.offset()
 
     top + contentOffset.top
@@ -303,7 +307,7 @@ class TableView extends View
     return @table.getRowsCount() - 1
 
   findRowAtScreenPosition: (y) ->
-    content = @getRowsContainer()
+    content = @getRowsWrapper()
 
     bodyOffset = content.offset()
 
@@ -352,6 +356,10 @@ class TableView extends View
 
   hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
 
+  getColumnWidth: -> @columnWidth ? @configColumnWidth
+
+  setColumnWidth: (@columnWidth) ->
+
   getColumnsWidths: ->
     return @columnsWidths if @columnsWidths
 
@@ -359,7 +367,10 @@ class TableView extends View
       @columnsWidths = @getColumnsWidthsFromModel()
     else
       count = @table.getColumnsCount()
-      (1 / count for n in [0...count])
+      if @absoluteColumnsWidths
+        (@getColumnWidth() for n in [0...count])
+      else
+        (1 / count for n in [0...count])
 
   setColumnsWidths: (columnsWidths) ->
     unless @absoluteColumnsWidths
@@ -386,8 +397,11 @@ class TableView extends View
     @normalizeColumnsWidths(widths)
 
   getColumnsScreenWidths: ->
-    width = @getRowsContainer().width()
-    @getColumnsWidths().map (v) => v * width
+    if @absoluteColumnsWidths
+      @getColumnsWidths()
+    else
+      width = @getRowsContainer().width()
+      @getColumnsWidths().map (v) => v * width
 
   getColumnsScreenMargins: ->
     widths = @getColumnsWidths()
@@ -537,7 +551,7 @@ class TableView extends View
   cellScreenPosition: (position) ->
     {top, left} = @cellScrollPosition(position)
 
-    content = @getRowsContainer()
+    content = @getRowsWrapper()
     contentOffset = content.offset()
 
     {
@@ -556,7 +570,7 @@ class TableView extends View
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    content = @getRowsContainer()
+    content = @getRowsWrapper()
 
     bodyWidth = content.width()
     bodyOffset = content.offset()

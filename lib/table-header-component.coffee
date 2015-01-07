@@ -9,6 +9,7 @@ module.exports = React.createClass
   render: ->
     {table, parentView} = @props
     {columnsWidths, columnsAligns, gutter, totalRows} = @state
+    width = @getTableWidth()
 
     cells = []
     for column,index in table.getColumns()
@@ -34,7 +35,13 @@ module.exports = React.createClass
           'text-align': columnsAligns[index] ? 'left'
       }, column.name, editAction, resizeHandle
 
-    row = div className: 'table-edit-header-row', cells
+    cellsWrapper = div {
+      className: 'table-edit-header-wrapper'
+      style:
+        width: "#{width}px"
+    }, cells
+
+    row = div className: 'table-edit-header-row', cellsWrapper
 
     content = [row]
     if gutter
@@ -43,3 +50,6 @@ module.exports = React.createClass
     content.push div className: 'column-resize-ruler'
 
     div className: 'table-edit-header-content', content
+
+  getTableWidth: ->
+    @props.parentView.getColumnsScreenWidths().reduce (a,b) -> a + b

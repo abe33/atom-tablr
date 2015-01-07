@@ -12,6 +12,9 @@ module.exports =
     rowHeight:
       type: 'integer'
       default: 24
+    columnWidth:
+      type: 'integer'
+      default: 120
     minimumRowHeight:
       type: 'integer'
       default: 16

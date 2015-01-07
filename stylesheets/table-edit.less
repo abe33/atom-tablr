@@ -93,6 +93,14 @@
 .table-edit-header-row {
   -webkit-flex: 1;
   cursor: pointer;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.table-edit-header-wrapper {
+  position: absolute;
+  display: block;
+  min-width: 100%;
 }
 
 .table-edit-header-cell {
@@ -287,7 +295,6 @@
 
 .table-edit-content {
   .flex-container;
-  overflow-x: auto;
 }
 
 .table-edit-rows {
@@ -295,9 +302,15 @@
   cursor: cell;
   display: -webkit-flex;
   -webkit-flex: 1;
-  pointer-events: none;
+  overflow-x: scroll;
 }
 
+.table-edit-rows-wrapper {
+  pointer-events: none;
+  position: absolute;
+  display: block;
+  min-width: 100%;
+}
 .table-edit-row {
   position: absolute;
   overflow: hidden;

@@ -56,6 +56,7 @@ describe 'TableView', ->
       ]
 
     atom.config.set 'table-edit.rowHeight', 20
+    atom.config.set 'table-edit.columnWidth', 100
     atom.config.set 'table-edit.rowOverdraw', 10
     atom.config.set 'table-edit.minimumRowHeight', 10
 
@@ -143,16 +144,33 @@ describe 'TableView', ->
       nextAnimationFrame()
       expect(cells.first().text()).toEqual('bar')
 
+    it 'sets the proper height on the table body content', ->
+      bodyContent = tableView.find('.table-edit-content')
+
+      expect(bodyContent.outerHeight()).toBeCloseTo(2000)
+
+    it 'sets the proper width and height on the table rows container', ->
+      bodyContent = tableView.find('.table-edit-rows')
+
+      expect(bodyContent.outerHeight()).toBeCloseTo(2000)
+      expect(bodyContent.outerWidth()).toBeCloseTo(tableView.width(), -1)
+
     describe 'with the absolute widths setting enabled', ->
+      beforeEach ->
+        tableView.absoluteColumnsWidths = true
+        tableView.showGutter()
+        nextAnimationFrame()
+
+        row = tableView.find('.table-edit-row').first()
+        cells = row.find('.table-edit-cell')
+
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
           cells.each ->
-            expect(@clientWidth).toBeCloseTo(tableView.width() / 3, -2)
+            expect(@clientWidth).toBeCloseTo(100, -1)
 
       describe 'with a columns layout defined', ->
         beforeEach ->
-          tableView.absoluteColumnsWidths = true
-
           tableView.setColumnsWidths([100, 200, 300])
           nextAnimationFrame()
 
@@ -160,6 +178,23 @@ describe 'TableView', ->
           expect(cells.eq(0).width()).toEqual(100)
           expect(cells.eq(1).width()).toEqual(200)
           expect(cells.eq(2).width()).toEqual(300)
+
+        it 'sets the proper width and height on the table rows container', ->
+          bodyContent = tableView.find('.table-edit-rows-wrapper')
+
+          expect(bodyContent.outerHeight()).toBeCloseTo(2000)
+          expect(bodyContent.outerWidth()).toBeCloseTo(600, -1)
+
+        it 'sets the proper widths on the cells', ->
+          widths = [100,200,300]
+          cells.each (i) ->
+            expect(@clientWidth).toBeCloseTo(widths[i], -1)
+
+        it 'sets the proper widths on the header cells', ->
+          cells = tableView.find('.table-edit-header-cell')
+          widths = [100,200,300]
+          cells.each (i) ->
+            expect(@clientWidth).toBeCloseTo(widths[i], -1)
 
     describe 'with the absolute widths setting disabled', ->
       describe 'without any columns layout data', ->
