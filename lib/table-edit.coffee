@@ -23,7 +23,7 @@ module.exports =
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
     atom.workspaceView.command 'table-edit:demo-with-gutter', => @openDemoWithGutter()
 
-    @openDemoWithGutter()
+    # @openDemoWithGutter()
 
   deactivate: ->
 
