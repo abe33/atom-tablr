@@ -11,7 +11,27 @@ CustomCellComponent = require './fixtures/custom-cell-component'
 {mousedown, mousemove, mouseup, mousewheel, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
-stylesheet = atom.themes.loadStylesheet(stylesheetPath)
+stylesheet = "
+  #{atom.themes.loadStylesheet(stylesheetPath)}
+
+  atom-table-editor {
+    height: 200px;
+    width: 400px;
+  }
+
+  atom-table-editor::shadow .table-edit-header {
+    height: 27px;
+  }
+
+  atom-table-editor::shadow .table-edit-row {
+    border: 0;
+  }
+
+  atom-table-editor::shadow .table-edit-cell {
+    border: none;
+    padding: 0;
+  }
+"
 
 compareCloseArrays = (a,b,precision=-2) ->
   expect(a.length).toEqual(b.length)
@@ -25,7 +45,7 @@ mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 
 
 describe 'tableElement', ->
-  [tableElement, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
+  [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   beforeEach ->
     TableElement.registerViewProvider()
@@ -63,29 +83,10 @@ describe 'tableElement', ->
     atom.config.set 'table-edit.minimumRowHeight', 10
 
     tableElement = atom.views.getView(table)
+    tableShadowRoot = tableElement.shadowRoot
 
     styleNode = document.createElement('style')
-    styleNode.textContent = "
-      #{stylesheet}
-
-      .table-edit {
-        height: 200px;
-        width: 400px;
-      }
-
-      .table-edit-header {
-        height: 27px;
-      }
-
-      .table-edit-row {
-        border: 0;
-      }
-
-      .table-edit-cell {
-        border: none;
-        padding: 0;
-      }
-    "
+    styleNode.textContent = stylesheet
 
     firstChild = jasmineContent.firstChild
 
@@ -94,7 +95,7 @@ describe 'tableElement', ->
 
     nextAnimationFrame()
 
-  fit 'holds a table', ->
+  it 'holds a table', ->
     expect(tableElement.table).toEqual(table)
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
@@ -106,11 +107,11 @@ describe 'tableElement', ->
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
   it 'has a scroll-view', ->
-    expect(tableElement.querySelector('.scroll-view')).toExist()
+    expect(tableShadowRoot.querySelector('.scroll-view')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
-      rows = tableElement.querySelectorAll('.table-edit-row')
+      rows = tableShadowRoot.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(18)
       expect(rows[0].dataset.rowId).toEqual('1')
       expect(rows[rows.length - 1].dataset.rowId).toEqual('18')
@@ -125,7 +126,7 @@ describe 'tableElement', ->
 
   describe 'once rendered', ->
     beforeEach ->
-      row = tableElement.querySelector('.table-edit-row')
+      row = tableShadowRoot.querySelector('.table-edit-row')
       cells = row.querySelectorAll('.table-edit-cell')
 
     it 'has as many columns as the model row', ->
@@ -144,18 +145,18 @@ describe 'tableElement', ->
 
       tableElement.getActiveCell().setValue(undefined)
       nextAnimationFrame()
-      expect(cells.first().text()).toEqual('bar')
+      expect(cells[0].textContent).toEqual('bar')
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableElement.find('.table-edit-content')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
 
-      expect(bodyContent.outerHeight()).toBeCloseTo(2000)
+      expect(bodyContent.offsetHeight).toBeCloseTo(2000)
 
     it 'sets the proper width and height on the table rows container', ->
-      bodyContent = tableElement.find('.table-edit-rows')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-rows')
 
-      expect(bodyContent.outerHeight()).toBeCloseTo(2000)
-      expect(bodyContent.outerWidth()).toBeCloseTo(tableElement.width(), -1)
+      expect(bodyContent.offsetHeight).toBeCloseTo(2000)
+      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.offsetWidth, -1)
 
     describe 'with the absolute widths setting enabled', ->
       beforeEach ->

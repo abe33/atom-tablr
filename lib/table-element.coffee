@@ -34,7 +34,20 @@ class TableElement extends HTMLElement
     @initializeContent()
 
   initializeContent: ->
-    
+    @shadowRoot = @createShadowRoot()
+
+    @body = document.createElement('div')
+    @body.className = 'scroll-view'
+
+    @head = document.createElement('div')
+    @head.className = 'table-edit-header'
+
+    @hiddenInput = document.createElement('input')
+    @hiddenInput.className = 'hidden-input'
+
+    @shadowRoot.appendChild(@hiddenInput)
+    @shadowRoot.appendChild(@head)
+    @shadowRoot.appendChild(@body)
 
   setModel: (@table) ->
     @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
@@ -187,7 +200,6 @@ class TableElement extends HTMLElement
         @subscriptions.add @asDisposable object.on event, callback
 
   observeConfig: (configs) ->
-    return
     for config, callback of configs
       @subscriptions.add atom.config.observe config, callback
 
@@ -231,12 +243,12 @@ class TableElement extends HTMLElement
   getLastRow: -> @table.getRowsCount() - 1
 
   getFirstVisibleRow: ->
-    @findRowAtPosition(@body.scrollTop())
+    @findRowAtPosition(@body.scrollTop)
 
   getLastVisibleRow: ->
-    scrollViewHeight = @body.height()
+    scrollViewHeight = @body.clientHeight
 
-    @findRowAtPosition(@body.scrollTop() + scrollViewHeight) ? @table.getRowsCount() - 1
+    @findRowAtPosition(@body.scrollTop + scrollViewHeight) ? @table.getRowsCount() - 1
 
   getScreenRows: -> @screenRows
 
@@ -249,11 +261,11 @@ class TableElement extends HTMLElement
 
   getScreenRowOffsetAt: (row) -> @rowOffsets[row]
 
-  getRowsContainer: -> @body.find('.table-edit-rows')
+  getRowsContainer: -> @body.querySelector('.table-edit-rows')
 
-  getRowsWrapper: -> @body.find('.table-edit-rows-wrapper')
+  getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
 
-  getRowResizeRuler: -> @body.find('.row-resize-ruler')
+  getRowResizeRuler: -> @body.querySelector('.row-resize-ruler')
 
   insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
 
@@ -410,13 +422,13 @@ class TableElement extends HTMLElement
     if @absoluteColumnsWidths
       @getColumnsWidths()
     else
-      width = @getRowsWrapper().width()
+      width = @getRowsWrapper()?.offsetWidth ? 0
       @getColumnsWidths().map (v) => v * width
 
   getColumnsScreenMargins: ->
     widths = @getColumnsWidths()
     pad = 0
-    width = @getRowsWrapper().width()
+    width = @getRowsWrapper()?.offsetWidth ? 0
     margins = widths.map (v) =>
       res = pad
       pad += v * width
@@ -424,11 +436,11 @@ class TableElement extends HTMLElement
 
     margins
 
-  getColumnsContainer: -> @head.find('.table-edit-header-row')
+  getColumnsContainer: -> @head.querySelector('.table-edit-header-row')
 
-  getColumnsWrapper: -> @head.find('.table-edit-header-wrapper')
+  getColumnsWrapper: -> @head.querySelector('.table-edit-header-wrapper')
 
-  getColumnResizeRuler: -> @head.find('.column-resize-ruler')
+  getColumnResizeRuler: -> @head.querySelector('.column-resize-ruler')
 
   getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
 
@@ -1171,10 +1183,10 @@ class TableElement extends HTMLElement
 
   scrollTop: (scroll) ->
     if scroll?
-      @body.scrollTop(scroll)
+      @body.scrollTop = scroll
       @requestUpdate(false)
 
-    @body.scrollTop()
+    @body.scrollTop
 
   requestUpdate: (@hasChanged=true) =>
     return if @updateRequested
