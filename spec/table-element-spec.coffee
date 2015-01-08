@@ -343,7 +343,7 @@ describe 'tableElement', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(18)
       expect(rows[0].dataset.rowId).toEqual('1')
-      expect(rows[rows.length - 1].dataset.rowId).toEqual('18')
+      expect(rows[rows.length-1].dataset.rowId).toEqual('18')
 
   describe 'when scrolled by 300px', ->
     beforeEach ->
@@ -362,7 +362,7 @@ describe 'tableElement', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(28)
       expect(rows[0].dataset.rowId).toEqual('6')
-      expect(rows[rows.length - 1].dataset.rowId).toEqual('33')
+      expect(rows[rows.length-1].dataset.rowId).toEqual('33')
 
   describe 'when the table columns are modified', ->
     describe 'by adding one column', ->
@@ -400,13 +400,13 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows[0].dataset.rowId).toEqual(1)
-        expect(rows.last().dataset.rowId).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual('1')
+        expect(rows[rows.length-1].dataset.rowId).toEqual('18')
 
     describe 'by adding one at the begining', ->
       it 'updates the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows[0].find('.table-edit-cell')[0].text()).toEqual('row0')
+        expect(rows[0].querySelector('.table-edit-cell').textContent).toEqual('row0')
 
         table.addRowAt 0, ['foo', 'bar', 'baz']
 
@@ -414,14 +414,14 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows[0].dataset.rowId).toEqual(1)
-        expect(rows[0].find('.table-edit-cell')[0].text()).toEqual('foo')
-        expect(rows.last().dataset.rowId).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual('1')
+        expect(rows[0].querySelector('.table-edit-cell').textContent).toEqual('foo')
+        expect(rows[rows.length-1].dataset.rowId).toEqual('18')
 
     describe 'by adding one in the middle', ->
       it 'updates the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('row6')
+        expect(rows[6].querySelector('.table-edit-cell').textContent).toEqual('row6')
 
         table.addRowAt 6, ['foo', 'bar', 'baz']
 
@@ -429,21 +429,21 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows[0].dataset.rowId).toEqual(1)
-        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('foo')
-        expect(rows.last().dataset.rowId).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual('1')
+        expect(rows[6].querySelector('.table-edit-cell').textContent).toEqual('foo')
+        expect(rows[rows.length-1].dataset.rowId).toEqual('18')
 
     describe 'by updating the content of a row', ->
       it 'update the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('row6')
+        expect(rows[6].querySelector('.table-edit-cell').textContent).toEqual('row6')
 
         table.getRow(6).key = 'foo'
 
         nextAnimationFrame()
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('foo')
+        expect(rows[6].querySelector('.table-edit-cell').textContent).toEqual('foo')
 
   describe 'setting a custom height for a row', ->
     beforeEach ->
@@ -451,22 +451,22 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelectorAll('.table-edit-content')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
 
-      expect(bodyContent.outerHeight()).toBeCloseTo(2080)
+      expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
     it "renders the row's cells with the provided height", ->
-      cells = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(3) .table-edit-cell')
+      cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(3) .table-edit-cell')
 
-      expect(cells[0].outerHeight()).toEqual(100)
+      expect(cell.offsetHeight).toEqual(100)
 
     it 'offsets the cells after the modified one', ->
-      row = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4)')
+      row = tableShadowRoot.querySelector('.table-edit-row:nth-child(4)')
 
-      expect(row.css('top')).toEqual('140px')
+      expect(row.style.top).toEqual('140px')
 
     it 'activates the cell under the mouse when pressed', ->
-      cell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(2)')
+      cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(2)')
       mousedown(cell)
 
       expect(tableElement.getActiveCell().getValue()).toEqual(300)
@@ -476,15 +476,16 @@ describe 'tableElement', ->
       nextAnimationFrame()
       tableElement.startCellEdit()
 
-      expect(tableShadowRoot.querySelectorAll('atom-text-editor').outerHeight()).toEqual(100)
+      expect(tableShadowRoot.querySelector('atom-text-editor').offsetHeight).toEqual(100)
 
     it 'uses the offset to position the editor', ->
       tableElement.activateCellAtPosition(row: 3, column: 0)
       nextAnimationFrame()
       tableElement.startCellEdit()
 
-      expect(tableShadowRoot.querySelectorAll('atom-text-editor').offset().top)
-      .toBeCloseTo(tableShadowRoot.querySelectorAll('.table-edit-cell.active').offset().top, -2)
+      editorTop = tableShadowRoot.querySelector('atom-text-editor').getBoundingClientRect().top
+      cellTop = tableShadowRoot.querySelector('.table-edit-cell.active').getBoundingClientRect().top
+      expect(editorTop).toBeCloseTo(cellTop, -2)
 
     describe 'by changing the option on the row itself', ->
       beforeEach ->
@@ -492,38 +493,38 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
-        bodyContent = tableShadowRoot.querySelectorAll('.table-edit-content')
+        bodyContent = tableShadowRoot.querySelector('.table-edit-content')
 
-        expect(bodyContent.outerHeight()).toBeCloseTo(2030)
+        expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
       it "renders the row's cells with the provided height", ->
-        cells = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(3) .table-edit-cell')
+        cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(3) .table-edit-cell')
 
-        expect(cells[0].outerHeight()).toEqual(50)
+        expect(cell.offsetHeight).toEqual(50)
 
       it 'offsets the cells after the modified one', ->
-        row = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4)')
+        row = tableShadowRoot.querySelector('.table-edit-row:nth-child(4)')
 
-        expect(row.css('top')).toEqual('90px')
+        expect(row.style.top).toEqual('90px')
 
     describe 'when scrolled by 300px', ->
       beforeEach ->
-        tableElement.scrollTop(300)
+        tableElement.setScrollTop(300)
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelectorAll('.table-edit-row[data-row-id=15] .table-edit-cell:nth-child(2)')
+        cell = tableShadowRoot.querySelector('.table-edit-row[data-row-id="15"] .table-edit-cell:nth-child(2)')
         mousedown(cell)
 
         expect(tableElement.getActiveCell().getValue()).toEqual(1400)
 
     describe 'when scrolled all way down to the bottom edge', ->
       beforeEach ->
-        tableElement.scrollTop(2000)
+        tableElement.setScrollTop(2000)
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelectorAll('.table-edit-row:last-child .table-edit-cell:nth-child(2)')
+        cell = tableShadowRoot.querySelector('.table-edit-row:last-child .table-edit-cell:nth-child(2)')
         mousedown(cell)
 
         expect(tableElement.getActiveCell().getValue()).toEqual(9900)
@@ -537,7 +538,7 @@ describe 'tableElement', ->
   #    ##     ## ######## ##     ## ########  ######## ##     ##
 
   it 'has a header', ->
-    expect(tableShadowRoot.querySelectorAll('.table-edit-header').length).toEqual(1)
+    expect(tableShadowRoot.querySelector('.table-edit-header')).toExist()
 
   describe 'header', ->
     header = null
@@ -548,9 +549,9 @@ describe 'tableElement', ->
     it 'has as many cells as there is columns in the table', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-header-cell')
       expect(cells.length).toEqual(3)
-      expect(cells[0].text()).toEqual('key')
-      expect(cells[1].text()).toEqual('value')
-      expect(cells[2].text()).toEqual('foo')
+      expect(cells[0].textContent).toEqual('key')
+      expect(cells[1].textContent).toEqual('value')
+      expect(cells[2].textContent).toEqual('foo')
 
     it 'has cells that contains a resize handle', ->
       expect(tableShadowRoot.querySelectorAll('.column-resize-handle').length).toEqual(tableShadowRoot.querySelectorAll('.table-edit-header-cell').length)
@@ -565,9 +566,9 @@ describe 'tableElement', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-header-cell')
       rowCells = tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell')
 
-      expect(cells[0].width()).toBeCloseTo(rowCells[0].width(), -2)
-      expect(cells[1].width()).toBeCloseTo(rowCells[1].width(), -2)
-      expect(cells[2].width()).toBeCloseTo(rowCells.last().width(), -2)
+      expect(cells[0].offsetWidth).toBeCloseTo(rowCells[0].offsetWidth, -2)
+      expect(cells[1].offsetWidth).toBeCloseTo(rowCells[1].offsetWidth, -2)
+      expect(cells[2].offsetWidth).toBeCloseTo(rowCells.last().offsetWidth, -2)
 
     describe 'when the gutter is enabled', ->
       beforeEach ->
@@ -575,13 +576,13 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'contains a filler div to figurate the gutter width', ->
-        expect(header.find('.table-edit-header-filler').length).toEqual(1)
+        expect(header.querySelector('.table-edit-header-filler')).toExist()
 
     describe 'clicking on a header cell', ->
       [column] = []
 
       beforeEach ->
-        column = tableShadowRoot.querySelectorAll('.table-edit-header-cell:last-child')
+        column = tableShadowRoot.querySelector('.table-edit-header-cell:last-child')
         mousedown(column)
 
       it 'changes the sort order to use the clicked column', ->
@@ -610,7 +611,7 @@ describe 'tableElement', ->
           tableElement.setColumnsWidths([100, 200, 300])
           nextAnimationFrame()
 
-          column = tableShadowRoot.querySelectorAll('.table-edit-header-cell:nth-child(2)')
+          column = tableShadowRoot.querySelector('.table-edit-header-cell:nth-child(2)')
           mousedown(column)
 
         it 'changes the sort order to use the clicked column', ->
@@ -621,7 +622,7 @@ describe 'tableElement', ->
         beforeEach ->
           tableElement.setColumnsWidths([0.1, 0.1, 0.8])
           nextAnimationFrame()
-          column = tableShadowRoot.querySelectorAll('.table-edit-header-cell:first-child')
+          column = tableShadowRoot.querySelector('.table-edit-header-cell:first-child')
           mousedown(column)
 
         it 'changes the sort order to use the clicked column', ->
@@ -632,7 +633,7 @@ describe 'tableElement', ->
       it 'resizes the columns', ->
         initialColumnWidths = tableElement.getColumnsScreenWidths()
 
-        handle = header.find('.column-resize-handle')[1]
+        handle = header.querySelectorAll('.column-resize-handle')[1]
         {x, y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -717,7 +718,7 @@ describe 'tableElement', ->
         expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
         expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
         expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
-        expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
+        expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
       it 'gives the focus to the editor', ->
         expect(editor.is('.is-focused')).toBeTruthy()
@@ -928,7 +929,7 @@ describe 'tableElement', ->
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
           expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
-          expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
+          expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -1362,7 +1363,7 @@ describe 'tableElement', ->
       expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
       expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
       expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
-      expect(editor.outerHeight()).toBeCloseTo(cell.outerHeight(), -2)
+      expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
     it 'gives the focus to the editor', ->
       expect(editor.is('.is-focused')).toBeTruthy()
@@ -1523,7 +1524,7 @@ describe 'tableElement', ->
       lastCell = cells[2]
       expect(selectionBox.offset()).toEqual(firstCell.offset())
       expect(selectionBox.outerWidth()).toEqual(tableShadowRoot.querySelectorAll('.table-edit-rows').width())
-      expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())
+      expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
     it 'positions the selection box handle at the bottom right corner', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
@@ -1545,7 +1546,7 @@ describe 'tableElement', ->
         lastCell = cells[2]
         expect(selectionBox.offset()).toEqual(firstCell.offset())
         expect(selectionBox.outerWidth()).toEqual(firstCell.outerWidth() + lastCell.outerWidth())
-        expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())
+        expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
   describe '::setSelection', ->
     it 'change the active cell so that the upper left cell is active', ->

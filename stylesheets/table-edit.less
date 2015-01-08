@@ -38,7 +38,20 @@ atom-table-editor {
   -webkit-flex-direction: column;
   display: -webkit-flex;
 
+  &.with-editor-gutter::shadow atom-text-editor::shadow .gutter {
+    display: block;
+  }
+
   &::shadow {
+    atom-text-editor {
+      position: fixed;
+      margin: 1px;
+
+      &::shadow .gutter {
+        display: none;
+      }
+    }
+
     .scroll-view {
       overflow-y: auto;
       overflow-x: hidden;
@@ -53,19 +66,6 @@ atom-table-editor {
       height: 0;
       background: transparent;
       border: none;
-    }
-
-    atom-text-editor {
-      position: fixed;
-      margin: 1px;
-
-      &::shadow .gutter {
-        display: none;
-      }
-    }
-
-    &.with-editor-gutter atom-text-editor::shadow .gutter {
-      display: block;
     }
 
     &.demo {

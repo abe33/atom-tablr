@@ -35,8 +35,13 @@ class EventsDelegation extends Mixin
           callback(e)
           return true
 
-      eventsForObject['__NONE__'](e)
+      eventsForObject['__NONE__']?(e)
+      return true
 
     object.addEventListener event, listener
     @subscriptions.add new Disposable ->
       object.removeEventListener event, listener
+
+  addEventDisposable: (object, event, listener) ->
+    object.addEventListener event, listener
+    new Disposable -> object.removeEventListener event, listener

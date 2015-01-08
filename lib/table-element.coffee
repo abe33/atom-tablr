@@ -1,6 +1,5 @@
-{Point, Range} = require 'atom'
+{Point, Range, TextEditor} = require 'atom'
 {View, $} = require 'space-pen'
-{TextEditorView} = require 'atom-space-pen-views'
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
@@ -277,8 +276,8 @@ class TableElement extends HTMLElement
 
   makeRowVisible: (row) ->
     rowHeight = @getScreenRowHeightAt(row)
-    scrollViewHeight = @body.height()
-    currentScrollTop = @body.scrollTop()
+    scrollViewHeight = @body.offsetHeight
+    currentScrollTop = @body.scrollTop
 
     rowOffset = @getScreenRowOffsetAt(row)
 
@@ -289,9 +288,9 @@ class TableElement extends HTMLElement
               scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
 
     if rowOffset > currentScrollTop
-      @body.scrollTop(scrollTopAsLastVisibleRow)
+      @body.scrollTop = scrollTopAsLastVisibleRow
     else
-      @body.scrollTop(scrollTopAsFirstVisibleRow)
+      @body.scrollTop = scrollTopAsFirstVisibleRow
 
   computeRowOffsets: ->
     offsets = []
@@ -307,7 +306,7 @@ class TableElement extends HTMLElement
     top = @getScreenRowOffsetAt(row)
 
     content = @getRowsContainer()
-    contentOffset = content.offset()
+    contentOffset = content.getBoundingClientRect()
 
     top + contentOffset.top
 
@@ -321,7 +320,7 @@ class TableElement extends HTMLElement
   findRowAtScreenPosition: (y) ->
     content = @getRowsContainer()
 
-    bodyOffset = content.offset()
+    bodyOffset = content.getBoundingClientRect()
 
     y -= bodyOffset.top
 
@@ -456,8 +455,8 @@ class TableElement extends HTMLElement
 
     content = @getColumnsContainer()
 
-    bodyWidth = content.width()
-    bodyOffset = content.offset()
+    bodyWidth = content.offsetWidth
+    bodyOffset = content.getBoundingClientRect()
 
     x -= bodyOffset.left
     y -= bodyOffset.top
@@ -566,7 +565,7 @@ class TableElement extends HTMLElement
     {top, left} = @cellScrollPosition(position)
 
     content = @getRowsWrapper()
-    contentOffset = content.offset()
+    contentOffset = content.getBoundingClientRect()
 
     {
       top: top + contentOffset.top,
@@ -586,8 +585,8 @@ class TableElement extends HTMLElement
 
     content = @getRowsWrapper()
 
-    bodyWidth = content.width()
-    bodyOffset = content.offset()
+    bodyWidth = content.offsetWidth
+    bodyOffset = content.getBoundingClientRect()
 
     x -= bodyOffset.left
     y -= bodyOffset.top
@@ -715,29 +714,26 @@ class TableElement extends HTMLElement
   isEditing: -> @editing
 
   startCellEdit: =>
-    @createEditView() unless @editView?
+    @createTextEditor() unless @editor?
 
-    @subscribeToCellTextEditor(@editView)
+    @subscribeToCellTextEditor(@editor)
 
     @editing = true
 
     activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
 
-    @editView.css(
-      top: activeCellRect.top + 'px'
-      left: activeCellRect.left + 'px'
-    )
-    .width(activeCellRect.width)
-    .height(activeCellRect.height)
-    .show()
+    @editorElement.style.top = activeCellRect.top + 'px'
+    @editorElement.style.left = activeCellRect.left + 'px'
+    @editorElement.style.width = activeCellRect.width + 'px'
+    @editorElement.style.height = activeCellRect.height + 'px'
+    @editorElement.style.display = 'block'
+    @editorElement.focus()
 
-    @editView.focus()
+    @editor.setText(activeCell.getValue().toString())
 
-    @editView.setText(activeCell.getValue().toString())
-
-    @editView.getModel().getBuffer().history.clearUndoStack()
-    @editView.getModel().getBuffer().history.clearRedoStack()
+    @editor.getBuffer().history.clearUndoStack()
+    @editor.getBuffer().history.clearRedoStack()
 
   confirmCellEdit: ->
     @stopEdit()
@@ -746,7 +742,7 @@ class TableElement extends HTMLElement
     activeCell.setValue(newValue) unless newValue is activeCell.getValue()
 
   startColumnEdit: ({target}) =>
-    @createEditView() unless @editView?
+    @createTextEditor() unless @editView?
 
     @subscribeToColumnTextEditor(@editView)
 
@@ -782,13 +778,14 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions = null
     @focus()
 
-  createEditView: ->
-    @editView = new TextEditorView({})
-    @append(@editView)
+  createTextEditor: ->
+    @editor = new TextEditor({})
+    @editorElement = atom.views.getView(@editor)
+    @shadowRoot.appendChild(@editorElement)
 
-  subscribeToCellTextEditor: (editorView) ->
+  subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add '.table-edit atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmCellEdit()
         @moveRight()
@@ -806,7 +803,7 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add '.table-edit atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmColumnEdit()
         @moveRight()
@@ -962,9 +959,9 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    @body.on 'mousemove', stopPropagationAndDefault (e) => @drag(e)
-    @body.on 'mouseup', stopPropagationAndDefault (e) => @endDrag(e)
-    @initializeDragDisposable()
+    @initializeDragEvents @body,
+      'mousemove': stopPropagationAndDefault (e) => @drag(e)
+      'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
 
   drag: (e) ->
     if @dragging
@@ -1138,10 +1135,10 @@ class TableElement extends HTMLElement
     else if row <= @getFirstVisibleRow() + 1
       @makeRowVisible(row - 1)
 
-  initializeDragDisposable: ->
-    @dragSubscription = new Disposable =>
-      @body.off 'mousemove'
-      @body.off 'mouseup'
+  initializeDragEvents: (object, events) ->
+    @dragSubscription = new CompositeDisposable
+    for event,callback of events
+      @dragSubscription.add @addEventDisposable object, event, callback
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##

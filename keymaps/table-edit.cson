@@ -8,7 +8,7 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 
-'.table-edit':
+'atom-table-editor':
   'tab': 'core:move-right'
   'shift-tab': 'core:move-left'
   'cmd-shift-right': 'table-edit:select-to-end-of-line'
@@ -22,7 +22,7 @@
   'cmd-alt-right': 'table-edit:insert-column-after'
   'cmd-alt-ctrl-backspace': 'table-edit:delete-column'
 
-'.table-edit atom-text-editor':
+'atom-table-editor atom-text-editor':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
   'tab': 'table-edit:move-right'
