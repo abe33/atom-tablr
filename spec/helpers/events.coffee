@@ -1,56 +1,54 @@
-{$} = require 'atom-space-pen-views'
+
+mouseEvent = (type, properties={}) ->
+  defaults = {
+    bubbles: true
+    cancelable: (type isnt "mousemove")
+    view: window
+    detail: 0
+    pageX: 0
+    pageY: 0
+    clientX: 0
+    clientY: 0
+    ctrlKey: false
+    altKey: false
+    shiftKey: false
+    metaKey: false
+    button: 0
+    relatedTarget: `undefined`
+  }
+
+  properties[k] = v for k,v of defaults when not properties[k]?
+
+  new MouseEvent type, properties
+
+inputEvent = (type, properties={}) ->
+  defaults = {
+    isComposing: false
+    data: null
+  }
+
+  properties[k] = v for k,v of defaults when not properties[k]?
+
+  new InputEvent type, properties
 
 objectCenterCoordinates = (obj) ->
-  {top, left} = obj.offset()
-  {x: left + obj.width() / 2, y: top + obj.height() / 2}
+  {top, left, width, height} = obj.getBoundingClientRect()
+  {x: left + width / 2, y: top + height / 2}
 
-module.exports =
-  mousedown: (obj, x, y) ->
+module.exports = {objectCenterCoordinates, mouseEvent, inputEvent}
+
+['mousedown', 'mousemove', 'mouseup', 'click'].forEach (key) ->
+  module.exports[key] = (obj, x, y, cx, cy) ->
     {x,y} = objectCenterCoordinates(obj) unless x? and y?
-    event = $.Event "mousedown", {
-      which: 1
-      pageX: x
-      pageY: y
-    }
 
-    obj.trigger(event)
+    unless cx? and cy?
+      cx = x
+      cy = y
 
-  mousemove: (obj, x, y) ->
-    {x,y} = objectCenterCoordinates(obj) unless x? and y?
-    event = $.Event "mousemove", {
-      which: 1
-      pageX: x
-      pageY: y
-    }
+    obj.dispatchEvent(mouseEvent key, {pageX: x, pageY: y, clientX: cx, clientY: cy})
 
-    obj.trigger(event)
+module.exports.mousewheel = (obj, deltaX=0, deltaY=0) ->
+  obj.dispatchEvent(mouseEvent 'mousewheel', {deltaX, deltaY})
 
-  mouseup: (obj, x, y) ->
-    {x,y} = objectCenterCoordinates(obj) unless x? and y?
-    event = $.Event "mouseup", {
-      which: 1
-      pageX: x
-      pageY: y
-    }
-
-    obj.trigger(event)
-
-  mousewheel: (obj, x, y) ->
-    {x,y} = objectCenterCoordinates(obj) unless x? and y?
-    event = $.Event "mousewheel", {
-      which: 1
-      pageX: x
-      pageY: y
-    }
-
-    obj.trigger(event)
-
-  textInput: (obj, data) ->
-    event = $.Event "textInput", {
-      originalEvent:
-        data: data
-    }
-
-    obj.trigger(event)
-
-  objectCenterCoordinates: objectCenterCoordinates
+module.exports.textInput = (obj, data) ->
+  obj.dispatchEvent(inputEvent 'textInput', {data})

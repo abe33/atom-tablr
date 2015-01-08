@@ -196,12 +196,12 @@ describe 'tableElement', ->
 
         describe 'when the content is scroll horizontally', ->
           beforeEach ->
-            tableElement.getRowsContainer().scrollLeft(100)
+            tableElement.getRowsContainer().scrollLeft = 100
             mousewheel(tableElement.getRowsContainer())
             nextAnimationFrame()
 
           it 'scrolls the header by the same amount', ->
-            expect(tableElement.getColumnsContainer().scrollLeft()).toEqual(100)
+            expect(tableElement.getColumnsContainer().scrollLeft).toEqual(100)
 
     describe 'with the absolute widths setting disabled', ->
       beforeEach ->

@@ -8,6 +8,7 @@ React = require 'react-atom-fork'
 Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
+EventsDelegation = require './mixins/events-delegation'
 
 stopPropagationAndDefault = (f) -> (e) ->
   e.stopPropagation()
@@ -17,6 +18,7 @@ stopPropagationAndDefault = (f) -> (e) ->
 module.exports =
 class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
+  EventsDelegation.includeInto(this)
 
   @content: ->
     @div class: 'table-edit', =>
@@ -130,7 +132,7 @@ class TableElement extends HTMLElement
       'mousewheel': (e) =>
         e.stopPropagation()
         requestAnimationFrame =>
-          @getColumnsContainer().scrollLeft(@getRowsContainer().scrollLeft())
+          @getColumnsContainer().scrollLeft = @getRowsContainer().scrollLeft
 
     @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
@@ -188,16 +190,6 @@ class TableElement extends HTMLElement
     @requestUpdate()
 
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
-
-  subscribeTo: (object, selector, events) ->
-    return
-    [events, selector] = [selector, null] if typeof selector is 'object'
-    if selector
-      for event, callback of events
-        @subscriptions.add @asDisposable object.on event, selector, callback
-    else
-      for event, callback of events
-        @subscriptions.add @asDisposable object.on event, callback
 
   observeConfig: (configs) ->
     for config, callback of configs
@@ -1226,8 +1218,6 @@ class TableElement extends HTMLElement
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
 
   floatToPixel: (w) -> "#{w}px"
-
-  asDisposable: (o) -> new Disposable -> o?.off()
 
 #    ######## ##       ######## ##     ## ######## ##    ## ########
 #    ##       ##       ##       ###   ### ##       ###   ##    ##
