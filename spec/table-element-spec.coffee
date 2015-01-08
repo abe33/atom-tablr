@@ -163,13 +163,12 @@ describe 'tableElement', ->
         tableElement.setAbsoluteColumnsWidths(true)
         nextAnimationFrame()
 
-        row = tableElement.find('.table-edit-row').first()
-        cells = row.find('.table-edit-cell')
+        row = tableShadowRoot.querySelector('.table-edit-row')
+        cells = row.querySelectorAll('.table-edit-cell')
 
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
-          cells.each ->
-            expect(@clientWidth).toBeCloseTo(100, -1)
+          expect(cell.offsetWidth).toEqual(100) for cell,i in cells
 
       describe 'with a columns layout defined', ->
         beforeEach ->
@@ -177,26 +176,23 @@ describe 'tableElement', ->
           nextAnimationFrame()
 
         it 'modifies the columns width', ->
-          expect(cells.eq(0).width()).toEqual(100)
-          expect(cells.eq(1).width()).toEqual(200)
-          expect(cells.eq(2).width()).toEqual(300)
+          widths = [100,200,300]
+          expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         it 'sets the proper width and height on the table rows container', ->
-          bodyContent = tableShadowRoot.querySelectorAll('.table-edit-rows-wrapper')
+          bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
-          expect(bodyContent.outerHeight()).toBeCloseTo(2000)
-          expect(bodyContent.outerWidth()).toBeCloseTo(600, -1)
+          expect(bodyContent.offsetHeight).toEqual(2000)
+          expect(bodyContent.offsetWidth).toEqual(600)
 
         it 'sets the proper widths on the cells', ->
           widths = [100,200,300]
-          cells.each (i) ->
-            expect(@clientWidth).toBeCloseTo(widths[i], -1)
+          expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         it 'sets the proper widths on the header cells', ->
           cells = tableShadowRoot.querySelectorAll('.table-edit-header-cell')
           widths = [100,200,300]
-          cells.each (i) ->
-            expect(@clientWidth).toBeCloseTo(widths[i], -1)
+          expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         describe 'when the content is scroll horizontally', ->
           beforeEach ->
@@ -1494,6 +1490,7 @@ describe 'tableElement', ->
 
       nextAnimationFrame()
 
+      expect(tableShadowRoot.querySelectorAll('.selected').length).toEqual(6)
 
     it 'marks the row number with a selected class', ->
       tableElement.showGutter()
