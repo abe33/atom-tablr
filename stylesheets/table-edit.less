@@ -37,355 +37,357 @@ atom-table-editor {
   -webkit-flex-direction: column;
   display: -webkit-flex;
 
-  .scroll-view {
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: -webkit-flex;
-    -webkit-flex: 1;
-    border: 1px solid @background-color-highlight;
-  }
-
-  .hidden-input {
-    position: absolute;
-    width: 0;
-    height: 0;
-    background: transparent;
-    border: none;
-  }
-
-  atom-text-editor {
-    position: fixed;
-    margin: 1px;
-
-    &::shadow .gutter {
-      display: none;
+  &::shadow {
+    .scroll-view {
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: -webkit-flex;
+      -webkit-flex: 1;
+      border: 1px solid @background-color-highlight;
     }
-  }
 
-  &.with-editor-gutter atom-text-editor::shadow .gutter {
-    display: block;
-  }
-
-  &.demo {
-    position: absolute;
-  }
-}
-
-//    ##     ## ########    ###    ########  ######## ########
-//    ##     ## ##         ## ##   ##     ## ##       ##     ##
-//    ##     ## ##        ##   ##  ##     ## ##       ##     ##
-//    ######### ######   ##     ## ##     ## ######   ########
-//    ##     ## ##       ######### ##     ## ##       ##   ##
-//    ##     ## ##       ##     ## ##     ## ##       ##    ##
-//    ##     ## ######## ##     ## ########  ######## ##     ##
-
-.table-edit-header {
-  top: 0;
-  left: 0;
-  right: 0;
-  border: 1px solid @background-color-highlight;
-}
-
-.table-edit-header, .table-edit-header-content, .table-edit-header-row {
-  .flex-container;
-}
-
-.table-edit-header-row {
-  -webkit-flex: 1;
-  cursor: pointer;
-  position: relative;
-  overflow-x: hidden;
-}
-
-.table-edit-header-wrapper {
-  position: absolute;
-  display: block;
-  min-width: 100%;
-}
-
-.table-edit-header-cell {
-  .cell;
-  position: relative;
-  cursor: s-resize;
-  padding-right: 24px;
-
-  &.order {
-    padding-right: 40px;
-    cursor: n-resize;
-
-    &::after {
-      font-family: 'Octicons Regular';
-      content: '\f0a3';
-      display: inline-block;
+    .hidden-input {
       position: absolute;
-      right: 20px;
-      top: 50%;
-      width: 20px;
-      height: 20px;
-      text-align: center;
-      font-size: 16px;
-      line-height: 20px;
-      margin-top: -10px;
+      width: 0;
+      height: 0;
+      background: transparent;
+      border: none;
     }
 
-    &.descending {
-      cursor: default;
+    atom-text-editor {
+      position: fixed;
+      margin: 1px;
 
-      &::after {
-        content: '\f0a2';
+      &::shadow .gutter {
+        display: none;
       }
     }
-  }
-}
 
-.table-edit-header-filler {
-  .row-number-placeholder;
-}
+    &.with-editor-gutter atom-text-editor::shadow .gutter {
+      display: block;
+    }
 
-.table-edit-header-filler + * {
-  border-left: 1px solid @background-color-highlight;
-  margin-left: -1px;
-}
-
-.column-resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 4px;
-  cursor: col-resize;
-  z-index: 2;
-}
-
-.column-edit-action {
-  position: absolute;
-  cursor: pointer;
-  display: block
-  transition: opacity 0.2s;
-  right: 2px;
-  top: 50%;
-  width: 16px;
-  height: 16px;
-  text-align: center;
-  font-size: 10px;
-  line-height: 16px;
-  margin-top: -8px;
-  background: @background-color-highlight;
-
-  &::before {
-    content: '\f058';
-    font-family: 'Octicons Regular';
-  }
-}
-
-//     ######   ##     ## ######## ######## ######## ########
-//    ##    ##  ##     ##    ##       ##    ##       ##     ##
-//    ##        ##     ##    ##       ##    ##       ##     ##
-//    ##   #### ##     ##    ##       ##    ######   ########
-//    ##    ##  ##     ##    ##       ##    ##       ##   ##
-//    ##    ##  ##     ##    ##       ##    ##       ##    ##
-//     ######    #######     ##       ##    ######## ##     ##
-
-.table-edit-gutter {
-  display: -webkit-flex;
-  position: relative;
-  cursor: cell;
-}
-
-.table-edit-gutter-filler, .table-edit-header-filler {
-  visibility: hidden;
-}
-
-.table-edit-row-number {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  border-top: 1px solid @background-color-highlight;
-  border-right: 1px solid @background-color-highlight;
-  pointer-events: none;
-
-  &:nth-child(2) {
-    border-top: none;
-  }
-
-  &.selected {
-    background: @background-color-highlight;
-  }
-
-  .row-resize-handle {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 4px;
-    cursor: row-resize;
-    pointer-events: auto;
-  }
-}
-
-.table-edit-row-number, .table-edit-gutter-filler {
-  .row-number-placeholder;
-}
-
-//   ########  ##     ## ##       ######## ########   ######
-//   ##     ## ##     ## ##       ##       ##     ## ##    ##
-//   ##     ## ##     ## ##       ##       ##     ## ##
-//   ########  ##     ## ##       ######   ########   ######
-//   ##   ##   ##     ## ##       ##       ##   ##         ##
-//   ##    ##  ##     ## ##       ##       ##    ##  ##    ##
-//   ##     ##  #######  ######## ######## ##     ##  ######
-
-.selection-box {
-  position: absolute;
-  pointer-events: none;
-  border: 1px solid fadeout(@background-color-info, 50%);
-}
-
-.selection-box-handle {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  margin-top: -3px;
-  margin-left: -3px;
-  background: @background-color-info;
-
-  &:before {
-    content: '';
-    position: absolute;
-    display: block;
-    top: -4px;
-    bottom: -4px;
-    left: -4px;
-    right: -4px;
-    cursor: nwse-resize;
-  }
-}
-.ruler {
-  position: absolute;
-  display: none;
-  min-height: 1px;
-  min-width: 1px;
-  background: @background-color-info;
-
-  &.visible {
-    display: block;
-  }
-}
-.row-resize-ruler {
-  .ruler;
-  height: 1px;
-  left: 0;
-  right: 0;
-}
-
-.column-resize-ruler {
-  .ruler;
-  width: 1px;
-  top: 0;
-  bottom: 0;
-}
-
-//   ########   #######  ##      ##  ######
-//   ##     ## ##     ## ##  ##  ## ##    ##
-//   ##     ## ##     ## ##  ##  ## ##
-//   ########  ##     ## ##  ##  ##  ######
-//   ##   ##   ##     ## ##  ##  ##       ##
-//   ##    ##  ##     ## ##  ##  ## ##    ##
-//   ##     ##  #######   ###  ###   ######
-
-.table-edit-content {
-  .flex-container;
-}
-
-.table-edit-rows {
-  position: relative;
-  cursor: cell;
-  display: -webkit-flex;
-  -webkit-flex: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: 100%;
-}
-
-.table-edit-rows-wrapper {
-  pointer-events: none;
-  position: absolute;
-  display: block;
-  min-width: 100%;
-}
-.table-edit-row {
-  position: absolute;
-  overflow: hidden;
-  width: 100%;
-  border-top: 1px solid @background-color-highlight;
-
-  &:first-child {
-    border-top: none;
-  }
-}
-
-//     ######  ######## ##       ##        ######
-//    ##    ## ##       ##       ##       ##    ##
-//    ##       ##       ##       ##       ##
-//    ##       ######   ##       ##        ######
-//    ##       ##       ##       ##             ##
-//    ##    ## ##       ##       ##       ##    ##
-//     ######  ######## ######## ########  ######
-
-.table-edit-cell, .table-edit-header-cell, .table-edit-row-number, .table-edit-gutter-filler, .table-edit-header-filler {
-  font-size: 13px;
-}
-.table-edit-cell {
-  .cell;
-}
-
-//     ######  ########    ###    ######## ########  ######
-//    ##    ##    ##      ## ##      ##    ##       ##    ##
-//    ##          ##     ##   ##     ##    ##       ##
-//     ######     ##    ##     ##    ##    ######    ######
-//          ##    ##    #########    ##    ##             ##
-//    ##    ##    ##    ##     ##    ##    ##       ##    ##
-//     ######     ##    ##     ##    ##    ########  ######
-
-.active-row {
-  background: fadeout(@background-color-success, 95%);
-}
-
-.order {
-  background: fadeout(@background-color-info, 95%);
-}
-
-.active-column {
-  background: fadeout(@background-color-error, 95%);
-
-  &.order {
-    background: screen(fadeout(@background-color-error, 90%), fadeout(@background-color-info, 90%));
-  }
-}
-
-.table-edit-header-cell.active-column {
-  color: @text-color-selected;
-}
-
-.table-edit-cell {
-  &.selected {
-    background: @background-color-highlight;
-  }
-
-
-  &.active {
-    background: fadeout(@background-color-warning, 90%);
-    color: @text-color-selected;
-    position: relative;
-
-    &:before {
-      content: '';
+    &.demo {
       position: absolute;
+    }
+
+    //    ##     ## ########    ###    ########  ######## ########
+    //    ##     ## ##         ## ##   ##     ## ##       ##     ##
+    //    ##     ## ##        ##   ##  ##     ## ##       ##     ##
+    //    ######### ######   ##     ## ##     ## ######   ########
+    //    ##     ## ##       ######### ##     ## ##       ##   ##
+    //    ##     ## ##       ##     ## ##     ## ##       ##    ##
+    //    ##     ## ######## ##     ## ########  ######## ##     ##
+
+    .table-edit-header {
+      top: 0;
       left: 0;
+      right: 0;
+      border: 1px solid @background-color-highlight;
+    }
+
+    .table-edit-header, .table-edit-header-content, .table-edit-header-row {
+      .flex-container;
+    }
+
+    .table-edit-header-row {
+      -webkit-flex: 1;
+      cursor: pointer;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .table-edit-header-wrapper {
+      position: absolute;
+      display: block;
+      min-width: 100%;
+    }
+
+    .table-edit-header-cell {
+      .cell;
+      position: relative;
+      cursor: s-resize;
+      padding-right: 24px;
+
+      &.order {
+        padding-right: 40px;
+        cursor: n-resize;
+
+        &::after {
+          font-family: 'Octicons Regular';
+          content: '\f0a3';
+          display: inline-block;
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          width: 20px;
+          height: 20px;
+          text-align: center;
+          font-size: 16px;
+          line-height: 20px;
+          margin-top: -10px;
+        }
+
+        &.descending {
+          cursor: default;
+
+          &::after {
+            content: '\f0a2';
+          }
+        }
+      }
+    }
+
+    .table-edit-header-filler {
+      .row-number-placeholder;
+    }
+
+    .table-edit-header-filler + * {
+      border-left: 1px solid @background-color-highlight;
+      margin-left: -1px;
+    }
+
+    .column-resize-handle {
+      position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
-      border: 1px solid fadeout(@background-color-warning, 75%);
+      width: 4px;
+      cursor: col-resize;
+      z-index: 2;
+    }
+
+    .column-edit-action {
+      position: absolute;
+      cursor: pointer;
+      display: block
+      transition: opacity 0.2s;
+      right: 2px;
+      top: 50%;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      font-size: 10px;
+      line-height: 16px;
+      margin-top: -8px;
+      background: @background-color-highlight;
+
+      &::before {
+        content: '\f058';
+        font-family: 'Octicons Regular';
+      }
+    }
+
+    //     ######   ##     ## ######## ######## ######## ########
+    //    ##    ##  ##     ##    ##       ##    ##       ##     ##
+    //    ##        ##     ##    ##       ##    ##       ##     ##
+    //    ##   #### ##     ##    ##       ##    ######   ########
+    //    ##    ##  ##     ##    ##       ##    ##       ##   ##
+    //    ##    ##  ##     ##    ##       ##    ##       ##    ##
+    //     ######    #######     ##       ##    ######## ##     ##
+
+    .table-edit-gutter {
+      display: -webkit-flex;
+      position: relative;
+      cursor: cell;
+    }
+
+    .table-edit-gutter-filler, .table-edit-header-filler {
+      visibility: hidden;
+    }
+
+    .table-edit-row-number {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-top: 1px solid @background-color-highlight;
+      border-right: 1px solid @background-color-highlight;
+      pointer-events: none;
+
+      &:nth-child(2) {
+        border-top: none;
+      }
+
+      &.selected {
+        background: @background-color-highlight;
+      }
+
+      .row-resize-handle {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 4px;
+        cursor: row-resize;
+        pointer-events: auto;
+      }
+    }
+
+    .table-edit-row-number, .table-edit-gutter-filler {
+      .row-number-placeholder;
+    }
+
+    //   ########  ##     ## ##       ######## ########   ######
+    //   ##     ## ##     ## ##       ##       ##     ## ##    ##
+    //   ##     ## ##     ## ##       ##       ##     ## ##
+    //   ########  ##     ## ##       ######   ########   ######
+    //   ##   ##   ##     ## ##       ##       ##   ##         ##
+    //   ##    ##  ##     ## ##       ##       ##    ##  ##    ##
+    //   ##     ##  #######  ######## ######## ##     ##  ######
+
+    .selection-box {
+      position: absolute;
+      pointer-events: none;
+      border: 1px solid fadeout(@background-color-info, 50%);
+    }
+
+    .selection-box-handle {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      margin-top: -3px;
+      margin-left: -3px;
+      background: @background-color-info;
+
+      &:before {
+        content: '';
+        position: absolute;
+        display: block;
+        top: -4px;
+        bottom: -4px;
+        left: -4px;
+        right: -4px;
+        cursor: nwse-resize;
+      }
+    }
+    .ruler {
+      position: absolute;
+      display: none;
+      min-height: 1px;
+      min-width: 1px;
+      background: @background-color-info;
+
+      &.visible {
+        display: block;
+      }
+    }
+    .row-resize-ruler {
+      .ruler;
+      height: 1px;
+      left: 0;
+      right: 0;
+    }
+
+    .column-resize-ruler {
+      .ruler;
+      width: 1px;
+      top: 0;
+      bottom: 0;
+    }
+
+    //   ########   #######  ##      ##  ######
+    //   ##     ## ##     ## ##  ##  ## ##    ##
+    //   ##     ## ##     ## ##  ##  ## ##
+    //   ########  ##     ## ##  ##  ##  ######
+    //   ##   ##   ##     ## ##  ##  ##       ##
+    //   ##    ##  ##     ## ##  ##  ## ##    ##
+    //   ##     ##  #######   ###  ###   ######
+
+    .table-edit-content {
+      .flex-container;
+    }
+
+    .table-edit-rows {
+      position: relative;
+      cursor: cell;
+      display: -webkit-flex;
+      -webkit-flex: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      height: 100%;
+    }
+
+    .table-edit-rows-wrapper {
+      pointer-events: none;
+      position: absolute;
+      display: block;
+      min-width: 100%;
+    }
+    .table-edit-row {
+      position: absolute;
+      overflow: hidden;
+      width: 100%;
+      border-top: 1px solid @background-color-highlight;
+
+      &:first-child {
+        border-top: none;
+      }
+    }
+
+    //     ######  ######## ##       ##        ######
+    //    ##    ## ##       ##       ##       ##    ##
+    //    ##       ##       ##       ##       ##
+    //    ##       ######   ##       ##        ######
+    //    ##       ##       ##       ##             ##
+    //    ##    ## ##       ##       ##       ##    ##
+    //     ######  ######## ######## ########  ######
+
+    .table-edit-cell, .table-edit-header-cell, .table-edit-row-number, .table-edit-gutter-filler, .table-edit-header-filler {
+      font-size: 13px;
+    }
+    .table-edit-cell {
+      .cell;
+    }
+
+    //     ######  ########    ###    ######## ########  ######
+    //    ##    ##    ##      ## ##      ##    ##       ##    ##
+    //    ##          ##     ##   ##     ##    ##       ##
+    //     ######     ##    ##     ##    ##    ######    ######
+    //          ##    ##    #########    ##    ##             ##
+    //    ##    ##    ##    ##     ##    ##    ##       ##    ##
+    //     ######     ##    ##     ##    ##    ########  ######
+
+    .active-row {
+      background: fadeout(@background-color-success, 95%);
+    }
+
+    .order {
+      background: fadeout(@background-color-info, 95%);
+    }
+
+    .active-column {
+      background: fadeout(@background-color-error, 95%);
+
+      &.order {
+        background: screen(fadeout(@background-color-error, 90%), fadeout(@background-color-info, 90%));
+      }
+    }
+
+    .table-edit-header-cell.active-column {
+      color: @text-color-selected;
+    }
+
+    .table-edit-cell {
+      &.selected {
+        background: @background-color-highlight;
+      }
+
+
+      &.active {
+        background: fadeout(@background-color-warning, 90%);
+        color: @text-color-selected;
+        position: relative;
+
+        &:before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          border: 1px solid fadeout(@background-color-warning, 75%);
+        }
+      }
     }
   }
 }
