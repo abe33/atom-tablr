@@ -210,8 +210,8 @@ describe 'tableElement', ->
 
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
-          cells.each ->
-            expect(@clientWidth).toBeCloseTo(tableElement.width() / 3, -2)
+          for cell in cells
+            expect(cell.clientWidth).toBeCloseTo(tableElement.clientWidth / 3, -2)
 
       describe 'with a columns layout defined', ->
         describe 'with an array with enough values', ->
@@ -219,45 +219,45 @@ describe 'tableElement', ->
             tableElement.setColumnsWidths([0.2, 0.3, 0.5])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.2, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.3, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.5, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
 
         describe 'with an array with sparse values', ->
           it 'computes the other columns width', ->
             tableElement.setColumnsWidths([0.2, null, 0.5])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.2, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.3, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.5, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
 
         describe 'with an array with more than one missing value', ->
           it 'divides the rest width between the missing columns', ->
             tableElement.setColumnsWidths([0.2])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.2, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.4, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.4, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.4, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.4, -2)
 
         describe 'with an array whose sum is greater than 1', ->
           it 'divides the rest width between the missing columns', ->
             tableElement.setColumnsWidths([0.5, 0.5, 1])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.25, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.25, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.5, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
 
         describe 'with a sparse array whose sum is greater or equal than 1', ->
           it 'divides the rest width between the missing columns', ->
             tableElement.setColumnsWidths([0.5, 0.5])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.25, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.25, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.5, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
 
         describe "by setting the width on model's columns", ->
           it 'uses the columns data', ->
@@ -266,9 +266,9 @@ describe 'tableElement', ->
 
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.2, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.3, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.5, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
 
         describe "from both the model's columns and in the view", ->
           it 'uses the view data and fallback to the columns data if available', ->
@@ -278,9 +278,9 @@ describe 'tableElement', ->
             tableElement.setColumnsWidths([0.8])
             nextAnimationFrame()
 
-            expect(cells.first().width()).toBeCloseTo(tableElement.width() * 0.8, -2)
-            expect(cells.eq(1).width()).toBeCloseTo(tableElement.width() * 0.1, -2)
-            expect(cells.last().width()).toBeCloseTo(tableElement.width() * 0.1, -2)
+            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.8, -2)
+            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.1, -2)
+            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.1, -2)
 
       describe 'with alignements defined in the columns models', ->
         it 'sets the cells text-alignement using the model data', ->
@@ -289,18 +289,18 @@ describe 'tableElement', ->
 
           nextAnimationFrame()
 
-          expect(cells.first().css('text-align')).toEqual('right')
-          expect(cells.eq(1).css('text-align')).toEqual('center')
-          expect(cells.last().css('text-align')).toEqual('left')
+          expect(cells[0].style.textAlign).toEqual('right')
+          expect(cells[1].style.textAlign).toEqual('center')
+          expect(cells[2].style.textAlign).toEqual('left')
 
       describe 'with alignements defined in the view', ->
         it 'sets the cells text-alignement with the view data', ->
           tableElement.setColumnsAligns(['right', 'center'])
           nextAnimationFrame()
 
-          expect(cells.first().css('text-align')).toEqual('right')
-          expect(cells.eq(1).css('text-align')).toEqual('center')
-          expect(cells.last().css('text-align')).toEqual('left')
+          expect(cells[0].style.textAlign).toEqual('right')
+          expect(cells[1].style.textAlign).toEqual('center')
+          expect(cells[2].style.textAlign).toEqual('left')
 
       describe 'with both alignements defined on the view and models', ->
         it 'sets the cells text-alignement with the view data', ->
@@ -311,9 +311,9 @@ describe 'tableElement', ->
           tableElement.setColumnsAligns(['right', 'center'])
           nextAnimationFrame()
 
-          expect(cells.first().css('text-align')).toEqual('right')
-          expect(cells.eq(1).css('text-align')).toEqual('center')
-          expect(cells.last().css('text-align')).toEqual('center')
+          expect(cells[0].style.textAlign).toEqual('right')
+          expect(cells[1].style.textAlign).toEqual('center')
+          expect(cells[2].style.textAlign).toEqual('center')
 
     describe 'with a custom cell renderer defined on a column', ->
       it 'uses the provided renderer to render the columns cells', ->
@@ -321,11 +321,11 @@ describe 'tableElement', ->
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:last-child').text()).toEqual('foo: yes')
+        expect(tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:last-child').textContent).toEqual('foo: yes')
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
-      tableElement.scrollTop(100)
+      tableElement.setScrollTop 100
       nextAnimationFrame()
 
     describe '::getFirstVisibleRow', ->
@@ -337,17 +337,17 @@ describe 'tableElement', ->
         expect(tableElement.getLastVisibleRow()).toEqual(13)
 
     it 'translates the content by the amount of scroll', ->
-      expect(tableShadowRoot.querySelectorAll('.scroll-view').scrollTop()).toEqual(100)
+      expect(tableElement.body.scrollTop).toEqual(100)
 
     it 'does not render new rows', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(18)
-      expect(rows.first().data('row-id')).toEqual(1)
-      expect(rows.last().data('row-id')).toEqual(18)
+      expect(rows[0].dataset.rowId).toEqual('1')
+      expect(rows[rows.length - 1].dataset.rowId).toEqual('18')
 
   describe 'when scrolled by 300px', ->
     beforeEach ->
-      tableElement.scrollTop(300)
+      tableElement.setScrollTop(300)
       nextAnimationFrame()
 
     describe '::getFirstVisibleRow', ->
@@ -361,8 +361,8 @@ describe 'tableElement', ->
     it 'renders new rows', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(28)
-      expect(rows.first().data('row-id')).toEqual(6)
-      expect(rows.last().data('row-id')).toEqual(33)
+      expect(rows[0].dataset.rowId).toEqual('6')
+      expect(rows[rows.length - 1].dataset.rowId).toEqual('33')
 
   describe 'when the table columns are modified', ->
     describe 'by adding one column', ->
@@ -400,13 +400,13 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows.first().data('row-id')).toEqual(1)
-        expect(rows.last().data('row-id')).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual(1)
+        expect(rows.last().dataset.rowId).toEqual(18)
 
     describe 'by adding one at the begining', ->
       it 'updates the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.first().find('.table-edit-cell').first().text()).toEqual('row0')
+        expect(rows[0].find('.table-edit-cell')[0].text()).toEqual('row0')
 
         table.addRowAt 0, ['foo', 'bar', 'baz']
 
@@ -414,14 +414,14 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows.first().data('row-id')).toEqual(1)
-        expect(rows.first().find('.table-edit-cell').first().text()).toEqual('foo')
-        expect(rows.last().data('row-id')).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual(1)
+        expect(rows[0].find('.table-edit-cell')[0].text()).toEqual('foo')
+        expect(rows.last().dataset.rowId).toEqual(18)
 
     describe 'by adding one in the middle', ->
       it 'updates the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('row6')
+        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('row6')
 
         table.addRowAt 6, ['foo', 'bar', 'baz']
 
@@ -429,21 +429,21 @@ describe 'tableElement', ->
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
         expect(rows.length).toEqual(18)
-        expect(rows.first().data('row-id')).toEqual(1)
-        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
-        expect(rows.last().data('row-id')).toEqual(18)
+        expect(rows[0].dataset.rowId).toEqual(1)
+        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('foo')
+        expect(rows.last().dataset.rowId).toEqual(18)
 
     describe 'by updating the content of a row', ->
       it 'update the rows', ->
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('row6')
+        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('row6')
 
         table.getRow(6).key = 'foo'
 
         nextAnimationFrame()
 
         rows = tableShadowRoot.querySelectorAll('.table-edit-row')
-        expect(rows.eq(6).find('.table-edit-cell').first().text()).toEqual('foo')
+        expect(rows.eq(6).find('.table-edit-cell')[0].text()).toEqual('foo')
 
   describe 'setting a custom height for a row', ->
     beforeEach ->
@@ -458,7 +458,7 @@ describe 'tableElement', ->
     it "renders the row's cells with the provided height", ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(3) .table-edit-cell')
 
-      expect(cells.first().outerHeight()).toEqual(100)
+      expect(cells[0].outerHeight()).toEqual(100)
 
     it 'offsets the cells after the modified one', ->
       row = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4)')
@@ -499,7 +499,7 @@ describe 'tableElement', ->
       it "renders the row's cells with the provided height", ->
         cells = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(3) .table-edit-cell')
 
-        expect(cells.first().outerHeight()).toEqual(50)
+        expect(cells[0].outerHeight()).toEqual(50)
 
       it 'offsets the cells after the modified one', ->
         row = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4)')
@@ -548,9 +548,9 @@ describe 'tableElement', ->
     it 'has as many cells as there is columns in the table', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-header-cell')
       expect(cells.length).toEqual(3)
-      expect(cells.first().text()).toEqual('key')
-      expect(cells.eq(1).text()).toEqual('value')
-      expect(cells.last().text()).toEqual('foo')
+      expect(cells[0].text()).toEqual('key')
+      expect(cells[1].text()).toEqual('value')
+      expect(cells[2].text()).toEqual('foo')
 
     it 'has cells that contains a resize handle', ->
       expect(tableShadowRoot.querySelectorAll('.column-resize-handle').length).toEqual(tableShadowRoot.querySelectorAll('.table-edit-header-cell').length)
@@ -565,9 +565,9 @@ describe 'tableElement', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-header-cell')
       rowCells = tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell')
 
-      expect(cells.first().width()).toBeCloseTo(rowCells.first().width(), -2)
-      expect(cells.eq(1).width()).toBeCloseTo(rowCells.eq(1).width(), -2)
-      expect(cells.last().width()).toBeCloseTo(rowCells.last().width(), -2)
+      expect(cells[0].width()).toBeCloseTo(rowCells[0].width(), -2)
+      expect(cells[1].width()).toBeCloseTo(rowCells[1].width(), -2)
+      expect(cells[2].width()).toBeCloseTo(rowCells.last().width(), -2)
 
     describe 'when the gutter is enabled', ->
       beforeEach ->
@@ -632,7 +632,7 @@ describe 'tableElement', ->
       it 'resizes the columns', ->
         initialColumnWidths = tableElement.getColumnsScreenWidths()
 
-        handle = header.find('.column-resize-handle').eq(1)
+        handle = header.find('.column-resize-handle')[1]
         {x, y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -650,7 +650,7 @@ describe 'tableElement', ->
         expect(ruler.length).toEqual(1)
         expect(ruler.is(':visible')).toBeFalsy()
 
-        handle = header.find('.column-resize-handle').eq(1)
+        handle = header.find('.column-resize-handle')[1]
         {x} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -661,7 +661,7 @@ describe 'tableElement', ->
 
       it 'moves the ruler during drag', ->
         ruler = tableShadowRoot.querySelectorAll('.column-resize-ruler')
-        handle = header.find('.column-resize-handle').eq(1)
+        handle = header.find('.column-resize-handle')[1]
         {x,y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -671,7 +671,7 @@ describe 'tableElement', ->
 
       it 'moves the ruler during drag', ->
         ruler = tableShadowRoot.querySelectorAll('.column-resize-ruler')
-        handle = header.find('.column-resize-handle').eq(1)
+        handle = header.find('.column-resize-handle')[1]
 
         mousedown(handle)
         mouseup(handle)
@@ -686,7 +686,7 @@ describe 'tableElement', ->
         it 'resizes the columns', ->
           initialColumnWidths = tableElement.getColumnsScreenWidths()
 
-          handle = header.find('.column-resize-handle').eq(1)
+          handle = header.find('.column-resize-handle')[1]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -837,7 +837,7 @@ describe 'tableElement', ->
 
           describe 'then dragging the mouse up', ->
             beforeEach ->
-              cell = gutter.find('.table-edit-row-number').first()
+              cell = gutter.find('.table-edit-row-number')[0]
               mousemove(cell)
               nextAnimationFrame()
 
@@ -1519,15 +1519,15 @@ describe 'tableElement', ->
 
     it 'positions the selection box over the cells', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
-      firstCell = cells.first()
-      lastCell = cells.last()
+      firstCell = cells[0]
+      lastCell = cells[2]
       expect(selectionBox.offset()).toEqual(firstCell.offset())
       expect(selectionBox.outerWidth()).toEqual(tableShadowRoot.querySelectorAll('.table-edit-rows').width())
       expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())
 
     it 'positions the selection box handle at the bottom right corner', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
-      lastCell = cells.last()
+      lastCell = cells[2]
       lastCellOffset = lastCell.offset()
 
       expect(parseFloat selectionBoxHandle.css('top')).toBeCloseTo(parseFloat(lastCell.parent().css('top')) + lastCell.height(), -1)
@@ -1541,8 +1541,8 @@ describe 'tableElement', ->
 
       it 'positions the selection box over the cells', ->
         cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
-        firstCell = cells.first()
-        lastCell = cells.last()
+        firstCell = cells[0]
+        lastCell = cells[2]
         expect(selectionBox.offset()).toEqual(firstCell.offset())
         expect(selectionBox.outerWidth()).toEqual(firstCell.outerWidth() + lastCell.outerWidth())
         expect(selectionBox.outerHeight()).toEqual(firstCell.outerHeight() + lastCell.outerHeight())

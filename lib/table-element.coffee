@@ -1173,7 +1173,7 @@ class TableElement extends HTMLElement
   #    ##     ## ##        ##     ## ##     ##    ##    ##
   #     #######  ##        ########  ##     ##    ##    ########
 
-  scrollTop: (scroll) ->
+  setScrollTop: (scroll) ->
     if scroll?
       @body.scrollTop = scroll
       @requestUpdate(false)
