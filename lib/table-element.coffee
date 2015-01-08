@@ -9,6 +9,8 @@ TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
 EventsDelegation = require './mixins/events-delegation'
 
+PIXEL = 'px'
+
 stopPropagationAndDefault = (f) -> (e) ->
   e.stopPropagation()
   e.preventDefault()
@@ -723,10 +725,10 @@ class TableElement extends HTMLElement
     activeCell = @getActiveCell()
     activeCellRect = @cellScreenRect(@activeCellPosition)
 
-    @editorElement.style.top = activeCellRect.top + 'px'
-    @editorElement.style.left = activeCellRect.left + 'px'
-    @editorElement.style.width = activeCellRect.width + 'px'
-    @editorElement.style.height = activeCellRect.height + 'px'
+    @editorElement.style.top = @toUnit(activeCellRect.top)
+    @editorElement.style.left = @toUnit(activeCellRect.left)
+    @editorElement.style.width = @toUnit(activeCellRect.width)
+    @editorElement.style.height = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
     @editorElement.focus()
 
@@ -752,8 +754,8 @@ class TableElement extends HTMLElement
     activeColumnRect = target.parentNode.getBoundingClientRect()
 
     @editView.css(
-      top: activeColumnRect.top + 'px'
-      left: activeColumnRect.left + 'px'
+      top: @toUnit(activeColumnRect.top)
+      left: @toUnit(activeColumnRect.left)
     )
     .width(activeColumnRect.width)
     .height(activeColumnRect.height)
@@ -1081,26 +1083,32 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    handle = $(target)
-    handleWidth = handle.width()
-    handleOffset = handle.offset()
+    handleWidth = target.offsetWidth
+    handleOffset = target.getBoundingClientRect()
     dragOffset = handleOffset.left - pageX
 
-    leftCellIndex = handle.parent().index()
-    rightCellIndex = handle.parent().next().index()
+    parent = target.parentNode
+    container = parent.parentNode
 
-    initial = {handle, leftCellIndex, rightCellIndex, handleWidth, dragOffset, startX: pageX}
+    leftCellIndex = Array::indexOf.call(container.childNodes, parent)
+    rightCellIndex = Array::indexOf.call(container.childNodes, parent.nextSibling)
 
-    @on 'mousemove', stopPropagationAndDefault (e) => @columnResizeDrag(e, initial)
-    @on 'mouseup', stopPropagationAndDefault (e) => @endColumnResizeDrag(e, initial)
-    @dragSubscription = new Disposable =>
-      @off 'mousemove'
-      @off 'mouseup'
+    initial = {handle: target, leftCellIndex, rightCellIndex, handleWidth, dragOffset, startX: pageX}
 
-    @getColumnResizeRuler().addClass('visible').css(left: pageX - @head.offset().left).height(@height())
+    @initializeDragEvents this,
+      'mousemove': stopPropagationAndDefault (e) =>
+        @columnResizeDrag(e, initial)
+      'mouseup': stopPropagationAndDefault (e) =>
+        @endColumnResizeDrag(e, initial)
+
+    ruler = @getColumnResizeRuler()
+    ruler.classList.add('visible')
+    ruler.style.left = @toUnit(pageX - @head.getBoundingClientRect().left)
+    ruler.style.height = @toUnit(@offsetHeight)
 
   columnResizeDrag: ({pageX}) ->
-    @getColumnResizeRuler().css(left: pageX - @head.offset().left)
+    ruler = @getColumnResizeRuler()
+    ruler.style.left = @toUnit(pageX - @head.getBoundingClientRect().left)
 
   endColumnResizeDrag: ({pageX}, {startX, leftCellIndex, rightCellIndex}) ->
     return unless @dragging
@@ -1115,7 +1123,7 @@ class TableElement extends HTMLElement
     if @absoluteColumnsWidths
       columnsWidths[leftCellIndex] = leftCellWidth + moveX
     else
-      columnsWidth = @getColumnsWrapper().width()
+      columnsWidth = @getColumnsWrapper().offsetWidth
 
       leftCellRatio = (leftCellWidth + moveX) / columnsWidth
       rightCellRatio = (rightCellWidth - moveX) / columnsWidth
@@ -1125,7 +1133,7 @@ class TableElement extends HTMLElement
 
     @setColumnsWidths(columnsWidths)
 
-    @getColumnResizeRuler().removeClass('visible')
+    @getColumnResizeRuler().classList.remove('visible')
     @dragSubscription.dispose()
     @dragging = false
 
@@ -1215,6 +1223,8 @@ class TableElement extends HTMLElement
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
 
   floatToPixel: (w) -> "#{w}px"
+
+  toUnit: (value, unit=PIXEL) -> "#{value}#{unit}"
 
 #    ######## ##       ######## ##     ## ######## ##    ## ########
 #    ##       ##       ##       ###   ### ##       ###   ##    ##

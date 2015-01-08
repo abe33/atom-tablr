@@ -41,8 +41,16 @@ compareCloseArrays = (a,b,precision=-2) ->
       valueB = b[i]
       expect(valueA).toBeCloseTo(valueB, precision)
 
-mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
+comparePixelStyles = (a,b,precision=-1) ->
+  expect(parseFloat(a)).toBeCloseTo(parseFloat(b), precision)
 
+isVisible = (node) ->
+  node.offsetWidth? and
+  node.offsetWidth isnt 0 and
+  node.offsetHeight? and
+  node.offsetHeight isnt 0
+
+mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
@@ -568,7 +576,7 @@ describe 'tableElement', ->
 
       expect(cells[0].offsetWidth).toBeCloseTo(rowCells[0].offsetWidth, -2)
       expect(cells[1].offsetWidth).toBeCloseTo(rowCells[1].offsetWidth, -2)
-      expect(cells[2].offsetWidth).toBeCloseTo(rowCells.last().offsetWidth, -2)
+      expect(cells[2].offsetWidth).toBeCloseTo(rowCells[rowCells.length-1].offsetWidth, -2)
 
     describe 'when the gutter is enabled', ->
       beforeEach ->
@@ -641,43 +649,43 @@ describe 'tableElement', ->
 
         newColumnWidths = tableElement.getColumnsScreenWidths()
 
-        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0])
-        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
-        expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50)
+        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0], -1)
+        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50, -1)
+        expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50, -1)
 
       it 'displays a ruler when starting the drag', ->
-        ruler = tableShadowRoot.querySelectorAll('.column-resize-ruler')
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
 
-        expect(ruler.length).toEqual(1)
-        expect(ruler.is(':visible')).toBeFalsy()
+        expect(ruler).toExist()
+        expect(isVisible(ruler)).toBeFalsy()
 
-        handle = header.find('.column-resize-handle')[1]
+        handle = header.querySelectorAll('.column-resize-handle')[1]
         {x} = objectCenterCoordinates(handle)
 
         mousedown(handle)
 
-        expect(ruler.is(':visible')).toBeTruthy()
-        expect(ruler.css('left')).toEqual(x + 'px')
-        expect(ruler.height()).toEqual(tableElement.height())
+        expect(isVisible(ruler)).toBeTruthy()
+        comparePixelStyles(ruler.style.left, x + 'px')
+        expect(ruler.offsetHeight).toEqual(tableElement.offsetHeight)
 
       it 'moves the ruler during drag', ->
-        ruler = tableShadowRoot.querySelectorAll('.column-resize-ruler')
-        handle = header.find('.column-resize-handle')[1]
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        handle = header.querySelectorAll('.column-resize-handle')[1]
         {x,y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
         mousemove(handle, x + 50, y)
 
-        expect(ruler.css('left')).toEqual((x + 50) + 'px')
+        comparePixelStyles(ruler.style.left, (x + 50) + 'px')
 
       it 'moves the ruler during drag', ->
-        ruler = tableShadowRoot.querySelectorAll('.column-resize-ruler')
-        handle = header.find('.column-resize-handle')[1]
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        handle = header.querySelectorAll('.column-resize-handle')[1]
 
         mousedown(handle)
         mouseup(handle)
 
-        expect(ruler.is(':visible')).toBeFalsy()
+        expect(isVisible(ruler)).toBeFalsy()
 
       describe 'with absolute columns widths layout', ->
         beforeEach ->
@@ -687,7 +695,7 @@ describe 'tableElement', ->
         it 'resizes the columns', ->
           initialColumnWidths = tableElement.getColumnsScreenWidths()
 
-          handle = header.find('.column-resize-handle')[1]
+          handle = header.querySelectorAll('.column-resize-handle')[1]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)

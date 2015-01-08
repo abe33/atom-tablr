@@ -69,7 +69,7 @@ module.exports =
     tableElement.classList.add('from-top')
     tableElement.style.height = '400px'
 
-    tableElement.attach(atom.workspaceView)
+    tableElement.attach(atom.views.getView(atom.workspace))
 
     atom.commands.add tableElement, 'core:cancel', -> tableElement.destroy()
 
