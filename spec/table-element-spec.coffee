@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, mousemove, mouseup, mousewheel, textInput, objectCenterCoordinates} = require './helpers/events'
+{mousedown, mousemove, mouseup, mousewheel, click, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = "
@@ -707,51 +707,53 @@ describe 'tableElement', ->
           expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
           expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2])
 
-    describe 'clicking on a header cell edit action button', ->
-      [editor, cell, cellOffset] = []
+    fdescribe 'clicking on a header cell edit action button', ->
+      [editor, editorElement, cell, cellOffset] = []
 
       beforeEach ->
-        cell = header.find('.table-edit-header-cell').eq(0)
-        action = cell.find('.column-edit-action')
-        cellOffset = cell.offset()
+        cell = header.querySelector('.table-edit-header-cell')
+        action = cell.querySelector('.column-edit-action')
+        cellOffset = cell.getBoundingClientRect()
 
-        action.trigger('click')
+        click(action)
 
-        editor = tableShadowRoot.querySelectorAll('atom-text-editor').view()
+        editorElement = tableShadowRoot.querySelector('atom-text-editor')
+        editor = editorElement.model
 
       it 'starts the edition of the column name', ->
-        editorOffset = editor.offset()
+        editorOffset = editorElement.getBoundingClientRect()
 
-        expect(editor.length).toEqual(1)
+        expect(editorElement).toExist(1)
         expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
         expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
-        expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
+        expect(editor.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
         expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
       it 'gives the focus to the editor', ->
-        expect(editor.is('.is-focused')).toBeTruthy()
+        expect(editorElement.matches('.is-focused')).toBeTruthy()
 
       it 'fills the editor with the cell value', ->
         expect(editor.getText()).toEqual('key')
 
       it 'cleans the buffer history', ->
-        expect(editor.getModel().getBuffer().history.undoStack.length).toEqual(0)
-        expect(editor.getModel().getBuffer().history.redoStack.length).toEqual(0)
+        expect(editor.getBuffer().history.undoStack.length).toEqual(0)
+        expect(editor.getBuffer().history.redoStack.length).toEqual(0)
+
       describe 'core:cancel', ->
         it 'closes the editor', ->
-          atom.commands.dispatch(editor.element, 'core:cancel')
+          atom.commands.dispatch(editorElement, 'core:cancel')
           expect(tableElement.isEditing()).toBeFalsy()
 
       describe 'core:confirm', ->
         beforeEach ->
           editor.setText('foobar')
-          atom.commands.dispatch(editor.element, 'core:confirm')
+          atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
-          expect(tableShadowRoot.querySelectorAll('atom-text-editor:visible').length).toEqual(0)
+          expect(isVisible(editorElement)).toBeFalsy()
 
         it 'gives the focus back to the table view', ->
-          expect(tableElement.hiddenInput.is(':focus')).toBeTruthy()
+          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
         it 'changes the cell value', ->
           expect(tableElement.table.getColumn(0).name).toEqual('foobar')
