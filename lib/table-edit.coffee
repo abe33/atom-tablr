@@ -23,6 +23,10 @@ module.exports =
       default: 10
 
   activate: (state) ->
+    Table ?= require './table'
+    TableView ?= require './table-element'
+    TableView.registerViewProvider()
+
     atom.workspaceView.command 'table-edit:demo', => @openDemo()
     atom.workspaceView.command 'table-edit:demo-with-gutter', => @openDemoWithGutter()
 
@@ -35,13 +39,10 @@ module.exports =
   openDemo: -> @getTableView()
 
   openDemoWithGutter: ->
-    tableView = @getTableView()
-    tableView.showGutter()
+    tableElement = @getTableView()
+    tableElement.showGutter()
 
   getTableView: ->
-    Table ?= require './table'
-    TableView ?= require './table-view'
-
     table = new Table
     table.addColumn 'key'
     table.addColumn 'value', align: 'right'
@@ -56,20 +57,24 @@ module.exports =
 
     table.clearUndoStack()
 
-    tableView = new TableView(table)
-    tableView.absoluteColumnsWidths = true
-    tableView.setRowHeightAt(3, 90)
-    tableView.setRowHeightAt(30, 110)
-    tableView.setRowHeightAt(60, 60)
-    tableView.setRowHeightAt(90, 80)
+    tableElement = atom.views.getView(table)
+    tableElement.absoluteColumnsWidths = true
+    tableElement.setRowHeightAt(3, 90)
+    tableElement.setRowHeightAt(30, 110)
+    tableElement.setRowHeightAt(60, 60)
+    tableElement.setRowHeightAt(90, 80)
 
-    tableView.addClass('demo overlay from-top').height(300)
-    tableView.attach(atom.workspaceView)
+    tableElement.classList.add('demo')
+    tableElement.classList.add('overlay')
+    tableElement.classList.add('from-top')
+    tableElement.style.height = '400px'
 
-    tableView.on 'core:cancel', -> tableView.destroy()
+    tableElement.attach(atom.workspaceView)
 
-    tableView.sortBy('value')
+    atom.commands.add tableElement, 'core:cancel', -> tableElement.destroy()
 
-    tableView.focus()
+    tableElement.sortBy('value')
 
-    tableView
+    tableElement.focus()
+
+    tableElement

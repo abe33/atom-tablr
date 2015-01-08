@@ -4,6 +4,8 @@
 {CompositeDisposable, Disposable} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
+
+Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
 
@@ -13,7 +15,7 @@ stopPropagationAndDefault = (f) -> (e) ->
   f?(e)
 
 module.exports =
-class TableView extends View
+class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
 
   @content: ->
@@ -22,16 +24,19 @@ class TableView extends View
       @div outlet: 'head', class: 'table-edit-header'
       @div outlet: 'body', class: 'scroll-view'
 
-  gutter: false
-  scroll: 0
-  rowOffsets: null
-  absoluteColumnsWidths: false
-
-  initialize: (@table) ->
+  createdCallback: ->
+    @gutter = false
+    @scroll = 0
+    @rowOffsets = null
+    @absoluteColumnsWidths = false
     @activeCellPosition = new Point
-
     @subscriptions = new CompositeDisposable
+    @initializeContent()
 
+  initializeContent: ->
+    
+
+  setModel: (@table) ->
     @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @subscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
     @subscriptions.add @table.onDidChangeRows => @requestUpdate()
@@ -143,14 +148,13 @@ class TableView extends View
     @subscribeToColumn(column) for column in @table.getColumns()
 
     props = {@table, parentView: this}
-    @bodyComponent = React.renderComponent(TableComponent(props), @body[0])
-    @headComponent = React.renderComponent(TableHeaderComponent(props), @head[0])
+    @bodyComponent = React.renderComponent(TableComponent(props), @body)
+    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
 
   attach: (target) ->
-    @onAttach()
-    target.append(this)
+    target.appendChild(this)
 
-  onAttach: ->
+  attachedCallback: ->
     @computeRowOffsets()
     @requestUpdate()
 
@@ -173,6 +177,7 @@ class TableView extends View
   getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
 
   subscribeTo: (object, selector, events) ->
+    return
     [events, selector] = [selector, null] if typeof selector is 'object'
     if selector
       for event, callback of events
@@ -182,6 +187,7 @@ class TableView extends View
         @subscriptions.add @asDisposable object.on event, callback
 
   observeConfig: (configs) ->
+    return
     for config, callback of configs
       @subscriptions.add atom.config.observe config, callback
 
@@ -1210,3 +1216,19 @@ class TableView extends View
   floatToPixel: (w) -> "#{w}px"
 
   asDisposable: (o) -> new Disposable -> o?.off()
+
+#    ######## ##       ######## ##     ## ######## ##    ## ########
+#    ##       ##       ##       ###   ### ##       ###   ##    ##
+#    ##       ##       ##       #### #### ##       ####  ##    ##
+#    ######   ##       ######   ## ### ## ######   ## ## ##    ##
+#    ##       ##       ##       ##     ## ##       ##  ####    ##
+#    ##       ##       ##       ##     ## ##       ##   ###    ##
+#    ######## ######## ######## ##     ## ######## ##    ##    ##
+
+module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
+
+TableElement.registerViewProvider = ->
+  atom.views.addViewProvider Table, (model) ->
+    element = new TableElement
+    element.setModel(model)
+    element

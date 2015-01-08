@@ -3,7 +3,7 @@
 path = require 'path'
 
 Table = require '../lib/table'
-tableElement = require '../lib/table-view'
+TableElement = require '../lib/table-element'
 Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
@@ -28,6 +28,8 @@ describe 'tableElement', ->
   [tableElement, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   beforeEach ->
+    TableElement.registerViewProvider()
+
     jasmineContent = document.body.querySelector('#jasmine-content')
 
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
@@ -92,7 +94,7 @@ describe 'tableElement', ->
 
     nextAnimationFrame()
 
-  it 'holds a table', ->
+  fit 'holds a table', ->
     expect(tableElement.table).toEqual(table)
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
@@ -104,14 +106,14 @@ describe 'tableElement', ->
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
   it 'has a scroll-view', ->
-    expect(tableElement.find('.scroll-view').length).toEqual(1)
+    expect(tableElement.querySelector('.scroll-view')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
-      rows = tableElement.find('.table-edit-row')
+      rows = tableElement.querySelectorAll('.table-edit-row')
       expect(rows.length).toEqual(18)
-      expect(rows.first().data('row-id')).toEqual(1)
-      expect(rows.last().data('row-id')).toEqual(18)
+      expect(rows[0].dataset.rowId).toEqual('1')
+      expect(rows[rows.length - 1].dataset.rowId).toEqual('18')
 
     describe '::getFirstVisibleRow', ->
       it 'returns 0', ->
@@ -123,8 +125,8 @@ describe 'tableElement', ->
 
   describe 'once rendered', ->
     beforeEach ->
-      row = tableElement.find('.table-edit-row').first()
-      cells = row.find('.table-edit-cell')
+      row = tableElement.querySelector('.table-edit-row')
+      cells = row.querySelectorAll('.table-edit-cell')
 
     it 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)
@@ -134,7 +136,7 @@ describe 'tableElement', ->
 
       tableElement.getActiveCell().setValue(undefined)
       nextAnimationFrame()
-      expect(cells.first().text()).toEqual('foo')
+      expect(cells[0].textContent).toEqual('foo')
 
     it 'renders undefined cells based on the view property', ->
       tableElement.undefinedDisplay = 'bar'
