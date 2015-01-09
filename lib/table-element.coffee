@@ -66,7 +66,7 @@ class TableElement extends HTMLElement
           @startCellEdit()
           @editView.setText(e.originalEvent.data)
 
-    @subscriptions.add atom.commands.add '.table-edit',
+    @subscriptions.add atom.commands.add 'atom-table-editor',
       'core:confirm': => @startCellEdit()
       'core:undo': => @table.undo()
       'core:redo': => @table.redo()
@@ -787,7 +787,7 @@ class TableElement extends HTMLElement
 
   subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor::shadow atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmCellEdit()
         @moveRight()
@@ -805,7 +805,7 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor::shadow atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmColumnEdit()
         @moveRight()

@@ -22,7 +22,7 @@
   'cmd-alt-right': 'table-edit:insert-column-after'
   'cmd-alt-ctrl-backspace': 'table-edit:delete-column'
 
-'atom-table-editor atom-text-editor':
+'atom-table-editor::shadow atom-text-editor':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
   'tab': 'table-edit:move-right'
