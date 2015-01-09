@@ -626,8 +626,9 @@ class TableElement extends HTMLElement
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
-  focus: ->
-    @hiddenInput.focus() unless document.activeElement is @hiddenInput[0]
+  focus: -> @hiddenInput.focus() unless @hasFocus()
+
+  hasFocus: -> this is document.activeElement
 
   moveRight: ->
     if @activeCellPosition.column + 1 < @table.getColumnsCount()

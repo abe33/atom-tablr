@@ -923,23 +923,24 @@ describe 'tableElement', ->
           expect(tableElement.getRowHeightAt(2)).toEqual(10)
 
       describe 'when an editor is opened', ->
-        [editor] = []
+        [editor, editorElement] = []
 
         beforeEach ->
           tableElement.startCellEdit()
-          editor = tableShadowRoot.querySelectorAll('atom-text-editor').view()
+          editorElement = tableElement.querySelector('atom-text-editor')
+          editor = editorElement.model
 
         it 'opens a text editor above the active cell', ->
-          cell = tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:first-child')
-          cellOffset = cell.offset()
+          cell = tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:first-child')
+          cellOffset = cell.getBoundingClientRect()
 
-          editorOffset = editor.offset()
+          editorOffset = editorElement.getBoundingClientRect()
 
-          expect(editor.length).toEqual(1)
+          expect(editorElement).toExist()
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
-          expect(editor.outerWidth()).toBeCloseTo(cell.outerWidth(), -2)
-          expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
+          expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
+          expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -950,12 +951,12 @@ describe 'tableElement', ->
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
   it 'gains focus when mouse is pressed on the table view', ->
-    tableElement.mousedown()
+    mousedown(tableElement)
 
-    expect(tableElement.hiddenInput.is(':focus')).toBeTruthy()
+    expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
   it 'activates the cell under the mouse when pressed', ->
-    cell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
+    cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
     mousedown(cell)
 
     expect(tableElement.getActiveCell().getValue()).toEqual('no')
@@ -963,12 +964,12 @@ describe 'tableElement', ->
   it 'does not focus the hidden input twice when multiple press occurs', ->
     spyOn(tableElement.hiddenInput, 'focus').andCallThrough()
 
-    tableElement.mousedown()
-    tableElement.mousedown()
+    mousedown(tableElement)
+    mousedown(tableElement)
 
     expect(tableElement.hiddenInput.focus).toHaveBeenCalled()
     expect(tableElement.hiddenInput.focus.calls.length).toEqual(1)
-    expect(tableElement.hiddenInput.is(':focus')).toBeTruthy()
+    expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
   it 'has an active cell', ->
     activeCell = tableElement.getActiveCell()
@@ -988,7 +989,7 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'activates the cell under the mouse when pressed', ->
-      cell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
+      cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
       mousedown(cell)
 
       expect(tableElement.getActiveCell().getValue()).toEqual('no')
@@ -1009,7 +1010,7 @@ describe 'tableElement', ->
     it 'is triggered on core:move-right', ->
       spyOn(tableElement, 'moveRight')
 
-      atom.commands.dispatch(tableElement.element, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-right')
 
       expect(tableElement.moveRight).toHaveBeenCalled()
 
@@ -1051,7 +1052,7 @@ describe 'tableElement', ->
     it 'is triggered on core:move-left', ->
       spyOn(tableElement, 'moveLeft')
 
-      atom.commands.dispatch(tableElement.element, 'core:move-left')
+      atom.commands.dispatch(tableElement, 'core:move-left')
 
       expect(tableElement.moveLeft).toHaveBeenCalled()
 
@@ -1087,7 +1088,7 @@ describe 'tableElement', ->
     it 'is triggered on core:move-up', ->
       spyOn(tableElement, 'moveUp')
 
-      atom.commands.dispatch(tableElement.element, 'core:move-up')
+      atom.commands.dispatch(tableElement, 'core:move-up')
 
       expect(tableElement.moveUp).toHaveBeenCalled()
 
@@ -1117,7 +1118,7 @@ describe 'tableElement', ->
     it 'is triggered on core:move-down', ->
       spyOn(tableElement, 'moveDown')
 
-      atom.commands.dispatch(tableElement.element, 'core:move-down')
+      atom.commands.dispatch(tableElement, 'core:move-down')
 
       expect(tableElement.moveDown).toHaveBeenCalled()
 
@@ -1135,13 +1136,13 @@ describe 'tableElement', ->
     it 'scrolls the view until the passed-on row become visible', ->
       tableElement.makeRowVisible(50)
 
-      expect(tableElement.body.scrollTop()).toEqual(849)
+      expect(tableElement.body.scrollTop).toEqual(849)
 
   describe 'core:undo', ->
     it 'triggers an undo on the table', ->
       spyOn(table, 'undo')
 
-      atom.commands.dispatch(tableElement.element, 'core:undo')
+      atom.commands.dispatch(tableElement, 'core:undo')
 
       expect(table.undo).toHaveBeenCalled()
 
