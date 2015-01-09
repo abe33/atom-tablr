@@ -30,12 +30,14 @@ class EventsDelegation extends Mixin
       eventsForObject = @eventsMap.get(object)[event]
 
       {target} = e
-      @eachSelector eventsForObject, (selector,callback) =>
+      found = @eachSelector eventsForObject, (selector,callback) =>
         if @targetMatch(target, selector)
           callback(e)
           return true
 
-      eventsForObject[NO_SELECTOR]?(e)
+        return false
+
+      eventsForObject[NO_SELECTOR]?(e) unless found
       return true
 
     object.addEventListener event, listener
@@ -44,8 +46,13 @@ class EventsDelegation extends Mixin
 
   eachSelector: (eventsForObject, callback) ->
     keys = Object.keys(eventsForObject)
+    if keys.indexOf(NO_SELECTOR) isnt - 1
+      keys.splice(keys.indexOf(NO_SELECTOR), 1)
     keys.sort (a,b) -> b.split(' ').length - a.split(' ').length
-    keys.forEach (key) -> callback(key, eventsForObject[key])
+
+    for key in keys
+      return true if callback(key, eventsForObject[key])
+    return false
 
   targetMatch: (target, selector) ->
     return true if target.matches(selector)
