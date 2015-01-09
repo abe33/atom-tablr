@@ -68,7 +68,7 @@ class TableElement extends HTMLElement
       'textInput': (e) =>
         unless @isEditing()
           @startCellEdit()
-          @editView.setText(e.originalEvent.data)
+          @editor.setText(e.data)
 
     @subscriptions.add atom.commands.add 'atom-table-editor',
       'core:confirm': => @startCellEdit()

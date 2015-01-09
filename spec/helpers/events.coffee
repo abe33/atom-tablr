@@ -22,14 +22,10 @@ mouseEvent = (type, properties={}) ->
   new MouseEvent type, properties
 
 inputEvent = (type, properties={}) ->
-  defaults = {
-    isComposing: false
-    data: null
-  }
 
-  properties[k] = v for k,v of defaults when not properties[k]?
-
-  new InputEvent type, properties
+  event = new Event type, properties
+  event.data = properties.data
+  event
 
 objectCenterCoordinates = (obj) ->
   {top, left, width, height} = obj.getBoundingClientRect()
@@ -37,7 +33,7 @@ objectCenterCoordinates = (obj) ->
 
 module.exports = {objectCenterCoordinates, mouseEvent, inputEvent}
 
-['mousedown', 'mousemove', 'mouseup', 'click'].forEach (key) ->
+['mousedown', 'mousemove', 'mouseup', 'click', 'dblclick'].forEach (key) ->
   module.exports[key] = (obj, x, y, cx, cy) ->
     {x,y} = objectCenterCoordinates(obj) unless x? and y?
 
