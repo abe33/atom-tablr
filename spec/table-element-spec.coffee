@@ -790,12 +790,12 @@ describe 'tableElement', ->
 
   describe 'gutter', ->
     it 'is rendered only when the flag is enabled', ->
-      expect(tableShadowRoot.querySelectorAll('.table-edit-gutter').length).toEqual(0)
+      expect(tableShadowRoot.querySelector('.table-edit-gutter')).not.toExist()
 
       tableElement.showGutter()
       nextAnimationFrame()
 
-      expect(tableShadowRoot.querySelectorAll('.table-edit-gutter').length).toEqual(1)
+      expect(tableShadowRoot.querySelector('.table-edit-gutter')).toExist()
 
     describe 'rows numbers', ->
       [content, gutter] = []
@@ -803,23 +803,23 @@ describe 'tableElement', ->
       beforeEach ->
         tableElement.showGutter()
         nextAnimationFrame()
-        content = tableShadowRoot.querySelectorAll('.table-edit-content')
-        gutter = tableShadowRoot.querySelectorAll('.table-edit-gutter')
+        content = tableShadowRoot.querySelector('.table-edit-content')
+        gutter = tableShadowRoot.querySelector('.table-edit-gutter')
 
       it 'contains a filler div to set the gutter width', ->
-        expect(gutter.find('.table-edit-gutter-filler').length).toEqual(1)
+        expect(gutter.querySelector('.table-edit-gutter-filler')).toExist()
 
       it 'matches the count of rows in the body', ->
-        expect(gutter.find('.table-edit-row-number').length)
-        .toEqual(content.find('.table-edit-row').length)
+        expect(gutter.querySelectorAll('.table-edit-row-number').length)
+        .toEqual(content.querySelectorAll('.table-edit-row').length)
 
       it 'contains resize handlers for each row', ->
-        expect(gutter.find('.table-edit-row-number .row-resize-handle').length)
-        .toEqual(content.find('.table-edit-row').length)
+        expect(gutter.querySelectorAll('.table-edit-row-number .row-resize-handle').length)
+        .toEqual(content.querySelectorAll('.table-edit-row').length)
 
       describe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
-          cell = gutter.find('.table-edit-row-number').eq(2)
+          cell = gutter.querySelectorAll('.table-edit-row-number')[2]
           mousedown(cell)
           nextAnimationFrame()
 
@@ -829,7 +829,7 @@ describe 'tableElement', ->
 
         describe 'then dragging the mouse down', ->
           beforeEach ->
-            cell = gutter.find('.table-edit-row-number').eq(4)
+            cell = gutter.querySelectorAll('.table-edit-row-number')[4]
             mousemove(cell)
             nextAnimationFrame()
 
@@ -839,16 +839,16 @@ describe 'tableElement', ->
 
           describe 'until reaching the bottom of the view', ->
             beforeEach ->
-              cell = gutter.find('.table-edit-row-number').eq(10)
+              cell = gutter.querySelectorAll('.table-edit-row-number')[10]
               mousemove(cell)
               nextAnimationFrame()
 
             it 'scrolls the view', ->
-              expect(tableElement.body.scrollTop()).toBeGreaterThan(0)
+              expect(tableElement.body.scrollTop).toBeGreaterThan(0)
 
           describe 'then dragging the mouse up', ->
             beforeEach ->
-              cell = gutter.find('.table-edit-row-number')[0]
+              cell = gutter.querySelectorAll('.table-edit-row-number')[0]
               mousemove(cell)
               nextAnimationFrame()
 
@@ -858,20 +858,20 @@ describe 'tableElement', ->
 
       describe 'dragging the mouse over gutter cells and reaching the top of the view', ->
         it 'scrolls the view', ->
-          tableElement.scrollTop(300)
+          tableElement.setScrollTop(300)
           nextAnimationFrame()
 
-          startCell = tableShadowRoot.querySelectorAll('.table-edit-row-number:nth-child(12)')
-          endCell = tableShadowRoot.querySelectorAll('.table-edit-row-number:nth-child(9)')
+          startCell = tableShadowRoot.querySelector('.table-edit-row-number:nth-child(12)')
+          endCell = tableShadowRoot.querySelector('.table-edit-row-number:nth-child(9)')
 
           mousedown(startCell)
           mousemove(endCell)
 
-          expect(tableElement.body.scrollTop()).toBeLessThan(300)
+          expect(tableElement.body.scrollTop).toBeLessThan(300)
 
       describe 'dragging the resize handler of a row number', ->
         it 'resize the row on mouse up', ->
-          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle').eq(2)
+          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -880,43 +880,43 @@ describe 'tableElement', ->
           expect(tableElement.getRowHeightAt(2)).toEqual(70)
 
         it 'displays a ruler when the drag have begun', ->
-          ruler = tableShadowRoot.querySelectorAll('.row-resize-ruler')
+          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
 
-          expect(ruler.is(':visible')).toBeFalsy()
+          expect(isVisible(ruler)).toBeFalsy()
 
-          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle').eq(2)
+          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle')[2]
           mousedown(handle)
 
-          expect(ruler.is(':visible')).toBeTruthy()
-          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height())
+          expect(isVisible(ruler)).toBeTruthy()
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight)
 
         it 'moves the handle during the drag', ->
-          ruler = tableShadowRoot.querySelectorAll('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle').eq(2)
+          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
+          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
           mousemove(handle, x, y + 50)
 
-          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height() + 50)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50)
 
         it 'hides the ruler on drag end', ->
-          ruler = tableShadowRoot.querySelectorAll('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle').eq(2)
+          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
+          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle')[2]
           mousedown(handle)
           mouseup(handle)
 
-          expect(ruler.is(':visible')).toBeFalsy()
+          expect(isVisible(ruler)).toBeFalsy()
 
         it 'stops the resize when the height is lower than the minimum row height', ->
-          ruler = tableShadowRoot.querySelectorAll('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle').eq(2)
+          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
+          handle = tableShadowRoot.querySelectorAll('.table-edit-row-number .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
           mousemove(handle, x, y + -20)
 
-          expect(ruler.offset().top).toEqual(handle.offset().top + handle.height() - 10)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 10)
 
           mouseup(handle, x, y + -20)
 

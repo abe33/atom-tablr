@@ -3,6 +3,8 @@ Mixin = require 'mixto'
 
 eachPair = (object, callback) -> callback(k,v) for k,v of object
 
+NO_SELECTOR = '__NONE__'
+
 module.exports =
 class EventsDelegation extends Mixin
   subscribeTo: (object, selector, events) ->
@@ -14,7 +16,7 @@ class EventsDelegation extends Mixin
     eventsForObject = @eventsMap.get(object)
 
     [events, selector] = [selector, null] if typeof selector is 'object'
-    selector = '__NONE__' unless selector?
+    selector = NO_SELECTOR unless selector?
 
     eachPair events, (event, callback) =>
       unless eventsForObject[event]?
@@ -28,19 +30,32 @@ class EventsDelegation extends Mixin
       eventsForObject = @eventsMap.get(object)[event]
 
       {target} = e
-      for selector,callback of eventsForObject
-        continue if selector is '__NONE__'
-
-        if target.matches(selector)
+      @eachSelector eventsForObject, (selector,callback) =>
+        if @targetMatch(target, selector)
           callback(e)
           return true
 
-      eventsForObject['__NONE__']?(e)
+      eventsForObject[NO_SELECTOR]?(e)
       return true
 
     object.addEventListener event, listener
     @subscriptions.add new Disposable ->
       object.removeEventListener event, listener
+
+  eachSelector: (eventsForObject, callback) ->
+    keys = Object.keys(eventsForObject)
+    keys.sort (a,b) -> b.split(' ').length - a.split(' ').length
+    keys.forEach (key) -> callback(key, eventsForObject[key])
+
+  targetMatch: (target, selector) ->
+    return true if target.matches(selector)
+
+    parent = target.parentNode
+    while parent? and parent.matches?
+      return true if parent.matches(selector)
+      parent = parent.parentNode
+
+    false
 
   addEventDisposable: (object, event, listener) ->
     object.addEventListener event, listener

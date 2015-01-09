@@ -1007,12 +1007,12 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    @body.on 'mousemove', stopPropagationAndDefault (e) => @gutterDrag(e)
-    @body.on 'mouseup', stopPropagationAndDefault (e) => @endGutterDrag(e)
-    @initializeDragDisposable()
-
     row = @findRowAtScreenPosition(e.pageY)
     @setSelection(@getRowRange(row)) if row?
+
+    @initializeDragEvents @body,
+      'mousemove': stopPropagationAndDefault (e) => @gutterDrag(e)
+      'mouseup': stopPropagationAndDefault (e) => @endGutterDrag(e)
 
   gutterDrag: (e) ->
     if @dragging
@@ -1045,20 +1045,22 @@ class TableElement extends HTMLElement
 
     row = @findRowAtScreenPosition(e.pageY)
 
-    handle = $(e.target)
-    handleHeight = handle.height()
-    handleOffset = handle.offset()
+    handle = e.target
+    handleHeight = handle.offsetHeight
+    handleOffset = handle.getBoundingClientRect()
     dragOffset = handleOffset.top - e.pageY
 
     initial = {row, handle, handleHeight, dragOffset}
 
-    @body.on 'mousemove', stopPropagationAndDefault (e) => @rowResizeDrag(e, initial)
-    @body.on 'mouseup', stopPropagationAndDefault (e) => @endRowResizeDrag(e, initial)
-
     rulerTop = @getScreenRowOffsetAt(row) + @getScreenRowHeightAt(row)
 
-    @getRowResizeRuler().addClass('visible').css(top: rulerTop)
-    @initializeDragDisposable()
+    ruler = @getRowResizeRuler()
+    ruler.classList.add('visible')
+    ruler.style.top = @toUnit(rulerTop)
+
+    @initializeDragEvents @body,
+      'mousemove': stopPropagationAndDefault (e) => @rowResizeDrag(e, initial)
+      'mouseup': stopPropagationAndDefault (e) => @endRowResizeDrag(e, initial)
 
   rowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
     if @dragging
@@ -1066,7 +1068,8 @@ class TableElement extends HTMLElement
       rowY = @rowScreenPosition(row)
       newRowHeight = Math.max(pageY - rowY + dragOffset + handleHeight, @getMinimumRowHeight())
       rulerTop = @getScreenRowOffsetAt(row) + newRowHeight
-      @getRowResizeRuler().css(top: rulerTop)
+      ruler = @getRowResizeRuler()
+      ruler.style.top = @toUnit(rulerTop)
 
   endRowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
     return unless @dragging
@@ -1075,7 +1078,7 @@ class TableElement extends HTMLElement
     rowY = @rowScreenPosition(row)
     newRowHeight = pageY - rowY + dragOffset + handleHeight
     @setScreenRowHeightAt(row, newRowHeight)
-    @getRowResizeRuler().removeClass('visible')
+    @getRowResizeRuler().classList.remove('visible')
 
     @dragSubscription.dispose()
     @dragging = false
