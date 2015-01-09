@@ -48,9 +48,13 @@ class TableElement extends HTMLElement
     @hiddenInput = document.createElement('input')
     @hiddenInput.className = 'hidden-input'
 
+    @contentInsertion = document.createElement('content')
+    @contentInsertion.select = 'atom-text-editor'
+
     @shadowRoot.appendChild(@hiddenInput)
     @shadowRoot.appendChild(@head)
     @shadowRoot.appendChild(@body)
+    @shadowRoot.appendChild(@contentInsertion)
 
   setModel: (@table) ->
     @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
@@ -740,42 +744,40 @@ class TableElement extends HTMLElement
   confirmCellEdit: ->
     @stopEdit()
     activeCell = @getActiveCell()
-    newValue = @editView.getText()
+    newValue = @editor.getText()
     activeCell.setValue(newValue) unless newValue is activeCell.getValue()
 
   startColumnEdit: ({target}) =>
-    @createTextEditor() unless @editView?
+    @createTextEditor() unless @editor?
 
-    @subscribeToColumnTextEditor(@editView)
+    @subscribeToColumnTextEditor(@editor)
 
     @editing = true
 
     activeColumn = @getActiveColumn()
     activeColumnRect = target.parentNode.getBoundingClientRect()
 
-    @editView.css(
-      top: @toUnit(activeColumnRect.top)
-      left: @toUnit(activeColumnRect.left)
-    )
-    .width(activeColumnRect.width)
-    .height(activeColumnRect.height)
-    .show()
+    @editorElement.style.top = @toUnit(activeColumnRect.top)
+    @editorElement.style.left =  @toUnit(activeColumnRect.left)
+    @editorElement.style.width = @toUnit(activeColumnRect.width)
+    @editorElement.style.height = @toUnit(activeColumnRect.height)
+    @editorElement.style.display = 'block'
 
-    @editView.focus()
-    @editView.setText(activeColumn.name)
+    @editorElement.focus()
+    @editor.setText(activeColumn.name)
 
-    @editView.getModel().getBuffer().history.clearUndoStack()
-    @editView.getModel().getBuffer().history.clearRedoStack()
+    @editor.getBuffer().history.clearUndoStack()
+    @editor.getBuffer().history.clearRedoStack()
 
   confirmColumnEdit: ->
     @stopEdit()
     activeColumn = @getActiveColumn()
-    newValue = @editView.getText()
+    newValue = @editor.getText()
     activeColumn.name = newValue unless newValue is activeColumn.name
 
   stopEdit: ->
     @editing = false
-    @editView.hide()
+    @editorElement.style.display = 'none'
     @textEditorSubscriptions?.dispose()
     @textEditorSubscriptions = null
     @focus()
@@ -783,11 +785,11 @@ class TableElement extends HTMLElement
   createTextEditor: ->
     @editor = new TextEditor({})
     @editorElement = atom.views.getView(@editor)
-    @shadowRoot.appendChild(@editorElement)
+    @appendChild(@editorElement)
 
   subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor::shadow atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmCellEdit()
         @moveRight()
@@ -805,7 +807,7 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor::shadow atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
       'table-edit:move-right': (e) =>
         @confirmColumnEdit()
         @moveRight()

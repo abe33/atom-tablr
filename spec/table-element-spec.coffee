@@ -484,14 +484,14 @@ describe 'tableElement', ->
       nextAnimationFrame()
       tableElement.startCellEdit()
 
-      expect(tableShadowRoot.querySelector('atom-text-editor').offsetHeight).toEqual(100)
+      expect(tableElement.querySelector('atom-text-editor').offsetHeight).toEqual(100)
 
     it 'uses the offset to position the editor', ->
       tableElement.activateCellAtPosition(row: 3, column: 0)
       nextAnimationFrame()
       tableElement.startCellEdit()
 
-      editorTop = tableShadowRoot.querySelector('atom-text-editor').getBoundingClientRect().top
+      editorTop = tableElement.querySelector('atom-text-editor').getBoundingClientRect().top
       cellTop = tableShadowRoot.querySelector('.table-edit-cell.active').getBoundingClientRect().top
       expect(editorTop).toBeCloseTo(cellTop, -2)
 
@@ -707,7 +707,7 @@ describe 'tableElement', ->
           expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
           expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2])
 
-    fdescribe 'clicking on a header cell edit action button', ->
+    describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
       beforeEach ->
@@ -717,7 +717,7 @@ describe 'tableElement', ->
 
         click(action)
 
-        editorElement = tableShadowRoot.querySelector('atom-text-editor')
+        editorElement = tableElement.querySelector('atom-text-editor')
         editor = editorElement.model
 
       it 'starts the edition of the column name', ->
@@ -726,8 +726,8 @@ describe 'tableElement', ->
         expect(editorElement).toExist(1)
         expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
         expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
-        expect(editor.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
-        expect(editor.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
+        expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
+        expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
       it 'gives the focus to the editor', ->
         expect(editorElement.matches('.is-focused')).toBeTruthy()
@@ -763,7 +763,7 @@ describe 'tableElement', ->
           previousActiveCell = tableElement.getActiveCell()
           spyOn(tableElement, 'moveRight')
           editor.setText('Foo Bar')
-          atom.commands.dispatch(editor.element, 'table-edit:move-right')
+          atom.commands.dispatch(editorElement, 'table-edit:move-right')
 
           expect(tableElement.isEditing()).toBeFalsy()
           expect(tableElement.table.getColumn(0).name).toEqual('Foo Bar')
@@ -774,7 +774,7 @@ describe 'tableElement', ->
           previousActiveCell = tableElement.getActiveCell()
           spyOn(tableElement, 'moveLeft')
           editor.setText('Foo Bar')
-          atom.commands.dispatch(editor.element, 'table-edit:move-left')
+          atom.commands.dispatch(editorElement, 'table-edit:move-left')
 
           expect(tableElement.isEditing()).toBeFalsy()
           expect(tableElement.table.getColumn(0).name).toEqual('Foo Bar')
