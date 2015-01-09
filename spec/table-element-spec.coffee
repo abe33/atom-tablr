@@ -1649,12 +1649,12 @@ describe 'tableElement', ->
       expect(tableElement.getSelection()).toEqual([[0,0],[2,0]])
 
     it 'scrolls the view to make the added row visible', ->
-      tableElement.scrollTop(200)
+      tableElement.setScrollTop(200)
       tableElement.activateCellAtPosition([10,0])
 
       atom.commands.dispatch(tableElement, 'core:select-up')
 
-      expect(tableElement.body.scrollTop()).toEqual(180)
+      expect(tableElement.body.scrollTop).toEqual(180)
 
     describe 'then triggering core:select-down', ->
       it 'collapse the selection back to the bottom', ->
@@ -1684,7 +1684,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:select-down')
 
-      expect(tableElement.body.scrollTop()).not.toEqual(0)
+      expect(tableElement.body.scrollTop).not.toEqual(0)
 
     describe 'then triggering core:select-up', ->
       it 'collapse the selection back to the bottom', ->
@@ -1736,7 +1736,7 @@ describe 'tableElement', ->
     it 'scrolls the view to make the added row visible', ->
       atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
 
-      expect(tableElement.body.scrollTop()).not.toEqual(0)
+      expect(tableElement.body.scrollTop).not.toEqual(0)
 
     describe 'then triggering table-edit:select-to-beginning-of-table', ->
       it 'expands the selection to the beginning of the table', ->
@@ -1760,7 +1760,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
 
-      expect(tableElement.body.scrollTop()).toEqual(0)
+      expect(tableElement.body.scrollTop).toEqual(0)
 
     describe 'table-edit:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
@@ -1773,8 +1773,8 @@ describe 'tableElement', ->
 
   describe 'dragging the mouse pressed over cell', ->
     it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
-      endCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(3)')
+      startCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
+      endCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(3)')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1787,25 +1787,25 @@ describe 'tableElement', ->
       expect(tableElement.getSelection()).toEqual([[3,0],[6,2]])
 
     it 'scrolls the view when the selection reach the last row', ->
-      startCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(1)')
-      endCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(10) .table-edit-cell:nth-child(3)')
+      startCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(1)')
+      endCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(10) .table-edit-cell:nth-child(3)')
 
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop()).toBeGreaterThan(0)
+      expect(tableElement.body.scrollTop).toBeGreaterThan(0)
 
     it 'scrolls the view when the selection reach the first row', ->
-      tableElement.scrollTop(300)
+      tableElement.setScrollTop(300)
       nextAnimationFrame()
 
-      startCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(12) .table-edit-cell:nth-child(1)')
-      endCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(9) .table-edit-cell:nth-child(3)')
+      startCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(12) .table-edit-cell:nth-child(1)')
+      endCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(9) .table-edit-cell:nth-child(3)')
 
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop()).toBeLessThan(300)
+      expect(tableElement.body.scrollTop).toBeLessThan(300)
 
   describe 'when the columns widths have been changed', ->
     beforeEach ->
@@ -1813,8 +1813,8 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
-      endCell = tableShadowRoot.querySelectorAll('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(2)')
+      startCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:nth-child(1)')
+      endCell = tableShadowRoot.querySelector('.table-edit-row:nth-child(7) .table-edit-cell:nth-child(2)')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1827,14 +1827,14 @@ describe 'tableElement', ->
     beforeEach ->
       tableElement.setSelection([[2,0],[2,1]])
       nextAnimationFrame()
-      handle = tableShadowRoot.querySelectorAll('.selection-box-handle')
+      handle = tableShadowRoot.querySelector('.selection-box-handle')
 
       mousedown(handle)
 
     describe 'to the right', ->
       beforeEach ->
-        handleOffset = handle.offset()
-        mousemove(handle, handleOffset.left + 50, handleOffset.top + 2)
+        handleOffset = handle.getBoundingClientRect()
+        mousemove(handle, handleOffset.left + 50, handleOffset.top-2)
 
       it 'expands the selection to the right', ->
         expect(tableElement.getSelection()).toEqual([[2,0],[2,2]])
@@ -1854,14 +1854,14 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sorts the rows accordingly', ->
-        expect(tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row99')
+        expect(tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:first-child').textContent).toEqual('row99')
 
       it 'leaves the active cell position as it was before', ->
         expect(tableElement.activeCellPosition).toEqual([0,0])
         expect(tableElement.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
-        expect(tableShadowRoot.querySelectorAll('.table-edit-rows').height()).toEqual(2000)
+        expect(tableShadowRoot.querySelector('.table-edit-rows').offsetHeight).toEqual(2000)
 
       it 'decorates the table cells with a class', ->
         expect(tableShadowRoot.querySelectorAll('.table-edit-cell.order').length).toBeGreaterThan(1)
@@ -1879,8 +1879,8 @@ describe 'tableElement', ->
           tableElement.startCellEdit()
 
         it 'opens the editor at the cell position', ->
-          editorOffset = tableShadowRoot.querySelectorAll('atom-text-editor').offset()
-          cellOffset = tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:first-child').offset()
+          editorOffset = tableElement.querySelector('atom-text-editor').getBoundingClientRect()
+          cellOffset = tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:first-child').getBoundingClientRect()
 
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
@@ -1891,7 +1891,7 @@ describe 'tableElement', ->
           nextAnimationFrame()
 
           expect(tableElement.direction).toEqual(1)
-          expect(tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
+          expect(tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:first-child').textContent).toEqual('row0')
 
       describe '::resetSort', ->
         beforeEach ->
@@ -1902,4 +1902,4 @@ describe 'tableElement', ->
           expect(tableElement.order).toBeNull()
 
         it 'reorder the table in its initial order', ->
-          expect(tableShadowRoot.querySelectorAll('.table-edit-row:first-child .table-edit-cell:first-child').text()).toEqual('row0')
+          expect(tableShadowRoot.querySelector('.table-edit-row:first-child .table-edit-cell:first-child').textContent).toEqual('row0')
