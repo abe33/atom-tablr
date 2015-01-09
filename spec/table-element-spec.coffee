@@ -31,6 +31,12 @@ stylesheet = "
     border: none;
     padding: 0;
   }
+
+  atom-table-editor::shadow .selection-box-handle {
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
 "
 
 compareCloseArrays = (a,b,precision=-2) ->
@@ -1136,7 +1142,7 @@ describe 'tableElement', ->
     it 'scrolls the view until the passed-on row become visible', ->
       tableElement.makeRowVisible(50)
 
-      expect(tableElement.body.scrollTop).toEqual(849)
+      expect(tableElement.body.scrollTop).toEqual(847)
 
   describe 'core:undo', ->
     it 'triggers an undo on the table', ->
@@ -1524,28 +1530,34 @@ describe 'tableElement', ->
     beforeEach ->
       tableElement.setSelection([[2,0],[3,2]])
       nextAnimationFrame()
-      selectionBox = tableShadowRoot.querySelectorAll('.selection-box')
-      selectionBoxHandle = tableShadowRoot.querySelectorAll('.selection-box-handle')
+      selectionBox = tableShadowRoot.querySelector('.selection-box')
+      selectionBoxHandle = tableShadowRoot.querySelector('.selection-box-handle')
 
     it 'renders the selection box', ->
-      expect(selectionBox.length).toEqual(1)
-      expect(selectionBoxHandle.length).toEqual(1)
+      expect(selectionBox).toExist()
+      expect(selectionBoxHandle).toExist()
 
     it 'positions the selection box over the cells', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
       firstCell = cells[0]
       lastCell = cells[2]
-      expect(selectionBox.offset()).toEqual(firstCell.offset())
-      expect(selectionBox.offsetWidth).toEqual(tableShadowRoot.querySelectorAll('.table-edit-rows').width())
+
+      selectionBoxOffset = selectionBox.getBoundingClientRect()
+      firstCellOffset = firstCell.getBoundingClientRect()
+
+      expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
+      expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
+      expect(selectionBox.offsetWidth).toEqual(tableShadowRoot.querySelector('.table-edit-rows').offsetWidth)
       expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
     it 'positions the selection box handle at the bottom right corner', ->
       cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
       lastCell = cells[2]
-      lastCellOffset = lastCell.offset()
+      lastCellOffset = lastCell.getBoundingClientRect()
+      selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
 
-      expect(parseFloat selectionBoxHandle.css('top')).toBeCloseTo(parseFloat(lastCell.parent().css('top')) + lastCell.height(), -1)
-      expect(parseFloat selectionBoxHandle.css('left')).toBeCloseTo(lastCellOffset.left + lastCell.width(), -1)
+      expect(selectionBoxHandleOffset.top - 20).toBeCloseTo(lastCellOffset.bottom, -1)
+      expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
 
     describe 'when the columns widths have been changed', ->
       beforeEach ->
@@ -1557,7 +1569,12 @@ describe 'tableElement', ->
         cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
         firstCell = cells[0]
         lastCell = cells[2]
-        expect(selectionBox.offset()).toEqual(firstCell.offset())
+
+        selectionBoxOffset = selectionBox.getBoundingClientRect()
+        firstCellOffset = firstCell.getBoundingClientRect()
+
+        expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
+        expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
         expect(selectionBox.offsetWidth).toEqual(firstCell.offsetWidth + lastCell.offsetWidth)
         expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 

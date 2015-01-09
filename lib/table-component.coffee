@@ -75,8 +75,8 @@ module.exports = React.createClass
       content.unshift gutterComponent
 
     if parentView.selectionSpansManyCells()
-      rows.push new SelectionComponent(subComponentProps)
-      rows.push new SelectionHandleComponent(subComponentProps)
+      content.push new SelectionComponent(subComponentProps)
+      content.push new SelectionHandleComponent(subComponentProps)
 
     content.push div className: 'row-resize-ruler'
 
