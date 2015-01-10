@@ -422,12 +422,17 @@ class TableElement extends HTMLElement
       @getColumnsWidths().map (v) => v * width
 
   getColumnsScreenMargins: ->
-    widths = @getColumnsWidths()
+    widths = if @absoluteColumnsWidths
+      @getColumnsWidths()
+    else
+      width = @getRowsWrapper()?.offsetWidth ? 0
+      @getColumnsWidths().map (v) -> v * width
+      
     pad = 0
     width = @getRowsWrapper()?.offsetWidth ? 0
     margins = widths.map (v) =>
       res = pad
-      pad += v * width
+      pad += v
       res
 
     margins

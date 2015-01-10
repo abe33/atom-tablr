@@ -1563,22 +1563,23 @@ describe 'tableElement', ->
       beforeEach ->
         tableElement.showGutter()
         nextAnimationFrame()
-        tableElement.setSelection([[2,0],[3,2]])
+        tableElement.setSelection([[2,1],[3,2]])
         nextAnimationFrame()
 
       it 'positions the selection box over the cells', ->
         selectionBox = tableShadowRoot.querySelector('.selection-box')
         cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
         firstCell = cells[0]
-        lastCell = cells[2]
+        lastCell = cells[1]
 
         selectionBoxOffset = selectionBox.getBoundingClientRect()
         firstCellOffset = firstCell.getBoundingClientRect()
+        lastCellOffset = lastCell.getBoundingClientRect()
 
-        expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
-        expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
-        expect(selectionBox.offsetWidth).toEqual(tableShadowRoot.querySelector('.table-edit-rows').offsetWidth)
-        expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
+        expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, 0)
+        expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, 0)
+        expect(selectionBox.offsetWidth).toBeCloseTo(lastCellOffset.right - firstCellOffset.left, -1)
+        expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, 0)
 
     describe 'when the columns widths have been changed', ->
       beforeEach ->
