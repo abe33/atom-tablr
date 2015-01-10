@@ -100,12 +100,22 @@ atom-table-editor {
       cursor: pointer;
       position: relative;
       overflow-x: hidden;
+
+      &::before {
+        .cell;
+        content: 'H';
+        position: relative;
+        visibility: hidden;
+        padding: 3px;
+      }
     }
 
     .table-edit-header-wrapper {
       position: absolute;
       display: block;
       min-width: 100%;
+      top: 0;
+      left: 0;
     }
 
     .table-edit-header-cell {
