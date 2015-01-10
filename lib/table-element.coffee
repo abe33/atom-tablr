@@ -179,12 +179,11 @@ class TableElement extends HTMLElement
     @requestUpdate()
 
   destroy: ->
-    @off()
-    @body.off()
-    @hiddenInput.off()
-
     @subscriptions.dispose()
     @remove()
+
+  remove: ->
+    @parentNode?.removeChild(this)
 
   showGutter: ->
     @gutter = true
