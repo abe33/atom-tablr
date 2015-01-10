@@ -40,6 +40,8 @@ module.exports =
 
   openDemoWithGutter: ->
     tableElement = @getTableView()
+    tableElement.setAbsoluteColumnsWidths(true)
+
     tableElement.showGutter()
 
   getTableView: ->
@@ -58,7 +60,6 @@ module.exports =
     table.clearUndoStack()
 
     tableElement = atom.views.getView(table)
-    tableElement.absoluteColumnsWidths = true
     tableElement.setRowHeightAt(3, 90)
     tableElement.setRowHeightAt(30, 110)
     tableElement.setRowHeightAt(60, 60)
