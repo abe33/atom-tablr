@@ -1559,6 +1559,27 @@ describe 'tableElement', ->
       expect(selectionBoxHandleOffset.top - 20).toBeCloseTo(lastCellOffset.bottom, -1)
       expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
 
+    describe 'with gutter enabled', ->
+      beforeEach ->
+        tableElement.showGutter()
+        nextAnimationFrame()
+        tableElement.setSelection([[2,0],[3,2]])
+        nextAnimationFrame()
+
+      it 'positions the selection box over the cells', ->
+        selectionBox = tableShadowRoot.querySelector('.selection-box')
+        cells = tableShadowRoot.querySelectorAll('.table-edit-cell.selected')
+        firstCell = cells[0]
+        lastCell = cells[2]
+
+        selectionBoxOffset = selectionBox.getBoundingClientRect()
+        firstCellOffset = firstCell.getBoundingClientRect()
+
+        expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
+        expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
+        expect(selectionBox.offsetWidth).toEqual(tableShadowRoot.querySelector('.table-edit-rows').offsetWidth)
+        expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
+
     describe 'when the columns widths have been changed', ->
       beforeEach ->
         tableElement.setColumnsWidths([0.1, 0.1, 0.8])

@@ -846,10 +846,10 @@ class TableElement extends HTMLElement
     width = 0
     height = 0
 
-    widths = @getColumnsWidths()
+    widths = @getColumnsScreenWidths()
 
     for col in [@selection.start.column..@selection.end.column]
-      width += widths[col] * 100
+      width += widths[col]
 
     for row in [@selection.start.row..@selection.end.row]
       height += @getScreenRowHeightAt(row)

@@ -65,18 +65,21 @@ module.exports = React.createClass
       style
     }, rows
 
-    content = [div className: 'table-edit-rows', rowsWrapper]
-
     subComponentProps = {parentView, height}
     subComponentProps[k] = v for k,v of @state
+
+    rowsContent = [rowsWrapper]
+
+    if parentView.selectionSpansManyCells()
+      rowsContent.push new SelectionComponent(subComponentProps)
+      rowsContent.push new SelectionHandleComponent(subComponentProps)
+
+    content = [div className: 'table-edit-rows', rowsContent]
 
     if gutter
       gutterComponent = new GutterComponent(subComponentProps)
       content.unshift gutterComponent
 
-    if parentView.selectionSpansManyCells()
-      content.push new SelectionComponent(subComponentProps)
-      content.push new SelectionHandleComponent(subComponentProps)
 
     content.push div className: 'row-resize-ruler'
 

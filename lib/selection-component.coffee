@@ -10,5 +10,5 @@ module.exports = React.createClass
       top: top + 'px'
       left: left + 'px'
       height: height + 'px'
-      width: width + '%'
+      width: width + 'px'
     }
