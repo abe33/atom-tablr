@@ -427,7 +427,7 @@ class TableElement extends HTMLElement
     else
       width = @getRowsWrapper()?.offsetWidth ? 0
       @getColumnsWidths().map (v) -> v * width
-      
+
     pad = 0
     width = @getRowsWrapper()?.offsetWidth ? 0
     margins = widths.map (v) =>
@@ -794,7 +794,8 @@ class TableElement extends HTMLElement
 
   subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
+
       'table-edit:move-right': (e) =>
         @confirmCellEdit()
         @moveRight()
@@ -812,7 +813,8 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
+
       'table-edit:move-right': (e) =>
         @confirmColumnEdit()
         @moveRight()
