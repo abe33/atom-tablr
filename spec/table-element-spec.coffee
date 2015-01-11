@@ -170,7 +170,7 @@ describe 'tableElement', ->
       bodyContent = tableShadowRoot.querySelector('.table-edit-rows')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
-      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -1)
+      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -2)
 
     describe 'with the absolute widths setting enabled', ->
       beforeEach ->
