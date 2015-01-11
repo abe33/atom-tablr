@@ -29,13 +29,9 @@ class TableElement extends HTMLElement
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
 
-    @setModel(@getDefaultModel())
     @initializeContent()
     @subscribeToContent()
     @subscribeToConfig()
-
-    @updateScreenRows()
-    @setSelectionFromActiveCell()
 
   initializeContent: ->
     @shadowRoot = @createShadowRoot()
@@ -150,23 +146,27 @@ class TableElement extends HTMLElement
   subscribeToConfig: ->
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
-        @requestUpdate()
-      'table-edit.pageMovesAmount': (@configPageMovesAmount) => @requestUpdate()
+        @requestUpdate() if @attached
+      'table-edit.pageMovesAmount': (@configPageMovesAmount) =>
+        @requestUpdate() if @attached
       'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
       'table-edit.columnWidth': (@configColumnWidth) =>
       'table-edit.rowHeight': (@configRowHeight) =>
-        @computeRowOffsets()
-        @requestUpdate()
-      'table-edit.rowOverdraw': (@configRowOverdraw) => @requestUpdate()
+        if @table?
+          @computeRowOffsets()
+          @requestUpdate() if @attached
+      'table-edit.rowOverdraw': (@configRowOverdraw) =>
+        @requestUpdate() if @attached
 
   attach: (target) ->
     target.appendChild(this)
 
   attachedCallback: ->
-    @attached = true
-    @mountComponent() unless @mounted?
+    @buildModel() unless @getModel()?
     @computeRowOffsets()
+    @mountComponent() unless @bodyComponent?.isMounted()
     @requestUpdate()
+    @attached = true
 
   detachedCallback: ->
     @attached = false
@@ -179,14 +179,9 @@ class TableElement extends HTMLElement
     @parentNode?.removeChild(this)
 
   mountComponent: ->
-    @updateScreenRows()
     props = {parentView: this}
     @bodyComponent = React.renderComponent(TableComponent(props), @body)
     @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
-    @mounted = true
-
-  unmountComponent: ->
-    @mounted = false
 
   showGutter: ->
     @gutter = true
@@ -212,10 +207,10 @@ class TableElement extends HTMLElement
 
   getModel: -> @table
 
-  getDefaultModel: ->
+  buildModel: ->
     model = new Table
     model.addColumn('untitled 0')
-    model
+    @setModel(model)
 
   setModel: (table) ->
     return unless table?
@@ -235,10 +230,9 @@ class TableElement extends HTMLElement
 
     @subscribeToColumn(column) for column in @table.getColumns()
 
-    if @mounted
-      @updateScreenRows()
-      @setSelectionFromActiveCell()
-      @requestUpdate()
+    @updateScreenRows()
+    @setSelectionFromActiveCell()
+    @requestUpdate()
 
   unsetModel: ->
     @modelSubscriptions.dispose()
