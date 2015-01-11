@@ -21,12 +21,6 @@ class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
 
-  @content: ->
-    @div class: 'table-edit', =>
-      @input type: 'text', class: 'hidden-input', outlet: 'hiddenInput'
-      @div outlet: 'head', class: 'table-edit-header'
-      @div outlet: 'body', class: 'scroll-view'
-
   createdCallback: ->
     @gutter = false
     @scroll = 0
