@@ -170,7 +170,7 @@ describe 'tableElement', ->
       bodyContent = tableShadowRoot.querySelector('.table-edit-rows')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
-      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.offsetWidth, -1)
+      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -1)
 
     describe 'with the absolute widths setting enabled', ->
       beforeEach ->
@@ -655,8 +655,8 @@ describe 'tableElement', ->
 
         newColumnWidths = tableElement.getColumnsScreenWidths()
 
-        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0], -1)
-        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50, -1)
+        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0], -2)
+        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50, -2)
         expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50, -1)
 
       it 'displays a ruler when starting the drag', ->
@@ -1603,10 +1603,10 @@ describe 'tableElement', ->
         selectionBoxOffset = selectionBox.getBoundingClientRect()
         firstCellOffset = firstCell.getBoundingClientRect()
 
-        expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
-        expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
-        expect(selectionBox.offsetWidth).toEqual(firstCell.offsetWidth + lastCell.offsetWidth)
-        expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
+        expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, -1)
+        expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, -1)
+        expect(selectionBox.offsetWidth).toBeCloseTo(firstCell.offsetWidth + lastCell.offsetWidth, -1)
+        expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, -1)
 
   describe '::setSelection', ->
     it 'change the active cell so that the upper left cell is active', ->
