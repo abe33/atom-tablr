@@ -21,6 +21,8 @@ module.exports = React.createClass
 
     rows = for row in [firstRow...lastRow]
       rowData = parentView.getScreenRow(row)
+
+      continue unless rowData?
       cells = []
 
       rowData.eachCell (cell,i) ->
@@ -95,4 +97,6 @@ module.exports = React.createClass
     @props.parentView.getScreenRowOffsetAt(lastIndex) + @props.parentView.getScreenRowHeightAt(lastIndex)
 
   getTableWidth: ->
-    @props.parentView.getColumnsScreenWidths().reduce (a,b) -> a + b
+    columnsWidths = @props.parentView.getColumnsScreenWidths()
+    return 0 if columnsWidths.length is 0
+    columnsWidths.reduce (a,b) -> a + b

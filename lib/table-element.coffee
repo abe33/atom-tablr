@@ -28,7 +28,14 @@ class TableElement extends HTMLElement
     @absoluteColumnsWidths = false
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
+
+    @setModel(@getDefaultModel())
     @initializeContent()
+    @subscribeToContent()
+    @subscribeToConfig()
+
+    @updateScreenRows()
+    @setSelectionFromActiveCell()
 
   initializeContent: ->
     @shadowRoot = @createShadowRoot()
@@ -50,16 +57,7 @@ class TableElement extends HTMLElement
     @shadowRoot.appendChild(@body)
     @shadowRoot.appendChild(@contentInsertion)
 
-  setModel: (@table) ->
-    @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
-    @subscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
-    @subscriptions.add @table.onDidChangeRows =>
-      @computeRowOffsets()
-      @requestUpdate()
-    @subscriptions.add @table.onDidChangeRowsOptions =>
-      @computeRowOffsets()
-      @requestUpdate()
-
+  subscribeToContent: ->
     @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
@@ -147,8 +145,7 @@ class TableElement extends HTMLElement
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
       'click': stopPropagationAndDefault()
 
-    @updateScreenRows()
-
+  subscribeToConfig: ->
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
         @requestUpdate()
@@ -160,19 +157,17 @@ class TableElement extends HTMLElement
         @requestUpdate()
       'table-edit.rowOverdraw': (@configRowOverdraw) => @requestUpdate()
 
-    @setSelectionFromActiveCell()
-    @subscribeToColumn(column) for column in @table.getColumns()
-
-    props = {@table, parentView: this}
-    @bodyComponent = React.renderComponent(TableComponent(props), @body)
-    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
-
   attach: (target) ->
     target.appendChild(this)
 
   attachedCallback: ->
+    @attached = true
+    @mountComponent() unless @mounted?
     @computeRowOffsets()
     @requestUpdate()
+
+  detachedCallback: ->
+    @attached = false
 
   destroy: ->
     @subscriptions.dispose()
@@ -180,6 +175,16 @@ class TableElement extends HTMLElement
 
   remove: ->
     @parentNode?.removeChild(this)
+
+  mountComponent: ->
+    @updateScreenRows()
+    props = {parentView: this}
+    @bodyComponent = React.renderComponent(TableComponent(props), @body)
+    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
+    @mounted = true
+
+  unmountComponent: ->
+    @mounted = false
 
   showGutter: ->
     @gutter = true
@@ -194,6 +199,49 @@ class TableElement extends HTMLElement
   observeConfig: (configs) ->
     for config, callback of configs
       @subscriptions.add atom.config.observe config, callback
+
+  #    ##     ##  #######  ########  ######## ##
+  #    ###   ### ##     ## ##     ## ##       ##
+  #    #### #### ##     ## ##     ## ##       ##
+  #    ## ### ## ##     ## ##     ## ######   ##
+  #    ##     ## ##     ## ##     ## ##       ##
+  #    ##     ## ##     ## ##     ## ##       ##
+  #    ##     ##  #######  ########  ######## ########
+
+  getModel: -> @table
+
+  getDefaultModel: ->
+    model = new Table
+    model.addColumn('untitled 0')
+    model
+
+  setModel: (table) ->
+    return unless table?
+
+    @unsetModel() if @table?
+
+    @table = table
+    @modelSubscriptions = new CompositeDisposable()
+    @modelSubscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
+    @modelSubscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    @modelSubscriptions.add @table.onDidChangeRows =>
+      @computeRowOffsets()
+      @requestUpdate()
+    @modelSubscriptions.add @table.onDidChangeRowsOptions =>
+      @computeRowOffsets()
+      @requestUpdate()
+
+    @subscribeToColumn(column) for column in @table.getColumns()
+
+    if @mounted
+      @updateScreenRows()
+      @setSelectionFromActiveCell()
+      @requestUpdate()
+
+  unsetModel: ->
+    @modelSubscriptions.dispose()
+    @modelSubscriptions = null
+    @table = null
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -1202,6 +1250,8 @@ class TableElement extends HTMLElement
       @updateRequested = false
 
   update: =>
+    return unless @table?
+    console.log 'here'
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
 
@@ -1212,6 +1262,7 @@ class TableElement extends HTMLElement
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
 
     state = {
+      @table
       @gutter
       firstRow
       lastRow

@@ -7,39 +7,42 @@ module.exports = React.createClass
     columnsAligns: []
 
   render: ->
-    {table, parentView} = @props
-    {columnsWidths, columnsAligns, gutter, totalRows, absoluteColumnsWidths} = @state
-    width = @getTableWidth()
+    {parentView} = @props
+    {table, columnsWidths, columnsAligns, gutter, totalRows, absoluteColumnsWidths} = @state
 
     cells = []
-    for column,index in table.getColumns()
-      classes = ['table-edit-header-cell']
-      classes.push 'active-column' if parentView.isActiveColumn(index)
+    wrapperStyle = {}
 
-      if parentView.order is column.name
-        classes.push 'order'
+    if table?
+      width = @getTableWidth()
+      for column,index in table.getColumns()
+        classes = ['table-edit-header-cell']
+        classes.push 'active-column' if parentView.isActiveColumn(index)
 
-        if parentView.direction is 1
-          classes.push 'ascending'
-        else
-          classes.push 'descending'
+        if parentView.order is column.name
+          classes.push 'order'
 
-      editAction = div className: 'column-edit-action'
-      resizeHandle = div className: 'column-resize-handle'
+          if parentView.direction is 1
+            classes.push 'ascending'
+          else
+            classes.push 'descending'
 
-      cells.push div {
-        key: "header-cell-#{index}"
-        className: classes.join(' ')
-        style:
-          width: columnsWidths[index]
-          'text-align': columnsAligns[index] ? 'left'
-      }, column.name, editAction, resizeHandle
+        editAction = div className: 'column-edit-action'
+        resizeHandle = div className: 'column-resize-handle'
 
-    style = {}
-    style['width'] = "#{width}px" if absoluteColumnsWidths
+        cells.push div {
+          key: "header-cell-#{index}"
+          className: classes.join(' ')
+          style:
+            width: columnsWidths[index]
+            'text-align': columnsAligns[index] ? 'left'
+        }, column.name, editAction, resizeHandle
+
+      wrapperStyle['width'] = "#{width}px" if absoluteColumnsWidths
+
     cellsWrapper = div {
       className: 'table-edit-header-wrapper'
-      style
+      style: wrapperStyle
     }, cells
 
     row = div className: 'table-edit-header-row', cellsWrapper
@@ -53,4 +56,6 @@ module.exports = React.createClass
     div className: 'table-edit-header-content', content
 
   getTableWidth: ->
-    @props.parentView.getColumnsScreenWidths().reduce (a,b) -> a + b
+    columnsWidths = @props.parentView.getColumnsScreenWidths()
+    return 0 if columnsWidths.length is 0
+    columnsWidths.reduce (a,b) -> a + b

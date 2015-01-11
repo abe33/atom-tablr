@@ -110,7 +110,19 @@ describe 'tableElement', ->
     nextAnimationFrame()
 
   it 'holds a table', ->
-    expect(tableElement.table).toEqual(table)
+    expect(tableElement.getModel()).toEqual(table)
+
+  describe "instantiation", ->
+    [element] = []
+
+    describe 'by putting an atom-table-editor tag in the DOM', ->
+      beforeEach ->
+        jasmineContent.innerHTML = "<atom-table-editor>"
+        element = jasmineContent.firstChild
+
+      it 'creates a default model to boot the table', ->
+        expect(element.getModel()).toBeDefined()
+
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
   #    ##    ## ##     ## ###   ##    ##    ##       ###   ##    ##
