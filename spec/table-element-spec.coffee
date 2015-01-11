@@ -1238,6 +1238,14 @@ describe 'tableElement', ->
 
       expect(table.getRow(0).getValues()).toEqual([null, null, null])
 
+    it 'refreshes the rows offsets', ->
+      tableElement.setRowHeightAt(0, 60)
+      atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
+
+      expect(tableElement.getRowHeightAt(0)).toEqual(tableElement.getRowHeight())
+      expect(tableElement.getRowHeightAt(1)).toEqual(60)
+      expect(tableElement.getRowOffsetAt(1)).toEqual(tableElement.getRowHeight())
+
   describe 'table-edit:insert-row-after', ->
     it 'inserts a new row after the active row', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-row-after')

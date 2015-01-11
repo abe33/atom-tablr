@@ -59,7 +59,9 @@ class TableElement extends HTMLElement
   setModel: (@table) ->
     @subscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @subscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
-    @subscriptions.add @table.onDidChangeRows => @requestUpdate()
+    @subscriptions.add @table.onDidChangeRows =>
+      @computeRowOffsets()
+      @requestUpdate()
     @subscriptions.add @table.onDidChangeRowsOptions =>
       @computeRowOffsets()
       @requestUpdate()
