@@ -57,6 +57,8 @@ class TableElement extends HTMLElement
     @shadowRoot.appendChild(@body)
     @shadowRoot.appendChild(@contentInsertion)
 
+    @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
+
   subscribeToContent: ->
     @subscribeTo @hiddenInput,
       'textInput': (e) =>

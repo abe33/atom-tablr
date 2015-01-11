@@ -123,6 +123,10 @@ describe 'tableElement', ->
       it 'creates a default model to boot the table', ->
         expect(element.getModel()).toBeDefined()
 
+    it "honors the abolute-columns-widths attribute", ->
+      jasmineContent.innerHTML = "<atom-table-editor absolute-columns-widths>"
+      element = jasmineContent.firstChild
+      expect(element.absoluteColumnsWidths).toBeTruthy()
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
   #    ##    ## ##     ## ###   ##    ##    ##       ###   ##    ##
