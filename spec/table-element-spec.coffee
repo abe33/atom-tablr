@@ -201,6 +201,15 @@ describe 'tableElement', ->
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
       expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -2)
 
+    describe 'when resized', ->
+      beforeEach ->
+        tableElement.style.width = '800px'
+        tableElement.style.height = '600px'
+
+      it 'repaints the table', ->
+        advanceClock(150)
+        nextAnimationFrame()
+        expect(tableShadowRoot.querySelectorAll('.table-edit-rows')).not.toEqual(18)
     describe 'with the absolute widths setting enabled', ->
       beforeEach ->
         tableElement.setAbsoluteColumnsWidths(true)

@@ -21,11 +21,15 @@ class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
 
+  domPollingInterval: 100
+  domPollingIntervalId: null
+  domPollingPaused: false
+  gutter: false
+  scroll: 0
+  rowOffsets: null
+  absoluteColumnsWidths: false
+
   createdCallback: ->
-    @gutter = false
-    @scroll = 0
-    @rowOffsets = null
-    @absoluteColumnsWidths = false
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
 
@@ -179,6 +183,8 @@ class TableElement extends HTMLElement
     @buildModel() unless @getModel()?
     @computeRowOffsets()
     @mountComponent() unless @bodyComponent?.isMounted()
+    @domPollingIntervalId = setInterval((=> @pollDOM()), @domPollingInterval)
+    @measureHeightAndWidth()
     @requestUpdate()
     @attached = true
 
@@ -204,6 +210,27 @@ class TableElement extends HTMLElement
   hideGutter: ->
     @gutter = false
     @requestUpdate()
+
+  pauseDOMPolling: ->
+    @domPollingPaused = true
+    @resumeDOMPollingAfterDelay ?= debounce(@resumeDOMPolling, 100)
+    @resumeDOMPollingAfterDelay()
+
+  resumeDOMPolling: ->
+    @domPollingPaused = false
+
+  resumeDOMPollingAfterDelay: null
+
+  pollDOM: ->
+    return if @domPollingPaused or @frameRequested
+
+    if @width isnt @clientWidth or @height isnt @clientHeight
+      @measureHeightAndWidth()
+      @requestUpdate()
+
+  measureHeightAndWidth: ->
+    @height = @clientHeight
+    @width = @clientWidth
 
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
