@@ -9,6 +9,7 @@
     "atom": ">0.130.0"
   },
   "dependencies": {
+    "atom-utils": "0.1.x",
     "event-kit": ">= 0.7.2",
     "underscore-plus": "^1",
     "mixto": "1.x",

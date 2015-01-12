@@ -1,13 +1,13 @@
 {Point, Range, TextEditor} = require 'atom'
 {View, $} = require 'space-pen'
 {CompositeDisposable, Disposable} = require 'event-kit'
+{EventsDelegation} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
 
 Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
-EventsDelegation = require './mixins/events-delegation'
 
 PIXEL = 'px'
 
@@ -56,7 +56,7 @@ class TableElement extends HTMLElement
     @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
 
   subscribeToContent: ->
-    @subscribeTo @hiddenInput,
+    @subscriptions.add @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
           @startCellEdit()
@@ -89,11 +89,11 @@ class TableElement extends HTMLElement
       'table-edit:insert-column-after': => @insertColumnAfter()
       'table-edit:delete-column': => @deleteActiveColumn()
 
-    @subscribeTo this,
+    @subscriptions.add @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @head,
+    @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
         if column = @columnAtScreenPosition(e.pageX, e.pageY)
           if column.name is @order
@@ -104,15 +104,15 @@ class TableElement extends HTMLElement
           else
             @sortBy(column.name)
 
-    @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
+    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
-    @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
+    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body,
+    @subscriptions.add @subscribeTo @body,
       'scroll': (e) => @requestUpdate()
       'dblclick': (e) => @startCellEdit()
       'mousedown': stopPropagationAndDefault (e) =>
@@ -125,21 +125,21 @@ class TableElement extends HTMLElement
         @focus()
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.table-edit-rows',
+    @subscriptions.add @subscribeTo @body, '.table-edit-rows',
       'mousewheel': (e) =>
         e.stopPropagation()
         requestAnimationFrame =>
           @getColumnsContainer().scrollLeft = @getRowsContainer().scrollLeft
 
-    @subscribeTo @body, '.table-edit-gutter',
+    @subscriptions.add @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
+    @subscriptions.add @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startRowResizeDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.selection-box-handle',
+    @subscriptions.add @subscribeTo @body, '.selection-box-handle',
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
       'click': stopPropagationAndDefault()
 
@@ -1207,7 +1207,7 @@ class TableElement extends HTMLElement
   initializeDragEvents: (object, events) ->
     @dragSubscription = new CompositeDisposable
     for event,callback of events
-      @dragSubscription.add @addEventDisposable object, event, callback
+      @dragSubscription.add @addDisposableEventListener object, event, callback
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
