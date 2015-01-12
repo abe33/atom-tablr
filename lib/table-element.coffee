@@ -209,7 +209,8 @@ class TableElement extends HTMLElement
 
   buildModel: ->
     model = new Table
-    model.addColumn('untitled 0')
+    model.addColumn('untitled')
+    model.addRow()
     @setModel(model)
 
   setModel: (table) ->
@@ -1247,7 +1248,6 @@ class TableElement extends HTMLElement
 
   update: =>
     return unless @table?
-    console.log 'here'
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
 

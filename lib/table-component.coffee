@@ -26,7 +26,6 @@ module.exports = React.createClass
       cells = []
 
       rowData.eachCell (cell,i) ->
-
         classes = ['table-edit-cell']
         if parentView.isActiveCell(cell)
           classes.push 'active'

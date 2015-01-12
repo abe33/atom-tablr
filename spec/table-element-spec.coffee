@@ -113,19 +113,32 @@ describe 'tableElement', ->
     expect(tableElement.getModel()).toEqual(table)
 
   describe "instantiation", ->
-    [element] = []
+    [element, container] = []
+
+    beforeEach ->
+      container = document.createElement('div')
+      jasmineContent.appendChild(container)
 
     describe 'by putting an atom-table-editor tag in the DOM', ->
       beforeEach ->
-        jasmineContent.innerHTML = "<atom-table-editor>"
-        element = jasmineContent.firstChild
+        container.innerHTML = "<atom-table-editor>"
+        element = container.firstChild
+        nextAnimationFrame()
 
       it 'creates a default model to boot the table', ->
-        expect(element.getModel()).toBeDefined()
+        model = element.getModel()
+        expect(model).toBeDefined()
+        expect(model.getColumnsCount()).toEqual(1)
+        expect(model.getRowsCount()).toEqual(1)
+
+      it 'renders the default model', ->
+        rows = element.shadowRoot.querySelectorAll('.table-edit-row')
+        expect(rows.length).toEqual(1)
+        expect(rows[0].querySelectorAll('.table-edit-cell').length).toEqual(1)
 
     it "honors the abolute-columns-widths attribute", ->
-      jasmineContent.innerHTML = "<atom-table-editor absolute-columns-widths>"
-      element = jasmineContent.firstChild
+      container.innerHTML = "<atom-table-editor absolute-columns-widths>"
+      element = container.firstChild
       expect(element.absoluteColumnsWidths).toBeTruthy()
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
