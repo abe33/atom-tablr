@@ -136,7 +136,7 @@ describe 'tableElement', ->
         expect(rows.length).toEqual(1)
         expect(rows[0].querySelectorAll('.table-edit-cell').length).toEqual(1)
 
-    it "honors the absolute-columns-widths attribute", ->
+    it 'honors the absolute-columns-widths attribute', ->
       container.innerHTML = "<atom-table-editor absolute-columns-widths>"
       element = container.firstChild
       expect(element.absoluteColumnsWidths).toBeTruthy()
