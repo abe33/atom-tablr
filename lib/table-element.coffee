@@ -158,6 +158,20 @@ class TableElement extends HTMLElement
       'table-edit.rowOverdraw': (@configRowOverdraw) =>
         @requestUpdate() if @attached
 
+  observeConfig: (configs) ->
+    for config, callback of configs
+      @subscriptions.add atom.config.observe config, callback
+
+  getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
+
+  #        ###    ######## ########    ###     ######  ##     ##
+  #       ## ##      ##       ##      ## ##   ##    ## ##     ##
+  #      ##   ##     ##       ##     ##   ##  ##       ##     ##
+  #     ##     ##    ##       ##    ##     ## ##       #########
+  #     #########    ##       ##    ######### ##       ##     ##
+  #     ##     ##    ##       ##    ##     ## ##    ## ##     ##
+  #     ##     ##    ##       ##    ##     ##  ######  ##     ##
+
   attach: (target) ->
     target.appendChild(this)
 
@@ -167,6 +181,11 @@ class TableElement extends HTMLElement
     @mountComponent() unless @bodyComponent?.isMounted()
     @requestUpdate()
     @attached = true
+
+  mountComponent: ->
+    props = {parentView: this}
+    @bodyComponent = React.renderComponent(TableComponent(props), @body)
+    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
 
   detachedCallback: ->
     @attached = false
@@ -178,11 +197,6 @@ class TableElement extends HTMLElement
   remove: ->
     @parentNode?.removeChild(this)
 
-  mountComponent: ->
-    props = {parentView: this}
-    @bodyComponent = React.renderComponent(TableComponent(props), @body)
-    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
-
   showGutter: ->
     @gutter = true
     @requestUpdate()
@@ -190,12 +204,6 @@ class TableElement extends HTMLElement
   hideGutter: ->
     @gutter = false
     @requestUpdate()
-
-  getUndefinedDisplay: -> @undefinedDisplay ? @configUndefinedDisplay
-
-  observeConfig: (configs) ->
-    for config, callback of configs
-      @subscriptions.add atom.config.observe config, callback
 
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
