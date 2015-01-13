@@ -293,6 +293,10 @@ class TableElement extends HTMLElement
 
   getRowResizeRuler: -> @body.querySelector('.row-resize-ruler')
 
+  insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
+
+  insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
+
   @axis 'y', 'height', 'top', 'row', 'rows'
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######

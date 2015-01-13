@@ -67,12 +67,6 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
     getScreen#{Singular}OffsetAt: (#{singular}) ->
       @#{singular}Offsets[#{singular}]
 
-    insert#{Singular}Before: ->
-      @table.add#{Singular}At(@activeCellPosition.#{singular})
-
-    insert#{Singular}After: ->
-      @table.add#{Singular}At(@activeCellPosition.#{singular} + 1)
-
     deleteActive#{Singular}: ->
       confirmation = atom.confirm
         message: 'Are you sure you want to delete the current active #{singular}?'
