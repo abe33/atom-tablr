@@ -19,6 +19,7 @@
     "react-atom-fork": "0.x",
     "space-pen": "4.x",
     "reactionary-atom-fork": "0.x",
-    "atom-space-pen-views": "^0"
+    "atom-space-pen-views": "^0",
+    "coffee-script": "1.7.x"
   }
 }

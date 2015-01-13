@@ -8,6 +8,7 @@ React = require 'react-atom-fork'
 Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
+Axis = require './mixins/axis'
 
 PIXEL = 'px'
 
@@ -20,6 +21,7 @@ module.exports =
 class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
+  Axis.includeInto(this)
 
   domPollingInterval: 100
   domPollingIntervalId: null
@@ -283,55 +285,7 @@ class TableElement extends HTMLElement
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
-  isActiveRow: (row) -> @activeCellPosition.row is row
-
-  isSelectedRow: (row) ->
-    row >= @selection.start.row and row <= @selection.end.row
-
-  getRowHeight: -> @rowHeight ? @configRowHeight
-
-  getMinimumRowHeight: -> @minimumRowHeight ? @configMinimumRowHeight
-
-  setRowHeight: (@rowHeight) ->
-    @computeRowOffsets()
-    @requestUpdate()
-
-  getRowHeightAt: (index) ->
-    @table.getRow(index)?.height ? @getRowHeight()
-
-  setRowHeightAt: (index, height) ->
-    minHeight = @getMinimumRowHeight()
-    height = minHeight if height < minHeight
-    @table.getRow(index)?.height = height
-
   getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
-
-  getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
-
-  getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
-
-  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
-
-  getLastRow: -> @table.getRowsCount() - 1
-
-  getFirstVisibleRow: ->
-    @findRowAtPosition(@body.scrollTop)
-
-  getLastVisibleRow: ->
-    scrollViewHeight = @body.clientHeight
-
-    @findRowAtPosition(@body.scrollTop + scrollViewHeight) ? @table.getRowsCount() - 1
-
-  getScreenRows: -> @screenRows
-
-  getScreenRow: (row) -> @table.getRow(@screenRowToModelRow(row))
-
-  getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
-
-  setScreenRowHeightAt: (row, height) ->
-    @setRowHeightAt(@screenRowToModelRow(row), height)
-
-  getScreenRowOffsetAt: (row) -> @rowOffsets[row]
 
   getRowsContainer: -> @body.querySelector('.table-edit-rows')
 
@@ -339,91 +293,7 @@ class TableElement extends HTMLElement
 
   getRowResizeRuler: -> @body.querySelector('.row-resize-ruler')
 
-  insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
-
-  insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
-
-  deleteActiveRow: ->
-    confirmation = atom.confirm
-      message: 'Are you sure you want to delete the current active row?'
-      detailedMessage: "You are deleting the row ##{@activeCellPosition.row + 1}."
-      buttons: ['Delete Row', 'Cancel']
-
-    @table.removeRowAt(@activeCellPosition.row) if confirmation is 0
-
-  screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
-
-  modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
-
-  makeRowVisible: (row) ->
-    rowHeight = @getScreenRowHeightAt(row)
-    scrollViewHeight = @body.offsetHeight
-    currentScrollTop = @body.scrollTop
-
-    rowOffset = @getScreenRowOffsetAt(row)
-
-    scrollTopAsFirstVisibleRow = rowOffset
-    scrollTopAsLastVisibleRow = rowOffset - (scrollViewHeight - rowHeight)
-
-    return if scrollTopAsFirstVisibleRow >= currentScrollTop and
-              scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
-
-    if rowOffset > currentScrollTop
-      @body.scrollTop = scrollTopAsLastVisibleRow
-    else
-      @body.scrollTop = scrollTopAsFirstVisibleRow
-
-  computeRowOffsets: ->
-    offsets = []
-    offset = 0
-
-    for i in [0...@table.getRowsCount()]
-      offsets.push offset
-      offset += @getScreenRowHeightAt(i)
-
-    @rowOffsets = offsets
-
-  rowScreenPosition: (row) ->
-    top = @getScreenRowOffsetAt(row)
-
-    content = @getRowsContainer()
-    contentOffset = content.getBoundingClientRect()
-
-    top + contentOffset.top
-
-  findRowAtPosition: (y) ->
-    for i in [0...@table.getRowsCount()]
-      offset = @getScreenRowOffsetAt(i)
-      return i - 1 if y < offset
-
-    return @table.getRowsCount() - 1
-
-  findRowAtScreenPosition: (y) ->
-    content = @getRowsContainer()
-
-    bodyOffset = content.getBoundingClientRect()
-
-    y -= bodyOffset.top
-
-    @findRowAtPosition(y)
-
-  updateScreenRows: ->
-    rows = @table.getRows()
-    @screenRows = rows.concat()
-    @screenRows.sort(@compareRows(@order, @direction)) if @order?
-    @screenToModelRowsMap = (rows.indexOf(row) for row in @screenRows)
-    @modelToScreenRowsMap = (@screenRows.indexOf(row) for row in rows)
-    @computeRowOffsets()
-
-  compareRows: (order, direction) -> (a,b) ->
-    a = a[order]
-    b = b[order]
-    if a > b
-      direction
-    else if a < b
-      -direction
-    else
-      0
+  @axis 'y', 'height', 'top', 'row', 'rows'
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
