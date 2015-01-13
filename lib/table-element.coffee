@@ -27,8 +27,8 @@ class TableElement extends HTMLElement
   domPollingIntervalId: null
   domPollingPaused: false
   gutter: false
-  scroll: 0
   rowOffsets: null
+  columnOffsets: null
   absoluteColumnsWidths: false
 
   createdCallback: ->
@@ -156,12 +156,17 @@ class TableElement extends HTMLElement
       'table-edit.pageMovesAmount': (@configPageMovesAmount) =>
         @requestUpdate() if @attached
       'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
-      'table-edit.columnWidth': (@configColumnWidth) =>
       'table-edit.rowHeight': (@configRowHeight) =>
         if @table?
           @computeRowOffsets()
           @requestUpdate() if @attached
       'table-edit.rowOverdraw': (@configRowOverdraw) =>
+        @requestUpdate() if @attached
+      'table-edit.columnWidth': (@configColumnWidth) =>
+        if @table?
+          @computeColumnOffsets()
+          @requestUpdate() if @attached
+      'table-edit.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
 
   observeConfig: (configs) ->
@@ -184,6 +189,7 @@ class TableElement extends HTMLElement
   attachedCallback: ->
     @buildModel() unless @getModel()?
     @computeRowOffsets()
+    @computeColumnOffsets()
     @mountComponent() unless @bodyComponent?.isMounted()
     @domPollingIntervalId = setInterval((=> @pollDOM()), @domPollingInterval)
     @measureHeightAndWidth()
@@ -259,6 +265,9 @@ class TableElement extends HTMLElement
     @modelSubscriptions = new CompositeDisposable()
     @modelSubscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @modelSubscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    @modelSubscriptions.add @table.onDidChangeColumnsOptions =>
+      @computeColumnOffsets()
+      @requestUpdate()
     @modelSubscriptions.add @table.onDidChangeRows =>
       @computeRowOffsets()
       @requestUpdate()
@@ -269,6 +278,7 @@ class TableElement extends HTMLElement
     @subscribeToColumn(column) for column in @table.getColumns()
 
     @updateScreenRows()
+    @updateScreenColumns()
     @setSelectionFromActiveCell()
     @requestUpdate()
 
@@ -459,11 +469,13 @@ class TableElement extends HTMLElement
     widths
 
   onColumnAdded: ({column}) ->
+    @computeColumnOffsets()
     @calculateNewColumnWidthFor(column) if @columnsWidths?
     @subscribeToColumn(column)
     @requestUpdate()
 
   onColumnRemoved: ({column, index}) ->
+    @computeColumnOffsets()
     @columnsWidths.splice(index, 1) if @columnsWidths?
     @unsubscribeFromColumn(column)
     @requestUpdate()
@@ -485,6 +497,8 @@ class TableElement extends HTMLElement
   unsubscribeFromColumn: (column) ->
     @columnSubscriptions[column.id]?.dispose()
     delete @columnSubscriptions[column.id]
+
+  @axis 'x', 'width', 'left', 'column', 'columns'
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##

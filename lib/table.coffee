@@ -47,6 +47,9 @@ class Table
   onDidChangeRowsOptions: (callback) ->
     @emitter.on 'did-change-rows-options', callback
 
+  onDidChangeColumnsOptions: (callback) ->
+    @emitter.on 'did-change-columns-options', callback
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -142,9 +145,21 @@ class Table
     delete @columnSubscriptions[column.id]
 
   registerColumnTransaction: (change) =>
+    doChange = change
+    undoChange = {
+      column: change.column
+      option: change.option
+      newValue: change.oldValue
+      oldValue: change.newValue
+    }
+    @emitter.emit 'did-change-columns-options', doChange
     @transaction
-      undo: -> change.column.setOption(change.option, change.oldValue, true)
-      redo: -> change.column.setOption(change.option, change.newValue, true)
+      undo: =>
+        @emitter.emit 'did-change-columns-options', undoChange
+        change.column.setOption(change.option, change.oldValue, true)
+      redo: =>
+        @emitter.emit 'did-change-columns-options', doChange
+        change.column.setOption(change.option, change.newValue, true)
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
