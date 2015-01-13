@@ -20,7 +20,7 @@ module.exports =
       default: 16
     rowOverdraw:
       type: 'integer'
-      default: 10
+      default: 3
 
   activate: (state) ->
     Table ?= require './table'
