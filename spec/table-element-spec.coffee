@@ -1080,6 +1080,19 @@ describe 'tableElement', ->
       tableElement.moveRight()
       expect(tableElement.getActiveCell().getValue()).toEqual('row0')
 
+    xdescribe 'when the absoluteColumnsWidths setting is enabled', ->
+      describe 'and the last column is partially hidden', ->
+        beforeEach ->
+          tableElement.setAbsoluteColumnsWidths(true)
+          tableElement.setColumnsWidths([100, 200, 300])
+
+          tableElement.moveRight()
+          tableElement.moveRight()
+
+        it 'scrolls the view to the right', ->
+          rows = tableShadowRoot.querySelector('.table-edit-rows')
+          expect(rows.scrollLeft).not.toEqual(0)
+
   describe '::moveLeft', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
