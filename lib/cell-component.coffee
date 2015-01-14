@@ -12,7 +12,7 @@ module.exports = React.createClass
       key: "cell-#{row}-#{index}"
       className: classes.join(' ')
       style:
-        width: "#{parentView.getScreenColumnHeightAt(index)}px"
+        width: "#{parentView.getScreenColumnWidthAt(index)}px"
         left: "#{parentView.getScreenColumnOffsetAt(index)}px"
         'text-align': columnAlign ? 'left'
     }, cell.getValue() ? parentView.getUndefinedDisplay()

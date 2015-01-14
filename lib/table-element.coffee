@@ -101,7 +101,8 @@ class TableElement extends HTMLElement
 
     @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
-        if column = @columnAtScreenPosition(e.pageX, e.pageY)
+        columnIndex = @findColumnAtScreenPosition(e.pageX, e.pageY)
+        if column = @getScreenColumn(columnIndex)
           if column.name is @order
             if @direction is -1
               @resetSort()
@@ -136,6 +137,7 @@ class TableElement extends HTMLElement
         e.stopPropagation()
         requestAnimationFrame =>
           @getColumnsContainer().scrollLeft = @getRowsContainer().scrollLeft
+          @requestUpdate()
 
     @subscriptions.add @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
@@ -299,6 +301,8 @@ class TableElement extends HTMLElement
 
   getRowsContainer: -> @body.querySelector('.table-edit-rows')
 
+  getRowsOffsetContainer: -> @getRowsContainer()
+
   getRowsScrollContainer: -> @body
 
   getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
@@ -329,14 +333,12 @@ class TableElement extends HTMLElement
   setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
 
   setColumnsWidths: (columnsWidths) ->
-    unless @absoluteColumnsWidths
-      columnsWidths = @normalizeColumnsWidths(columnsWidths)
-
-    @columnsWidths = columnsWidths
-
+    @getScreenColumn(i).width = w for w,i in columnsWidths
     @requestUpdate()
 
   getColumnsContainer: -> @head.querySelector('.table-edit-header-row')
+
+  getColumnsOffsetContainer: -> @body.querySelector('.table-edit-rows-wrapper')
 
   getColumnsScrollContainer: -> @getRowsContainer()
 
@@ -353,12 +355,12 @@ class TableElement extends HTMLElement
     @table.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
   onColumnAdded: ({column}) ->
-    @computeColumnOffsets()
+    @updateScreenColumns()
     @subscribeToColumn(column)
     @requestUpdate()
 
   onColumnRemoved: ({column, index}) ->
-    @computeColumnOffsets()
+    @updateScreenColumns()
     @unsubscribeFromColumn(column)
     @requestUpdate()
 
@@ -403,9 +405,8 @@ class TableElement extends HTMLElement
 
   cellScreenRect: (position) ->
     {top, left} = @cellScreenPosition(position)
-    widths = @getColumnsScreenWidths()
 
-    width = widths[position.column]
+    width = @getScreenColumnWidthAt(position.column)
     height = @getScreenRowHeightAt(position.row)
 
     {top, left, width, height}
@@ -413,53 +414,35 @@ class TableElement extends HTMLElement
   cellScreenPosition: (position) ->
     {top, left} = @cellScrollPosition(position)
 
-    content = @getRowsWrapper()
-    contentOffset = content.getBoundingClientRect()
-
     {
-      top: top + contentOffset.top,
-      left: left + contentOffset.left
+      top: top + @getRowsOffsetContainer().getBoundingClientRect().top,
+      left: left + @getColumnsOffsetContainer().getBoundingClientRect().left
     }
 
   cellScrollPosition: (position) ->
     position = Point.fromObject(position)
-    margins = @getColumnsScreenMargins()
     {
       top: @getScreenRowOffsetAt(position.row)
-      left: margins[position.column]
+      left: @getScreenColumnOffsetAt(position.column)
     }
 
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    content = @getRowsWrapper()
-
-    bodyWidth = content.offsetWidth
-    bodyOffset = content.getBoundingClientRect()
-
-    x -= bodyOffset.left
-    y -= bodyOffset.top
-
-    row = @findRowAtPosition(y)
-
-    columnsWidths = @getColumnsScreenWidths()
-    column = -1
-    pad = 0
-    while pad <= x
-      pad += columnsWidths[column+1]
-      column++
+    row = @findRowAtScreenPosition(y)
+    column = @findColumnAtScreenPosition(x)
 
     {row, column}
 
   screenPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @modelRowToScreenRow(row), column}
+    {row: @modelRowToScreenRow(row), column: @modelColumnToScreenColumn(column)}
 
   modelPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @screenRowToModelRow(row), column}
+    {row: @screenRowToModelRow(row), column: @screenColumnToModelColumn(column)}
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -692,10 +675,8 @@ class TableElement extends HTMLElement
     width = 0
     height = 0
 
-    widths = @getColumnsScreenWidths()
-
     for col in [@selection.start.column..@selection.end.column]
-      width += widths[col]
+      width += @getScreenColumnWidthAt(col)
 
     for row in [@selection.start.row..@selection.end.row]
       height += @getScreenRowHeightAt(row)
@@ -965,24 +946,10 @@ class TableElement extends HTMLElement
     return unless @dragging
 
     moveX = pageX - startX
-    columnsScreenWidths = @getColumnsScreenWidths()
-    columnsWidths = @getColumnsWidths().concat()
 
-    leftCellWidth = columnsScreenWidths[leftCellIndex]
-    rightCellWidth = columnsScreenWidths[rightCellIndex]
-
-    if @absoluteColumnsWidths
-      columnsWidths[leftCellIndex] = leftCellWidth + moveX
-    else
-      columnsWidth = @getColumnsWrapper().offsetWidth
-
-      leftCellRatio = (leftCellWidth + moveX) / columnsWidth
-      rightCellRatio = (rightCellWidth - moveX) / columnsWidth
-
-      columnsWidths[leftCellIndex] = leftCellRatio
-      columnsWidths[rightCellIndex] = rightCellRatio
-
-    @setColumnsWidths(columnsWidths)
+    column = @getScreenColumn(leftCellIndex)
+    width = @getScreenColumnWidthAt(leftCellIndex)
+    column.width = width + moveX
 
     @getColumnResizeRuler().classList.remove('visible')
     @dragSubscription.dispose()
@@ -1051,7 +1018,12 @@ class TableElement extends HTMLElement
     firstVisibleColumn = @getFirstVisibleColumn()
     lastVisibleColumn = @getLastVisibleColumn()
 
-    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and firstVisibleColumn >= @firstRenderedColumn and lastVisibleColumn <= @lastRenderedColumn and not @hasChanged
+    if firstVisibleRow >= @firstRenderedRow and
+       lastVisibleRow <= @lastRenderedRow and
+       firstVisibleColumn >= @firstRenderedColumn and
+       lastVisibleColumn <= @lastRenderedColumn and
+       not @hasChanged
+      return
 
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw

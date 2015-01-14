@@ -26,9 +26,6 @@ module.exports = React.createClass
       continue unless rowData?
       cells = []
 
-      console.log parentView.columnOffsets
-      console.log firstRow, lastRow, firstColumn, lastColumn
-
       for i in [firstColumn...lastColumn]
         cell = rowData.getCell(i)
         classes = ['table-edit-cell']

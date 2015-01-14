@@ -13,6 +13,9 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
 
   mixinSource =  """
   class #{Plural}Axis extends Mixin
+    getActive#{Singular}: ->
+      @table.get#{Singular}(@activeCellPosition.#{singular})
+
     isActive#{Singular}: (#{singular}) ->
       @activeCellPosition.#{singular} is #{singular}
 
@@ -51,7 +54,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
     getLastVisible#{Singular}: ->
       scrollView#{Dimension} = @get#{Plural}ScrollContainer().client#{Dimension}
 
-      @find#{Singular}AtPosition(@get#{Plural}ScrollContainer.scroll#{Offset} + scrollView#{Dimension}) ? @table.get#{Plural}Count() - 1
+      @find#{Singular}AtPosition(@get#{Plural}ScrollContainer().scroll#{Offset} + scrollView#{Dimension})
 
     getScreen#{Plural}: -> @screen#{Plural}
 
@@ -123,7 +126,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
       return @table.get#{Plural}Count() - 1
 
     find#{Singular}AtScreenPosition: (#{axis}) ->
-      content = @get#{Plural}ScrollContainer()
+      content = @get#{Plural}OffsetContainer()
 
       bodyOffset = content.getBoundingClientRect()
 

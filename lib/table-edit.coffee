@@ -21,6 +21,9 @@ module.exports =
     rowOverdraw:
       type: 'integer'
       default: 3
+    columnOverdraw:
+      type: 'integer'
+      default: 2
 
   activate: (state) ->
     Table ?= require './table'
