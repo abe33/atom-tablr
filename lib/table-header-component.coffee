@@ -8,10 +8,9 @@ module.exports = React.createClass
 
   render: ->
     {parentView} = @props
-    {table, columnsWidths, columnsAligns, gutter, totalRows, absoluteColumnsWidths} = @state
+    {table, columnsAligns, gutter, totalRows, absoluteColumnsWidths} = @state
 
     cells = []
-    wrapperStyle = {}
 
     if table?
       width = @getTableWidth()
@@ -34,15 +33,15 @@ module.exports = React.createClass
           key: "header-cell-#{index}"
           className: classes.join(' ')
           style:
-            width: columnsWidths[index]
+            width: "#{parentView.getScreenColumnWidthAt(index)}px"
+            left: "#{parentView.getScreenColumnOffsetAt(index)}px"
             'text-align': columnsAligns[index] ? 'left'
         }, column.name, editAction, resizeHandle
 
-      wrapperStyle['width'] = "#{width}px" if absoluteColumnsWidths
-
     cellsWrapper = div {
       className: 'table-edit-header-wrapper'
-      style: wrapperStyle
+      style:
+        width: "#{width}px"
     }, cells
 
     row = div className: 'table-edit-header-row', cellsWrapper
@@ -56,6 +55,7 @@ module.exports = React.createClass
     div className: 'table-edit-header-content', content
 
   getTableWidth: ->
-    columnsWidths = @props.parentView.getColumnsScreenWidths()
-    return 0 if columnsWidths.length is 0
-    columnsWidths.reduce (a,b) -> a + b
+    lastIndex = Math.max(0, @state.totalColumns - 1)
+    return 0 if lastIndex is 0
+
+    @props.parentView.getScreenColumnOffsetAt(lastIndex) + @props.parentView.getScreenColumnWidthAt(lastIndex)

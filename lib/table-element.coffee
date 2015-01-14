@@ -299,6 +299,8 @@ class TableElement extends HTMLElement
 
   getRowsContainer: -> @body.querySelector('.table-edit-rows')
 
+  getRowsScrollContainer: -> @body
+
   getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
 
   getRowResizeRuler: -> @body.querySelector('.row-resize-ruler')
@@ -317,12 +319,6 @@ class TableElement extends HTMLElement
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
-  getLastColumn: -> @table.getColumnsCount() - 1
-
-  getActiveColumn: -> @table.getColumn(@activeCellPosition.column)
-
-  isActiveColumn: (column) -> @activeCellPosition.column is column
-
   getColumnsAligns: ->
     [0...@table.getColumnsCount()].map (col) =>
       @columnsAligns?[col] ? @table.getColumn(col).align
@@ -330,25 +326,7 @@ class TableElement extends HTMLElement
   setColumnsAligns: (@columnsAligns) ->
     @requestUpdate()
 
-  hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
-
-  getColumnWidth: -> @columnWidth ? @configColumnWidth
-
-  setColumnWidth: (@columnWidth) ->
-
   setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
-
-  getColumnsWidths: ->
-    return @columnsWidths if @columnsWidths
-
-    if @hasColumnWithWidth()
-      @columnsWidths = @getColumnsWidthsFromModel()
-    else
-      count = @table.getColumnsCount()
-      if @absoluteColumnsWidths
-        (@getColumnWidth() for n in [0...count])
-      else
-        (1 / count for n in [0...count])
 
   setColumnsWidths: (columnsWidths) ->
     unless @absoluteColumnsWidths
@@ -358,46 +336,9 @@ class TableElement extends HTMLElement
 
     @requestUpdate()
 
-  getColumnsWidthsCSS: ->
-    if @absoluteColumnsWidths
-      @getColumnsWidthPixels()
-    else
-      @getColumnsWidthPercentages()
-
-  getColumnsWidthPercentages: -> @getColumnsWidths().map @floatToPercent
-
-  getColumnsWidthPixels: -> @getColumnsWidths().map @floatToPixel
-
-  getColumnsWidthsFromModel: ->
-    count = @table.getColumnsCount()
-
-    widths = (@table.getColumn(col).width for col in [0...count])
-    @normalizeColumnsWidths(widths)
-
-  getColumnsScreenWidths: ->
-    if @absoluteColumnsWidths
-      @getColumnsWidths()
-    else
-      width = @getRowsWrapper()?.offsetWidth ? 0
-      @getColumnsWidths().map (v) => v * width
-
-  getColumnsScreenMargins: ->
-    widths = if @absoluteColumnsWidths
-      @getColumnsWidths()
-    else
-      width = @getRowsWrapper()?.offsetWidth ? 0
-      @getColumnsWidths().map (v) -> v * width
-
-    pad = 0
-    width = @getRowsWrapper()?.offsetWidth ? 0
-    margins = widths.map (v) =>
-      res = pad
-      pad += v
-      res
-
-    margins
-
   getColumnsContainer: -> @head.querySelector('.table-edit-header-row')
+
+  getColumnsScrollContainer: -> @getRowsContainer()
 
   getColumnsWrapper: -> @head.querySelector('.table-edit-header-wrapper')
 
@@ -411,81 +352,15 @@ class TableElement extends HTMLElement
   insertColumnAfter: ->
     @table.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
-  deleteActiveColumn: ->
-    column = @table.getColumn(@activeCellPosition.column).name
-    confirmation = atom.confirm
-      message: 'Are you sure you want to delete the current active column?'
-      detailedMessage: "You are deleting the column '#{column}'."
-      buttons: ['Delete Column', 'Cancel']
-
-    @table.removeColumnAt(@activeCellPosition.column) if confirmation is 0
-
-  columnAtScreenPosition: (x,y) ->
-    return unless x? and y?
-
-    content = @getColumnsContainer()
-
-    bodyWidth = content.offsetWidth
-    bodyOffset = content.getBoundingClientRect()
-
-    x -= bodyOffset.left
-    y -= bodyOffset.top
-
-    columnsWidths = @getColumnsScreenWidths()
-    column = -1
-    pad = 0
-    while pad <= x
-      pad += columnsWidths[column+1]
-      column++
-
-    @table.getColumn(column)
-
-  normalizeColumnsWidths: (columnsWidths) ->
-    restWidth = 1
-    wholeWidth = 0
-    missingIndices = []
-    widths = []
-
-    for index in [0...@table.getColumnsCount()]
-      width = columnsWidths[index]
-      if width?
-        widths[index] = width
-        wholeWidth += width
-        restWidth -= width
-      else
-        missingIndices.push index
-
-    if (missingCount = missingIndices.length)
-      if restWidth <= 0 and missingCount
-        restWidth = wholeWidth
-        wholeWidth *= 2
-
-      for index in missingIndices
-        widths[index] = restWidth / missingCount
-
-    if wholeWidth > 1
-      widths = widths.map (w) -> w * (1 / wholeWidth)
-
-    widths
-
   onColumnAdded: ({column}) ->
     @computeColumnOffsets()
-    @calculateNewColumnWidthFor(column) if @columnsWidths?
     @subscribeToColumn(column)
     @requestUpdate()
 
   onColumnRemoved: ({column, index}) ->
     @computeColumnOffsets()
-    @columnsWidths.splice(index, 1) if @columnsWidths?
     @unsubscribeFromColumn(column)
     @requestUpdate()
-
-  calculateNewColumnWidthFor: (column) ->
-    index = @table.getColumns().indexOf(column)
-    newColumnWidth = 1 / (@table.getColumnsCount())
-    columnsWidths = @getColumnsWidths()
-    columnsWidths.splice(index, 0, newColumnWidth)
-    @setColumnsWidths(columnsWidths)
 
   subscribeToColumn: (column) ->
     @columnSubscriptions ?= {}
@@ -1173,22 +1048,31 @@ class TableElement extends HTMLElement
     return unless @table?
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
+    firstVisibleColumn = @getFirstVisibleColumn()
+    lastVisibleColumn = @getLastVisibleColumn()
 
-    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
+    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and firstVisibleColumn >= @firstRenderedColumn and lastVisibleColumn <= @lastRenderedColumn and not @hasChanged
 
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
+
+    columnOverdraw = @getColumnOverdraw()
+    firstColumn = Math.max 0, firstVisibleColumn - columnOverdraw
+    lastColumn = Math.min @table.getColumnsCount(), lastVisibleColumn + columnOverdraw
 
     state = {
       @table
       @gutter
       firstRow
       lastRow
+      firstColumn
+      lastColumn
       @absoluteColumnsWidths
-      columnsWidths: @getColumnsWidthsCSS()
+      columnsWidths: null
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
+      totalColumns: @table.getColumnsCount()
     }
 
     @bodyComponent.setState state
@@ -1196,6 +1080,8 @@ class TableElement extends HTMLElement
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
+    @firstRenderedColumn = firstColumn
+    @lastRenderedColumn = lastColumn
     @hasChanged = false
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"

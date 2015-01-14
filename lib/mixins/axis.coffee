@@ -46,12 +46,12 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
     getLast#{Singular}: -> @table.get#{Plural}Count() - 1
 
     getFirstVisible#{Singular}: ->
-      @find#{Singular}AtPosition(@body.scroll#{Offset})
+      @find#{Singular}AtPosition(@get#{Plural}ScrollContainer().scroll#{Offset})
 
     getLastVisible#{Singular}: ->
-      scrollView#{Dimension} = @body.client#{Dimension}
+      scrollView#{Dimension} = @get#{Plural}ScrollContainer().client#{Dimension}
 
-      @find#{Singular}AtPosition(@body.scroll#{Offset} + scrollView#{Dimension}) ? @table.get#{Plural}Count() - 1
+      @find#{Singular}AtPosition(@get#{Plural}ScrollContainer.scroll#{Offset} + scrollView#{Dimension}) ? @table.get#{Plural}Count() - 1
 
     getScreen#{Plural}: -> @screen#{Plural}
 
@@ -110,7 +110,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
     #{singular}ScreenPosition: (#{singular}) ->
       #{offset} = @getScreen#{Singular}OffsetAt(#{singular})
 
-      content = @get#{Plural}Container()
+      content = @get#{Plural}ScrollContainer()
       contentOffset = content.getBoundingClientRect()
 
       #{offset} + contentOffset.#{offset}
@@ -123,7 +123,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
       return @table.get#{Plural}Count() - 1
 
     find#{Singular}AtScreenPosition: (#{axis}) ->
-      content = @get#{Plural}Container()
+      content = @get#{Plural}ScrollContainer()
 
       bodyOffset = content.getBoundingClientRect()
 
@@ -150,7 +150,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
         0
   """
 
-  sandbox = {Mixin, atom}
+  sandbox = {Mixin, atom, console}
   context = vm.createContext(sandbox)
 
   vm.runInContext(compile(mixinSource, bare: true), context, "axis-#{axis}.vm")

@@ -64,7 +64,7 @@ describe 'tableElement', ->
   beforeEach ->
     TableElement.registerViewProvider()
 
-    jasmineContent = document.body.querySelector('#jasmine-content')
+    jasmineContent = document.body#.querySelector('#jasmine-content')
 
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
     spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
@@ -172,7 +172,7 @@ describe 'tableElement', ->
       row = tableShadowRoot.querySelector('.table-edit-row')
       cells = row.querySelectorAll('.table-edit-cell')
 
-    it 'has as many columns as the model row', ->
+    fit 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)
 
     it 'renders undefined cells based on a config', ->
