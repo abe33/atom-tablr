@@ -78,6 +78,8 @@ class TableElement extends HTMLElement
       'core:move-down': => @moveDown()
       'core:move-to-top': => @moveToTop()
       'core:move-to-bottom': => @moveToBottom()
+      'table-edit:move-to-end-of-line': => @moveToRight()
+      'table-edit:move-to-beginning-of-line': => @moveToLeft()
       'core:page-up': => @pageUp()
       'core:page-down': => @pageDown()
       'core:select-right': => @expandSelectionRight()
@@ -512,6 +514,19 @@ class TableElement extends HTMLElement
     return if @activeCellPosition.row is end
 
     @activeCellPosition.row = end
+    @afterActiveCellMove()
+
+  moveToLeft: ->
+    return if @activeCellPosition.column is 0
+
+    @activeCellPosition.column = 0
+    @afterActiveCellMove()
+
+  moveToRight: ->
+    end = @getLastColumn()
+    return if @activeCellPosition.column is end
+
+    @activeCellPosition.column = end
     @afterActiveCellMove()
 
   pageDown: ->
