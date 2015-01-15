@@ -100,3 +100,10 @@ module.exports = React.createClass
     return 0 if lastIndex is 0
 
     @props.parentView.getScreenColumnOffsetAt(lastIndex) + @props.parentView.getScreenColumnWidthAt(lastIndex)
+
+  componentDidMount: ->
+    @props.parentView.initializeHorizontalScroll()
+
+  componentDidUpdate: ->
+    parentView = @props.parentView
+    parentView.getColumnsContainer().scrollLeft = parentView.getColumnsScrollContainer().scrollLeft

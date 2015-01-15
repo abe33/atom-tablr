@@ -83,9 +83,11 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
     model#{Singular}ToScreen#{Singular}: (#{singular}) -> @modelToScreen#{Plural}Map[#{singular}]
 
     make#{Singular}Visible: (#{singular}) ->
+      container = @get#{Plural}ScrollContainer()
       #{singular}#{Dimension} = @getScreen#{Singular}#{Dimension}At(#{singular})
-      scrollView#{Dimension} = @body.offset#{Dimension}
-      currentScroll#{Offset} = @body.scroll#{Offset}
+
+      scrollView#{Dimension} = container.offset#{Dimension}
+      currentScroll#{Offset} = container.scroll#{Offset}
 
       #{singular}Offset = @getScreen#{Singular}OffsetAt(#{singular})
 
@@ -96,9 +98,9 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
                 scroll#{Offset}AsFirstVisible#{Singular} + #{singular}#{Dimension} <= currentScroll#{Offset} + scrollView#{Dimension}
 
       if #{singular}Offset > currentScroll#{Offset}
-        @body.scroll#{Offset} = scroll#{Offset}AsLastVisible#{Singular}
+        container.scroll#{Offset} = scroll#{Offset}AsLastVisible#{Singular}
       else
-        @body.scroll#{Offset} = scroll#{Offset}AsFirstVisible#{Singular}
+        container.scroll#{Offset} = scroll#{Offset}AsFirstVisible#{Singular}
 
     compute#{Singular}Offsets: ->
       offsets = []

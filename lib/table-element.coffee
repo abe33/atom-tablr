@@ -132,13 +132,6 @@ class TableElement extends HTMLElement
         @focus()
       'click': stopPropagationAndDefault()
 
-    @subscriptions.add @subscribeTo @body, '.table-edit-rows',
-      'mousewheel': (e) =>
-        e.stopPropagation()
-        requestAnimationFrame =>
-          @getColumnsContainer().scrollLeft = @getRowsContainer().scrollLeft
-          @requestUpdate()
-
     @subscriptions.add @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
       'click': stopPropagationAndDefault()
@@ -444,6 +437,16 @@ class TableElement extends HTMLElement
 
     {row: @screenRowToModelRow(row), column: @screenColumnToModelColumn(column)}
 
+  makeCellVisible: (position) ->
+    @makeRowVisible(position.row)
+    @makeColumnVisible(position.column)
+
+  initializeHorizontalScroll: ->
+    @subscriptions.add @subscribeTo @getColumnsScrollContainer(),
+      'scroll': (e) =>
+        e.stopPropagation()
+        requestAnimationFrame => @requestUpdate()
+
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
   #    ##       ##     ## ####  ##    ##    ##     ## ##     ## ##
@@ -532,7 +535,7 @@ class TableElement extends HTMLElement
   afterActiveCellMove: ->
     @setSelectionFromActiveCell()
     @requestUpdate()
-    @makeRowVisible(@activeCellPosition.row)
+    @makeCellVisible(@activeCellPosition)
 
   getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
 
@@ -1055,6 +1058,7 @@ class TableElement extends HTMLElement
     @firstRenderedColumn = firstColumn
     @lastRenderedColumn = lastColumn
     @hasChanged = false
+
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
 

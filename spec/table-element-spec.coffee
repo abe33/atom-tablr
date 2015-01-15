@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, mousemove, mouseup, mousewheel, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
+{mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = "
@@ -247,7 +247,8 @@ describe 'tableElement', ->
         describe 'when the content is scroll horizontally', ->
           beforeEach ->
             tableElement.getRowsContainer().scrollLeft = 100
-            mousewheel(tableElement.getRowsContainer())
+            scroll(tableElement.getRowsContainer())
+            nextAnimationFrame()
             nextAnimationFrame()
 
           it 'scrolls the header by the same amount', ->
@@ -747,7 +748,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mouseup(handle, x, y + 50)
 
-          expect(tableElement.getRowHeightAt(2)).toEqual(70)
+          expect(tableElement.getRowHeightAt(2)).toEqual(71)
 
         it 'displays a ruler when the drag have begun', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -768,7 +769,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mousemove(handle, x, y + 50)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50 + 1)
 
         it 'hides the ruler on drag end', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -1692,7 +1693,7 @@ describe 'tableElement', ->
 
   describe 'when the columns widths have been changed', ->
     beforeEach ->
-      tableElement.setColumnsWidths([0.1, 0.1, 0.8])
+      tableElement.setColumnsWidths([100, 200, 300])
       nextAnimationFrame()
 
     it 'creates a selection with the cells from the mouse movements', ->
