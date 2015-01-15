@@ -563,7 +563,7 @@ class TableElement extends HTMLElement
     @editorElement.style.display = 'block'
     @editorElement.focus()
 
-    @editor.setText(activeCell.getValue().toString())
+    @editor.setText(String(activeCell.getValue() ? @getUndefinedDisplay()))
 
     @editor.getBuffer().history.clearUndoStack()
     @editor.getBuffer().history.clearRedoStack()
