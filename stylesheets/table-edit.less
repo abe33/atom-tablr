@@ -52,14 +52,6 @@ atom-table-editor {
       box-sizing: border-box;
     }
 
-    .scroll-view {
-      overflow-y: auto;
-      overflow-x: hidden;
-      display: -webkit-flex;
-      -webkit-flex: 1;
-      border: 1px solid @background-color-highlight;
-    }
-
     .hidden-input {
       position: absolute;
       width: 0;
@@ -191,6 +183,30 @@ atom-table-editor {
       }
     }
 
+    //     ########   #######  ########  ##    ##
+    //     ##     ## ##     ## ##     ##  ##  ##
+    //     ##     ## ##     ## ##     ##   ####
+    //     ########  ##     ## ##     ##    ##
+    //     ##     ## ##     ## ##     ##    ##
+    //     ##     ## ##     ## ##     ##    ##
+    //     ########   #######  ########     ##
+
+    .table-edit-body {
+      display: -webkit-flex;
+      -webkit-flex: 1;
+      border: 1px solid @background-color-highlight;
+      position: relative;
+    }
+    
+    .table-edit-content {
+      .flex-container;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
     //     ######   ##     ## ######## ######## ######## ########
     //    ##    ##  ##     ##    ##       ##    ##       ##     ##
     //    ##        ##     ##    ##       ##    ##       ##     ##
@@ -201,8 +217,10 @@ atom-table-editor {
 
     .table-edit-gutter {
       display: -webkit-flex;
+      order: 1;
       position: relative;
       cursor: cell;
+      overflow: hidden;
     }
 
     .table-edit-gutter-filler, .table-edit-header-filler {
@@ -306,17 +324,13 @@ atom-table-editor {
     //   ##    ##  ##     ## ##  ##  ## ##    ##
     //   ##     ##  #######   ###  ###   ######
 
-    .table-edit-content {
-      .flex-container;
-    }
-
     .table-edit-rows {
+      .flex-container;
       position: relative;
       cursor: cell;
-      display: -webkit-flex;
+      order: 2;
       -webkit-flex: 1;
-      overflow-x: auto;
-      overflow-y: hidden;
+      overflow: auto;
       height: 100%;
     }
 

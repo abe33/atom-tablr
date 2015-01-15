@@ -61,6 +61,9 @@ mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
+  afterEach ->
+    window.requestAnimationFrame = requestAnimationFrameSafe
+
   beforeEach ->
     TableElement.registerViewProvider()
 
@@ -150,8 +153,8 @@ describe 'tableElement', ->
   #    ##    ## ##     ## ##   ###    ##    ##       ##   ###    ##
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
-  it 'has a scroll-view', ->
-    expect(tableShadowRoot.querySelector('.scroll-view')).toExist()
+  it 'has a body', ->
+    expect(tableShadowRoot.querySelector('.table-edit-body')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
@@ -248,7 +251,6 @@ describe 'tableElement', ->
           beforeEach ->
             tableElement.getRowsContainer().scrollLeft = 100
             scroll(tableElement.getRowsContainer())
-            nextAnimationFrame()
             nextAnimationFrame()
 
           it 'scrolls the header by the same amount', ->
@@ -667,6 +669,17 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
       expect(tableShadowRoot.querySelector('.table-edit-gutter')).toExist()
+
+    describe 'when scrolled', ->
+      beforeEach ->
+        tableElement.showGutter()
+        nextAnimationFrame()
+
+        tableElement.setScrollTop(300)
+        nextAnimationFrame()
+
+      it 'scrolls the header by the same amount', ->
+        expect(tableElement.getGutter().scrollTop).toEqual(300)
 
     describe 'rows numbers', ->
       [content, gutter] = []

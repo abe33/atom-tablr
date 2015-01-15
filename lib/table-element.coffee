@@ -43,7 +43,7 @@ class TableElement extends HTMLElement
     @shadowRoot = @createShadowRoot()
 
     @body = document.createElement('div')
-    @body.className = 'scroll-view'
+    @body.className = 'table-edit-body'
 
     @head = document.createElement('div')
     @head.className = 'table-edit-header'
@@ -122,7 +122,6 @@ class TableElement extends HTMLElement
       'click': stopPropagationAndDefault()
 
     @subscriptions.add @subscribeTo @body,
-      'scroll': (e) => @requestUpdate()
       'dblclick': (e) => @startCellEdit()
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
@@ -233,9 +232,15 @@ class TableElement extends HTMLElement
       @measureHeightAndWidth()
       @requestUpdate()
 
+  initializeHorizontalScroll: ->
+    @subscriptions.add @subscribeTo @getRowsContainer(),
+      'scroll': (e) => @requestUpdate()
+
   measureHeightAndWidth: ->
     @height = @clientHeight
     @width = @clientWidth
+
+  getGutter: -> @shadowRoot.querySelector('.table-edit-gutter')
 
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
@@ -296,9 +301,9 @@ class TableElement extends HTMLElement
 
   getRowsContainer: -> @body.querySelector('.table-edit-rows')
 
-  getRowsOffsetContainer: -> @getRowsContainer()
+  getRowsOffsetContainer: -> @getRowsWrapper()
 
-  getRowsScrollContainer: -> @body
+  getRowsScrollContainer: -> @getRowsContainer()
 
   getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
 
@@ -442,12 +447,6 @@ class TableElement extends HTMLElement
   makeCellVisible: (position) ->
     @makeRowVisible(position.row)
     @makeColumnVisible(position.column)
-
-  initializeHorizontalScroll: ->
-    @subscriptions.add @subscribeTo @getColumnsScrollContainer(),
-      'scroll': (e) =>
-        e.stopPropagation()
-        requestAnimationFrame => @requestUpdate()
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -1016,10 +1015,17 @@ class TableElement extends HTMLElement
 
   setScrollTop: (scroll) ->
     if scroll?
-      @body.scrollTop = scroll
+      @getRowsContainer().scrollTop = scroll
       @requestUpdate(false)
 
-    @body.scrollTop
+    @getRowsContainer().scrollTop
+
+  setScrollLeft: (scroll) ->
+    if scroll?
+      @getRowsContainer().scrollLeft
+      @requestUpdate(false)
+
+    @getRowsContainer().scrollLeft
 
   requestUpdate: (@hasChanged=true) =>
     return if @updateRequested

@@ -22,7 +22,13 @@ module.exports = React.createClass
 
     rows.unshift div className: 'table-edit-gutter-filler', totalRows
 
-    div {
-      className: 'table-edit-gutter'
+    wrapper = div {
+      className: 'table-edit-gutter-wrapper'
       style: {height}
     }, rows
+
+    div {className: 'table-edit-gutter'}, rows
+
+  componentDidUpdate: ->
+    {parentView} = @props
+    parentView.getGutter().scrollTop = parentView.getRowsContainer().scrollTop

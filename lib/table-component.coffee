@@ -79,14 +79,12 @@ module.exports = React.createClass
 
     if gutter
       gutterComponent = new GutterComponent(subComponentProps)
-      content.unshift gutterComponent
-
+      content.push gutterComponent
 
     content.push div className: 'row-resize-ruler'
 
     div {
       className: 'table-edit-content'
-      style: {height}
     }, content
 
   getTableHeight: ->
