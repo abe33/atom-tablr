@@ -194,13 +194,8 @@ describe 'tableElement', ->
       nextAnimationFrame()
       expect(cells[0].textContent).toEqual('bar')
 
-    it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
-
-      expect(bodyContent.offsetHeight).toBeCloseTo(2000)
-
     it 'sets the proper width and height on the table rows container', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-rows')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
       expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -2)
@@ -311,7 +306,7 @@ describe 'tableElement', ->
         expect(tableElement.getLastVisibleRow()).toEqual(13)
 
     it 'translates the content by the amount of scroll', ->
-      expect(tableElement.body.scrollTop).toEqual(100)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(100)
 
     it 'does not render new rows', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
@@ -398,7 +393,7 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
@@ -440,7 +435,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
-        bodyContent = tableShadowRoot.querySelector('.table-edit-content')
+        bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
         expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
@@ -728,7 +723,7 @@ describe 'tableElement', ->
               nextAnimationFrame()
 
             it 'scrolls the view', ->
-              expect(tableElement.body.scrollTop).toBeGreaterThan(0)
+              expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
 
           describe 'then dragging the mouse up', ->
             beforeEach ->
@@ -751,7 +746,7 @@ describe 'tableElement', ->
           mousedown(startCell)
           mousemove(endCell)
 
-          expect(tableElement.body.scrollTop).toBeLessThan(300)
+          expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
 
       describe 'dragging the resize handler of a row number', ->
         it 'resize the row on mouse up', ->
@@ -761,7 +756,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mouseup(handle, x, y + 50)
 
-          expect(tableElement.getRowHeightAt(2)).toEqual(71)
+          expect(tableElement.getRowHeightAt(2)).toEqual(70)
 
         it 'displays a ruler when the drag have begun', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -782,7 +777,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mousemove(handle, x, y + 50)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50 + 1)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50)
 
         it 'hides the ruler on drag end', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -1021,7 +1016,7 @@ describe 'tableElement', ->
     it 'scrolls the view until the passed-on row become visible', ->
       tableElement.makeRowVisible(50)
 
-      expect(tableElement.body.scrollTop).toEqual(847)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(849)
 
   describe 'core:undo', ->
     it 'triggers an undo on the table', ->
@@ -1551,7 +1546,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:select-up')
 
-      expect(tableElement.body.scrollTop).toEqual(180)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(180)
 
     describe 'then triggering core:select-down', ->
       it 'collapse the selection back to the bottom', ->
@@ -1581,7 +1576,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:select-down')
 
-      expect(tableElement.body.scrollTop).not.toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
     describe 'then triggering core:select-up', ->
       it 'collapse the selection back to the bottom', ->
@@ -1633,7 +1628,7 @@ describe 'tableElement', ->
     it 'scrolls the view to make the added row visible', ->
       atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
 
-      expect(tableElement.body.scrollTop).not.toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
     describe 'then triggering table-edit:select-to-beginning-of-table', ->
       it 'expands the selection to the beginning of the table', ->
@@ -1657,7 +1652,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
 
-      expect(tableElement.body.scrollTop).toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
 
     describe 'table-edit:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
@@ -1690,7 +1685,7 @@ describe 'tableElement', ->
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop).toBeGreaterThan(0)
+      expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
 
     it 'scrolls the view when the selection reach the first row', ->
       tableElement.setScrollTop(300)
@@ -1702,7 +1697,7 @@ describe 'tableElement', ->
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop).toBeLessThan(300)
+      expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
 
   describe 'when the columns widths have been changed', ->
     beforeEach ->
@@ -1758,7 +1753,7 @@ describe 'tableElement', ->
         expect(tableElement.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
-        expect(tableShadowRoot.querySelector('.table-edit-rows').offsetHeight).toEqual(2000)
+        expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)
 
       it 'decorates the table cells with a class', ->
         expect(tableShadowRoot.querySelectorAll('.table-edit-cell.order').length).toBeGreaterThan(1)
