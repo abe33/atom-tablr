@@ -10,11 +10,12 @@ module.exports = React.createClass
     firstRow: 0
     lastRow: 0
     totalRows: 0
-    columnsWidths: []
-    columnsAligns: []
+    firstColumn: 0
+    lastColumn: 0
+    totalColumns: 0
 
   render: ->
-    {firstRow, lastRow, columnsWidths, columnsAligns, gutter, absoluteColumnsWidths} = @state
+    {firstRow, lastRow, firstColumn, lastColumn, columnsAligns, gutter, absoluteColumnsWidths} = @state
     {parentView} = @props
     height = @getTableHeight()
     width = @getTableWidth()
@@ -25,7 +26,8 @@ module.exports = React.createClass
       continue unless rowData?
       cells = []
 
-      rowData.eachCell (cell,i) ->
+      for i in [firstColumn...lastColumn]
+        cell = rowData.getCell(i)
         classes = ['table-edit-cell']
         if parentView.isActiveCell(cell)
           classes.push 'active'
@@ -42,7 +44,6 @@ module.exports = React.createClass
           cell
           classes
           index: i
-          columnWidth: columnsWidths[i]
           columnAlign: columnsAligns[i]
         })
 
@@ -58,12 +59,11 @@ module.exports = React.createClass
           top: "#{parentView.getScreenRowOffsetAt(row)}px"
       }, cells
 
-    style = {height: "#{height}px"}
-    style['width'] = "#{width}px" if absoluteColumnsWidths
-
     rowsWrapper = div {
       className: 'table-edit-rows-wrapper'
-      style
+      style:
+        height: "#{height}px"
+        width: "#{width}px"
     }, rows
 
     subComponentProps = {parentView, height}
@@ -79,14 +79,12 @@ module.exports = React.createClass
 
     if gutter
       gutterComponent = new GutterComponent(subComponentProps)
-      content.unshift gutterComponent
-
+      content.push gutterComponent
 
     content.push div className: 'row-resize-ruler'
 
     div {
       className: 'table-edit-content'
-      style: {height}
     }, content
 
   getTableHeight: ->
@@ -96,6 +94,14 @@ module.exports = React.createClass
     @props.parentView.getScreenRowOffsetAt(lastIndex) + @props.parentView.getScreenRowHeightAt(lastIndex)
 
   getTableWidth: ->
-    columnsWidths = @props.parentView.getColumnsScreenWidths()
-    return 0 if columnsWidths.length is 0
-    columnsWidths.reduce (a,b) -> a + b
+    lastIndex = Math.max(0, @state.totalColumns - 1)
+    return 0 if lastIndex is 0
+
+    @props.parentView.getScreenColumnOffsetAt(lastIndex) + @props.parentView.getScreenColumnWidthAt(lastIndex)
+
+  componentDidMount: ->
+    @props.parentView.initializeHorizontalScroll()
+
+  componentDidUpdate: ->
+    parentView = @props.parentView
+    parentView.getColumnsContainer().scrollLeft = parentView.getColumnsScrollContainer().scrollLeft

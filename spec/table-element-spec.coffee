@@ -8,7 +8,7 @@ Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
-{mousedown, mousemove, mouseup, mousewheel, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
+{mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
 stylesheet = "
@@ -61,6 +61,9 @@ mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
+  afterEach ->
+    window.requestAnimationFrame = requestAnimationFrameSafe
+
   beforeEach ->
     TableElement.registerViewProvider()
 
@@ -94,6 +97,7 @@ describe 'tableElement', ->
     atom.config.set 'table-edit.rowHeight', 20
     atom.config.set 'table-edit.columnWidth', 100
     atom.config.set 'table-edit.rowOverdraw', 10
+    atom.config.set 'table-edit.columnOverdraw', 2
     atom.config.set 'table-edit.minimumRowHeight', 10
 
     tableElement = atom.views.getView(table)
@@ -149,8 +153,8 @@ describe 'tableElement', ->
   #    ##    ## ##     ## ##   ###    ##    ##       ##   ###    ##
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
-  it 'has a scroll-view', ->
-    expect(tableShadowRoot.querySelector('.scroll-view')).toExist()
+  it 'has a body', ->
+    expect(tableShadowRoot.querySelector('.table-edit-body')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
@@ -190,22 +194,23 @@ describe 'tableElement', ->
       nextAnimationFrame()
       expect(cells[0].textContent).toEqual('bar')
 
-    it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
-
-      expect(bodyContent.offsetHeight).toBeCloseTo(2000)
-
     it 'sets the proper width and height on the table rows container', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-rows')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
       expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -2)
 
-    describe 'with the absolute widths setting enabled', ->
+    describe 'when resized', ->
       beforeEach ->
-        tableElement.setAbsoluteColumnsWidths(true)
-        nextAnimationFrame()
+        tableElement.style.width = '800px'
+        tableElement.style.height = '600px'
 
+      it 'repaints the table', ->
+        advanceClock(150)
+        nextAnimationFrame()
+        expect(tableShadowRoot.querySelectorAll('.table-edit-rows')).not.toEqual(18)
+    describe 'the columns widths', ->
+      beforeEach ->
         row = tableShadowRoot.querySelector('.table-edit-row')
         cells = row.querySelectorAll('.table-edit-cell')
 
@@ -240,90 +245,11 @@ describe 'tableElement', ->
         describe 'when the content is scroll horizontally', ->
           beforeEach ->
             tableElement.getRowsContainer().scrollLeft = 100
-            mousewheel(tableElement.getRowsContainer())
+            scroll(tableElement.getRowsContainer())
             nextAnimationFrame()
 
           it 'scrolls the header by the same amount', ->
             expect(tableElement.getColumnsContainer().scrollLeft).toEqual(100)
-
-    describe 'with the absolute widths setting disabled', ->
-      beforeEach ->
-        tableElement.setAbsoluteColumnsWidths(false)
-        nextAnimationFrame()
-
-      describe 'without any columns layout data', ->
-        it 'has cells that all have the same width', ->
-          for cell in cells
-            expect(cell.clientWidth).toBeCloseTo(tableElement.clientWidth / 3, -2)
-
-      describe 'with a columns layout defined', ->
-        describe 'with an array with enough values', ->
-          it 'modifies the columns widths', ->
-            tableElement.setColumnsWidths([0.2, 0.3, 0.5])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
-
-        describe 'with an array with sparse values', ->
-          it 'computes the other columns width', ->
-            tableElement.setColumnsWidths([0.2, null, 0.5])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
-
-        describe 'with an array with more than one missing value', ->
-          it 'divides the rest width between the missing columns', ->
-            tableElement.setColumnsWidths([0.2])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.4, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.4, -2)
-
-        describe 'with an array whose sum is greater than 1', ->
-          it 'divides the rest width between the missing columns', ->
-            tableElement.setColumnsWidths([0.5, 0.5, 1])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
-
-        describe 'with a sparse array whose sum is greater or equal than 1', ->
-          it 'divides the rest width between the missing columns', ->
-            tableElement.setColumnsWidths([0.5, 0.5])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.25, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
-
-        describe "by setting the width on model's columns", ->
-          it 'uses the columns data', ->
-            table.getColumn(0).width = 0.2
-            table.getColumn(1).width = 0.3
-
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.2, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.3, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.5, -2)
-
-        describe "from both the model's columns and in the view", ->
-          it 'uses the view data and fallback to the columns data if available', ->
-            table.getColumn(0).width = 0.2
-            table.getColumn(1).width = 0.3
-
-            tableElement.setColumnsWidths([0.8])
-            nextAnimationFrame()
-
-            expect(cells[0].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.8, -2)
-            expect(cells[1].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.1, -2)
-            expect(cells[2].clientWidth).toBeCloseTo(tableElement.clientWidth * 0.1, -2)
 
       describe 'with alignements defined in the columns models', ->
         it 'sets the cells text-alignement using the model data', ->
@@ -380,7 +306,7 @@ describe 'tableElement', ->
         expect(tableElement.getLastVisibleRow()).toEqual(13)
 
     it 'translates the content by the amount of scroll', ->
-      expect(tableElement.body.scrollTop).toEqual(100)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(100)
 
     it 'does not render new rows', ->
       rows = tableShadowRoot.querySelectorAll('.table-edit-row')
@@ -406,33 +332,6 @@ describe 'tableElement', ->
       expect(rows.length).toEqual(28)
       expect(rows[0].dataset.rowId).toEqual('6')
       expect(rows[rows.length-1].dataset.rowId).toEqual('33')
-
-  describe 'when the table columns are modified', ->
-    describe 'by adding one column', ->
-      it 'adjusts the columns widths', ->
-        table.addColumn('bar')
-
-        compareCloseArrays(tableElement.getColumnsWidths(), [0.25, 0.25, 0.25, 0.25])
-
-      describe 'when columns have already a width', ->
-        it 'adjusts the columns widths and keeps the proportions of initial columns', ->
-          tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-          table.addColumn('bar')
-
-          compareCloseArrays(tableElement.getColumnsWidths(), [0.08, 0.08, 0.64, 0.2])
-
-    describe 'by removing a column', ->
-      it 'adjusts the columns widths', ->
-        table.removeColumnAt(2)
-
-        compareCloseArrays(tableElement.getColumnsWidths(), [0.5, 0.5])
-
-    describe 'when columns have already a width', ->
-      it 'adjusts the columns widths and keeps the proportions of initial columns', ->
-        tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-        table.removeColumnAt(2)
-
-        compareCloseArrays(tableElement.getColumnsWidths(), [0.5, 0.5])
 
   describe 'when the table rows are modified', ->
     describe 'by adding one at the end', ->
@@ -494,7 +393,7 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-content')
+      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
@@ -536,7 +435,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
-        bodyContent = tableShadowRoot.querySelector('.table-edit-content')
+        bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
         expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
@@ -648,9 +547,8 @@ describe 'tableElement', ->
         it 'removes the sorting order', ->
           expect(tableElement.order).toBeNull()
 
-      describe 'when the absoluteColumnsWidths setting is enabled', ->
+      describe 'when the columns size have been changed', ->
         beforeEach ->
-          tableElement.setAbsoluteColumnsWidths(true)
           tableElement.setColumnsWidths([100, 200, 300])
           nextAnimationFrame()
 
@@ -661,86 +559,21 @@ describe 'tableElement', ->
           expect(tableElement.order).toEqual('value')
           expect(tableElement.direction).toEqual(1)
 
-      describe 'when the columns size have been changed', ->
-        beforeEach ->
-          tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-          nextAnimationFrame()
-          column = tableShadowRoot.querySelector('.table-edit-header-cell:first-child')
-          mousedown(column)
-
-        it 'changes the sort order to use the clicked column', ->
-          expect(tableElement.order).toEqual('key')
-          expect(tableElement.direction).toEqual(1)
-
     describe 'dragging a resize handle', ->
-      it 'resizes the columns', ->
-        initialColumnWidths = tableElement.getColumnsScreenWidths()
+      beforeEach ->
+        tableElement.absoluteColumnsWidths = true
+        tableElement.setColumnsWidths([100,100,100])
 
+      it 'resizes the columns', ->
         handle = header.querySelectorAll('.column-resize-handle')[1]
         {x, y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
         mouseup(handle, x + 50, y)
 
-        newColumnWidths = tableElement.getColumnsScreenWidths()
-
-        expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0], -2)
-        expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50, -2)
-        expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2] - 50, -1)
-
-      it 'displays a ruler when starting the drag', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-
-        expect(ruler).toExist()
-        expect(isVisible(ruler)).toBeFalsy()
-
-        handle = header.querySelectorAll('.column-resize-handle')[1]
-        {x} = objectCenterCoordinates(handle)
-
-        mousedown(handle)
-
-        expect(isVisible(ruler)).toBeTruthy()
-        comparePixelStyles(ruler.style.left, x + 'px')
-        expect(ruler.offsetHeight).toEqual(tableElement.offsetHeight)
-
-      it 'moves the ruler during drag', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-        handle = header.querySelectorAll('.column-resize-handle')[1]
-        {x,y} = objectCenterCoordinates(handle)
-
-        mousedown(handle)
-        mousemove(handle, x + 50, y)
-
-        comparePixelStyles(ruler.style.left, (x + 50) + 'px')
-
-      it 'moves the ruler during drag', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-        handle = header.querySelectorAll('.column-resize-handle')[1]
-
-        mousedown(handle)
-        mouseup(handle)
-
-        expect(isVisible(ruler)).toBeFalsy()
-
-      describe 'with absolute columns widths layout', ->
-        beforeEach ->
-          tableElement.absoluteColumnsWidths = true
-          tableElement.setColumnsWidths([100,100,100])
-
-        it 'resizes the columns', ->
-          initialColumnWidths = tableElement.getColumnsScreenWidths()
-
-          handle = header.querySelectorAll('.column-resize-handle')[1]
-          {x, y} = objectCenterCoordinates(handle)
-
-          mousedown(handle)
-          mouseup(handle, x + 50, y)
-
-          newColumnWidths = tableElement.getColumnsScreenWidths()
-
-          expect(newColumnWidths[0]).toBeCloseTo(initialColumnWidths[0])
-          expect(newColumnWidths[1]).toBeCloseTo(initialColumnWidths[1] + 50)
-          expect(newColumnWidths[2]).toBeCloseTo(initialColumnWidths[2])
+        expect(table.getColumn(0).width).toBeCloseTo(100)
+        expect(table.getColumn(1).width).toBeCloseTo(150)
+        expect(table.getColumn(2).width).toBeCloseTo(100)
 
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
@@ -832,6 +665,17 @@ describe 'tableElement', ->
 
       expect(tableShadowRoot.querySelector('.table-edit-gutter')).toExist()
 
+    describe 'when scrolled', ->
+      beforeEach ->
+        tableElement.showGutter()
+        nextAnimationFrame()
+
+        tableElement.setScrollTop(300)
+        nextAnimationFrame()
+
+      it 'scrolls the header by the same amount', ->
+        expect(tableElement.getGutter().scrollTop).toEqual(300)
+
     describe 'rows numbers', ->
       [content, gutter] = []
 
@@ -879,7 +723,7 @@ describe 'tableElement', ->
               nextAnimationFrame()
 
             it 'scrolls the view', ->
-              expect(tableElement.body.scrollTop).toBeGreaterThan(0)
+              expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
 
           describe 'then dragging the mouse up', ->
             beforeEach ->
@@ -902,7 +746,7 @@ describe 'tableElement', ->
           mousedown(startCell)
           mousemove(endCell)
 
-          expect(tableElement.body.scrollTop).toBeLessThan(300)
+          expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
 
       describe 'dragging the resize handler of a row number', ->
         it 'resize the row on mouse up', ->
@@ -1018,17 +862,6 @@ describe 'tableElement', ->
     expect(tableShadowRoot.querySelectorAll('.table-edit-cell.active-column').length)
     .toBeGreaterThan(1)
 
-  describe 'when the absoluteColumnsWidths setting is enabled', ->
-    beforeEach ->
-      tableElement.setAbsoluteColumnsWidths(true)
-      nextAnimationFrame()
-
-    it 'activates the cell under the mouse when pressed', ->
-      cell = tableShadowRoot.querySelector('.table-edit-row:nth-child(4) .table-edit-cell:last-child')
-      mousedown(cell)
-
-      expect(tableElement.getActiveCell().getValue()).toEqual('no')
-
   describe '::moveRight', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
@@ -1070,6 +903,18 @@ describe 'tableElement', ->
 
       tableElement.moveRight()
       expect(tableElement.getActiveCell().getValue()).toEqual('row0')
+
+    xdescribe 'when the absoluteColumnsWidths setting is enabled', ->
+      describe 'and the last column is partially hidden', ->
+        beforeEach ->
+          tableElement.setColumnsWidths([100, 200, 300])
+
+          tableElement.moveRight()
+          tableElement.moveRight()
+
+        it 'scrolls the view to the right', ->
+          rows = tableShadowRoot.querySelector('.table-edit-rows')
+          expect(rows.scrollLeft).not.toEqual(0)
 
   describe '::moveLeft', ->
     it 'requests an update', ->
@@ -1171,7 +1016,7 @@ describe 'tableElement', ->
     it 'scrolls the view until the passed-on row become visible', ->
       tableElement.makeRowVisible(50)
 
-      expect(tableElement.body.scrollTop).toEqual(847)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(849)
 
   describe 'core:undo', ->
     it 'triggers an undo on the table', ->
@@ -1320,12 +1165,6 @@ describe 'tableElement', ->
 
       expect(table.getRow(0).getValues()).toEqual([null, 'row0', 0, 'yes'])
 
-    it 'adjusts the columns width and keeps proportions of the initial columns', ->
-      tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-      atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
-
-      compareCloseArrays(tableElement.getColumnsWidths(), [0.2, 0.08, 0.08, 0.64])
-
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
         atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
@@ -1339,12 +1178,6 @@ describe 'tableElement', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
 
       expect(table.getRow(0).getValues()).toEqual(['row0', null, 0, 'yes'])
-
-    it 'adjusts the columns width and keeps proportions of the initial columns', ->
-      tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-      atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
-
-      compareCloseArrays(tableElement.getColumnsWidths(), [0.08, 0.2, 0.08, 0.64])
 
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
@@ -1584,7 +1417,7 @@ describe 'tableElement', ->
 
       expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
       expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
-      expect(selectionBox.offsetWidth).toEqual(tableShadowRoot.querySelector('.table-edit-rows').offsetWidth)
+      expect(selectionBox.offsetWidth).toEqual(300)
       expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
     it 'positions the selection box handle at the bottom right corner', ->
@@ -1713,7 +1546,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:select-up')
 
-      expect(tableElement.body.scrollTop).toEqual(180)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(180)
 
     describe 'then triggering core:select-down', ->
       it 'collapse the selection back to the bottom', ->
@@ -1743,7 +1576,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:select-down')
 
-      expect(tableElement.body.scrollTop).not.toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
     describe 'then triggering core:select-up', ->
       it 'collapse the selection back to the bottom', ->
@@ -1795,7 +1628,7 @@ describe 'tableElement', ->
     it 'scrolls the view to make the added row visible', ->
       atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
 
-      expect(tableElement.body.scrollTop).not.toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
     describe 'then triggering table-edit:select-to-beginning-of-table', ->
       it 'expands the selection to the beginning of the table', ->
@@ -1819,7 +1652,7 @@ describe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
 
-      expect(tableElement.body.scrollTop).toEqual(0)
+      expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
 
     describe 'table-edit:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
@@ -1852,7 +1685,7 @@ describe 'tableElement', ->
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop).toBeGreaterThan(0)
+      expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
 
     it 'scrolls the view when the selection reach the first row', ->
       tableElement.setScrollTop(300)
@@ -1864,11 +1697,11 @@ describe 'tableElement', ->
       mousedown(startCell)
       mousemove(endCell)
 
-      expect(tableElement.body.scrollTop).toBeLessThan(300)
+      expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
 
   describe 'when the columns widths have been changed', ->
     beforeEach ->
-      tableElement.setColumnsWidths([0.1, 0.1, 0.8])
+      tableElement.setColumnsWidths([100, 200, 300])
       nextAnimationFrame()
 
     it 'creates a selection with the cells from the mouse movements', ->
@@ -1920,7 +1753,7 @@ describe 'tableElement', ->
         expect(tableElement.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
-        expect(tableShadowRoot.querySelector('.table-edit-rows').offsetHeight).toEqual(2000)
+        expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)
 
       it 'decorates the table cells with a class', ->
         expect(tableShadowRoot.querySelectorAll('.table-edit-cell.order').length).toBeGreaterThan(1)

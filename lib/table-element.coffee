@@ -1,13 +1,14 @@
 {Point, Range, TextEditor} = require 'atom'
 {View, $} = require 'space-pen'
 {CompositeDisposable, Disposable} = require 'event-kit'
+{EventsDelegation} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
 
 Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
-EventsDelegation = require './mixins/events-delegation'
+Axis = require './mixins/axis'
 
 PIXEL = 'px'
 
@@ -20,12 +21,17 @@ module.exports =
 class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
+  Axis.includeInto(this)
+
+  domPollingInterval: 100
+  domPollingIntervalId: null
+  domPollingPaused: false
+  gutter: false
+  rowOffsets: null
+  columnOffsets: null
+  absoluteColumnsWidths: false
 
   createdCallback: ->
-    @gutter = false
-    @scroll = 0
-    @rowOffsets = null
-    @absoluteColumnsWidths = false
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
 
@@ -37,7 +43,7 @@ class TableElement extends HTMLElement
     @shadowRoot = @createShadowRoot()
 
     @body = document.createElement('div')
-    @body.className = 'scroll-view'
+    @body.className = 'table-edit-body'
 
     @head = document.createElement('div')
     @head.className = 'table-edit-header'
@@ -56,7 +62,7 @@ class TableElement extends HTMLElement
     @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
 
   subscribeToContent: ->
-    @subscribeTo @hiddenInput,
+    @subscriptions.add @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
           @startCellEdit()
@@ -72,6 +78,8 @@ class TableElement extends HTMLElement
       'core:move-down': => @moveDown()
       'core:move-to-top': => @moveToTop()
       'core:move-to-bottom': => @moveToBottom()
+      'table-edit:move-to-end-of-line': => @moveToRight()
+      'table-edit:move-to-beginning-of-line': => @moveToLeft()
       'core:page-up': => @pageUp()
       'core:page-down': => @pageDown()
       'core:select-right': => @expandSelectionRight()
@@ -89,13 +97,14 @@ class TableElement extends HTMLElement
       'table-edit:insert-column-after': => @insertColumnAfter()
       'table-edit:delete-column': => @deleteActiveColumn()
 
-    @subscribeTo this,
+    @subscriptions.add @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @head,
+    @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
-        if column = @columnAtScreenPosition(e.pageX, e.pageY)
+        columnIndex = @findColumnAtScreenPosition(e.pageX, e.pageY)
+        if column = @getScreenColumn(columnIndex)
           if column.name is @order
             if @direction is -1
               @resetSort()
@@ -104,16 +113,15 @@ class TableElement extends HTMLElement
           else
             @sortBy(column.name)
 
-    @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
+    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
-    @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
+    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body,
-      'scroll': (e) => @requestUpdate()
+    @subscriptions.add @subscribeTo @body,
       'dblclick': (e) => @startCellEdit()
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
@@ -125,21 +133,15 @@ class TableElement extends HTMLElement
         @focus()
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.table-edit-rows',
-      'mousewheel': (e) =>
-        e.stopPropagation()
-        requestAnimationFrame =>
-          @getColumnsContainer().scrollLeft = @getRowsContainer().scrollLeft
-
-    @subscribeTo @body, '.table-edit-gutter',
+    @subscriptions.add @subscribeTo @body, '.table-edit-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
+    @subscriptions.add @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startRowResizeDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscribeTo @body, '.selection-box-handle',
+    @subscriptions.add @subscribeTo @body, '.selection-box-handle',
       'mousedown': stopPropagationAndDefault (e) => @startDrag(e)
       'click': stopPropagationAndDefault()
 
@@ -150,12 +152,17 @@ class TableElement extends HTMLElement
       'table-edit.pageMovesAmount': (@configPageMovesAmount) =>
         @requestUpdate() if @attached
       'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
-      'table-edit.columnWidth': (@configColumnWidth) =>
       'table-edit.rowHeight': (@configRowHeight) =>
         if @table?
           @computeRowOffsets()
           @requestUpdate() if @attached
       'table-edit.rowOverdraw': (@configRowOverdraw) =>
+        @requestUpdate() if @attached
+      'table-edit.columnWidth': (@configColumnWidth) =>
+        if @table?
+          @computeColumnOffsets()
+          @requestUpdate() if @attached
+      'table-edit.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
 
   observeConfig: (configs) ->
@@ -178,7 +185,10 @@ class TableElement extends HTMLElement
   attachedCallback: ->
     @buildModel() unless @getModel()?
     @computeRowOffsets()
+    @computeColumnOffsets()
     @mountComponent() unless @bodyComponent?.isMounted()
+    @domPollingIntervalId = setInterval((=> @pollDOM()), @domPollingInterval)
+    @measureHeightAndWidth()
     @requestUpdate()
     @attached = true
 
@@ -205,6 +215,33 @@ class TableElement extends HTMLElement
     @gutter = false
     @requestUpdate()
 
+  pauseDOMPolling: ->
+    @domPollingPaused = true
+    @resumeDOMPollingAfterDelay ?= debounce(@resumeDOMPolling, 100)
+    @resumeDOMPollingAfterDelay()
+
+  resumeDOMPolling: ->
+    @domPollingPaused = false
+
+  resumeDOMPollingAfterDelay: null
+
+  pollDOM: ->
+    return if @domPollingPaused or @frameRequested
+
+    if @width isnt @clientWidth or @height isnt @clientHeight
+      @measureHeightAndWidth()
+      @requestUpdate()
+
+  initializeHorizontalScroll: ->
+    @subscriptions.add @subscribeTo @getRowsContainer(),
+      'scroll': (e) => @requestUpdate()
+
+  measureHeightAndWidth: ->
+    @height = @clientHeight
+    @width = @clientWidth
+
+  getGutter: -> @shadowRoot.querySelector('.table-edit-gutter')
+
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
   #    #### #### ##     ## ##     ## ##       ##
@@ -230,6 +267,9 @@ class TableElement extends HTMLElement
     @modelSubscriptions = new CompositeDisposable()
     @modelSubscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @modelSubscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    @modelSubscriptions.add @table.onDidChangeColumnsOptions =>
+      @computeColumnOffsets()
+      @requestUpdate()
     @modelSubscriptions.add @table.onDidChangeRows =>
       @computeRowOffsets()
       @requestUpdate()
@@ -240,6 +280,7 @@ class TableElement extends HTMLElement
     @subscribeToColumn(column) for column in @table.getColumns()
 
     @updateScreenRows()
+    @updateScreenColumns()
     @setSelectionFromActiveCell()
     @requestUpdate()
 
@@ -256,57 +297,13 @@ class TableElement extends HTMLElement
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
-  isActiveRow: (row) -> @activeCellPosition.row is row
-
-  isSelectedRow: (row) ->
-    row >= @selection.start.row and row <= @selection.end.row
-
-  getRowHeight: -> @rowHeight ? @configRowHeight
-
-  getMinimumRowHeight: -> @minimumRowHeight ? @configMinimumRowHeight
-
-  setRowHeight: (@rowHeight) ->
-    @computeRowOffsets()
-    @requestUpdate()
-
-  getRowHeightAt: (index) ->
-    @table.getRow(index)?.height ? @getRowHeight()
-
-  setRowHeightAt: (index, height) ->
-    minHeight = @getMinimumRowHeight()
-    height = minHeight if height < minHeight
-    @table.getRow(index)?.height = height
-
   getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
 
-  getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
-
-  getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
-
-  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
-
-  getLastRow: -> @table.getRowsCount() - 1
-
-  getFirstVisibleRow: ->
-    @findRowAtPosition(@body.scrollTop)
-
-  getLastVisibleRow: ->
-    scrollViewHeight = @body.clientHeight
-
-    @findRowAtPosition(@body.scrollTop + scrollViewHeight) ? @table.getRowsCount() - 1
-
-  getScreenRows: -> @screenRows
-
-  getScreenRow: (row) -> @table.getRow(@screenRowToModelRow(row))
-
-  getScreenRowHeightAt: (row) -> @getRowHeightAt(@screenRowToModelRow(row))
-
-  setScreenRowHeightAt: (row, height) ->
-    @setRowHeightAt(@screenRowToModelRow(row), height)
-
-  getScreenRowOffsetAt: (row) -> @rowOffsets[row]
-
   getRowsContainer: -> @body.querySelector('.table-edit-rows')
+
+  getRowsOffsetContainer: -> @getRowsWrapper()
+
+  getRowsScrollContainer: -> @getRowsContainer()
 
   getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
 
@@ -316,87 +313,7 @@ class TableElement extends HTMLElement
 
   insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
 
-  deleteActiveRow: ->
-    confirmation = atom.confirm
-      message: 'Are you sure you want to delete the current active row?'
-      detailedMessage: "You are deleting the row ##{@activeCellPosition.row + 1}."
-      buttons: ['Delete Row', 'Cancel']
-
-    @table.removeRowAt(@activeCellPosition.row) if confirmation is 0
-
-  screenRowToModelRow: (row) -> @screenToModelRowsMap[row]
-
-  modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
-
-  makeRowVisible: (row) ->
-    rowHeight = @getScreenRowHeightAt(row)
-    scrollViewHeight = @body.offsetHeight
-    currentScrollTop = @body.scrollTop
-
-    rowOffset = @getScreenRowOffsetAt(row)
-
-    scrollTopAsFirstVisibleRow = rowOffset
-    scrollTopAsLastVisibleRow = rowOffset - (scrollViewHeight - rowHeight)
-
-    return if scrollTopAsFirstVisibleRow >= currentScrollTop and
-              scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
-
-    if rowOffset > currentScrollTop
-      @body.scrollTop = scrollTopAsLastVisibleRow
-    else
-      @body.scrollTop = scrollTopAsFirstVisibleRow
-
-  computeRowOffsets: ->
-    offsets = []
-    offset = 0
-
-    for i in [0...@table.getRowsCount()]
-      offsets.push offset
-      offset += @getScreenRowHeightAt(i)
-
-    @rowOffsets = offsets
-
-  rowScreenPosition: (row) ->
-    top = @getScreenRowOffsetAt(row)
-
-    content = @getRowsContainer()
-    contentOffset = content.getBoundingClientRect()
-
-    top + contentOffset.top
-
-  findRowAtPosition: (y) ->
-    for i in [0...@table.getRowsCount()]
-      offset = @getScreenRowOffsetAt(i)
-      return i - 1 if y < offset
-
-    return @table.getRowsCount() - 1
-
-  findRowAtScreenPosition: (y) ->
-    content = @getRowsContainer()
-
-    bodyOffset = content.getBoundingClientRect()
-
-    y -= bodyOffset.top
-
-    @findRowAtPosition(y)
-
-  updateScreenRows: ->
-    rows = @table.getRows()
-    @screenRows = rows.concat()
-    @screenRows.sort(@compareRows(@order, @direction)) if @order?
-    @screenToModelRowsMap = (rows.indexOf(row) for row in @screenRows)
-    @modelToScreenRowsMap = (@screenRows.indexOf(row) for row in rows)
-    @computeRowOffsets()
-
-  compareRows: (order, direction) -> (a,b) ->
-    a = a[order]
-    b = b[order]
-    if a > b
-      direction
-    else if a < b
-      -direction
-    else
-      0
+  @axis 'y', 'height', 'top', 'row', 'rows'
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -406,12 +323,6 @@ class TableElement extends HTMLElement
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
-  getLastColumn: -> @table.getColumnsCount() - 1
-
-  getActiveColumn: -> @table.getColumn(@activeCellPosition.column)
-
-  isActiveColumn: (column) -> @activeCellPosition.column is column
-
   getColumnsAligns: ->
     [0...@table.getColumnsCount()].map (col) =>
       @columnsAligns?[col] ? @table.getColumn(col).align
@@ -419,74 +330,17 @@ class TableElement extends HTMLElement
   setColumnsAligns: (@columnsAligns) ->
     @requestUpdate()
 
-  hasColumnWithWidth: -> @table.getColumns().some (c) -> c.width?
-
-  getColumnWidth: -> @columnWidth ? @configColumnWidth
-
-  setColumnWidth: (@columnWidth) ->
-
   setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
 
-  getColumnsWidths: ->
-    return @columnsWidths if @columnsWidths
-
-    if @hasColumnWithWidth()
-      @columnsWidths = @getColumnsWidthsFromModel()
-    else
-      count = @table.getColumnsCount()
-      if @absoluteColumnsWidths
-        (@getColumnWidth() for n in [0...count])
-      else
-        (1 / count for n in [0...count])
-
   setColumnsWidths: (columnsWidths) ->
-    unless @absoluteColumnsWidths
-      columnsWidths = @normalizeColumnsWidths(columnsWidths)
-
-    @columnsWidths = columnsWidths
-
+    @getScreenColumn(i).width = w for w,i in columnsWidths
     @requestUpdate()
 
-  getColumnsWidthsCSS: ->
-    if @absoluteColumnsWidths
-      @getColumnsWidthPixels()
-    else
-      @getColumnsWidthPercentages()
-
-  getColumnsWidthPercentages: -> @getColumnsWidths().map @floatToPercent
-
-  getColumnsWidthPixels: -> @getColumnsWidths().map @floatToPixel
-
-  getColumnsWidthsFromModel: ->
-    count = @table.getColumnsCount()
-
-    widths = (@table.getColumn(col).width for col in [0...count])
-    @normalizeColumnsWidths(widths)
-
-  getColumnsScreenWidths: ->
-    if @absoluteColumnsWidths
-      @getColumnsWidths()
-    else
-      width = @getRowsWrapper()?.offsetWidth ? 0
-      @getColumnsWidths().map (v) => v * width
-
-  getColumnsScreenMargins: ->
-    widths = if @absoluteColumnsWidths
-      @getColumnsWidths()
-    else
-      width = @getRowsWrapper()?.offsetWidth ? 0
-      @getColumnsWidths().map (v) -> v * width
-
-    pad = 0
-    width = @getRowsWrapper()?.offsetWidth ? 0
-    margins = widths.map (v) =>
-      res = pad
-      pad += v
-      res
-
-    margins
-
   getColumnsContainer: -> @head.querySelector('.table-edit-header-row')
+
+  getColumnsOffsetContainer: -> @body.querySelector('.table-edit-rows-wrapper')
+
+  getColumnsScrollContainer: -> @getRowsContainer()
 
   getColumnsWrapper: -> @head.querySelector('.table-edit-header-wrapper')
 
@@ -500,79 +354,15 @@ class TableElement extends HTMLElement
   insertColumnAfter: ->
     @table.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
-  deleteActiveColumn: ->
-    column = @table.getColumn(@activeCellPosition.column).name
-    confirmation = atom.confirm
-      message: 'Are you sure you want to delete the current active column?'
-      detailedMessage: "You are deleting the column '#{column}'."
-      buttons: ['Delete Column', 'Cancel']
-
-    @table.removeColumnAt(@activeCellPosition.column) if confirmation is 0
-
-  columnAtScreenPosition: (x,y) ->
-    return unless x? and y?
-
-    content = @getColumnsContainer()
-
-    bodyWidth = content.offsetWidth
-    bodyOffset = content.getBoundingClientRect()
-
-    x -= bodyOffset.left
-    y -= bodyOffset.top
-
-    columnsWidths = @getColumnsScreenWidths()
-    column = -1
-    pad = 0
-    while pad <= x
-      pad += columnsWidths[column+1]
-      column++
-
-    @table.getColumn(column)
-
-  normalizeColumnsWidths: (columnsWidths) ->
-    restWidth = 1
-    wholeWidth = 0
-    missingIndices = []
-    widths = []
-
-    for index in [0...@table.getColumnsCount()]
-      width = columnsWidths[index]
-      if width?
-        widths[index] = width
-        wholeWidth += width
-        restWidth -= width
-      else
-        missingIndices.push index
-
-    if (missingCount = missingIndices.length)
-      if restWidth <= 0 and missingCount
-        restWidth = wholeWidth
-        wholeWidth *= 2
-
-      for index in missingIndices
-        widths[index] = restWidth / missingCount
-
-    if wholeWidth > 1
-      widths = widths.map (w) -> w * (1 / wholeWidth)
-
-    widths
-
   onColumnAdded: ({column}) ->
-    @calculateNewColumnWidthFor(column) if @columnsWidths?
+    @updateScreenColumns()
     @subscribeToColumn(column)
     @requestUpdate()
 
   onColumnRemoved: ({column, index}) ->
-    @columnsWidths.splice(index, 1) if @columnsWidths?
+    @updateScreenColumns()
     @unsubscribeFromColumn(column)
     @requestUpdate()
-
-  calculateNewColumnWidthFor: (column) ->
-    index = @table.getColumns().indexOf(column)
-    newColumnWidth = 1 / (@table.getColumnsCount())
-    columnsWidths = @getColumnsWidths()
-    columnsWidths.splice(index, 0, newColumnWidth)
-    @setColumnsWidths(columnsWidths)
 
   subscribeToColumn: (column) ->
     @columnSubscriptions ?= {}
@@ -584,6 +374,8 @@ class TableElement extends HTMLElement
   unsubscribeFromColumn: (column) ->
     @columnSubscriptions[column.id]?.dispose()
     delete @columnSubscriptions[column.id]
+
+  @axis 'x', 'width', 'left', 'column', 'columns'
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
@@ -613,9 +405,8 @@ class TableElement extends HTMLElement
 
   cellScreenRect: (position) ->
     {top, left} = @cellScreenPosition(position)
-    widths = @getColumnsScreenWidths()
 
-    width = widths[position.column]
+    width = @getScreenColumnWidthAt(position.column)
     height = @getScreenRowHeightAt(position.row)
 
     {top, left, width, height}
@@ -623,53 +414,39 @@ class TableElement extends HTMLElement
   cellScreenPosition: (position) ->
     {top, left} = @cellScrollPosition(position)
 
-    content = @getRowsWrapper()
-    contentOffset = content.getBoundingClientRect()
-
     {
-      top: top + contentOffset.top,
-      left: left + contentOffset.left
+      top: top + @getRowsOffsetContainer().getBoundingClientRect().top,
+      left: left + @getColumnsOffsetContainer().getBoundingClientRect().left
     }
 
   cellScrollPosition: (position) ->
     position = Point.fromObject(position)
-    margins = @getColumnsScreenMargins()
     {
       top: @getScreenRowOffsetAt(position.row)
-      left: margins[position.column]
+      left: @getScreenColumnOffsetAt(position.column)
     }
 
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    content = @getRowsWrapper()
-
-    bodyWidth = content.offsetWidth
-    bodyOffset = content.getBoundingClientRect()
-
-    x -= bodyOffset.left
-    y -= bodyOffset.top
-
-    row = @findRowAtPosition(y)
-
-    columnsWidths = @getColumnsScreenWidths()
-    column = -1
-    pad = 0
-    while pad <= x
-      pad += columnsWidths[column+1]
-      column++
+    row = @findRowAtScreenPosition(y)
+    column = @findColumnAtScreenPosition(x)
 
     {row, column}
 
   screenPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @modelRowToScreenRow(row), column}
+    {row: @modelRowToScreenRow(row), column: @modelColumnToScreenColumn(column)}
 
   modelPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @screenRowToModelRow(row), column}
+    {row: @screenRowToModelRow(row), column: @screenColumnToModelColumn(column)}
+
+  makeCellVisible: (position) ->
+    @makeRowVisible(position.row)
+    @makeColumnVisible(position.column)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -738,6 +515,19 @@ class TableElement extends HTMLElement
     @activeCellPosition.row = end
     @afterActiveCellMove()
 
+  moveToLeft: ->
+    return if @activeCellPosition.column is 0
+
+    @activeCellPosition.column = 0
+    @afterActiveCellMove()
+
+  moveToRight: ->
+    end = @getLastColumn()
+    return if @activeCellPosition.column is end
+
+    @activeCellPosition.column = end
+    @afterActiveCellMove()
+
   pageDown: ->
     amount = @getPageMovesAmount()
     if @activeCellPosition.row + amount < @table.getRowsCount()
@@ -759,7 +549,7 @@ class TableElement extends HTMLElement
   afterActiveCellMove: ->
     @setSelectionFromActiveCell()
     @requestUpdate()
-    @makeRowVisible(@activeCellPosition.row)
+    @makeCellVisible(@activeCellPosition)
 
   getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
 
@@ -790,7 +580,7 @@ class TableElement extends HTMLElement
     @editorElement.style.display = 'block'
     @editorElement.focus()
 
-    @editor.setText(activeCell.getValue().toString())
+    @editor.setText(String(activeCell.getValue() ? @getUndefinedDisplay()))
 
     @editor.getBuffer().history.clearUndoStack()
     @editor.getBuffer().history.clearRedoStack()
@@ -902,10 +692,8 @@ class TableElement extends HTMLElement
     width = 0
     height = 0
 
-    widths = @getColumnsScreenWidths()
-
     for col in [@selection.start.column..@selection.end.column]
-      width += widths[col]
+      width += @getScreenColumnWidthAt(col)
 
     for row in [@selection.start.row..@selection.end.row]
       height += @getScreenRowHeightAt(row)
@@ -1175,24 +963,10 @@ class TableElement extends HTMLElement
     return unless @dragging
 
     moveX = pageX - startX
-    columnsScreenWidths = @getColumnsScreenWidths()
-    columnsWidths = @getColumnsWidths().concat()
 
-    leftCellWidth = columnsScreenWidths[leftCellIndex]
-    rightCellWidth = columnsScreenWidths[rightCellIndex]
-
-    if @absoluteColumnsWidths
-      columnsWidths[leftCellIndex] = leftCellWidth + moveX
-    else
-      columnsWidth = @getColumnsWrapper().offsetWidth
-
-      leftCellRatio = (leftCellWidth + moveX) / columnsWidth
-      rightCellRatio = (rightCellWidth - moveX) / columnsWidth
-
-      columnsWidths[leftCellIndex] = leftCellRatio
-      columnsWidths[rightCellIndex] = rightCellRatio
-
-    @setColumnsWidths(columnsWidths)
+    column = @getScreenColumn(leftCellIndex)
+    width = @getScreenColumnWidthAt(leftCellIndex)
+    column.width = width + moveX
 
     @getColumnResizeRuler().classList.remove('visible')
     @dragSubscription.dispose()
@@ -1207,7 +981,7 @@ class TableElement extends HTMLElement
   initializeDragEvents: (object, events) ->
     @dragSubscription = new CompositeDisposable
     for event,callback of events
-      @dragSubscription.add @addEventDisposable object, event, callback
+      @dragSubscription.add @addDisposableEventListener object, event, callback
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
@@ -1241,10 +1015,17 @@ class TableElement extends HTMLElement
 
   setScrollTop: (scroll) ->
     if scroll?
-      @body.scrollTop = scroll
+      @getRowsContainer().scrollTop = scroll
       @requestUpdate(false)
 
-    @body.scrollTop
+    @getRowsContainer().scrollTop
+
+  setScrollLeft: (scroll) ->
+    if scroll?
+      @getRowsContainer().scrollLeft
+      @requestUpdate(false)
+
+    @getRowsContainer().scrollLeft
 
   requestUpdate: (@hasChanged=true) =>
     return if @updateRequested
@@ -1258,22 +1039,36 @@ class TableElement extends HTMLElement
     return unless @table?
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
+    firstVisibleColumn = @getFirstVisibleColumn()
+    lastVisibleColumn = @getLastVisibleColumn()
 
-    return if firstVisibleRow >= @firstRenderedRow and lastVisibleRow <= @lastRenderedRow and not @hasChanged
+    if firstVisibleRow >= @firstRenderedRow and
+       lastVisibleRow <= @lastRenderedRow and
+       firstVisibleColumn >= @firstRenderedColumn and
+       lastVisibleColumn <= @lastRenderedColumn and
+       not @hasChanged
+      return
 
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
+
+    columnOverdraw = @getColumnOverdraw()
+    firstColumn = Math.max 0, firstVisibleColumn - columnOverdraw
+    lastColumn = Math.min @table.getColumnsCount(), lastVisibleColumn + columnOverdraw
 
     state = {
       @table
       @gutter
       firstRow
       lastRow
+      firstColumn
+      lastColumn
       @absoluteColumnsWidths
-      columnsWidths: @getColumnsWidthsCSS()
+      columnsWidths: null
       columnsAligns: @getColumnsAligns()
       totalRows: @table.getRowsCount()
+      totalColumns: @table.getColumnsCount()
     }
 
     @bodyComponent.setState state
@@ -1281,7 +1076,10 @@ class TableElement extends HTMLElement
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
+    @firstRenderedColumn = firstColumn
+    @lastRenderedColumn = lastColumn
     @hasChanged = false
+
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
 

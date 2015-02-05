@@ -6,12 +6,13 @@ module.exports = React.createClass
     {}
 
   render: ->
-    {parentView, row, cell, index, columnWidth, columnAlign, classes} = @props
+    {parentView, row, cell, index, columnAlign, classes} = @props
 
     div {
       key: "cell-#{row}-#{index}"
       className: classes.join(' ')
       style:
-        width: columnWidth
+        width: "#{parentView.getScreenColumnWidthAt(index)}px"
+        left: "#{parentView.getScreenColumnOffsetAt(index)}px"
         'text-align': columnAlign ? 'left'
     }, cell.getValue() ? parentView.getUndefinedDisplay()

@@ -9,6 +9,7 @@
     "atom": ">0.130.0"
   },
   "dependencies": {
+    "atom-utils": "0.4.x",
     "event-kit": ">= 0.7.2",
     "underscore-plus": "^1",
     "mixto": "1.x",
@@ -18,6 +19,7 @@
     "react-atom-fork": "0.x",
     "space-pen": "4.x",
     "reactionary-atom-fork": "0.x",
-    "atom-space-pen-views": "^0"
+    "atom-space-pen-views": "^0",
+    "coffee-script": "1.7.x"
   }
 }

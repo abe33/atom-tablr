@@ -46,5 +46,8 @@ module.exports = {objectCenterCoordinates, mouseEvent, inputEvent}
 module.exports.mousewheel = (obj, deltaX=0, deltaY=0) ->
   obj.dispatchEvent(mouseEvent 'mousewheel', {deltaX, deltaY})
 
+module.exports.scroll = (obj, deltaX=0, deltaY=0) ->
+  obj.dispatchEvent(mouseEvent 'scroll', {deltaX, deltaY})
+
 module.exports.textInput = (obj, data) ->
   obj.dispatchEvent(inputEvent 'textInput', {data})

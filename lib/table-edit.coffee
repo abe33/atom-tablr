@@ -20,15 +20,19 @@ module.exports =
       default: 16
     rowOverdraw:
       type: 'integer'
-      default: 10
+      default: 3
+    columnOverdraw:
+      type: 'integer'
+      default: 2
 
   activate: (state) ->
     Table ?= require './table'
     TableView ?= require './table-element'
     TableView.registerViewProvider()
 
-    atom.workspaceView.command 'table-edit:demo', => @openDemo()
-    atom.workspaceView.command 'table-edit:demo-with-gutter', => @openDemoWithGutter()
+    atom.commands.add 'atom-workspace',
+      'table-edit:demo', => @openDemo()
+      'table-edit:demo-with-gutter', => @openDemoWithGutter()
 
     # @openDemoWithGutter()
 
