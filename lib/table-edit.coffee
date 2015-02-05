@@ -31,8 +31,8 @@ module.exports =
     TableView.registerViewProvider()
 
     atom.commands.add 'atom-workspace',
-      'table-edit:demo', => @openDemo()
-      'table-edit:demo-with-gutter', => @openDemoWithGutter()
+      'table-edit:demo': => @openDemo()
+      'table-edit:demo-with-gutter': => @openDemoWithGutter()
 
     # @openDemoWithGutter()
 
