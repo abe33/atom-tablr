@@ -197,7 +197,7 @@ atom-table-editor {
       border: 1px solid @background-color-highlight;
       position: relative;
     }
-    
+
     .table-edit-content {
       .flex-container;
       position: absolute;
@@ -340,16 +340,6 @@ atom-table-editor {
       display: block;
       min-width: 100%;
     }
-    .table-edit-row {
-      position: absolute;
-      overflow: hidden;
-      width: 100%;
-      border-top: 1px solid @background-color-highlight;
-
-      &:first-child {
-        border-top: none;
-      }
-    }
 
     //     ######  ######## ##       ##        ######
     //    ##    ## ##       ##       ##       ##    ##
@@ -364,6 +354,7 @@ atom-table-editor {
     }
     .table-edit-cell {
       .cell;
+      border-bottom: 1px solid @background-color-highlight;
     }
 
     //     ######  ########    ###    ######## ########  ######

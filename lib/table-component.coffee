@@ -20,11 +20,11 @@ module.exports = React.createClass
     height = @getTableHeight()
     width = @getTableWidth()
 
-    rows = for row in [firstRow...lastRow]
+    cells = []
+    for row in [firstRow...lastRow]
       rowData = parentView.getScreenRow(row)
 
       continue unless rowData?
-      cells = []
 
       for i in [firstColumn...lastColumn]
         cell = rowData.getCell(i)
@@ -33,6 +33,8 @@ module.exports = React.createClass
           classes.push 'active'
         else if parentView.isActiveColumn(i)
           classes.push 'active-column'
+        else if parentView.isActiveRow(row)
+          classes.push 'active-row'
 
         classes.push 'selected' if parentView.isSelectedPosition([row, i])
 
@@ -47,24 +49,12 @@ module.exports = React.createClass
           columnAlign: columnsAligns[i]
         })
 
-      classes = ['table-edit-row']
-      classes.push 'active-row' if parentView.isActiveRow(row)
-
-      div {
-        key: "row-#{row}"
-        className: classes.join(' ')
-        'data-row-id': row + 1
-        style:
-          height: "#{parentView.getScreenRowHeightAt(row)}px"
-          top: "#{parentView.getScreenRowOffsetAt(row)}px"
-      }, cells
-
     rowsWrapper = div {
       className: 'table-edit-rows-wrapper'
       style:
         height: "#{height}px"
         width: "#{width}px"
-    }, rows
+    }, cells
 
     subComponentProps = {parentView, height}
     subComponentProps[k] = v for k,v of @state
