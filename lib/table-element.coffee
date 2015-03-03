@@ -23,9 +23,6 @@ class TableElement extends HTMLElement
   EventsDelegation.includeInto(this)
   Axis.includeInto(this)
 
-  domPollingInterval: 100
-  domPollingIntervalId: null
-  domPollingPaused: false
   gutter: false
   rowOffsets: null
   columnOffsets: null
@@ -187,7 +184,7 @@ class TableElement extends HTMLElement
     @computeRowOffsets()
     @computeColumnOffsets()
     @mountComponent() unless @bodyComponent?.isMounted()
-    @domPollingIntervalId = setInterval((=> @pollDOM()), @domPollingInterval)
+    @subscriptions.add atom.views.pollDocument => @pollDOM()
     @measureHeightAndWidth()
     @requestUpdate()
     @attached = true
@@ -214,16 +211,6 @@ class TableElement extends HTMLElement
   hideGutter: ->
     @gutter = false
     @requestUpdate()
-
-  pauseDOMPolling: ->
-    @domPollingPaused = true
-    @resumeDOMPollingAfterDelay ?= debounce(@resumeDOMPolling, 100)
-    @resumeDOMPollingAfterDelay()
-
-  resumeDOMPolling: ->
-    @domPollingPaused = false
-
-  resumeDOMPollingAfterDelay: null
 
   pollDOM: ->
     return if @domPollingPaused or @frameRequested

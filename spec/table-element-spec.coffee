@@ -200,7 +200,7 @@ describe 'tableElement', ->
         tableElement.style.height = '600px'
 
       it 'repaints the table', ->
-        advanceClock(150)
+        tableElement.pollDOM()
         nextAnimationFrame()
         expect(tableShadowRoot.querySelectorAll('.table-edit-rows')).not.toEqual(18)
     describe 'the columns widths', ->
