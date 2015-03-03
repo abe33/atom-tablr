@@ -340,20 +340,26 @@ describe 'Table', ->
 
         table.onDidChangeRows spy
 
-        table.removeRowsInRange([0,2])
-
       it 'removes the rows from the table', ->
+        table.removeRowsInRange([0,2])
         expect(table.getRowsCount()).toEqual(1)
         expect(table.getRow(0).key).toEqual('ofo')
         expect(table.getRow(0).value).toEqual('arb')
 
       it 'dispatches a single did-change-rows', ->
+        table.removeRowsInRange([0,2])
         expect(spy).toHaveBeenCalled()
         expect(spy.calls.length).toEqual(1)
         expect(spy.calls[0].args[0]).toEqual({
           oldRange: {start: 0, end: 2}
           newRange: {start: 0, end: 0}
         })
+
+      describe 'with a range running to infinity', ->
+        it 'removes all the rows in the table', ->
+          table.removeRowsInRange([0, Infinity])
+
+          expect(table.getRowsCount()).toEqual(0)
 
     describe '::removeRowsInRange', ->
       it 'throws an error without range', ->

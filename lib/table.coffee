@@ -296,6 +296,8 @@ class Table
 
     rowsValues = []
 
+    range.end = @getRowsCount() if range.end is Infinity
+
     if transaction
       options = @getRowsInRange(range).map (row) -> _.clone(row.options)
 
