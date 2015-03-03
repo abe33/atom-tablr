@@ -10,7 +10,7 @@ Cell = require '../lib/cell'
 CustomCellComponent = require './fixtures/custom-cell-component'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
-stylesheetPath = path.resolve __dirname, '..', 'stylesheets', 'table-edit.less'
+stylesheetPath = path.resolve __dirname, '..', 'styles', 'table-edit.less'
 stylesheet = "
   #{atom.themes.loadStylesheet(stylesheetPath)}
 
