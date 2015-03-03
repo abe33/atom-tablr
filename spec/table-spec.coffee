@@ -18,6 +18,15 @@ describe 'Table', ->
   it 'has 0 cells', ->
     expect(table.getCellsCount()).toEqual(0)
 
+  it 'has a title', ->
+    expect(table.getTitle()).toEqual('Untitled Table')
+
+  it 'has a long title', ->
+    expect(table.getLongTitle()).toEqual('Untitled Table')
+
+  it 'has an undefined path', ->
+    expect(table.getPath()).toBeUndefined()
+
   describe 'adding a row on a table without columns', ->
     it 'raises an exception', ->
       expect(-> table.addRow {}).toThrow()

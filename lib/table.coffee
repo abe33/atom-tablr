@@ -21,6 +21,12 @@ class Table
     @emitter = new Emitter
     @columnSubscriptions = {}
 
+  getTitle: -> 'Untitled Table'
+
+  getLongTitle: -> @getTitle()
+
+  getPath: ->
+
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##
   #    ##       ##     ## ##       ####  ##    ##    ##
