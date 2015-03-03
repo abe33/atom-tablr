@@ -1,4 +1,4 @@
-[Table, TableView] = []
+[Table, TableView, url] = []
 
 module.exports =
 
@@ -34,7 +34,13 @@ module.exports =
       'table-edit:demo': => @openDemo()
       'table-edit:demo-with-gutter': => @openDemoWithGutter()
 
-    # @openDemoWithGutter()
+    atom.workspace.addOpener (uriToOpen) ->
+      url ||= require 'url'
+
+      {protocol, host} = url.parse uriToOpen
+      return unless protocol is 'table:'
+
+      return new Table
 
   deactivate: ->
 
