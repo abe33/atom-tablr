@@ -258,6 +258,7 @@ class TableElement extends HTMLElement
       @computeColumnOffsets()
       @requestUpdate()
     @modelSubscriptions.add @table.onDidChangeRows =>
+      @updateScreenRows()
       @computeRowOffsets()
       @requestUpdate()
     @modelSubscriptions.add @table.onDidChangeRowsOptions =>
