@@ -28,11 +28,10 @@ module.exports =
   activate: (state) ->
     Table ?= require './table'
     TableView ?= require './table-element'
-    TableView.registerViewProvider()
+    TableView.registerViewProvider(true)
 
     atom.commands.add 'atom-workspace',
-      'table-edit:demo': => @openDemo()
-      'table-edit:demo-with-gutter': => @openDemoWithGutter()
+      'table-edit:demo-in-pane': => @openDemoInPane()
 
     atom.workspace.addOpener (uriToOpen) ->
       url ||= require 'url'
@@ -40,52 +39,26 @@ module.exports =
       {protocol, host} = url.parse uriToOpen
       return unless protocol is 'table:'
 
-      return new Table
+      table = new Table
+
+      table.addColumn 'key'
+      table.addColumn 'value', align: 'right'
+      table.addColumn 'foo', align: 'right'
+
+      for i in [0...1000]
+        table.addRow [
+          "row#{i}"
+          Math.random() * 100
+          if i % 2 is 0 then 'yes' else 'no'
+        ]
+
+      table.clearUndoStack()
+
+      return table
 
   deactivate: ->
 
   serialize: ->
 
-  openDemo: -> @getTableView()
-
-  openDemoWithGutter: ->
-    tableElement = @getTableView()
-    tableElement.setAbsoluteColumnsWidths(true)
-
-    tableElement.showGutter()
-
-  getTableView: ->
-    table = new Table
-    table.addColumn 'key'
-    table.addColumn 'value', align: 'right'
-    table.addColumn 'foo', align: 'right'
-
-    for i in [0...1000]
-      table.addRow [
-        "row#{i}"
-        Math.random() * 100
-        if i % 2 is 0 then 'yes' else 'no'
-      ]
-
-    table.clearUndoStack()
-
-    tableElement = atom.views.getView(table)
-    tableElement.setRowHeightAt(3, 90)
-    tableElement.setRowHeightAt(30, 110)
-    tableElement.setRowHeightAt(60, 60)
-    tableElement.setRowHeightAt(90, 80)
-
-    tableElement.classList.add('demo')
-    tableElement.classList.add('overlay')
-    tableElement.classList.add('from-top')
-    tableElement.style.height = '400px'
-
-    tableElement.attach(atom.views.getView(atom.workspace))
-
-    atom.commands.add tableElement, 'core:cancel', -> tableElement.destroy()
-
-    tableElement.sortBy('value')
-
-    tableElement.focus()
-
-    tableElement
+  openDemoInPane: ->
+    atom.workspace.open('table://demo')

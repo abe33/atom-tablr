@@ -1085,8 +1085,9 @@ class TableElement extends HTMLElement
 
 module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
 
-TableElement.registerViewProvider = ->
+TableElement.registerViewProvider = (showGutter=false) ->
   atom.views.addViewProvider Table, (model) ->
     element = new TableElement
     element.setModel(model)
+    element.showGutter() if showGutter
     element
