@@ -579,27 +579,28 @@ class TableElement extends HTMLElement
     newValue = @editor.getText()
     activeCell.setValue(newValue) unless newValue is activeCell.getValue()
 
-  startColumnEdit: ({target}) =>
+  startColumnEdit: ({target, pageX, pageY}) =>
     @createTextEditor() unless @editor?
 
     @subscribeToColumnTextEditor(@editor)
 
     @editing = true
 
-    activeColumn = @getActiveColumn()
-    activeColumnRect = target.parentNode.getBoundingClientRect()
+    columnIndex = @findColumnAtScreenPosition(pageX, pageY)
+    if activeColumn = @getScreenColumn(columnIndex)
+      activeColumnRect = target.parentNode.getBoundingClientRect()
 
-    @editorElement.style.top = @toUnit(activeColumnRect.top)
-    @editorElement.style.left =  @toUnit(activeColumnRect.left)
-    @editorElement.style.width = @toUnit(activeColumnRect.width)
-    @editorElement.style.height = @toUnit(activeColumnRect.height)
-    @editorElement.style.display = 'block'
+      @editorElement.style.top = @toUnit(activeColumnRect.top)
+      @editorElement.style.left =  @toUnit(activeColumnRect.left)
+      @editorElement.style.width = @toUnit(activeColumnRect.width)
+      @editorElement.style.height = @toUnit(activeColumnRect.height)
+      @editorElement.style.display = 'block'
 
-    @editorElement.focus()
-    @editor.setText(activeColumn.name)
+      @editorElement.focus()
+      @editor.setText(activeColumn.name)
 
-    @editor.getBuffer().history.clearUndoStack()
-    @editor.getBuffer().history.clearRedoStack()
+      @editor.getBuffer().history.clearUndoStack()
+      @editor.getBuffer().history.clearRedoStack()
 
   confirmColumnEdit: ->
     @stopEdit()
