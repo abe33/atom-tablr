@@ -166,5 +166,4 @@ class Axis extends Mixin
     mixin = AxisMixin({axis, dimension, offset, singular, plural})
     mixin[key] = value for key,value of ext
 
-    console.log mixin
     mixin.includeInto(this)
