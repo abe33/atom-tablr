@@ -6,7 +6,7 @@
   "repository": "https://github.com/abe33/atom-table-edit",
   "license": "MIT",
   "engines": {
-    "atom": ">0.130.0"
+    "atom": ">=1.0.0"
   },
   "dependencies": {
     "atom-utils": "0.4.x",
