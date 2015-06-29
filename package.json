@@ -9,7 +9,7 @@
     "atom": ">=1.0.0"
   },
   "dependencies": {
-    "atom-utils": "0.4.x",
+    "atom-utils": "0.6.x",
     "event-kit": ">= 0.7.2",
     "underscore-plus": "^1",
     "mixto": "1.x",
