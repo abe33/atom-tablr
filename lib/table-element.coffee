@@ -1,7 +1,7 @@
 {Point, Range, TextEditor} = require 'atom'
 {View, $} = require 'space-pen'
 {CompositeDisposable, Disposable} = require 'event-kit'
-{EventsDelegation} = require 'atom-utils'
+{EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 React = require 'react-atom-fork'
 
@@ -21,7 +21,29 @@ module.exports =
 class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
+  SpacePenDSL.includeInto(this)
   Axis.includeInto(this)
+
+  @useShadowRoot()
+
+  @content: ->
+    @div class: 'table-edit-header', outlet: 'head', =>
+      @div class: 'table-edit-header-content', =>
+        @div class: 'table-edit-header-filler'
+        @div class: 'table-edit-header-row', =>
+          @div class: 'table-edit-header-wrapper', outlet: 'tableHeaderCells'
+        @div class: 'column-resize-ruler', outlet: 'columnRuler'
+
+    @div class: 'table-edit-content', outlet: 'body', =>
+      @div class: 'table-edit-rows', =>
+        @div class: 'table-edit-rows-wrapper', outlet: 'tableCells'
+
+      @div class: 'table-edit-gutter', outlet: 'tableGutter', =>
+        @div class: 'table-edit-gutter-filler'
+      @div class: 'row-resize-ruler', outlet: 'rowRuler'
+
+    @input class: 'hidden-input', outlet: 'hiddenInput'
+    @tag 'content', select: 'atom-text-editor'
 
   gutter: false
   rowOffsets: null
@@ -32,31 +54,10 @@ class TableElement extends HTMLElement
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
 
-    @initializeContent()
+    @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
+
     @subscribeToContent()
     @subscribeToConfig()
-
-  initializeContent: ->
-    @shadowRoot = @createShadowRoot()
-
-    @body = document.createElement('div')
-    @body.className = 'table-edit-body'
-
-    @head = document.createElement('div')
-    @head.className = 'table-edit-header'
-
-    @hiddenInput = document.createElement('input')
-    @hiddenInput.className = 'hidden-input'
-
-    @contentInsertion = document.createElement('content')
-    @contentInsertion.select = 'atom-text-editor'
-
-    @shadowRoot.appendChild(@hiddenInput)
-    @shadowRoot.appendChild(@head)
-    @shadowRoot.appendChild(@body)
-    @shadowRoot.appendChild(@contentInsertion)
-
-    @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
 
   subscribeToContent: ->
     @subscriptions.add @subscribeTo @hiddenInput,
@@ -183,16 +184,16 @@ class TableElement extends HTMLElement
     @buildModel() unless @getModel()?
     @computeRowOffsets()
     @computeColumnOffsets()
-    @mountComponent() unless @bodyComponent?.isMounted()
+    # @mountComponent() unless @bodyComponent?.isMounted()
     @subscriptions.add atom.views.pollDocument => @pollDOM()
     @measureHeightAndWidth()
     @requestUpdate()
     @attached = true
 
-  mountComponent: ->
-    props = {parentView: this}
-    @bodyComponent = React.renderComponent(TableComponent(props), @body)
-    @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
+  # mountComponent: ->
+  #   props = {parentView: this}
+  #   @bodyComponent = React.renderComponent(TableComponent(props), @body)
+  #   @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
 
   detachedCallback: ->
     @attached = false
@@ -1046,22 +1047,22 @@ class TableElement extends HTMLElement
     firstColumn = Math.max 0, firstVisibleColumn - columnOverdraw
     lastColumn = Math.min @table.getColumnsCount(), lastVisibleColumn + columnOverdraw
 
-    state = {
-      @table
-      @gutter
-      firstRow
-      lastRow
-      firstColumn
-      lastColumn
-      @absoluteColumnsWidths
-      columnsWidths: null
-      columnsAligns: @getColumnsAligns()
-      totalRows: @table.getRowsCount()
-      totalColumns: @table.getColumnsCount()
-    }
-
-    @bodyComponent.setState state
-    @headComponent.setState state
+    # state = {
+    #   @table
+    #   @gutter
+    #   firstRow
+    #   lastRow
+    #   firstColumn
+    #   lastColumn
+    #   @absoluteColumnsWidths
+    #   columnsWidths: null
+    #   columnsAligns: @getColumnsAligns()
+    #   totalRows: @table.getRowsCount()
+    #   totalColumns: @table.getColumnsCount()
+    # }
+    #
+    # @bodyComponent.setState state
+    # @headComponent.setState state
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
