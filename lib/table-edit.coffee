@@ -31,41 +31,62 @@ module.exports =
     TableView.registerViewProvider(true)
 
     atom.commands.add 'atom-workspace',
-      'table-edit:demo-in-pane': => @openDemoInPane()
+      'table-edit:demo-large': => atom.workspace.open('table://large')
+      'table-edit:demo-small': => atom.workspace.open('table://small')
 
-    atom.workspace.addOpener (uriToOpen) ->
+    atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
 
       {protocol, host} = url.parse uriToOpen
       return unless protocol is 'table:'
 
-      table = new Table
+      switch host
+        when 'large' then @getLargeTable()
+        when 'small' then @getSmallTable()
 
-      table.addColumn 'key', width: 150, align: 'right'
-      table.addColumn 'value', width: 150, align: 'center'
+  getSmallTable: ->
+    table = new Table
+
+    table.addColumn 'key', width: 150, align: 'right'
+    table.addColumn 'value', width: 150, align: 'center'
+    table.addColumn 'locked', width: 150, align: 'left'
+
+    for i in [0...100]
+      table.addRow [
+        "row#{i}"
+        Math.random() * 100
+        if i % 2 is 0 then 'yes' else 'no'
+      ]
+
+    table.clearUndoStack()
+
+    return table
+
+  getLargeTable: ->
+    table = new Table
+
+    table.addColumn 'key', width: 150, align: 'right'
+    table.addColumn 'value', width: 150, align: 'center'
+    for i in [0..100]
+      table.addColumn 'column_' + i, width: 150, align: 'left'
+
+    for i in [0...1000]
+      data = [
+        "row#{i}"
+        Math.random() * 100
+      ]
       for i in [0..100]
-        table.addColumn 'column_' + i, width: 150, align: 'left'
+        if i % 2 is 0
+          data.push if i % 2 is 0 then 'yes' else 'no'
+        else
+          data.push Math.random() * 100
 
-      for i in [0...1000]
-        data = [
-          "row#{i}"
-          Math.random() * 100
-        ]
-        for i in [0..100]
-          if i % 2 is 0
-            data.push if i % 2 is 0 then 'yes' else 'no'
-          else
-            data.push Math.random() * 100
+      table.addRow data
 
-        table.addRow data
+    table.clearUndoStack()
 
-      table.clearUndoStack()
-
-      return table
+    return table
 
   deactivate: ->
 
   serialize: ->
-
-  openDemoInPane: ->
-    atom.workspace.open('table://demo')
