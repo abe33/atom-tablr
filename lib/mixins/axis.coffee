@@ -11,7 +11,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
   Plural = capitalize plural
   Axis = capitalize axis
 
-  mixinSource =  """
+  source =  """
   class #{Plural}Axis extends Mixin
     getActive#{Singular}: ->
       @table.get#{Singular}(@activeCellPosition.#{singular})
@@ -21,6 +21,12 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
 
     isSelected#{Singular}: (#{singular}) ->
       @selection.start.#{singular} <= #{singular} <= @selection.end.#{singular}
+
+    getContent#{Dimension}: ->
+      lastIndex = @getLast#{Singular}()
+      return 0 if lastIndex < 1
+
+      @getScreen#{Singular}OffsetAt(lastIndex) + @getScreen#{Singular}#{Dimension}At(lastIndex)
 
     get#{Singular}#{Dimension}: ->
       @#{singular}#{Dimension} ? @config#{Singular}#{Dimension}
@@ -158,7 +164,7 @@ AxisMixin = ({axis, dimension, offset, singular, plural}) ->
   sandbox = {Mixin, atom, console}
   context = vm.createContext(sandbox)
 
-  vm.runInContext(compile(mixinSource, bare: true), context, "axis-#{axis}.vm")
+  vm.runInContext(compile(source, bare: true), context, "#{axis}-axis.vm")
 
 module.exports =
 class Axis extends Mixin

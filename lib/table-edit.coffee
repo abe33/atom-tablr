@@ -41,16 +41,23 @@ module.exports =
 
       table = new Table
 
-      table.addColumn 'key'
-      table.addColumn 'value', align: 'right'
-      table.addColumn 'foo', align: 'right'
+      table.addColumn 'key', width: 150, align: 'right'
+      table.addColumn 'value', width: 150, align: 'center'
+      for i in [0..100]
+        table.addColumn 'column_' + i, width: 150, align: 'left'
 
       for i in [0...1000]
-        table.addRow [
+        data = [
           "row#{i}"
           Math.random() * 100
-          if i % 2 is 0 then 'yes' else 'no'
         ]
+        for i in [0..100]
+          if i % 2 is 0
+            data.push if i % 2 is 0 then 'yes' else 'no'
+          else
+            data.push Math.random() * 100
+
+        table.addRow data
 
       table.clearUndoStack()
 

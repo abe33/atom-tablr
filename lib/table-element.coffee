@@ -8,7 +8,11 @@ React = require 'react-atom-fork'
 Table = require './table'
 TableComponent = require './table-component'
 TableHeaderComponent = require './table-header-component'
+TableCellElement = require './table-cell-element'
+TableHeaderCellElement = require './table-header-cell-element'
+TableGutterCellElement = require './table-gutter-cell-element'
 Axis = require './mixins/axis'
+Pool = require './mixins/pool'
 
 PIXEL = 'px'
 
@@ -23,27 +27,35 @@ class TableElement extends HTMLElement
   EventsDelegation.includeInto(this)
   SpacePenDSL.includeInto(this)
   Axis.includeInto(this)
+  Pool.includeInto(this)
 
   @useShadowRoot()
 
   @content: ->
     @div class: 'table-edit-header', outlet: 'head', =>
       @div class: 'table-edit-header-content', =>
-        @div class: 'table-edit-header-filler'
-        @div class: 'table-edit-header-row', =>
+        @div class: 'table-edit-header-filler', outlet: 'tableHeaderFiller'
+        @div class: 'table-edit-header-row', outlet: 'tableHeaderRow', =>
           @div class: 'table-edit-header-wrapper', outlet: 'tableHeaderCells'
         @div class: 'column-resize-ruler', outlet: 'columnRuler'
 
-    @div class: 'table-edit-content', outlet: 'body', =>
-      @div class: 'table-edit-rows', =>
-        @div class: 'table-edit-rows-wrapper', outlet: 'tableCells'
+    @div class: 'table-edit-body', outlet: 'body', =>
+      @div class: 'table-edit-content', =>
+        @div class: 'table-edit-rows', outlet: 'tableRows', =>
+          @div class: 'table-edit-rows-wrapper', outlet: 'tableCells', =>
+            @div class: 'selection-box', outlet: 'tableSelectionBox'
+            @div class: 'selection-box-handle', outlet: 'tableSelectionBoxHandle'
 
-      @div class: 'table-edit-gutter', outlet: 'tableGutter', =>
-        @div class: 'table-edit-gutter-filler'
-      @div class: 'row-resize-ruler', outlet: 'rowRuler'
+        @div class: 'table-edit-gutter', outlet: 'tableGutter', =>
+          @div class: 'table-edit-gutter-filler', outlet: 'tableGutterFiller'
+        @div class: 'row-resize-ruler', outlet: 'rowRuler'
 
     @input class: 'hidden-input', outlet: 'hiddenInput'
     @tag 'content', select: 'atom-text-editor'
+
+  @pool 'cell', 'cells'
+  @pool 'headerCell', 'headerCells'
+  @pool 'gutterCell', 'gutterCells'
 
   gutter: false
   rowOffsets: null
@@ -51,6 +63,10 @@ class TableElement extends HTMLElement
   absoluteColumnsWidths: false
 
   createdCallback: ->
+    @cells = []
+    @headerCells = []
+    @gutterCells = []
+
     @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
 
@@ -58,6 +74,10 @@ class TableElement extends HTMLElement
 
     @subscribeToContent()
     @subscribeToConfig()
+
+    @initCellsPool(TableCellElement, @tableCells)
+    @initHeaderCellsPool(TableHeaderCellElement, @tableHeaderCells)
+    @initGutterCellsPool(TableGutterCellElement, @tableGutter)
 
   subscribeToContent: ->
     @subscriptions.add @subscribeTo @hiddenInput,
@@ -110,6 +130,9 @@ class TableElement extends HTMLElement
               @toggleSortDirection()
           else
             @sortBy(column.name)
+
+    @subscriptions.add @subscribeTo @getRowsContainer(),
+      'scroll': (e) => @requestUpdate()
 
     @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
@@ -184,16 +207,10 @@ class TableElement extends HTMLElement
     @buildModel() unless @getModel()?
     @computeRowOffsets()
     @computeColumnOffsets()
-    # @mountComponent() unless @bodyComponent?.isMounted()
     @subscriptions.add atom.views.pollDocument => @pollDOM()
     @measureHeightAndWidth()
     @requestUpdate()
     @attached = true
-
-  # mountComponent: ->
-  #   props = {parentView: this}
-  #   @bodyComponent = React.renderComponent(TableComponent(props), @body)
-  #   @headComponent = React.renderComponent(TableHeaderComponent(props), @head)
 
   detachedCallback: ->
     @attached = false
@@ -219,10 +236,6 @@ class TableElement extends HTMLElement
     if @width isnt @clientWidth or @height isnt @clientHeight
       @measureHeightAndWidth()
       @requestUpdate()
-
-  initializeHorizontalScroll: ->
-    @subscriptions.add @subscribeTo @getRowsContainer(),
-      'scroll': (e) => @requestUpdate()
 
   measureHeightAndWidth: ->
     @height = @clientHeight
@@ -288,15 +301,15 @@ class TableElement extends HTMLElement
 
   getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
 
-  getRowsContainer: -> @body.querySelector('.table-edit-rows')
+  getRowsContainer: -> @tableRows
 
   getRowsOffsetContainer: -> @getRowsWrapper()
 
   getRowsScrollContainer: -> @getRowsContainer()
 
-  getRowsWrapper: -> @body.querySelector('.table-edit-rows-wrapper')
+  getRowsWrapper: -> @tableCells
 
-  getRowResizeRuler: -> @body.querySelector('.row-resize-ruler')
+  getRowResizeRuler: -> @rowRuler
 
   insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
 
@@ -312,6 +325,9 @@ class TableElement extends HTMLElement
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
+  getColumnAlign: (col) ->
+    @columnsAligns?[col] ? @table.getColumn(col).align
+
   getColumnsAligns: ->
     [0...@table.getColumnsCount()].map (col) =>
       @columnsAligns?[col] ? @table.getColumn(col).align
@@ -325,15 +341,15 @@ class TableElement extends HTMLElement
     @getScreenColumn(i).width = w for w,i in columnsWidths
     @requestUpdate()
 
-  getColumnsContainer: -> @head.querySelector('.table-edit-header-row')
+  getColumnsContainer: -> @tableHeaderRow
 
-  getColumnsOffsetContainer: -> @body.querySelector('.table-edit-rows-wrapper')
+  getColumnsOffsetContainer: -> @tableCells
 
   getColumnsScrollContainer: -> @getRowsContainer()
 
-  getColumnsWrapper: -> @head.querySelector('.table-edit-header-wrapper')
+  getColumnsWrapper: -> @tableHeaderCells
 
-  getColumnResizeRuler: -> @head.querySelector('.column-resize-ruler')
+  getColumnResizeRuler: -> @columnRuler
 
   getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
 
@@ -1042,27 +1058,125 @@ class TableElement extends HTMLElement
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
     lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
+    visibleRows = [firstRow...lastRow]
+    oldVisibleRows = [@firstRenderedRow...@lastRenderedRow]
 
+    columns = @table.getColumns()
     columnOverdraw = @getColumnOverdraw()
     firstColumn = Math.max 0, firstVisibleColumn - columnOverdraw
-    lastColumn = Math.min @table.getColumnsCount(), lastVisibleColumn + columnOverdraw
+    lastColumn = Math.min columns.length, lastVisibleColumn + columnOverdraw
+    visibleColumns = [firstColumn...lastColumn]
+    oldVisibleColumns = [@firstRenderedColumn...@lastRenderedColumn]
 
-    # state = {
-    #   @table
-    #   @gutter
-    #   firstRow
-    #   lastRow
-    #   firstColumn
-    #   lastColumn
-    #   @absoluteColumnsWidths
-    #   columnsWidths: null
-    #   columnsAligns: @getColumnsAligns()
-    #   totalRows: @table.getRowsCount()
-    #   totalColumns: @table.getColumnsCount()
-    # }
+    intactFirstRow = @firstRenderedRow
+    intactLastRow = @lastRenderedRow
+    intactFirstColumn = @firstRenderedColumn
+    intactLastColumn = @lastRenderedColumn
+
+    @tableCells.style.cssText = """
+    height: #{@getContentHeight()}px;
+    width: #{@getContentWidth()}px;
+    """
+
+    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowsCount()
+    @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
+    @getGutter().scrollTop = @getRowsContainer().scrollTop
+
+    if @selectionSpansManyCells()
+      {top, left, width, height} = @selectionScrollRect()
+      @tableSelectionBox.style.cssText = """
+      top: #{top}px;
+      left: #{left}px;
+      height: #{height}px;
+      width: #{width}px;
+      """
+      @tableSelectionBoxHandle.style.cssText = """
+      top: #{top + height}px;
+      left: #{left + width}px;
+      """
+    else
+      @tableSelectionBox.style.cssText = "display: none"
+      @tableSelectionBoxHandle.style.cssText = "display: none"
+
+    # We never rendered anything
+    unless @firstRenderedRow?
+      for column in visibleColumns
+        @appendHeaderCell(columns[column], column)
+        @appendCell(row, column) for row in visibleRows
+
+      @appendGutterCell(row) for row in visibleRows
+
     #
-    # @bodyComponent.setState state
-    # @headComponent.setState state
+    else if firstRow isnt @firstRenderedRow or lastRow isnt @lastRenderedRow or firstColumn isnt @firstRenderedColumn or lastColumn isnt @lastRenderedColumn
+      disposed = 0
+      created = 0
+
+      if firstRow > @firstRenderedRow
+        intactFirstRow = firstRow
+        for row in [@firstRenderedRow...firstRow]
+          @disposeGutterCell(row)
+          for column in oldVisibleColumns
+            @disposeCell(row, column)
+            disposed++
+      if lastRow < @lastRenderedRow
+        intactLastRow = lastRow
+        for row in [lastRow...@lastRenderedRow]
+          @disposeGutterCell(row)
+          for column in oldVisibleColumns
+            @disposeCell(row, column)
+            disposed++
+      if firstColumn > @firstRenderedColumn
+        intactFirstColumn = firstColumn
+        for column in [@firstRenderedColumn...firstColumn]
+          @disposeHeaderCell(column)
+          for row in oldVisibleRows
+            @disposeCell(row, column)
+            disposed++
+      if lastColumn < @lastRenderedColumn
+        intactLastColumn = lastColumn
+        for column in [lastColumn...@lastRenderedColumn]
+          @disposeHeaderCell(column)
+          for row in oldVisibleRows
+            @disposeCell(row, column)
+            disposed++
+
+      if firstRow < @firstRenderedRow
+        for row in [firstRow...@firstRenderedRow]
+          @appendGutterCell(row)
+          for column in visibleColumns
+            @appendCell(row, column)
+            created++
+      if lastRow > @lastRenderedRow
+        for row in [@lastRenderedRow...lastRow]
+          @appendGutterCell(row)
+          for column in visibleColumns
+            @appendCell(row, column)
+            created++
+      if firstColumn < @firstRenderedColumn
+        for column in [firstColumn...@firstRenderedColumn]
+          @appendHeaderCell(columns[column], column)
+          for row in visibleRows
+            @appendCell(row, column)
+            created++
+      if lastColumn > @lastRenderedColumn
+        for column in [@lastRenderedColumn...lastColumn]
+          @appendHeaderCell(columns[column], column)
+          for row in visibleRows
+            @appendCell(row, column)
+            created++
+
+    for row in [intactFirstRow...intactLastRow]
+      @gutterCells[row]?.setModel({row})
+      for column in [intactFirstColumn...intactLastColumn]
+        @cells[column][row]?.setModel({
+          row
+          column
+          cell: @getScreenRow(row).getCell(column)
+        })
+    for column in [intactFirstColumn...intactLastColumn]
+      @headerCells[column]?.setModel({column: columns[column], index: column})
+
+    # console.log @totalCellsCount(), @totalHeaderCellsCount(), @totalGutterCellsCount()
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
@@ -1070,6 +1184,41 @@ class TableElement extends HTMLElement
     @lastRenderedColumn = lastColumn
     @hasChanged = false
 
+  getScreenCellAt: (row, column) -> @cells[column][row]
+
+  appendCell: (row, column) ->
+    @cells[column] ?= []
+    return @cells[column][row] if @cells[column][row]?
+
+    cell = @getScreenRow(row).getCell(column)
+    value = cell.value
+    @cells[column][row] = @requestCell({cell, column, row})
+
+  disposeCell: (row, column) ->
+    cell = @cells[column][row]
+    return unless cell?
+    @releaseCell(cell)
+    @cells[column][row] = undefined
+
+  appendHeaderCell: (column, index) ->
+    return @headerCells[index] if @headerCells[index]?
+
+    @headerCells[index] = @requestHeaderCell({column, index})
+
+  disposeHeaderCell: (column) ->
+    return unless cell = @headerCells[column]
+    @releaseHeaderCell(cell)
+    delete @headerCells[column]
+
+  appendGutterCell: (row) ->
+    return @gutterCells[row] if @gutterCells[row]?
+
+    @gutterCells[row] = @requestGutterCell({row})
+
+  disposeGutterCell: (row) ->
+    return unless cell = @gutterCells[row]
+    @releaseGutterCell(cell)
+    delete @gutterCells[row]
 
   floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
 
