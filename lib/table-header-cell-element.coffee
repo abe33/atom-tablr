@@ -14,6 +14,7 @@ class TableHeaderCellElement extends HTMLElement
     classes = @getHeaderCellClasses(column, index)
     @label.textContent = column.name
     @className = classes.join(' ')
+    @dataset.column = index
     @style.cssText = "
       width: #{@tableElement.getScreenColumnWidthAt(index)}px;
       left: #{@tableElement.getScreenColumnOffsetAt(index)}px;

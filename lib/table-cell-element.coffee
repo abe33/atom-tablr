@@ -10,8 +10,8 @@ class TableCellElement extends HTMLElement
       @textContent = cell.value ? @tableElement.getUndefinedDisplay()
 
     @className = @getCellClasses(cell, column, row).join(' ')
-    @dataset.rowId = row + 1
-    @dataset.columnId = column + 1
+    @dataset.row = row
+    @dataset.column = column
     @style.cssText = """
       width: #{@tableElement.getScreenColumnWidthAt(column)}px;
       left: #{@tableElement.getScreenColumnOffsetAt(column)}px;

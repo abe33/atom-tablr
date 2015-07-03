@@ -594,26 +594,26 @@ class TableElement extends HTMLElement
     @editing = true
 
     columnIndex = @findColumnAtScreenPosition(pageX, pageY)
-    if activeColumn = @getScreenColumn(columnIndex)
-      activeColumnRect = target.parentNode.getBoundingClientRect()
+    if @columnUnderEdit = @getScreenColumn(columnIndex)
+      columnRect = target.parentNode.getBoundingClientRect()
 
-      @editorElement.style.top = @toUnit(activeColumnRect.top)
-      @editorElement.style.left =  @toUnit(activeColumnRect.left)
-      @editorElement.style.width = @toUnit(activeColumnRect.width)
-      @editorElement.style.height = @toUnit(activeColumnRect.height)
+      @editorElement.style.top = @toUnit(columnRect.top)
+      @editorElement.style.left =  @toUnit(columnRect.left)
+      @editorElement.style.width = @toUnit(columnRect.width)
+      @editorElement.style.height = @toUnit(columnRect.height)
       @editorElement.style.display = 'block'
 
       @editorElement.focus()
-      @editor.setText(activeColumn.name)
+      @editor.setText(@columnUnderEdit.name)
 
       @editor.getBuffer().history.clearUndoStack()
       @editor.getBuffer().history.clearRedoStack()
 
   confirmColumnEdit: ->
     @stopEdit()
-    activeColumn = @getActiveColumn()
     newValue = @editor.getText()
-    activeColumn.name = newValue unless newValue is activeColumn.name
+    @columnUnderEdit.name = newValue unless newValue is @columnUnderEdit.name
+    delete @columnUnderEdit
 
   stopEdit: ->
     @editing = false
@@ -902,20 +902,15 @@ class TableElement extends HTMLElement
       'mousemove': stopPropagationAndDefault (e) => @rowResizeDrag(e, initial)
       'mouseup': stopPropagationAndDefault (e) => @endRowResizeDrag(e, initial)
 
-  rowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
+  rowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
     if @dragging
-      {pageY} = e
-      rowY = @rowScreenPosition(row)
-      newRowHeight = Math.max(pageY - rowY + dragOffset + handleHeight, @getMinimumRowHeight())
-      rulerTop = @getScreenRowOffsetAt(row) + newRowHeight
       ruler = @getRowResizeRuler()
-      ruler.style.top = @toUnit(rulerTop)
+      ruler.style.top = @toUnit(pageY - @body.getBoundingClientRect().top)
 
-  endRowResizeDrag: (e, {row, handleHeight, dragOffset}) ->
+  endRowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
     return unless @dragging
 
-    {pageY} = e
-    rowY = @rowScreenPosition(row)
+    rowY = @rowScreenPosition(row) - @getRowsScrollContainer().scrollTop
     newRowHeight = pageY - rowY + dragOffset + handleHeight
     @setScreenRowHeightAt(row, newRowHeight)
     @getRowResizeRuler().classList.remove('visible')
@@ -932,13 +927,10 @@ class TableElement extends HTMLElement
     handleOffset = target.getBoundingClientRect()
     dragOffset = handleOffset.left - pageX
 
-    parent = target.parentNode
-    container = parent.parentNode
+    cellElement = target.parentNode
+    position = parseInt cellElement.dataset.column
 
-    leftCellIndex = Array::indexOf.call(container.childNodes, parent)
-    rightCellIndex = Array::indexOf.call(container.childNodes, parent.nextSibling)
-
-    initial = {handle: target, leftCellIndex, rightCellIndex, handleWidth, dragOffset, startX: pageX}
+    initial = {handle: target, position, handleWidth, dragOffset, startX: pageX}
 
     @initializeDragEvents this,
       'mousemove': stopPropagationAndDefault (e) =>
@@ -955,13 +947,13 @@ class TableElement extends HTMLElement
     ruler = @getColumnResizeRuler()
     ruler.style.left = @toUnit(pageX - @head.getBoundingClientRect().left)
 
-  endColumnResizeDrag: ({pageX}, {startX, leftCellIndex, rightCellIndex}) ->
+  endColumnResizeDrag: ({pageX}, {startX, position}) ->
     return unless @dragging
 
     moveX = pageX - startX
 
-    column = @getScreenColumn(leftCellIndex)
-    width = @getScreenColumnWidthAt(leftCellIndex)
+    column = @getScreenColumn(position)
+    width = @getScreenColumnWidthAt(position)
     column.width = width + moveX
 
     @getColumnResizeRuler().classList.remove('visible')
@@ -1172,8 +1164,6 @@ class TableElement extends HTMLElement
     for column in [intactFirstColumn...intactLastColumn]
       @headerCells[column]?.setModel({column: columns[column], index: column})
 
-    # console.log @totalCellsCount(), @totalHeaderCellsCount(), @totalGutterCellsCount()
-
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
     @firstRenderedColumn = firstColumn
@@ -1216,9 +1206,9 @@ class TableElement extends HTMLElement
     @releaseGutterCell(cell)
     delete @gutterCells[row]
 
-  floatToPercent: (w) -> "#{Math.round(w * 10000) / 100}%"
+  floatToPercent: (w) -> @toUnit(Math.round(w * 10000) / 100, '%')
 
-  floatToPixel: (w) -> "#{w}px"
+  floatToPixel: (w) -> @toUnit(w)
 
   toUnit: (value, unit=PIXEL) -> "#{value}#{unit}"
 

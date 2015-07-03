@@ -152,8 +152,8 @@ describe 'tableElement', ->
     it 'renders the lines at the top of the table', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell')
       expect(cells.length).toEqual(18 * 3)
-      expect(cells[0].dataset.rowId).toEqual('1')
-      expect(cells[cells.length - 1].dataset.rowId).toEqual('18')
+      expect(cells[0].dataset.row).toEqual('0')
+      expect(cells[cells.length - 1].dataset.row).toEqual('17')
 
     describe '::getFirstVisibleRow', ->
       it 'returns 0', ->
@@ -165,7 +165,7 @@ describe 'tableElement', ->
 
   describe 'once rendered', ->
     beforeEach ->
-      cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row-id="1"]')
+      cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="0"]')
 
     it 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)
@@ -202,7 +202,7 @@ describe 'tableElement', ->
         expect(tableShadowRoot.querySelectorAll('.table-edit-rows')).not.toEqual(18)
     describe 'the columns widths', ->
       beforeEach ->
-        cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row-id="1"]')
+        cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="0"]')
 
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
@@ -340,12 +340,12 @@ describe 'tableElement', ->
         cells = tableShadowRoot.querySelectorAll('atom-table-cell')
         cell = tableElement.getScreenCellAt(0,0)
         expect(cells.length).toEqual(18 * 3)
-        expect(cell.dataset.rowId).toEqual('1')
+        expect(cell.dataset.row).toEqual('0')
         expect(cell.textContent).toEqual('foo')
 
     describe 'by adding one in the middle', ->
       it 'updates the rows', ->
-        cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="7"]')
+        cell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"]')
         expect(cell.textContent).toEqual('row6')
 
         table.addRowAt 6, ['foo', 'bar', 'baz']
@@ -379,17 +379,17 @@ describe 'tableElement', ->
       expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
     it "renders the row's cells with the provided height", ->
-      cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="3"]')
+      cell = tableShadowRoot.querySelector('atom-table-cell[data-row="2"]')
 
       expect(cell.offsetHeight).toEqual(100)
 
     it 'offsets the cells after the modified one', ->
-      cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"]')
+      cell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"]')
 
       expect(cell.style.top).toEqual('140px')
 
     it 'activates the cell under the mouse when pressed', ->
-      cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row-id="4"]')[1]
+      cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="3"]')[1]
       mousedown(cell)
 
       expect(tableElement.getActiveCell().getValue()).toEqual(300)
@@ -421,12 +421,12 @@ describe 'tableElement', ->
         expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
       it "renders the row's cells with the provided height", ->
-        cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="3"]')
+        cell = tableShadowRoot.querySelector('atom-table-cell[data-row="2"]')
 
         expect(cell.offsetHeight).toEqual(50)
 
       it 'offsets the cells after the modified one', ->
-        cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"]')
+        cell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"]')
 
         expect(cell.style.top).toEqual('90px')
 
@@ -436,7 +436,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row-id="15"] ')[1]
+        cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="14"] ')[1]
         mousedown(cell)
 
         expect(tableElement.getActiveCell().getValue()).toEqual(1400)
@@ -487,7 +487,7 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
       cells = tableShadowRoot.querySelectorAll('atom-table-header-cell')
-      rowCells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row-id="1"]')
+      rowCells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="0"]')
 
       expect(cells[0].offsetWidth).toBeCloseTo(rowCells[0].offsetWidth, -2)
       expect(cells[1].offsetWidth).toBeCloseTo(rowCells[1].offsetWidth, -2)
@@ -798,7 +798,7 @@ describe 'tableElement', ->
     expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
   it 'activates the cell under the mouse when pressed', ->
-    cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"][data-column-id="3"]')
+    cell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="2"]')
     mousedown(cell)
 
     expect(tableElement.getActiveCell().getValue()).toEqual('no')
@@ -1317,7 +1317,7 @@ describe 'tableElement', ->
 
     describe 'clicking on another cell', ->
       beforeEach ->
-        cell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"][data-column-id="3"]')
+        cell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="2"]')
         mousedown(cell)
 
       it 'closes the editor', ->
@@ -1632,8 +1632,8 @@ describe 'tableElement', ->
 
   describe 'dragging the mouse pressed over cell', ->
     it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"][data-column-id="1"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="7"][data-column-id="3"]')
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="2"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1646,8 +1646,8 @@ describe 'tableElement', ->
       expect(tableElement.getSelection()).toEqual([[3,0],[6,2]])
 
     it 'scrolls the view when the selection reach the last row', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="7"][data-column-id="1"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="10"][data-column-id="3"]')
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="9"][data-column="2"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1658,8 +1658,8 @@ describe 'tableElement', ->
       tableElement.setScrollTop(300)
       nextAnimationFrame()
 
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="12"][data-column-id="1"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="9"][data-column-id="3"]')
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="11"][data-column="0"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="8"][data-column="2"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1672,8 +1672,8 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="4"][data-column-id="1"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row-id="7"][data-column-id="2"]')
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="1"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -1739,7 +1739,7 @@ describe 'tableElement', ->
 
         it 'opens the editor at the cell position', ->
           editorOffset = tableElement.querySelector('atom-text-editor').getBoundingClientRect()
-          cellOffset = tableShadowRoot.querySelector('atom-table-cell').getBoundingClientRect()
+          cellOffset = tableElement.getScreenCellAt(0,0).getBoundingClientRect()
 
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
