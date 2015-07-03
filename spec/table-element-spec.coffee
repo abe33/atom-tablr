@@ -1,5 +1,3 @@
-{$} = require 'space-pen'
-
 path = require 'path'
 
 Table = require '../lib/table'

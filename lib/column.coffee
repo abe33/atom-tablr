@@ -1,7 +1,6 @@
 {Emitter} = require 'event-kit'
 PropertyAccessors = require 'property-accessors'
 Identifiable = require './mixins/identifiable'
-CellComponent = require './cell-component'
 
 module.exports =
 class Column

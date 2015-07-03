@@ -1,7 +1,6 @@
-[Table, TableView, url] = []
+[Table, TableElement, url] = []
 
 module.exports =
-
   config:
     undefinedDisplay:
       type: 'string'
@@ -27,8 +26,8 @@ module.exports =
 
   activate: (state) ->
     Table ?= require './table'
-    TableView ?= require './table-element'
-    TableView.registerViewProvider(true)
+    TableElement ?= require './table-element'
+    TableElement.registerViewProvider(true)
 
     atom.commands.add 'atom-workspace',
       'table-edit:demo-large': => atom.workspace.open('table://large')

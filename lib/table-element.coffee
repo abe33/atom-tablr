@@ -1,13 +1,9 @@
 {Point, Range, TextEditor} = require 'atom'
-{View, $} = require 'space-pen'
 {CompositeDisposable, Disposable} = require 'event-kit'
 {EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
-React = require 'react-atom-fork'
 
 Table = require './table'
-TableComponent = require './table-component'
-TableHeaderComponent = require './table-header-component'
 TableCellElement = require './table-cell-element'
 TableHeaderCellElement = require './table-header-cell-element'
 TableGutterCellElement = require './table-gutter-cell-element'

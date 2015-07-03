@@ -1,6 +1,5 @@
 {SpacePenDSL} = require 'atom-utils'
 
-
 module.exports =
 class TableGutterCellElement extends HTMLElement
   SpacePenDSL.includeInto(this)
