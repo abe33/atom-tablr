@@ -20,8 +20,8 @@
   'cmd-alt-up': 'table-edit:insert-row-before'
   'cmd-alt-down': 'table-edit:insert-row-after'
   'cmd-alt-backspace': 'table-edit:delete-row'
-  'cmd-alt-left': 'table-edit:insert-column-before'
-  'cmd-alt-right': 'table-edit:insert-column-after'
+  'cmd-alt-ctrl-left': 'table-edit:insert-column-before'
+  'cmd-alt-ctrl-right': 'table-edit:insert-column-after'
   'cmd-alt-ctrl-backspace': 'table-edit:delete-column'
 
 'atom-table-editor atom-text-editor:not([mini])':
