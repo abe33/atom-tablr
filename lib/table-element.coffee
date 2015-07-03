@@ -573,6 +573,10 @@ class TableElement extends HTMLElement
     @editorElement.style.width = @toUnit(activeCellRect.width)
     @editorElement.style.height = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
+
+    @editorElement.dataset.column = activeCell.column.name
+    @editorElement.dataset.row = @activeCellPosition.row + 1
+
     @editorElement.focus()
 
     @editor.setText(String(activeCell.getValue() ? @getUndefinedDisplay()))
@@ -905,14 +909,15 @@ class TableElement extends HTMLElement
   rowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
     if @dragging
       ruler = @getRowResizeRuler()
-      ruler.style.top = @toUnit(pageY - @body.getBoundingClientRect().top)
+      rulerTop = Math.max(@getMinimumRowHeight(), pageY - @body.getBoundingClientRect().top + dragOffset + handleHeight - ruler.offsetHeight)
+      ruler.style.top = @toUnit(rulerTop)
 
   endRowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
     return unless @dragging
 
     rowY = @rowScreenPosition(row) - @getRowsScrollContainer().scrollTop
     newRowHeight = pageY - rowY + dragOffset + handleHeight
-    @setScreenRowHeightAt(row, newRowHeight)
+    @setScreenRowHeightAt(row, Math.max(@getMinimumRowHeight(), newRowHeight))
     @getRowResizeRuler().classList.remove('visible')
 
     @dragSubscription.dispose()
@@ -1055,36 +1060,9 @@ class TableElement extends HTMLElement
     intactFirstColumn = @firstRenderedColumn
     intactLastColumn = @lastRenderedColumn
 
-    @tableCells.style.cssText = """
-    height: #{@getContentHeight()}px;
-    width: #{@getContentWidth()}px;
-    """
-    @tableGutter.style.cssText = """
-    height: #{@getContentHeight()}px;
-    """
-    @tableHeaderCells.style.cssText = """
-    width: #{@getContentWidth()}px;
-    """
-
-    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowsCount()
-    @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
-    @getGutter().scrollTop = @getRowsContainer().scrollTop
-
-    if @selectionSpansManyCells()
-      {top, left, width, height} = @selectionScrollRect()
-      @tableSelectionBox.style.cssText = """
-      top: #{top}px;
-      left: #{left}px;
-      height: #{height}px;
-      width: #{width}px;
-      """
-      @tableSelectionBoxHandle.style.cssText = """
-      top: #{top + height}px;
-      left: #{left + width}px;
-      """
-    else
-      @tableSelectionBox.style.cssText = "display: none"
-      @tableSelectionBoxHandle.style.cssText = "display: none"
+    @updateWidthAndHeight()
+    @updateScroll()
+    @updateSelection()
 
     # We never rendered anything
     unless @firstRenderedRow?
@@ -1094,7 +1072,9 @@ class TableElement extends HTMLElement
 
       @appendGutterCell(row) for row in visibleRows
 
-    #
+    # else if firstRow > @lastRenderedRow or lastRow < @firstRenderedRow or firstColumn > @lastRenderedColumn or lastColumn < @firstRenderedColumn
+    #   console.log 'full redraw'
+
     else if firstRow isnt @firstRenderedRow or lastRow isnt @lastRenderedRow or firstColumn isnt @firstRenderedColumn or lastColumn isnt @lastRenderedColumn
       disposed = 0
       created = 0
@@ -1103,55 +1083,39 @@ class TableElement extends HTMLElement
         intactFirstRow = firstRow
         for row in [@firstRenderedRow...firstRow]
           @disposeGutterCell(row)
-          for column in oldVisibleColumns
-            @disposeCell(row, column)
-            disposed++
+          @disposeCell(row, column) for column in oldVisibleColumns
       if lastRow < @lastRenderedRow
         intactLastRow = lastRow
         for row in [lastRow...@lastRenderedRow]
           @disposeGutterCell(row)
-          for column in oldVisibleColumns
-            @disposeCell(row, column)
-            disposed++
+          @disposeCell(row, column) for column in oldVisibleColumns
       if firstColumn > @firstRenderedColumn
         intactFirstColumn = firstColumn
         for column in [@firstRenderedColumn...firstColumn]
           @disposeHeaderCell(column)
-          for row in oldVisibleRows
-            @disposeCell(row, column)
-            disposed++
+          @disposeCell(row, column) for row in oldVisibleRows
       if lastColumn < @lastRenderedColumn
         intactLastColumn = lastColumn
         for column in [lastColumn...@lastRenderedColumn]
           @disposeHeaderCell(column)
-          for row in oldVisibleRows
-            @disposeCell(row, column)
-            disposed++
+          @disposeCell(row, column) for row in oldVisibleRows
 
       if firstRow < @firstRenderedRow
         for row in [firstRow...@firstRenderedRow]
           @appendGutterCell(row)
-          for column in visibleColumns
-            @appendCell(row, column)
-            created++
+          @appendCell(row, column) for column in visibleColumns
       if lastRow > @lastRenderedRow
         for row in [@lastRenderedRow...lastRow]
           @appendGutterCell(row)
-          for column in visibleColumns
-            @appendCell(row, column)
-            created++
+          @appendCell(row, column) for column in visibleColumns
       if firstColumn < @firstRenderedColumn
         for column in [firstColumn...@firstRenderedColumn]
           @appendHeaderCell(columns[column], column)
-          for row in visibleRows
-            @appendCell(row, column)
-            created++
+          @appendCell(row, column) for row in visibleRows
       if lastColumn > @lastRenderedColumn
         for column in [@lastRenderedColumn...lastColumn]
           @appendHeaderCell(columns[column], column)
-          for row in visibleRows
-            @appendCell(row, column)
-            created++
+          @appendCell(row, column) for row in visibleRows
 
     for row in [intactFirstRow...intactLastRow]
       @gutterCells[row]?.setModel({row})
@@ -1170,6 +1134,41 @@ class TableElement extends HTMLElement
     @lastRenderedColumn = lastColumn
     @hasChanged = false
 
+  updateWidthAndHeight: ->
+    @tableCells.style.cssText = """
+    height: #{@getContentHeight()}px;
+    width: #{@getContentWidth()}px;
+    """
+    @tableGutter.style.cssText = """
+    height: #{@getContentHeight()}px;
+    """
+    @tableHeaderCells.style.cssText = """
+    width: #{@getContentWidth()}px;
+    """
+
+    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowsCount()
+
+  updateScroll: ->
+    @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
+    @getGutter().scrollTop = @getRowsContainer().scrollTop
+
+  updateSelection: ->
+    if @selectionSpansManyCells()
+      {top, left, width, height} = @selectionScrollRect()
+      @tableSelectionBox.style.cssText = """
+      top: #{top}px;
+      left: #{left}px;
+      height: #{height}px;
+      width: #{width}px;
+      """
+      @tableSelectionBoxHandle.style.cssText = """
+      top: #{top + height}px;
+      left: #{left + width}px;
+      """
+    else
+      @tableSelectionBox.style.cssText = "display: none"
+      @tableSelectionBoxHandle.style.cssText = "display: none"
+
   getScreenCellAt: (row, column) -> @cells[column][row]
 
   appendCell: (row, column) ->
@@ -1177,11 +1176,10 @@ class TableElement extends HTMLElement
     return @cells[column][row] if @cells[column][row]?
 
     cell = @getScreenRow(row).getCell(column)
-    value = cell.value
     @cells[column][row] = @requestCell({cell, column, row})
 
   disposeCell: (row, column) ->
-    cell = @cells[column][row]
+    cell = @cells[column]?[row]
     return unless cell?
     @releaseCell(cell)
     @cells[column][row] = undefined

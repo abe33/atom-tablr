@@ -756,11 +756,11 @@ describe 'tableElement', ->
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
-          mousemove(handle, x, y + -20)
+          mousemove(handle, x, y - 20)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 10)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 20)
 
-          mouseup(handle, x, y + -20)
+          mouseup(handle, x, y - 20)
 
           expect(tableElement.getRowHeightAt(2)).toEqual(10)
 

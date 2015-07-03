@@ -11,7 +11,7 @@ class TableGutterCellElement extends HTMLElement
   setModel: ({row}) ->
     @released = false
     classes = @getGutterCellClasses(row)
-    @label.textContent = row
+    @label.textContent = row + 1
     @className = classes.join(' ')
     @style.cssText = "
       height: #{@tableElement.getScreenRowHeightAt(row)}px;

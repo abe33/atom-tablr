@@ -44,6 +44,18 @@ atom-table-editor {
     &::shadow .gutter {
       display: none;
     }
+
+    &::before {
+      content:  '#' attr(data-row) ' ' attr(data-column);
+      position: absolute;
+      top: 0;
+      left: -1px;
+      transform: translate(0, -100%);
+      font-size: 0.7em;
+      background: @background-color-info;
+      color: @base-background-color;
+      padding: 2px 6px;
+    }
   }
 
   &.with-editor-gutter atom-text-editor::shadow .gutter {
@@ -394,11 +406,12 @@ atom-table-editor {
     atom-table-cell {
       &.selected {
         background: @background-color-highlight;
+        border-color: @base-background-color;
       }
 
 
       &.active {
-        background: fadeout(@background-color-warning, 90%);
+        background: fadeout(@background-color-info, 90%);
         color: @text-color-selected;
         position: relative;
 
@@ -409,7 +422,7 @@ atom-table-editor {
           top: 0;
           right: 0;
           bottom: 0;
-          border: 1px solid fadeout(@background-color-warning, 75%);
+          border: 1px solid fadeout(@background-color-info, 50%);
         }
       }
     }
