@@ -4,9 +4,12 @@ class TableCellElement extends HTMLElement
   setModel: (@model) ->
     @released = false
     {cell, column, row} = @model
-    classes = @getCellClasses(cell, column, row)
-    @textContent = cell.value ? @tableElement.getUndefinedDisplay()
-    @className = classes.join(' ')
+    if cell.column.cellRender?
+      @innerHTML = cell.column.cellRender(cell, [row, column])
+    else
+      @textContent = cell.value ? @tableElement.getUndefinedDisplay()
+
+    @className = @getCellClasses(cell, column, row).join(' ')
     @dataset.rowId = row + 1
     @dataset.columnId = column + 1
     @style.cssText = """

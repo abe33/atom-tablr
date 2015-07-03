@@ -31,10 +31,10 @@ class TableHeaderCellElement extends HTMLElement
     classes = []
     classes.push 'active-column' if @tableElement.isActiveColumn(index)
 
-    if @order is column.name
+    if @tableElement.order is column.name
       classes.push 'order'
 
-      if @direction is 1
+      if @tableElement.direction is 1
         classes.push 'ascending'
       else
         classes.push 'descending'

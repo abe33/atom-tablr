@@ -23,9 +23,9 @@ class Column
     get: -> @options.align
     set: (newAlign) -> @setOption 'align', newAlign
 
-  @::accessor 'componentClass',
-    get: -> @options.componentClass or CellComponent
-    set: (newComponentClass) -> @setOption 'componentClass', newComponentClass
+  @::accessor 'cellRender',
+    get: -> @options.cellRender
+    set: (newCellRender) -> @setOption 'cellRender', newCellRender
 
   constructor: (@options={}) ->
     @initID()

@@ -7,7 +7,6 @@ TableElement = require '../lib/table-element'
 Column = require '../lib/column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
-CustomCellComponent = require './fixtures/custom-cell-component'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'styles', 'table-edit.less'
@@ -279,11 +278,11 @@ describe 'tableElement', ->
 
     describe 'with a custom cell renderer defined on a column', ->
       it 'uses the provided renderer to render the columns cells', ->
-        table.getColumn(2).componentClass = CustomCellComponent
+        table.getColumn(2).cellRender = (cell) -> "foo: #{cell.value}"
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelector('atom-table-cell:nth-child(3) ').textContent).toEqual('foo: yes')
+        expect(tableElement.getScreenCellAt(0,2).textContent).toEqual('foo: yes')
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
@@ -341,10 +340,10 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
         cells = tableShadowRoot.querySelectorAll('atom-table-cell')
+        cell = tableElement.getScreenCellAt(0,0)
         expect(cells.length).toEqual(18 * 3)
-        expect(cells[0].dataset.rowId).toEqual('1')
-        expect(cells[0].textContent).toEqual('foo')
-        expect(cells[cells.length-1].dataset.rowId).toEqual('18')
+        expect(cell.dataset.rowId).toEqual('1')
+        expect(cell.textContent).toEqual('foo')
 
     describe 'by adding one in the middle', ->
       it 'updates the rows', ->
@@ -356,22 +355,20 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
         cells = tableShadowRoot.querySelectorAll('atom-table-cell')
+        cell = tableElement.getScreenCellAt(6,0)
         expect(cells.length).toEqual(18 * 3)
-        expect(cells[0].dataset.rowId).toEqual('1')
-        expect(cells[18].textContent).toEqual('foo')
-        expect(cells[cells.length-1].dataset.rowId).toEqual('18')
+        expect(cell.textContent).toEqual('foo')
 
     describe 'by updating the content of a row', ->
       it 'update the rows', ->
-        cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-        expect(cells[18].textContent).toEqual('row6')
+        cell = tableElement.getScreenCellAt(6,0)
+        expect(cell.textContent).toEqual('row6')
 
         table.getRow(6).key = 'foo'
 
         nextAnimationFrame()
 
-        cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-        expect(cells[18].textContent).toEqual('foo')
+        expect(cell.textContent).toEqual('foo')
 
   describe 'setting a custom height for a row', ->
     beforeEach ->
@@ -498,13 +495,8 @@ describe 'tableElement', ->
       expect(cells[1].offsetWidth).toBeCloseTo(rowCells[1].offsetWidth, -2)
       expect(cells[2].offsetWidth).toBeCloseTo(rowCells[rowCells.length-1].offsetWidth, -2)
 
-    describe 'when the gutter is enabled', ->
-      beforeEach ->
-        tableElement.showGutter()
-        nextAnimationFrame()
-
-      it 'contains a filler div to figurate the gutter width', ->
-        expect(header.querySelector('.table-edit-header-filler')).toExist()
+    it 'contains a filler div to figurate the gutter width', ->
+      expect(header.querySelector('.table-edit-header-filler')).toExist()
 
     describe 'clicking on a header cell', ->
       [column] = []
@@ -643,19 +635,8 @@ describe 'tableElement', ->
   #     ######    #######     ##       ##    ######## ##     ##
 
   describe 'gutter', ->
-    it 'is rendered only when the flag is enabled', ->
-      expect(tableShadowRoot.querySelector('.table-edit-gutter')).not.toExist()
-
-      tableElement.showGutter()
-      nextAnimationFrame()
-
-      expect(tableShadowRoot.querySelector('.table-edit-gutter')).toExist()
-
     describe 'when scrolled', ->
       beforeEach ->
-        tableElement.showGutter()
-        nextAnimationFrame()
-
         tableElement.setScrollTop(300)
         nextAnimationFrame()
 
@@ -666,8 +647,6 @@ describe 'tableElement', ->
       [content, gutter] = []
 
       beforeEach ->
-        tableElement.showGutter()
-        nextAnimationFrame()
         content = tableShadowRoot.querySelector('.table-edit-content')
         gutter = tableShadowRoot.querySelector('.table-edit-gutter')
 
@@ -1375,10 +1354,9 @@ describe 'tableElement', ->
 
       nextAnimationFrame()
 
-      expect(tableShadowRoot.querySelectorAll('.selected').length).toEqual(6)
+      expect(tableShadowRoot.querySelectorAll('atom-table-cell.selected').length).toEqual(6)
 
     it 'marks the row number with a selected class', ->
-      tableElement.showGutter()
       tableElement.setSelection([[2,0],[3,2]])
 
       nextAnimationFrame()
@@ -1404,8 +1382,8 @@ describe 'tableElement', ->
 
     it 'positions the selection box over the cells', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      firstCell = cells[0]
-      lastCell = cells[2]
+      firstCell = tableElement.getScreenCellAt(2,0)
+      lastCell = tableElement.getScreenCellAt(3,2)
 
       selectionBoxOffset = selectionBox.getBoundingClientRect()
       firstCellOffset = firstCell.getBoundingClientRect()
@@ -1417,34 +1395,30 @@ describe 'tableElement', ->
 
     it 'positions the selection box handle at the bottom right corner', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      lastCell = cells[2]
+      lastCell = tableElement.getScreenCellAt(3,2)
       lastCellOffset = lastCell.getBoundingClientRect()
       selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
 
-      expect(selectionBoxHandleOffset.top - 20).toBeCloseTo(lastCellOffset.bottom, -1)
+      expect(selectionBoxHandleOffset.top).toBeCloseTo(lastCellOffset.bottom, -1)
       expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
 
-    describe 'with gutter enabled', ->
-      beforeEach ->
-        tableElement.showGutter()
-        nextAnimationFrame()
-        tableElement.setSelection([[2,1],[3,2]])
-        nextAnimationFrame()
+    it 'positions the selection box over the cells', ->
+      tableElement.setSelection([[2,1],[3,2]])
+      nextAnimationFrame()
 
-      it 'positions the selection box over the cells', ->
-        selectionBox = tableShadowRoot.querySelector('.selection-box')
-        cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-        firstCell = cells[0]
-        lastCell = cells[1]
+      selectionBox = tableShadowRoot.querySelector('.selection-box')
+      cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
+      firstCell = tableElement.getScreenCellAt(2,1)
+      lastCell = tableElement.getScreenCellAt(3,2)
 
-        selectionBoxOffset = selectionBox.getBoundingClientRect()
-        firstCellOffset = firstCell.getBoundingClientRect()
-        lastCellOffset = lastCell.getBoundingClientRect()
+      selectionBoxOffset = selectionBox.getBoundingClientRect()
+      firstCellOffset = firstCell.getBoundingClientRect()
+      lastCellOffset = lastCell.getBoundingClientRect()
 
-        expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, 0)
-        expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, 0)
-        expect(selectionBox.offsetWidth).toBeCloseTo(lastCellOffset.right - firstCellOffset.left, -1)
-        expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, 0)
+      expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, 0)
+      expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, 0)
+      expect(selectionBox.offsetWidth).toBeCloseTo(lastCellOffset.right - firstCellOffset.left, -1)
+      expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, 0)
 
     describe 'when the columns widths have been changed', ->
       beforeEach ->
@@ -1454,8 +1428,8 @@ describe 'tableElement', ->
 
       it 'positions the selection box over the cells', ->
         cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-        firstCell = cells[0]
-        lastCell = cells[2]
+        firstCell = tableElement.getScreenCellAt(2,0)
+        lastCell = tableElement.getScreenCellAt(3,1)
 
         selectionBoxOffset = selectionBox.getBoundingClientRect()
         firstCellOffset = firstCell.getBoundingClientRect()

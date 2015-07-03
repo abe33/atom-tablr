@@ -46,8 +46,10 @@ class TableElement extends HTMLElement
             @div class: 'selection-box', outlet: 'tableSelectionBox'
             @div class: 'selection-box-handle', outlet: 'tableSelectionBoxHandle'
 
-        @div class: 'table-edit-gutter', outlet: 'tableGutter', =>
-          @div class: 'table-edit-gutter-filler', outlet: 'tableGutterFiller'
+        @div class: 'table-edit-gutter', =>
+          @div class: 'table-edit-gutter-wrapper', outlet: 'tableGutter', =>
+            @div class: 'table-edit-gutter-filler', outlet: 'tableGutterFiller'
+
         @div class: 'row-resize-ruler', outlet: 'rowRuler'
 
     @input class: 'hidden-input', outlet: 'hiddenInput'
@@ -134,11 +136,11 @@ class TableElement extends HTMLElement
     @subscriptions.add @subscribeTo @getRowsContainer(),
       'scroll': (e) => @requestUpdate()
 
-    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-edit-action',
+    @subscriptions.add @subscribeTo @head, 'atom-table-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
-    @subscriptions.add @subscribeTo @head, '.table-edit-header-cell .column-resize-handle',
+    @subscriptions.add @subscribeTo @head, 'atom-table-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
 
@@ -221,14 +223,6 @@ class TableElement extends HTMLElement
 
   remove: ->
     @parentNode?.removeChild(this)
-
-  showGutter: ->
-    @gutter = true
-    @requestUpdate()
-
-  hideGutter: ->
-    @gutter = false
-    @requestUpdate()
 
   pollDOM: ->
     return if @domPollingPaused or @frameRequested
@@ -1077,6 +1071,12 @@ class TableElement extends HTMLElement
     height: #{@getContentHeight()}px;
     width: #{@getContentWidth()}px;
     """
+    @tableGutter.style.cssText = """
+    height: #{@getContentHeight()}px;
+    """
+    @tableHeaderCells.style.cssText = """
+    width: #{@getContentWidth()}px;
+    """
 
     @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowsCount()
     @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
@@ -1236,9 +1236,8 @@ class TableElement extends HTMLElement
 
 module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
 
-TableElement.registerViewProvider = (showGutter=false) ->
+TableElement.registerViewProvider = ->
   atom.views.addViewProvider Table, (model) ->
     element = new TableElement
     element.setModel(model)
-    element.showGutter() if showGutter
     element

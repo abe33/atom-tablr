@@ -75,8 +75,8 @@ module.exports =
         "row#{i}"
         Math.random() * 100
       ]
-      for i in [0..100]
-        if i % 2 is 0
+      for j in [0..100]
+        if j % 2 is 0
           data.push if i % 2 is 0 then 'yes' else 'no'
         else
           data.push Math.random() * 100

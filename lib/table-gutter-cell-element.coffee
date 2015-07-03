@@ -1,10 +1,18 @@
+{SpacePenDSL} = require 'atom-utils'
+
 
 module.exports =
 class TableGutterCellElement extends HTMLElement
+  SpacePenDSL.includeInto(this)
+
+  @content: ->
+    @div class: 'row-resize-handle'
+    @span outlet: 'label'
+
   setModel: ({row}) ->
     @released = false
     classes = @getGutterCellClasses(row)
-    @textContent = row
+    @label.textContent = row
     @className = classes.join(' ')
     @style.cssText = "
       height: #{@tableElement.getScreenRowHeightAt(row)}px;
