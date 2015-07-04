@@ -1072,9 +1072,6 @@ class TableElement extends HTMLElement
 
       @appendGutterCell(row) for row in visibleRows
 
-    # else if firstRow > @lastRenderedRow or lastRow < @firstRenderedRow or firstColumn > @lastRenderedColumn or lastColumn < @firstRenderedColumn
-    #   console.log 'full redraw'
-
     else if firstRow isnt @firstRenderedRow or lastRow isnt @lastRenderedRow or firstColumn isnt @firstRenderedColumn or lastColumn isnt @lastRenderedColumn
       disposed = 0
       created = 0
