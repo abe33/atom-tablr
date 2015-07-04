@@ -189,7 +189,7 @@ describe 'tableElement', ->
       bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
-      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth, -2)
+      expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth - tableElement.tableGutter.offsetWidth, -2)
 
     describe 'when resized', ->
       beforeEach ->
