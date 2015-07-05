@@ -1,3 +1,5 @@
+fs = require 'fs'
+csv = require 'csv'
 [Table, TableElement, url] = []
 
 module.exports =
@@ -32,6 +34,22 @@ module.exports =
     atom.commands.add 'atom-workspace',
       'table-edit:demo-large': => atom.workspace.open('table://large')
       'table-edit:demo-small': => atom.workspace.open('table://small')
+
+    atom.workspace.addOpener (uriToOpen) =>
+      return unless /\.csv$/.test uriToOpen
+
+      new Promise (resolve, reject) ->
+        fileContent = fs.readFileSync(uriToOpen)
+        csv.parse fileContent, (err, data) ->
+          return reject(err) if err?
+
+          table = new Table
+          return data if data.length is 0
+
+          table.addColumn(column, {}, false) for column in data.shift()
+          table.addRow(row) for row in data
+
+          resolve(table)
 
     atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'

@@ -16,6 +16,7 @@
     "serializable": "1.x",
     "property-accessors": "1.x",
     "delegato": "1.x",
-    "coffee-script": "1.7.x"
+    "coffee-script": "1.7.x",
+    "csv": "~0.4.5"
   }
 }
