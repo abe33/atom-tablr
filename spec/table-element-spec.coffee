@@ -51,7 +51,7 @@ isVisible = (node) ->
 
 mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 
-describe 'tableElement', ->
+xdescribe 'tableElement', ->
   [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   afterEach ->

@@ -18,15 +18,6 @@ describe 'Table', ->
   it 'has 0 cells', ->
     expect(table.getCellsCount()).toEqual(0)
 
-  it 'has a title', ->
-    expect(table.getTitle()).toEqual('Untitled Table')
-
-  it 'has a long title', ->
-    expect(table.getLongTitle()).toEqual('Untitled Table')
-
-  it 'has an undefined path', ->
-    expect(table.getPath()).toBeUndefined()
-
   describe 'adding a row on a table without columns', ->
     it 'raises an exception', ->
       expect(-> table.addRow {}).toThrow()
@@ -42,35 +33,26 @@ describe 'Table', ->
   describe 'with columns added to the table', ->
     beforeEach ->
       table.addColumn('key')
-      column = table.addColumn('value', default: 'empty')
+      table.addColumn('value')
 
     it 'has 2 columns', ->
       expect(table.getColumnsCount()).toEqual(2)
-
-    it 'returns the created column', ->
-      expect(column).toEqual(table.getColumn(1))
-
-    it 'creates the column with a single object', ->
-      column = table.addColumn(name: 'foo', default: 'empty')
-      expect(table.getColumnsCount()).toEqual(3)
-      expect(column).toEqual(table.getColumn(2))
-
-    it 'raises an exception if the column does not have a name', ->
-      expect(-> table.addColumn({})).toThrow()
+      expect(table.getColumn(0)).toEqual('key')
+      expect(table.getColumn(1)).toEqual('value')
 
     it 'raises an exception when adding a column whose name already exist in table', ->
       expect(-> table.addColumn('key')).toThrow()
 
     describe 'when there is already rows in the table', ->
       beforeEach ->
-        row = table.addRow key: 'foo', value: 'bar'
-        table.addRow key: 'oof', value: 'rab'
+        table.addRow ['foo', 'bar']
+        table.addRow ['oof', 'rab']
 
       describe 'adding a column', ->
         it 'extend all the rows with a new cell', ->
-          table.addColumn 'required', default: false
+          table.addColumn 'required'
 
-          expect(row.getCellsCount()).toEqual(3)
+          expect(table.getRow(0).length).toEqual(3)
 
         it 'dispatches a did-add-column event', ->
           spy = jasmine.createSpy 'addColumn'
@@ -82,19 +64,16 @@ describe 'Table', ->
 
       describe 'adding a column at a given index', ->
         beforeEach ->
-          column = table.addColumnAt 1, 'required', default: false
+          column = table.addColumnAt 1, 'required'
 
         it 'adds the column at the right place', ->
           expect(table.getColumnsCount()).toEqual(3)
-          expect(table.getColumn(1)).toEqual(column)
-          expect(table.getColumn(2).name).toEqual('value')
+          expect(table.getColumn(1)).toEqual('required')
+          expect(table.getColumn(2)).toEqual('value')
 
         it 'extend the existing rows at the right place', ->
-          expect(table.getRow(0).getCellsCount()).toEqual(3)
-          expect(table.getRow(1).getCellsCount()).toEqual(3)
-
-          expect(row.getCell(1).getColumn()).toEqual(column)
-          expect(row.getCell(2).getColumn().name).toEqual('value')
+          expect(table.getRow(0).length).toEqual(3)
+          expect(table.getRow(1).length).toEqual(3)
 
         it 'throws an error if the index is negative', ->
           expect(-> table.addColumnAt -1, 'foo').toThrow()
@@ -104,11 +83,11 @@ describe 'Table', ->
         beforeEach ->
           spy = jasmine.createSpy 'removeColumn'
 
-          table.addRow key: 'foo', value: 'bar'
-          table.addRow key: 'oof', value: 'rab'
+          table.addRow ['foo', 'bar']
+          table.addRow ['oof', 'rab']
 
           table.onDidRemoveColumn spy
-          table.removeColumn(column)
+          table.removeColumn('value')
 
         it 'removes the column', ->
           expect(table.getColumnsCount()).toEqual(1)
@@ -117,18 +96,11 @@ describe 'Table', ->
           expect(spy).toHaveBeenCalled()
 
         it 'removes the corresponding row cell', ->
-          expect(table.getRow(0).getCellsCount()).toEqual(1)
-          expect(table.getRow(1).getCellsCount()).toEqual(1)
-
-        it 'removes the rows accessors for the column', ->
-          descriptor = Object.getOwnPropertyDescriptor(table.getRow(0), 'value')
-          expect(descriptor).toBeUndefined()
+          expect(table.getRow(0).length).toEqual(1)
+          expect(table.getRow(1).length).toEqual(1)
 
       it 'throws an exception when the column is undefined', ->
         expect(-> table.removeColumn()).toThrow()
-
-      it 'throws an exception when the column is not in the table', ->
-        expect(-> table.removeColumn({})).toThrow()
 
       it 'throws an error with a negative index', ->
         expect(-> table.removeColumnAt(-1)).toThrow()
@@ -138,16 +110,13 @@ describe 'Table', ->
 
     describe 'changing a column name', ->
       beforeEach ->
-        row = table.addRow key: 'foo', value: 'bar'
-        table.addRow key: 'oof', value: 'rab'
+        row = table.addRow ['foo', 'bar']
+        table.addRow ['oof', 'rab']
 
-        column.name = 'content'
+        table.changeColumnName 'value', 'content'
 
-      it 'changes the accessors on the existing rows', ->
-        oldDescriptor = Object.getOwnPropertyDescriptor(row, 'value')
-
-        expect(oldDescriptor).toBeUndefined()
-        expect(row.content).toEqual('bar')
+      it 'changes the column name', ->
+        expect(table.getColumn(1)).toEqual('content')
 
     #    ########   #######  ##      ##  ######
     #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -159,13 +128,11 @@ describe 'Table', ->
 
     describe 'adding a row', ->
       describe 'with an object', ->
-        it 'creates a row with a cell for each value', ->
-          row = table.addRow key: 'foo', value: 'bar'
+        it 'creates a row containing the values', ->
+          table.addRow key: 'foo', value: 'bar'
 
           expect(table.getRowsCount()).toEqual(1)
-          expect(table.getRow(0)).toBe(row)
-          expect(row.key).toEqual('foo')
-          expect(row.value).toEqual('bar')
+          expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
         it 'dispatches a did-add-row event', ->
           spy = jasmine.createSpy 'addRow'
@@ -185,17 +152,15 @@ describe 'Table', ->
             newRange: {start: 0, end: 1}
           })
 
-        it "uses the column default when the value isn't provided", ->
+        it "fills the row with undefined values", ->
           row = table.addRow {}
 
-          expect(row.key).toBeNull()
-          expect(row.value).toEqual('empty')
+          expect(row).toEqual(new Array(2))
 
         it 'ignores data that not match any column', ->
           row = table.addRow key: 'foo', data: 'fooo'
 
-          expect(row.key).toEqual('foo')
-          expect(row.data).toBeUndefined()
+          expect(row).toEqual(['foo', undefined])
 
         describe 'at a specified index', ->
           beforeEach ->
@@ -206,8 +171,7 @@ describe 'Table', ->
             table.addRowAt(1, key: 'hello', value: 'world')
 
             expect(table.getRowsCount()).toEqual(3)
-            expect(table.getRow(1).key).toEqual('hello')
-            expect(table.getRow(1).value).toEqual('world')
+            expect(table.getRow(1)).toEqual(['hello','world'])
 
           it 'throws an error if the index is negative', ->
             expect(-> table.addRowAt -1, {}).toThrow()
@@ -225,18 +189,15 @@ describe 'Table', ->
 
       describe 'with an array', ->
         it 'creates a row with a cell for each value', ->
-          row = table.addRow ['foo', 'bar']
+          table.addRow ['foo', 'bar']
 
           expect(table.getRowsCount()).toEqual(1)
-          expect(table.getRow(0)).toBe(row)
-          expect(row.key).toEqual('foo')
-          expect(row.value).toEqual('bar')
+          expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
-        it "uses the column default when the value isn't provided", ->
+        it "fills the row with undefined values", ->
           row = table.addRow []
 
-          expect(row.key).toBeNull()
-          expect(row.value).toEqual('empty')
+          expect(row).toEqual(new Array(2))
 
         describe 'at a specified index', ->
           beforeEach ->
@@ -247,8 +208,7 @@ describe 'Table', ->
             table.addRowAt(1, ['hello', 'world'])
 
             expect(table.getRowsCount()).toEqual(3)
-            expect(table.getRow(1).key).toEqual('hello')
-            expect(table.getRow(1).value).toEqual('world')
+            expect(table.getRow(1)).toEqual(['hello', 'world'])
 
     describe 'adding many rows', ->
       beforeEach ->
@@ -343,8 +303,7 @@ describe 'Table', ->
       it 'removes the rows from the table', ->
         table.removeRowsInRange([0,2])
         expect(table.getRowsCount()).toEqual(1)
-        expect(table.getRow(0).key).toEqual('ofo')
-        expect(table.getRow(0).value).toEqual('arb')
+        expect(table.getRow(0)).toEqual(['ofo', 'arb'])
 
       it 'dispatches a single did-change-rows', ->
         table.removeRowsInRange([0,2])
@@ -386,10 +345,10 @@ describe 'Table', ->
       table.addRow(['Jane Doe', 30])
 
     it 'returns the cell at the given position array', ->
-      expect(table.cellAtPosition([1,0]).getValue()).toEqual('Jane Doe')
+      expect(table.cellAtPosition([1,0])).toEqual('Jane Doe')
 
     it 'returns the cell at the given position object', ->
-      expect(table.cellAtPosition(row: 1, column: 0).getValue()).toEqual('Jane Doe')
+      expect(table.cellAtPosition(row: 1, column: 0)).toEqual('Jane Doe')
 
     it 'throws an error without a position', ->
       expect(-> table.cellAtPosition()).toThrow()
@@ -398,7 +357,9 @@ describe 'Table', ->
       expect(table.cellAtPosition(row: 2, column: 0)).toBeUndefined()
       expect(table.cellAtPosition(row: 0, column: 2)).toBeUndefined()
 
-  describe '::positionOfCell', ->
+  # FIXME we can't be find the position of a primitive value if there's
+  # duplicates
+  xdescribe '::positionOfCell', ->
     beforeEach ->
       table.addColumn('name')
       table.addColumn('age')
@@ -434,7 +395,7 @@ describe 'Table', ->
 
       table.undo()
 
-      expect(table.getLastRow().foo).toEqual('foo18')
+      expect(table.getLastRow()).toEqual(['foo18'])
 
     it 'rolls back a column addition', ->
       table.addColumn('key')
@@ -450,7 +411,7 @@ describe 'Table', ->
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnsCount()).toEqual(1)
-      expect(table.getColumn(0).name).toEqual('key')
+      expect(table.getColumn(0)).toEqual('key')
 
     it 'rolls back a column deletion', ->
       column = table.addColumn('key')
@@ -467,10 +428,10 @@ describe 'Table', ->
       expect(table.getColumnsCount()).toEqual(1)
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
-      expect(table.getColumn(0).name).toEqual('key')
-      expect(table.getRow(0).getValues()).toEqual(['foo'])
-      expect(table.getRow(1).getValues()).toEqual(['bar'])
-      expect(table.getRow(2).getValues()).toEqual(['baz'])
+      expect(table.getColumn(0)).toEqual('key')
+      expect(table.getRow(0)).toEqual(['foo'])
+      expect(table.getRow(1)).toEqual(['bar'])
+      expect(table.getRow(2)).toEqual(['baz'])
 
       table.redo()
 
@@ -481,12 +442,12 @@ describe 'Table', ->
     describe 'with columns in the table', ->
       beforeEach ->
         table.addColumn('key')
-        column = table.addColumn('value', default: 'empty')
+        column = table.addColumn('value')
 
       it 'rolls back a row addition', ->
         table.clearUndoStack()
 
-        row = table.addRow ['foo', 'bar'], height: 100
+        row = table.addRow ['foo', 'bar']
 
         table.undo()
 
@@ -499,9 +460,7 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(1)
-        expect(table.getRow(0).key).toEqual('foo')
-        expect(table.getRow(0).value).toEqual('bar')
-        expect(table.getRow(0).height).toEqual(100)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
       it 'rolls back a batched rows addition', ->
         table.clearUndoStack()
@@ -509,9 +468,6 @@ describe 'Table', ->
         rows = table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
-        ], [
-          {height: 50}
-          {height: 100}
         ]
 
         table.undo()
@@ -525,16 +481,11 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowsCount()).toEqual(2)
-        expect(table.getRow(0).key).toEqual('foo')
-        expect(table.getRow(0).value).toEqual('bar')
-        expect(table.getRow(0).height).toEqual(50)
-        expect(table.getRow(1).key).toEqual('bar')
-        expect(table.getRow(1).value).toEqual('baz')
-        expect(table.getRow(1).height).toEqual(100)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
+        expect(table.getRow(1)).toEqual(['bar', 'baz'])
 
       it 'rolls back a row deletion', ->
         row = table.addRow ['foo', 'bar']
-        row.height = 100
 
         table.clearUndoStack()
 
@@ -545,9 +496,7 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(1)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
-        expect(table.getRow(0).key).toEqual('foo')
-        expect(table.getRow(0).value).toEqual('bar')
-        expect(table.getRow(0).height).toEqual(100)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
         table.redo()
 
@@ -556,13 +505,10 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(0)
 
       it 'rolls back a batched rows deletion', ->
-        rows = table.addRows [
+        table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
         ]
-
-        rows[0].height = 50
-        rows[1].height = 100
 
         table.clearUndoStack()
 
@@ -573,12 +519,8 @@ describe 'Table', ->
         expect(table.getRowsCount()).toEqual(2)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
-        expect(table.getRow(0).key).toEqual('foo')
-        expect(table.getRow(0).value).toEqual('bar')
-        expect(table.getRow(0).height).toEqual(50)
-        expect(table.getRow(1).key).toEqual('bar')
-        expect(table.getRow(1).value).toEqual('baz')
-        expect(table.getRow(1).height).toEqual(100)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
+        expect(table.getRow(1)).toEqual(['bar', 'baz'])
 
         table.redo()
 
@@ -589,18 +531,18 @@ describe 'Table', ->
       it 'rolls back a change in a column', ->
         table.clearUndoStack()
 
-        column.name = 'foo'
+        table.changeColumnName('value', 'foo')
 
         table.undo()
 
-        expect(column.name).toEqual('value')
+        expect(table.getColumn(1)).toEqual('value')
 
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
         table.redo()
 
-        expect(column.name).toEqual('foo')
+        expect(table.getColumn(1)).toEqual('foo')
 
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
@@ -613,24 +555,24 @@ describe 'Table', ->
 
         table.clearUndoStack()
 
-        row = table.getRow(0)
-        row.key = 'hello'
+        table.setValueAtPosition([0,0], 'hello')
+        expect(table.getRow(0)).toEqual(['hello', 'bar'])
 
         table.undo()
 
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
-        expect(row.key).toEqual('foo')
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
         table.redo()
 
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
-        expect(row.key).toEqual('hello')
+        expect(table.getRow(0)).toEqual(['hello', 'bar'])
 
-      it 'rolls back a change in a row options', ->
+      xit 'rolls back a change in a row options', ->
         table.addRows [
           ['foo', 'bar']
           ['bar', 'baz']
@@ -655,32 +597,6 @@ describe 'Table', ->
 
         expect(row.height).toEqual(100)
 
-      it 'rolls back a change in a cell data', ->
-        table.addRows [
-          ['foo', 'bar']
-          ['bar', 'baz']
-        ]
-
-        table.clearUndoStack()
-
-        cell = table.cellAtPosition([0, 0])
-
-        cell.setValue 'hello'
-
-        table.undo()
-
-        expect(table.undoStack.length).toEqual(0)
-        expect(table.redoStack.length).toEqual(1)
-
-        expect(cell.getValue()).toEqual('foo')
-
-        table.redo()
-
-        expect(table.undoStack.length).toEqual(1)
-        expect(table.redoStack.length).toEqual(0)
-
-        expect(cell.getValue()).toEqual('hello')
-
       describe '::clearUndoStack', ->
         it 'removes all the transactions in the undo stack', ->
           table.addRows [
@@ -688,9 +604,7 @@ describe 'Table', ->
             ['bar', 'baz']
           ]
 
-          cell = table.cellAtPosition([0, 0])
-
-          cell.setValue 'hello'
+          table.setValueAtPosition([0, 0], 'hello')
 
           table.undo()
 
@@ -705,9 +619,7 @@ describe 'Table', ->
             ['bar', 'baz']
           ]
 
-          cell = table.cellAtPosition([0, 0])
-
-          cell.setValue 'hello'
+          table.setValueAtPosition([0, 0], 'hello')
 
           table.undo()
 

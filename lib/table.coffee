@@ -3,9 +3,6 @@ _ = require 'underscore-plus'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 Identifiable = require './mixins/identifiable'
 Transactions = require './mixins/transactions'
-Column = require './column'
-Row = require './row'
-Cell = require './cell'
 
 module.exports =
 class Table
@@ -20,12 +17,6 @@ class Table
     @rows = []
     @emitter = new Emitter
     @columnSubscriptions = {}
-
-  getTitle: -> 'Untitled Table'
-
-  getLongTitle: -> @getTitle()
-
-  getPath: ->
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##
@@ -50,11 +41,8 @@ class Table
   onDidChangeRows: (callback) ->
     @emitter.on 'did-change-rows', callback
 
-  onDidChangeRowsOptions: (callback) ->
-    @emitter.on 'did-change-rows-options', callback
-
-  onDidChangeColumnsOptions: (callback) ->
-    @emitter.on 'did-change-columns-options', callback
+  onDidChangeCellValue: (callback) ->
+    @emitter.on 'did-change-cell-value', callback
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -68,36 +56,22 @@ class Table
 
   getColumn: (index) -> @columns[index]
 
-  getColumnValues: (index) ->
-    name = @columns[index].name
-    @rows.map (row) => row[name]
+  getColumnValues: (index) -> @rows.map (row) => row[index]
 
-  getColumnNames: -> @columns.map (column) -> column.name
+  getColumnNames: -> @columns.concat()
 
   getColumnsCount: -> @columns.length
 
-  addColumn: (name, options={}, transaction=true) ->
-    @addColumnAt(@columns.length, name, options, transaction)
+  addColumn: (name, transaction=true) ->
+    @addColumnAt(@columns.length, name, transaction)
 
-  addColumnAt: (index, name, options={}, transaction=true) ->
-    if index < 0
-      throw new Error "Can't add column #{name} at index #{index}"
+  addColumnAt: (index, column, transaction=true) ->
+    throw new Error "Can't add column #{column} at index #{index}" if index < 0
+    throw new Error "Can't add column without a name" unless column?
 
-    if typeof name is 'string'
-      options.name = name
-    else
-      [options, transaction] = [name, options]
-      {name} = options
+    if column in @columns
+      throw new Error "Can't add column #{column} as one already exist"
 
-    unless name?
-      throw new Error "Can't add column without a name"
-
-    if name in @getColumnNames()
-      throw new Error "Can't add column #{name} as one already exist"
-
-    column = new Column options
-
-    @subscribeToColumn(column)
     @extendExistingRows(column, index)
 
     if index >= @columns.length
@@ -111,61 +85,42 @@ class Table
     if transaction
       @transaction
         undo: -> @removeColumnAt(index, false)
-        redo: -> @addColumnAt(index, options, false)
+        redo: -> @addColumnAt(index, column, false)
 
     column
 
-  removeColumn: (column) ->
+  removeColumn: (column, transaction=true) ->
     throw new Error "Can't remove an undefined column" unless column?
 
-    @removeColumnAt(@columns.indexOf(column))
+    @removeColumnAt(@columns.indexOf(column), transaction)
 
   removeColumnAt: (index, transaction=true) ->
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
     values = @getColumnValues(index) if transaction
+
     column = @columns[index]
-    @unsubscribeFromColumn(column)
     @columns.splice(index, 1)
-    row.removeCellAt(index) for row in @rows
+    row.splice(index, 1) for row in @rows
     @emitter.emit 'did-remove-column', {column, index}
 
     if transaction
-      {name, options} = column
-
       @transaction
         undo: ->
-          @addColumnAt(index, name, options, false)
-          @rows.forEach (row,i) -> row.setProperty(name, values[i], false)
+          @addColumnAt(index, column, false)
+          @rows.forEach (row,i) -> row[index] = values[i]
         redo: -> @removeColumnAt(index, false)
 
-  subscribeToColumn: (column) ->
-    subscriptions = @columnSubscriptions[column.id] = new CompositeDisposable
+  changeColumnName: (column, newName, transaction=true) ->
+    index = @columns.indexOf(column)
 
-    subscriptions.add column.onDidChangeName @updateRowsColumnAccessor
-    subscriptions.add column.onDidChangeOption @registerColumnTransaction
+    @columns[index] = newName
 
-  unsubscribeFromColumn: (column) ->
-    @columnSubscriptions[column.id].dispose()
-    delete @columnSubscriptions[column.id]
-
-  registerColumnTransaction: (change) =>
-    doChange = change
-    undoChange = {
-      column: change.column
-      option: change.option
-      newValue: change.oldValue
-      oldValue: change.newValue
-    }
-    @emitter.emit 'did-change-columns-options', doChange
-    @transaction
-      undo: =>
-        @emitter.emit 'did-change-columns-options', undoChange
-        change.column.setOption(change.option, change.oldValue, true)
-      redo: =>
-        @emitter.emit 'did-change-columns-options', doChange
-        change.column.setOption(change.option, change.newValue, true)
+    if transaction
+      @transaction
+        undo: -> @columns[index] = column
+        redo: -> @columns[index] = newName
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -189,36 +144,21 @@ class Table
 
   getLastRow: -> @rows[@rows.length - 1]
 
-  addRow: (values, options, batch=false) ->
-    @addRowAt(@rows.length, values, options, batch)
+  addRow: (values, batch=false, transaction=true) ->
+    @addRowAt(@rows.length, values, batch, transaction)
 
-  addRowAt: (index, values={}, options, batch, transaction) ->
-    [options, batch, transaction] = [{}, options, batch] if typeof options is 'boolean'
+  addRowAt: (index, values={}, batch=false, transaction=true) ->
+    throw new Error "Can't add column #{name} at index #{index}" if index < 0
 
-    options ?= {}
-    batch ?= false
-    transaction ?= true
-
-    if index < 0
-      throw new Error "Can't add column #{name} at index #{index}"
-
-    if @getColumns().length is 0
+    if @columns.length is 0
       throw new Error "Can't add rows to a table without column"
 
-    cells = []
+    row = []
 
     if Array.isArray(values)
-      for column,i in @columns
-        value = values[i]
-        cell = new Cell {value, column}
-        cells.push cell
+      row = values.concat()
     else
-      for column in @columns
-        value = values[column.name]
-        cell = new Cell {value, column}
-        cells.push cell
-
-    row = new Row {cells, options, table: this}
+      row.push values[column] for column in @columns
 
     if index >= @rows.length
       @rows.push row
@@ -233,23 +173,17 @@ class Table
       }
 
     if not batch and transaction
-      options = _.clone(row.options)
       @transaction
         undo: -> @removeRowAt(index, false, false)
-        redo: -> @addRowAt(index, values, options, false, false)
+        redo: -> @addRowAt(index, values, false, false)
 
     row
 
-  addRows: (rows, options, transaction=true) ->
-    @addRowsAt(@rows.length, rows, options, transaction)
+  addRows: (rows, transaction=true) ->
+    @addRowsAt(@rows.length, rows, transaction)
 
-  addRowsAt: (index, rows, options, transaction) ->
-    [options, transaction] = [[], options] if typeof options is 'boolean'
-
-    options ?= []
-    transaction ?= true
-
-    createdRows = rows.map (row,i) => @addRowAt(index+i, row, options[i], true)
+  addRowsAt: (index, rows, transaction=true) ->
+    createdRows = rows.map (row,i) => @addRowAt(index+i, row, true)
 
     @emitter.emit 'did-change-rows', {
       oldRange: {start: index, end: index}
@@ -258,10 +192,9 @@ class Table
 
     if transaction
       range = {start: index, end: index+rows.length}
-      options = @getRowsInRange(range).map (row) -> _.clone(row.options)
       @transaction
         undo: -> @removeRowsInRange(range, false)
-        redo: -> @addRowsAt(index, rows, options, false)
+        redo: -> @addRowsAt(index, rows, false)
 
     createdRows
 
@@ -285,10 +218,9 @@ class Table
       }
 
     if not batch and transaction
-      values = row.getValues()
-      options = _.clone(row.options)
+      values = row.concat()
       @transaction
-        undo: -> @addRowAt(index, values, options, false, false)
+        undo: -> @addRowAt(index, values, false, false)
         redo: -> @removeRowAt(index, false, false)
 
   removeRowsInRange: (range, transaction=true) ->
@@ -298,11 +230,8 @@ class Table
 
     range.end = @getRowsCount() if range.end is Infinity
 
-    if transaction
-      options = @getRowsInRange(range).map (row) -> _.clone(row.options)
-
     for i in [range.start...range.end]
-      rowsValues.push @rows[range.start].getValues()
+      rowsValues.push @rows[range.start].concat()
       @removeRowAt(range.start, true)
 
     @emitter.emit 'did-change-rows', {
@@ -312,14 +241,11 @@ class Table
 
     if transaction
       @transaction
-        undo: -> @addRowsAt(range.start, rowsValues, options, false)
+        undo: -> @addRowsAt(range.start, rowsValues, false)
         redo: -> @removeRowsInRange(range, false)
 
   extendExistingRows: (column, index) ->
-    row.addCellAt index, new Cell {column} for row in @rows
-
-  updateRowsColumnAccessor: ({oldName, newName}) =>
-    row.updateCellAccessorName(oldName, newName) for row in @rows
+    row.splice index, 0, undefined for row in @rows
 
   rangeFrom: (range) ->
     throw new Error "Can't remove rows with a range" unless range?
@@ -368,17 +294,33 @@ class Table
   #    ##    ## ##       ##       ##       ##    ##
   #     ######  ######## ######## ########  ######
 
-  getCells: ->
-    @rows.reduce ((cells, row) -> cells.concat row.getCells()), []
+  getCells: -> @rows.reduce ((cells, row) -> cells.concat row), []
 
-  getCellsCount: -> @getCells().length
+  getCellsCount: -> @rows.length * @columns.length
 
   cellAtPosition: (position) ->
     unless position?
       throw new Error "Table::cellAtPosition called without a position"
 
     position = Point.fromObject(position)
-    @getRow(position.row)?.getCell(position.column)
+    @rows[position.row]?[position.column]
+
+  setValueAtPosition: (position, value, transaction=true) ->
+    unless position?
+      throw new Error "Table::setValueAtPosition called without a position"
+    if position.row < 0 or position.row >= @getRowsCount() or position.column < 0 or position.column >= @getColumnsCount()
+      throw new Error "Table::setValueAtPosition called without an invalid position #{position}"
+
+    position = Point.fromObject(position)
+    oldValue = @rows[position.row]?[position.column]
+    @rows[position.row]?[position.column] = value
+
+    @emitter.emit 'did-change-cell-value', {position, oldValue, newValue: value}
+
+    if transaction
+      @transaction
+        undo: -> @setValueAtPosition(position, oldValue, false)
+        redo: -> @setValueAtPosition(position, value, false)
 
   positionOfCell: (cell) ->
     unless cell?
