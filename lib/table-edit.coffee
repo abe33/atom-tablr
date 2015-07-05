@@ -1,7 +1,8 @@
-[Table, TableView, url] = []
+fs = require 'fs'
+csv = require 'csv'
+[Table, TableElement, url] = []
 
 module.exports =
-
   config:
     undefinedDisplay:
       type: 'string'
@@ -27,12 +28,28 @@ module.exports =
 
   activate: (state) ->
     Table ?= require './table'
-    TableView ?= require './table-element'
-    TableView.registerViewProvider(true)
+    TableElement ?= require './table-element'
+    TableElement.registerViewProvider(true)
 
     atom.commands.add 'atom-workspace',
-      'table-edit:demo-basic-table': => @openDemoInPane()
-      'table-edit:demo-large-table': => @openLargeDemoInPane()
+      'table-edit:demo-large': => atom.workspace.open('table://large')
+      'table-edit:demo-small': => atom.workspace.open('table://small')
+
+    atom.workspace.addOpener (uriToOpen) =>
+      return unless /\.csv$/.test uriToOpen
+
+      new Promise (resolve, reject) ->
+        fileContent = fs.readFileSync(uriToOpen)
+        csv.parse fileContent, (err, data) ->
+          return reject(err) if err?
+
+          table = new Table
+          return data if data.length is 0
+
+          table.addColumn(column, {}, false) for column in data.shift()
+          table.addRow(row) for row in data
+
+          resolve(table)
 
     atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
@@ -41,25 +58,17 @@ module.exports =
       return unless protocol is 'table:'
 
       switch host
-        when 'demo' then @getBasicTableDemo()
-        when 'large-demo' then @getLargeTableDemo()
+        when 'large' then @getLargeTable()
+        when 'small' then @getSmallTable()
 
-  deactivate: ->
-
-  serialize: ->
-
-  openDemoInPane: -> atom.workspace.open('table://demo')
-
-  openLargeDemoInPane: -> atom.workspace.open('table://large-demo')
-
-  getBasicTableDemo: ->
+  getSmallTable: ->
     table = new Table
 
-    table.addColumn 'key'
-    table.addColumn 'value', align: 'right'
-    table.addColumn 'foo', align: 'right'
+    table.addColumn 'key', width: 150, align: 'right'
+    table.addColumn 'value', width: 150, align: 'center'
+    table.addColumn 'locked', width: 150, align: 'left'
 
-    for i in [0...1000]
+    for i in [0...100]
       table.addRow [
         "row#{i}"
         Math.random() * 100
@@ -70,17 +79,27 @@ module.exports =
 
     return table
 
-  getLargeTableDemo: ->
+  getLargeTable: ->
     table = new Table
 
-    for n in [0..50]
-      table.addColumn("column #{n + 1}")
+    table.addColumn 'key', width: 150, align: 'right'
+    table.addColumn 'value', width: 150, align: 'center'
+    for i in [0..100]
+      table.addColumn 'column_' + i, width: 150, align: 'left'
 
-    for r in [0..1000]
-      rowData = []
-      for c in [0..50]
-        rowData.push "cell #{r}-#{c} data"
+    for i in [0...1000]
+      data = [
+        "row#{i}"
+        Math.random() * 100
+      ]
+      for j in [0..100]
+        if j % 2 is 0
+          data.push if i % 2 is 0 then 'yes' else 'no'
+        else
+          data.push Math.random() * 100
 
-      table.addRow(rowData)
+      table.addRow data
+
+    table.clearUndoStack()
 
     return table
