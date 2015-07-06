@@ -257,35 +257,6 @@ class Table
 
     range
 
-  rowUpdated: ({row, cell, newValue, oldValue, transaction}) ->
-    transaction ?= true
-
-    index = @rows.indexOf(row)
-    @emitter.emit 'did-change-rows', {
-      oldRange: {start: index, end: index}
-      newRange: {start: index, end: index}
-    }
-    if transaction
-      @transaction
-        undo: -> row.setProperty(cell, oldValue, false)
-        redo: -> row.setProperty(cell, newValue, false)
-
-  rowOptionUpdated: ({row, option, newValue, oldValue, transaction}) ->
-    transaction ?= true
-
-    index = @rows.indexOf(row)
-    @emitter.emit 'did-change-rows-options', {
-      row
-      option
-      oldValue
-      newValue
-      range: {start: index, end: index}
-    }
-    if transaction
-      @transaction
-        undo: -> row.setOption(option, oldValue, false)
-        redo: -> row.setOption(option, newValue, false)
-
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
   #    ##       ##       ##       ##       ##
