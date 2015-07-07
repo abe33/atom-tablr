@@ -64,6 +64,9 @@ describe 'DisplayTable', ->
       expect(displayTable.getScreenColumnOffsetAt(0)).toEqual(0)
       expect(displayTable.getScreenColumnOffsetAt(1)).toEqual(100)
 
+    it 'returns the column at given screen position', ->
+      expect(displayTable.getScreenColumnIndexAtPosition(120)).toEqual(1)
+
     describe 'adding a column', ->
       describe 'at the end of the row', ->
         beforeEach ->
@@ -100,6 +103,9 @@ describe 'DisplayTable', ->
 
         it 'computes the new column offset', ->
           expect(displayTable.getScreenColumnOffsetAt(2)).toEqual(200)
+
+        it 'returns the column at given screen position', ->
+          expect(displayTable.getScreenColumnIndexAtPosition(220)).toEqual(2)
 
         it 'computes the new content width', ->
           expect(displayTable.getContentWidth()).toEqual(300)
@@ -143,6 +149,10 @@ describe 'DisplayTable', ->
         expect(displayTable.getScreenColumnOffsetAt(0)).toEqual(0)
         expect(displayTable.getScreenColumnOffsetAt(1)).toEqual(200)
 
+      it 'returns the column at given screen position', ->
+        expect(displayTable.getScreenColumnIndexAtPosition(180)).toEqual(0)
+        expect(displayTable.getScreenColumnIndexAtPosition(220)).toEqual(1)
+
       it 'computes the new content width', ->
         expect(displayTable.getContentWidth()).toEqual(300)
 
@@ -165,6 +175,10 @@ describe 'DisplayTable', ->
       expect(displayTable.getScreenRowOffsetAt(0)).toEqual(0)
       expect(displayTable.getScreenRowOffsetAt(1)).toEqual(20)
       expect(displayTable.getScreenRowOffsetAt(2)).toEqual(40)
+
+    it 'returns the rows at given screen position', ->
+      expect(displayTable.getRowIndexAtPosition(50)).toEqual(2)
+      expect(displayTable.getScreenRowIndexAtPosition(50)).toEqual(2)
 
     describe 'setting the height of a row', ->
       beforeEach ->
@@ -196,6 +210,10 @@ describe 'DisplayTable', ->
         it 'computes the new table height', ->
           expect(displayTable.getContentHeight()).toEqual(80)
 
+        it 'returns the rows at given screen position', ->
+          expect(displayTable.getRowIndexAtPosition(70)).toEqual(3)
+          expect(displayTable.getScreenRowIndexAtPosition(70)).toEqual(3)
+
       describe 'at the middle of the table', ->
         beforeEach ->
           displayTable.addRowAt(1, ['blood type', 'ab-'])
@@ -213,7 +231,11 @@ describe 'DisplayTable', ->
         it 'computes the new table height', ->
           expect(displayTable.getContentHeight()).toEqual(80)
 
-      describe 'before a row with', ->
+        it 'returns the rows at given screen position', ->
+          expect(displayTable.getRowIndexAtPosition(50)).toEqual(2)
+          expect(displayTable.getScreenRowIndexAtPosition(50)).toEqual(2)
+
+      describe 'before a row with a height', ->
         beforeEach ->
           displayTable.setRowHeightAt(1, 100)
           displayTable.addRowAt(1, ['blood type', 'ab-'])
@@ -273,6 +295,18 @@ describe 'DisplayTable', ->
         expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
         expect(displayTable.getScreenRow(1)).toEqual(['gender', 'female'])
         expect(displayTable.getScreenRow(2)).toEqual(['name', 'Jane Doe'])
+
+      it 'returns the rows at given screen position', ->
+        displayTable.sortBy('key')
+
+        expect(displayTable.getRowIndexAtPosition(10)).toEqual(1)
+        expect(displayTable.getScreenRowIndexAtPosition(10)).toEqual(0)
+
+        expect(displayTable.getRowIndexAtPosition(30)).toEqual(2)
+        expect(displayTable.getScreenRowIndexAtPosition(30)).toEqual(1)
+
+        expect(displayTable.getRowIndexAtPosition(50)).toEqual(0)
+        expect(displayTable.getScreenRowIndexAtPosition(50)).toEqual(2)
 
       describe 'and there is already some custom height defined', ->
         it 'keeps the relation between the model rows and the heights', ->

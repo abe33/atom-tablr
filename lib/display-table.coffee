@@ -132,6 +132,13 @@ class DisplayTable
 
   getScreenColumnOffsetAt: (column) -> @screenColumnOffsets[column]
 
+  getScreenColumnIndexAtPosition: (position) ->
+    for i in [0...@getScreenColumnWidth()]
+      offset = @getScreenColumnOffsetAt(i)
+      return i - 1 if position < offset
+
+    return @getLastColumnIndex()
+
   addColumn: (name, options={}, transaction=true) ->
     @addColumnAt(@screenColumns.length, name, options, transaction)
 
@@ -242,6 +249,16 @@ class DisplayTable
     @computeRowOffsets()
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
+
+  getScreenRowIndexAtPosition: (position) ->
+    for i in [0...@getScreenRowsCount()]
+      offset = @getScreenRowOffsetAt(i)
+      return i - 1 if position < offset
+
+    return @getLastRowIndex()
+
+  getRowIndexAtPosition: (position) ->
+    @screenRowToModelRow(@getScreenRowIndexAtPosition(position))
 
   addRow: (row, options={}, transaction=true) ->
     @addRowAt(@table.getRowsCount(), row, options, transaction)
