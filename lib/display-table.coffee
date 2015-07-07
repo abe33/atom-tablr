@@ -132,7 +132,7 @@ class DisplayTable
 
   getScreenColumnOffsetAt: (column) -> @screenColumnOffsets[column]
 
-  getScreenColumnIndexAtPosition: (position) ->
+  getScreenColumnIndexAtPixelPosition: (position) ->
     for i in [0...@getScreenColumnWidth()]
       offset = @getScreenColumnOffsetAt(i)
       return i - 1 if position < offset
@@ -250,7 +250,7 @@ class DisplayTable
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 
-  getScreenRowIndexAtPosition: (position) ->
+  getScreenRowIndexAtPixelPosition: (position) ->
     for i in [0...@getScreenRowsCount()]
       offset = @getScreenRowOffsetAt(i)
       return i - 1 if position < offset
@@ -258,7 +258,7 @@ class DisplayTable
     return @getLastRowIndex()
 
   getRowIndexAtPosition: (position) ->
-    @screenRowToModelRow(@getScreenRowIndexAtPosition(position))
+    @screenRowToModelRow(@getScreenRowIndexAtPixelPosition(position))
 
   addRow: (row, options={}, transaction=true) ->
     @addRowAt(@table.getRowsCount(), row, options, transaction)
@@ -338,6 +338,19 @@ class DisplayTable
 
   setValueAtScreenPosition: (position, value) ->
     @setValueAtPosition(@modelPosition(position), value)
+
+  getScreenPositionAtPixelPosition: (x,y) ->
+    return unless x? and y?
+
+    row = @getScreenRowIndexAtPixelPosition(y)
+    column = @getScreenColumnIndexAtPixelPosition(x)
+
+    Point.fromObject([row, column])
+
+  getPositionAtPixelPosition: (x,y) ->
+    position = @getScreenPositionAtPixelPosition(x,y)
+    position.row = @screenRowToModelRow(position.row)
+    position
 
   screenPosition: (position) ->
     {row, column} = Point.fromObject(position)
