@@ -2,7 +2,7 @@ path = require 'path'
 
 Table = require '../lib/table'
 TableElement = require '../lib/table-element'
-Column = require '../lib/column'
+Column = require '../lib/display-column'
 Row = require '../lib/row'
 Cell = require '../lib/cell'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'

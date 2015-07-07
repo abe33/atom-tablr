@@ -1,4 +1,3 @@
-_ = require 'underscore-plus'
 {Point} = require 'atom'
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 Identifiable = require './mixins/identifiable'
@@ -32,6 +31,9 @@ class Table
   onDidRemoveColumn: (callback) ->
     @emitter.on 'did-remove-column', callback
 
+  onDidRenameColumn: (callback) ->
+    @emitter.on 'did-rename-column', callback
+
   onDidAddRow: (callback) ->
     @emitter.on 'did-add-row', callback
 
@@ -56,16 +58,18 @@ class Table
 
   getColumn: (index) -> @columns[index]
 
+  getColumnIndex: (column) -> @columns.indexOf(column)
+
   getColumnValues: (index) -> @rows.map (row) => row[index]
 
   getColumnNames: -> @columns.concat()
 
   getColumnsCount: -> @columns.length
 
-  addColumn: (name, transaction=true) ->
-    @addColumnAt(@columns.length, name, transaction)
+  addColumn: (name, transaction=true, event=true) ->
+    @addColumnAt(@columns.length, name, transaction, event)
 
-  addColumnAt: (index, column, transaction=true) ->
+  addColumnAt: (index, column, transaction=true, event=true) ->
     throw new Error "Can't add column #{column} at index #{index}" if index < 0
     throw new Error "Can't add column without a name" unless column?
 
@@ -80,7 +84,7 @@ class Table
     else
       @columns.splice index, 0, column
 
-    @emitter.emit 'did-add-column', {column}
+    @emitter.emit 'did-add-column', {column, index} if event
 
     if transaction
       @transaction
@@ -89,12 +93,12 @@ class Table
 
     column
 
-  removeColumn: (column, transaction=true) ->
+  removeColumn: (column, transaction=true, event=true) ->
     throw new Error "Can't remove an undefined column" unless column?
 
-    @removeColumnAt(@columns.indexOf(column), transaction)
+    @removeColumnAt(@columns.indexOf(column), transaction, event)
 
-  removeColumnAt: (index, transaction=true) ->
+  removeColumnAt: (index, transaction=true, event=true) ->
     if index is -1 or index >= @columns.length
       throw new Error "Can't remove column at index #{index}"
 
@@ -103,19 +107,24 @@ class Table
     column = @columns[index]
     @columns.splice(index, 1)
     row.splice(index, 1) for row in @rows
-    @emitter.emit 'did-remove-column', {column, index}
+
+    @emitter.emit 'did-remove-column', {column, index} if event
 
     if transaction
       @transaction
         undo: ->
+          console.log this
           @addColumnAt(index, column, false)
           @rows.forEach (row,i) -> row[index] = values[i]
         redo: -> @removeColumnAt(index, false)
 
-  changeColumnName: (column, newName, transaction=true) ->
+  changeColumnName: (column, newName, transaction=true, event=true) ->
     index = @columns.indexOf(column)
 
     @columns[index] = newName
+
+    if event
+      @emitter.emit('did-rename-column', {oldName: column, newName, index})
 
     if transaction
       @transaction
@@ -133,6 +142,8 @@ class Table
   getRows: -> @rows
 
   getRow: (index) -> @rows[index]
+
+  getRowIndex: (row) -> @rows.indexOf(row)
 
   getRowsCount: -> @rows.length
 

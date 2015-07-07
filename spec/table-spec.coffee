@@ -1,8 +1,5 @@
 {Point} = require 'atom'
 Table = require '../lib/table'
-Column = require '../lib/column'
-Row = require '../lib/row'
-Cell = require '../lib/cell'
 
 describe 'Table', ->
   [table, row, column, spy] = []

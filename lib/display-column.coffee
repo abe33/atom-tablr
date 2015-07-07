@@ -3,7 +3,7 @@ PropertyAccessors = require 'property-accessors'
 Identifiable = require './mixins/identifiable'
 
 module.exports =
-class Column
+class DisplayColumn
   Identifiable.includeInto(this)
   PropertyAccessors.includeInto(this)
 
@@ -15,11 +15,11 @@ class Column
       @emitter.emit 'did-change-name', {oldName, newName, column: this}
 
   @::accessor 'width',
-    get: -> @options.width
+    get: -> @options.width ? atom.config.get('table-edit.columnWidth')
     set: (newWidth) -> @setOption 'width', newWidth
 
   @::accessor 'align',
-    get: -> @options.align
+    get: -> @options.align ? 'left'
     set: (newAlign) -> @setOption 'align', newAlign
 
   @::accessor 'cellRender',
@@ -37,11 +37,14 @@ class Column
   onDidChangeOption: (callback) ->
     @emitter.on 'did-change-option', callback
 
-  setOption: (name, newValue, cancelEvent=false) ->
+  setOptions: (options={}) ->
+    @[name] = value for name, value of options when name isnt 'name'
+
+  setOption: (name, newValue, batch=false) ->
     oldValue = @[name]
     @options[name] = newValue
 
-    unless cancelEvent
+    unless batch
       @emitter.emit 'did-change-option', {
         option: name
         column: this
