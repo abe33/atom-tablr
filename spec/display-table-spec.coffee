@@ -4,13 +4,6 @@ Table = require '../lib/table'
 describe 'DisplayTable', ->
   [table, displayTable] = []
 
-  itDelegatesToTable = (methods...) ->
-    methods.forEach (method) ->
-      it "delegate ::#{method} to its table", ->
-        spyOn(table, method).andCallFake ->
-        displayTable[method]()
-        expect(table[method]).toHaveBeenCalled()
-
   beforeEach ->
     atom.config.set 'table-edit.columnWidth', 100
     atom.config.set 'table-edit.minimuColumnWidth', 10
