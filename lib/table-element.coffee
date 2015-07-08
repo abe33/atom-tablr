@@ -381,7 +381,7 @@ class TableElement extends HTMLElement
   #     ######  ######## ######## ########  ######
 
   getActiveCell: ->
-    @table.cellAtPosition(@modelPosition(@activeCellPosition))
+    @table.getValueAtPosition(@modelPosition(@activeCellPosition))
 
   isActiveCell: (cell) -> @getActiveCell() is cell
 

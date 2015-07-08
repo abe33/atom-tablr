@@ -1717,7 +1717,7 @@ xdescribe 'tableElement', ->
 
       it 'leaves the active cell position as it was before', ->
         expect(tableElement.activeCellPosition).toEqual([0,0])
-        expect(tableElement.getActiveCell()).toEqual(table.cellAtPosition([99,0]))
+        expect(tableElement.getActiveCell()).toEqual(table.getValueAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
         expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)

@@ -333,7 +333,7 @@ describe 'Table', ->
   #    ##    ## ##       ##       ##       ##    ##
   #     ######  ######## ######## ########  ######
 
-  describe '::cellAtPosition', ->
+  describe '::getValueAtPosition', ->
     beforeEach ->
       table.addColumn('name')
       table.addColumn('age')
@@ -342,17 +342,17 @@ describe 'Table', ->
       table.addRow(['Jane Doe', 30])
 
     it 'returns the cell at the given position array', ->
-      expect(table.cellAtPosition([1,0])).toEqual('Jane Doe')
+      expect(table.getValueAtPosition([1,0])).toEqual('Jane Doe')
 
     it 'returns the cell at the given position object', ->
-      expect(table.cellAtPosition(row: 1, column: 0)).toEqual('Jane Doe')
+      expect(table.getValueAtPosition(row: 1, column: 0)).toEqual('Jane Doe')
 
     it 'throws an error without a position', ->
-      expect(-> table.cellAtPosition()).toThrow()
+      expect(-> table.getValueAtPosition()).toThrow()
 
     it 'returns undefined with a position out of bounds', ->
-      expect(table.cellAtPosition(row: 2, column: 0)).toBeUndefined()
-      expect(table.cellAtPosition(row: 0, column: 2)).toBeUndefined()
+      expect(table.getValueAtPosition(row: 2, column: 0)).toBeUndefined()
+      expect(table.getValueAtPosition(row: 0, column: 2)).toBeUndefined()
 
   # FIXME we can't be find the position of a primitive value if there's
   # duplicates
@@ -365,7 +365,7 @@ describe 'Table', ->
       table.addRow(['Jane Doe', 30])
 
     it 'returns the position of the cell', ->
-      cell = table.cellAtPosition([1,1])
+      cell = table.getValueAtPosition([1,1])
 
       expect(table.positionOfCell(cell)).toEqual(row: 1, column: 1)
 

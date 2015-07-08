@@ -280,9 +280,9 @@ class Table
 
   getCellsCount: -> @rows.length * @columns.length
 
-  cellAtPosition: (position) ->
+  getValueAtPosition: (position) ->
     unless position?
-      throw new Error "Table::cellAtPosition called without a position"
+      throw new Error "Table::getValueAtPosition called without a position"
 
     position = Point.fromObject(position)
     @rows[position.row]?[position.column]
