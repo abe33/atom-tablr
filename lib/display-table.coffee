@@ -98,7 +98,7 @@ class DisplayTable
     @computeScreenColumnOffsets()
     @emitter.emit('did-add-column', {screenColumn, column: options.name, index})
 
-  getScreenColumns: -> @screenColumns
+  getScreenColumns: -> @screenColumns.slice()
 
   getScreenColumnsCount: -> @screenColumns.length
 
@@ -206,7 +206,7 @@ class DisplayTable
 
   modelRowToScreenRow: (row) -> @modelToScreenRowsMap[row]
 
-  getScreenRows: -> @screenRows
+  getScreenRows: -> @screenRows.slice()
 
   getScreenRowsCount: -> @screenRows.length
 

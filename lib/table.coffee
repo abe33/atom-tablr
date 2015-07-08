@@ -54,7 +54,7 @@ class Table
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
-  getColumns: -> @columns
+  getColumns: -> @columns.slice()
 
   getColumn: (index) -> @columns[index]
 
@@ -139,7 +139,7 @@ class Table
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
 
-  getRows: -> @rows
+  getRows: -> @rows.slice()
 
   getRow: (index) -> @rows[index]
 
