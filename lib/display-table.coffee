@@ -345,7 +345,7 @@ class DisplayTable
     row = @getScreenRowIndexAtPixelPosition(y)
     column = @getScreenColumnIndexAtPixelPosition(x)
 
-    Point.fromObject([row, column])
+    new Point(row, column)
 
   getPositionAtPixelPosition: (x,y) ->
     position = @getScreenPositionAtPixelPosition(x,y)
@@ -355,12 +355,12 @@ class DisplayTable
   screenPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @modelRowToScreenRow(row), column}
+    new Point(@modelRowToScreenRow(row), column)
 
   modelPosition: (position) ->
     {row, column} = Point.fromObject(position)
 
-    {row: @screenRowToModelRow(row), column}
+    new Point(@screenRowToModelRow(row), column)
 
   getScreenCellPosition: (position) ->
     position = Point.fromObject(position)
