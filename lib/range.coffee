@@ -232,9 +232,9 @@ class Range
   # * `otherRange` A {Range} or range-compatible {Array}
   # * `exclusive` A boolean value including that the containment should be exclusive of
   #   endpoints. Defaults to false.
-  containsRange: (otherRange, exclusive) ->
+  containsRange: (otherRange) ->
     {start, end} = @constructor.fromObject(otherRange)
-    @containsPoint(start, exclusive) and @containsPoint(end, exclusive)
+    @containsPoint(start) and @containsPoint(end)
 
   # Public: Returns a {Boolean} indicating whether this range contains the given
   # point.
@@ -242,12 +242,10 @@ class Range
   # * `point` A {Point} or point-compatible {Array}
   # * `exclusive` A boolean value including that the containment should be exclusive of
   #   endpoints. Defaults to false.
-  containsPoint: (point, exclusive) ->
+  containsPoint: (point) ->
     point = Point.fromObject(point)
-    if exclusive
-      point.row > @start.row and point.row < @end.row and point.column > @start.column and point.column < @end.column
-    else
-      point.row >= @start.row and point.row <= @end.row and point.column >= @start.column and point.column <= @end.column
+
+    point.row >= @start.row and point.row <= @end.row and point.column >= @start.column and point.column <= @end.column
 
   # Public: Returns a string representation of the range.
   toString: ->

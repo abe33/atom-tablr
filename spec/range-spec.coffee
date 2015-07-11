@@ -22,6 +22,18 @@ describe "Range", ->
         expect(intersectsWith([[1, 2], [3, 4]], [[1, 0], [1, 1]], true)).toBe false
         expect(intersectsWith([[1, 2], [3, 4]], [[1, 0], [1, 2]], true)).toBe false
 
+  describe "::containsRange(other, [exclusive])", ->
+    contains = (range1, range2, exclusive) ->
+      range1 = Range.fromObject(range1)
+      range2 = Range.fromObject(range2)
+      range1.containsRange(range2, exclusive)
+
+    it "returns true when the range is contained", ->
+      expect(contains([[0,0],[1,1]], [[0,0],[1,1]])).toBe true
+      expect(contains([[0,0],[2,2]], [[0,0],[1,1]])).toBe true
+      expect(contains([[0,0],[2,2]], [[1,1],[3,3]])).toBe false
+      expect(contains([[0,0],[2,2]], [[2,2],[3,3]])).toBe false
+
   describe "::negate()", ->
     it "should negate the start and end points", ->
       expect(new Range([ 0,  0], [ 0,  0]).negate().toString()).toBe "[(0, 0) - (0, 0)]"
