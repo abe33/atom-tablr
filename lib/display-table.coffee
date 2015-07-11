@@ -8,7 +8,7 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnsCount', 'getRowsCount', 'clearUndoStack', 'clearRedoStack', 'setValueAtPosition', toProperty: 'table'
+  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnsCount', 'getRowsCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', toProperty: 'table'
 
   rowOffsets: null
   columnOffsets: null
@@ -335,6 +335,9 @@ class DisplayTable
   ##    ##       ##       ##       ##             ##
   ##    ##    ## ##       ##       ##       ##    ##
   ##     ######  ######## ######## ########  ######
+
+  getValueAtScreenPosition: (position) ->
+    @getValueAtPosition(@modelPosition(position))
 
   setValueAtScreenPosition: (position, value) ->
     @setValueAtPosition(@modelPosition(position), value)
