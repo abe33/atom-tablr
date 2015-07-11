@@ -41,7 +41,7 @@ class RowsAxis extends Mixin
 
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
-  getLastRow: -> @table.getRowsCount() - 1
+  getLastRow: -> @table.getRowCount() - 1
 
   getFirstVisibleRow: ->
     @findRowAtPosition(@getRowsScrollContainer().scrollTop)
@@ -101,7 +101,7 @@ class RowsAxis extends Mixin
     offsets = []
     offset = 0
 
-    for i in [0...@table.getRowsCount()]
+    for i in [0...@table.getRowCount()]
       offsets.push offset
       offset += @getScreenRowHeightAt(i)
 
@@ -116,11 +116,11 @@ class RowsAxis extends Mixin
     top + contentOffset.top
 
   findRowAtPosition: (y) ->
-    for i in [0...@table.getRowsCount()]
+    for i in [0...@table.getRowCount()]
       offset = @getScreenRowOffsetAt(i)
       return i - 1 if y < offset
 
-    return @table.getRowsCount() - 1
+    return @table.getRowCount() - 1
 
   findRowAtScreenPosition: (y) ->
     content = @getRowsOffsetContainer()

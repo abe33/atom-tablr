@@ -125,8 +125,8 @@ xdescribe 'tableElement', ->
       it 'creates a default model to boot the table', ->
         model = element.getModel()
         expect(model).toBeDefined()
-        expect(model.getColumnsCount()).toEqual(1)
-        expect(model.getRowsCount()).toEqual(1)
+        expect(model.getColumnCount()).toEqual(1)
+        expect(model.getRowCount()).toEqual(1)
 
       it 'renders the default model', ->
         cell = element.shadowRoot.querySelectorAll('atom-table-cell')

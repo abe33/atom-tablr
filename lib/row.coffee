@@ -23,7 +23,7 @@ class Row
 
   getCell: (index) -> @cells[index]
 
-  getCellsCount: -> @cells.length
+  getCellCount: -> @cells.length
 
   addCell: (cell) ->
     @addCellAt(@cells.length, cell)

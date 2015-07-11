@@ -10,7 +10,7 @@ module.exports =
 class TableEditor
   Delegator.includeInto(this)
 
-  @delegatesMethods 'screenPosition', 'modelPosition', 'getValueAtPosition', 'getValueAtScreenPosition', 'getScreenRowsCount', 'getScreenColumnsCount', toProperty: 'displayTable'
+  @delegatesMethods 'screenPosition', 'modelPosition', 'getValueAtPosition', 'getValueAtScreenPosition', 'getScreenRowCount', 'getScreenColumnCount', toProperty: 'displayTable'
 
   constructor: (options={}) ->
     {@table} = options

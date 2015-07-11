@@ -64,7 +64,7 @@ class Table
 
   getColumnNames: -> @columns.concat()
 
-  getColumnsCount: -> @columns.length
+  getColumnCount: -> @columns.length
 
   addColumn: (name, transaction=true, event=true) ->
     @addColumnAt(@columns.length, name, transaction, event)
@@ -145,7 +145,7 @@ class Table
 
   getRowIndex: (row) -> @rows.indexOf(row)
 
-  getRowsCount: -> @rows.length
+  getRowCount: -> @rows.length
 
   getRowsInRange: (range) ->
     range = @rangeFrom(range)
@@ -239,7 +239,7 @@ class Table
 
     rowsValues = []
 
-    range.end = @getRowsCount() if range.end is Infinity
+    range.end = @getRowCount() if range.end is Infinity
 
     for i in [range.start...range.end]
       rowsValues.push @rows[range.start].concat()
@@ -278,7 +278,7 @@ class Table
 
   getCells: -> @rows.reduce ((cells, row) -> cells.concat row), []
 
-  getCellsCount: -> @rows.length * @columns.length
+  getCellCount: -> @rows.length * @columns.length
 
   getValueAtPosition: (position) ->
     unless position?
@@ -290,7 +290,7 @@ class Table
   setValueAtPosition: (position, value, transaction=true) ->
     unless position?
       throw new Error "Table::setValueAtPosition called without a position"
-    if position.row < 0 or position.row >= @getRowsCount() or position.column < 0 or position.column >= @getColumnsCount()
+    if position.row < 0 or position.row >= @getRowCount() or position.column < 0 or position.column >= @getColumnCount()
       throw new Error "Table::setValueAtPosition called without an invalid position #{position}"
 
     position = Point.fromObject(position)

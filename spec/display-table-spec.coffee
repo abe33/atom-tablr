@@ -388,7 +388,7 @@ describe 'DisplayTable', ->
 
       displayTable.undo()
 
-      expect(displayTable.getScreenColumnsCount()).toEqual(0)
+      expect(displayTable.getScreenColumnCount()).toEqual(0)
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
 
@@ -396,7 +396,7 @@ describe 'DisplayTable', ->
 
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
-      expect(displayTable.getScreenColumnsCount()).toEqual(1)
+      expect(displayTable.getScreenColumnCount()).toEqual(1)
       expect(displayTable.getScreenColumn(0).name).toEqual('key')
       expect(displayTable.getScreenColumn(0).width).toEqual(200)
       expect(displayTable.getScreenColumn(0).align).toEqual('right')
@@ -415,7 +415,7 @@ describe 'DisplayTable', ->
 
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
-      expect(displayTable.getScreenColumnsCount()).toEqual(1)
+      expect(displayTable.getScreenColumnCount()).toEqual(1)
       expect(displayTable.getScreenColumn(0).name).toEqual('key')
       expect(displayTable.getScreenColumn(0).width).toEqual(200)
       expect(displayTable.getScreenColumn(0).align).toEqual('right')
@@ -428,7 +428,7 @@ describe 'DisplayTable', ->
 
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
-      expect(displayTable.getScreenColumnsCount()).toEqual(0)
+      expect(displayTable.getScreenColumnCount()).toEqual(0)
 
     it 'rolls back a row addition', ->
       displayTable.addColumn('key')
@@ -438,7 +438,7 @@ describe 'DisplayTable', ->
 
       displayTable.undo()
 
-      expect(displayTable.getScreenRowsCount()).toEqual(0)
+      expect(displayTable.getScreenRowCount()).toEqual(0)
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
 
@@ -446,7 +446,7 @@ describe 'DisplayTable', ->
 
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
-      expect(displayTable.getScreenRowsCount()).toEqual(1)
+      expect(displayTable.getScreenRowCount()).toEqual(1)
       expect(displayTable.getScreenRow(0)).toEqual(['foo'])
       expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
 
@@ -459,7 +459,7 @@ describe 'DisplayTable', ->
 
       displayTable.undo()
 
-      expect(displayTable.getScreenRowsCount()).toEqual(1)
+      expect(displayTable.getScreenRowCount()).toEqual(1)
       expect(displayTable.getScreenRow(0)).toEqual(['foo'])
       expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
       expect(table.undoStack.length).toEqual(0)
@@ -469,4 +469,4 @@ describe 'DisplayTable', ->
 
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
-      expect(displayTable.getScreenRowsCount()).toEqual(0)
+      expect(displayTable.getScreenRowCount()).toEqual(0)

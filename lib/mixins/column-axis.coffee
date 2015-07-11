@@ -41,7 +41,7 @@ class ColumnsAxis extends Mixin
 
   setColumnOverdraw: (@columnOverdraw) -> @requestUpdate()
 
-  getLastColumn: -> @table.getColumnsCount() - 1
+  getLastColumn: -> @table.getColumnCount() - 1
 
   getFirstVisibleColumn: ->
     @findColumnAtPosition(@getColumnsScrollContainer().scrollLeft)
@@ -101,7 +101,7 @@ class ColumnsAxis extends Mixin
     offsets = []
     offset = 0
 
-    for i in [0...@table.getColumnsCount()]
+    for i in [0...@table.getColumnCount()]
       offsets.push offset
       offset += @getScreenColumnWidthAt(i)
 
@@ -116,11 +116,11 @@ class ColumnsAxis extends Mixin
     left + contentOffset.left
 
   findColumnAtPosition: (x) ->
-    for i in [0...@table.getColumnsCount()]
+    for i in [0...@table.getColumnCount()]
       offset = @getScreenColumnOffsetAt(i)
       return i - 1 if x < offset
 
-    return @table.getColumnsCount() - 1
+    return @table.getColumnCount() - 1
 
   findColumnAtScreenPosition: (x) ->
     content = @getColumnsOffsetContainer()

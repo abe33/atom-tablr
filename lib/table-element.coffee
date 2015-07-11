@@ -319,7 +319,7 @@ class TableElement extends HTMLElement
     @columnsAligns?[col] ? @table.getColumn(col).align
 
   getColumnsAligns: ->
-    [0...@table.getColumnsCount()].map (col) =>
+    [0...@table.getColumnCount()].map (col) =>
       @columnsAligns?[col] ? @table.getColumn(col).align
 
   setColumnsAligns: (@columnsAligns) ->
@@ -456,12 +456,12 @@ class TableElement extends HTMLElement
   hasFocus: -> this is document.activeElement
 
   moveRight: ->
-    if @activeCellPosition.column + 1 < @table.getColumnsCount()
+    if @activeCellPosition.column + 1 < @table.getColumnCount()
       @activeCellPosition.column++
     else
       @activeCellPosition.column = 0
 
-      if @activeCellPosition.row + 1 < @table.getRowsCount()
+      if @activeCellPosition.row + 1 < @table.getRowCount()
         @activeCellPosition.row++
       else
         @activeCellPosition.row = 0
@@ -490,7 +490,7 @@ class TableElement extends HTMLElement
     @afterActiveCellMove()
 
   moveDown: ->
-    if @activeCellPosition.row + 1 < @table.getRowsCount()
+    if @activeCellPosition.row + 1 < @table.getRowCount()
       @activeCellPosition.row++
     else
       @activeCellPosition.row = 0
@@ -525,7 +525,7 @@ class TableElement extends HTMLElement
 
   pageDown: ->
     amount = @getPageMovesAmount()
-    if @activeCellPosition.row + amount < @table.getRowsCount()
+    if @activeCellPosition.row + amount < @table.getRowCount()
       @activeCellPosition.row += amount
     else
       @activeCellPosition.row = @getLastRow()
@@ -1044,7 +1044,7 @@ class TableElement extends HTMLElement
 
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
-    lastRow = Math.min @table.getRowsCount(), lastVisibleRow + rowOverdraw
+    lastRow = Math.min @table.getRowCount(), lastVisibleRow + rowOverdraw
     visibleRows = [firstRow...lastRow]
     oldVisibleRows = [@firstRenderedRow...@lastRenderedRow]
 
@@ -1143,7 +1143,7 @@ class TableElement extends HTMLElement
     width: #{@getContentWidth()}px;
     """
 
-    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowsCount()
+    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowCount()
 
   updateScroll: ->
     @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft

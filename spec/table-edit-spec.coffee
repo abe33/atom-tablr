@@ -19,5 +19,5 @@ describe "TableEdit", ->
 
     it 'opens a table editor for the file', ->
       expect(table instanceof Table).toBeTruthy()
-      expect(table.getColumnsCount()).toEqual(3)
-      expect(table.getRowsCount()).toEqual(2)
+      expect(table.getColumnCount()).toEqual(3)
+      expect(table.getRowCount()).toEqual(2)

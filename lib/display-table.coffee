@@ -8,7 +8,7 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnsCount', 'getRowsCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', toProperty: 'table'
+  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', toProperty: 'table'
 
   rowOffsets: null
   columnOffsets: null
@@ -28,7 +28,7 @@ class DisplayTable
       @subscribeToScreenColumn(screenColumn)
       screenColumn
 
-    @rowsHeights = @table.getColumns().map (column) => @getRowHeight()
+    @rowHeights = @table.getColumns().map (column) => @getRowHeight()
     @computeScreenColumnOffsets()
     @updateScreenRows()
 
@@ -53,20 +53,20 @@ class DisplayTable
       @emitter.emit('did-rename-column', {screenColumn: @screenColumns[index], oldName, newName, index})
 
     @subscriptions.add @table.onDidAddRow ({index}) =>
-      @rowsHeights.splice(index, 0, undefined)
+      @rowHeights.splice(index, 0, undefined)
       @updateScreenRows()
 
     @subscriptions.add @table.onDidRemoveRow ({index}) =>
-      @rowsHeights.splice(index, 1)
+      @rowHeights.splice(index, 1)
       @updateScreenRows()
 
   subscribeToConfig: ->
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
       'table-edit.rowHeight': (@configRowHeight) =>
-        @computeRowOffsets() if @rowsHeights?
+        @computeRowOffsets() if @rowHeights?
       'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
-        @computeRowOffsets() if @rowsHeights?
+        @computeRowOffsets() if @rowHeights?
       'table-edit.columnWidth': (@configScreenColumnWidth) =>
         @computeScreenColumnOffsets() if @screenColumns?
       'table-edit.minimumColumnWidth': (@configMinimumScreenColumnWidth) =>
@@ -100,7 +100,7 @@ class DisplayTable
 
   getScreenColumns: -> @screenColumns.slice()
 
-  getScreenColumnsCount: -> @screenColumns.length
+  getScreenColumnCount: -> @screenColumns.length
 
   getScreenColumn: (index) -> @screenColumns[index]
 
@@ -208,7 +208,7 @@ class DisplayTable
 
   getScreenRows: -> @screenRows.slice()
 
-  getScreenRowsCount: -> @screenRows.length
+  getScreenRowCount: -> @screenRows.length
 
   getScreenRow: (row) ->
     @table.getRow(@screenRowToModelRow(row))
@@ -240,18 +240,18 @@ class DisplayTable
     @requestUpdate()
 
   getRowHeightAt: (index) ->
-    @rowsHeights[index] ? @getRowHeight()
+    @rowHeights[index] ? @getRowHeight()
 
   setRowHeightAt: (index, height) ->
     minHeight = @getMinimumRowHeight()
     height = minHeight if height < minHeight
-    @rowsHeights[index] = height
+    @rowHeights[index] = height
     @computeRowOffsets()
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 
   getScreenRowIndexAtPixelPosition: (position) ->
-    for i in [0...@getScreenRowsCount()]
+    for i in [0...@getScreenRowCount()]
       offset = @getScreenRowOffsetAt(i)
       return i - 1 if position < offset
 
@@ -261,7 +261,7 @@ class DisplayTable
     @screenRowToModelRow(@getScreenRowIndexAtPixelPosition(position))
 
   addRow: (row, options={}, transaction=true) ->
-    @addRowAt(@table.getRowsCount(), row, options, transaction)
+    @addRowAt(@table.getRowCount(), row, options, transaction)
 
   addRowAt: (index, row, options={}, transaction=true) ->
     @table.addRowAt(index, row, false, transaction)
@@ -279,7 +279,7 @@ class DisplayTable
     @removeRowAt(@table.getRowIndex(row), transaction)
 
   removeRowAt: (index, transaction=true) ->
-    rowHeight = @rowsHeights[index]
+    rowHeight = @rowHeights[index]
     @table.removeRowAt(index, false, transaction)
 
     if transaction
@@ -294,7 +294,7 @@ class DisplayTable
     offsets = []
     offset = 0
 
-    for i in [0...@table.getRowsCount()]
+    for i in [0...@table.getRowCount()]
       offsets.push offset
       offset += @getScreenRowHeightAt(i)
 
