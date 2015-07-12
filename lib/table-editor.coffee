@@ -29,11 +29,17 @@ class TableEditor
   onDidRemoveCursor: (callback) ->
     @emitter.on 'did-remove-cursor', callback
 
+  onDidChangeCursorPosition: (callback) ->
+    @emitter.on 'did-change-cursor-position', callback
+
   onDidAddSelection: (callback) ->
     @emitter.on 'did-add-selection', callback
 
   onDidRemoveSelection: (callback) ->
     @emitter.on 'did-remove-selection', callback
+
+  onDidChangeSelectionRange: (callback) ->
+    @emitter.on 'did-change-selection-range', callback
 
   ##     ######  ######## ##       ########  ######  ########
   ##    ##    ## ##       ##       ##       ##    ##    ##

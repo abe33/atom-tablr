@@ -41,6 +41,9 @@ class DisplayTable
   onDidRenameColumn: (callback) ->
     @emitter.on 'did-rename-column', callback
 
+  onDidChangeCellValue: (callback) ->
+    @emitter.on 'did-change-cell-value', callback
+
   subscribeToTable: ->
     @subscriptions.add @table.onDidAddColumn ({column, index}) =>
       @addScreenColumn(index, {name: column})
@@ -59,6 +62,13 @@ class DisplayTable
     @subscriptions.add @table.onDidRemoveRow ({index}) =>
       @rowHeights.splice(index, 1)
       @updateScreenRows()
+
+    @subscriptions.add @table.onDidChangeCellValue ({position, oldValue, newValue}) =>
+      newEvent = {
+        position, oldValue, newValue
+        screenPosition: @screenPosition(position)
+      }
+      @emitter.emit 'did-change-cell-value', newEvent
 
   subscribeToConfig: ->
     @observeConfig

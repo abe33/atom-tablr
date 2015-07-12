@@ -87,6 +87,22 @@ describe 'TableEditor', ->
         expect(tableEditor.getCursors().length).toEqual(1)
         expect(tableEditor.getSelections().length).toEqual(1)
 
+      it 'dispatch a did-add-cursor event', ->
+        spy = jasmine.createSpy('did-add-cursor')
+
+        tableEditor.onDidAddCursor(spy)
+        tableEditor.addCursorAtScreenPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
+
+      it 'dispatch a did-add-selection event', ->
+        spy = jasmine.createSpy('did-add-selection')
+
+        tableEditor.onDidAddSelection(spy)
+        tableEditor.addCursorAtScreenPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
+
     describe '::addCursorAtPosition', ->
       it 'adds a cursor', ->
         tableEditor.addCursorAtPosition([1,1])
@@ -100,6 +116,22 @@ describe 'TableEditor', ->
         expect(tableEditor.getCursors().length).toEqual(1)
         expect(tableEditor.getSelections().length).toEqual(1)
 
+      it 'dispatch a did-add-cursor event', ->
+        spy = jasmine.createSpy('did-add-cursor')
+
+        tableEditor.onDidAddCursor(spy)
+        tableEditor.addCursorAtPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
+
+      it 'dispatch a did-add-selection event', ->
+        spy = jasmine.createSpy('did-add-selection')
+
+        tableEditor.onDidAddSelection(spy)
+        tableEditor.addCursorAtPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
+
     describe '::setCursorAtScreenPosition', ->
       it 'sets the cursor position', ->
         tableEditor.setCursorAtScreenPosition([1,1])
@@ -108,6 +140,22 @@ describe 'TableEditor', ->
         expect(tableEditor.getSelections().length).toEqual(1)
         expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
         expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
+      it 'dispatch a did-change-cursor-position event', ->
+        spy = jasmine.createSpy('did-change-cursor-position')
+
+        tableEditor.onDidChangeCursorPosition(spy)
+        tableEditor.setCursorAtScreenPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
+
+      it 'dispatch a did-change-selection-range event', ->
+        spy = jasmine.createSpy('did-change-selection-range')
+
+        tableEditor.onDidChangeSelectionRange(spy)
+        tableEditor.setCursorAtScreenPosition([1,1])
+
+        expect(spy).toHaveBeenCalled()
 
       it 'removes the duplicates when the new cursor has the same position as a previous cursor', ->
         tableEditor.addCursorAtScreenPosition([2,1])

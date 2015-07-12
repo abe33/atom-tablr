@@ -1,13 +1,22 @@
+{Emitter} = require 'atom'
 Range = require './range'
 
 module.exports =
 class Selection
   constructor: ({@range, @cursor, @tableEditor}) ->
     @cursor.selection = this
-    @resetRangeOnCursor() unless @range?
+    @range = @cursor.getRange() unless @range?
+    @emitter = new Emitter
+
+  onDidChangeRange: (callback) ->
+    @emitter.on 'did-change-range', callback
+
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
 
   destroy: ->
     @tableEditor.removeSelection(this)
+    @emitter.emit('did-destroy', this)
 
   getCursor: -> @cursor
 
@@ -19,6 +28,8 @@ class Selection
     @range = Range.fromObject(range)
     unless @range.containsPoint(@getCursor().getPosition())
       @getCursor().setPosition(@range.start, false)
+
+    @rangeChanged()
 
   isEmpty: -> @range.isEmpty()
 
@@ -98,3 +109,10 @@ class Selection
 
   resetRangeOnCursor: ->
     @range = @cursor.getRange()
+    @rangeChanged()
+
+  rangeChanged: ->
+    eventObject = selection: this
+
+    @emitter.emit 'did-change-range', eventObject
+    @tableEditor.emitter.emit 'did-change-selection-range', eventObject

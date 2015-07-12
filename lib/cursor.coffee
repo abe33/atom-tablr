@@ -10,8 +10,12 @@ class Cursor
   onDidChangePosition: (callback) ->
     @emitter.on 'did-change-position', callback
 
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
+
   destroy: ->
     @tableEditor.removeCursor(this)
+    @emitter.emit('did-destroy', this)
 
   getPosition: -> @position
 
@@ -55,4 +59,6 @@ class Cursor
 
   cursorMoved: (resetSelection=true) ->
     @selection.resetRangeOnCursor() if resetSelection
-    @emitter.emit 'did-change-position', this
+    eventObject = cursor: this
+    @emitter.emit 'did-change-position', eventObject
+    @tableEditor.emitter.emit 'did-change-cursor-position', eventObject

@@ -363,6 +363,17 @@ describe 'DisplayTable', ->
         expect(table.getRow(1)).toEqual(['age', 20])
         expect(displayTable.getScreenRow(0)).toEqual(['age', 20])
 
+      it 'emits a did-change-cell-value event with screen position', ->
+        spy = jasmine.createSpy('did-change-cell-value')
+
+        displayTable.onDidChangeCellValue(spy)
+
+        displayTable.setValueAtScreenPosition([0,1], 20)
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy.calls[0].args[0].screenPosition).toEqual([0,1])
+        expect(spy.calls[0].args[0].position).toEqual([1,1])
+
       it 'can return a cell position', ->
         modelPosition = displayTable.getPositionAtPixelPosition(150, 30)
         screenPosition = displayTable.getScreenPositionAtPixelPosition(150, 30)

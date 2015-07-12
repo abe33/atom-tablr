@@ -354,6 +354,27 @@ describe 'Table', ->
       expect(table.getValueAtPosition(row: 2, column: 0)).toBeUndefined()
       expect(table.getValueAtPosition(row: 0, column: 2)).toBeUndefined()
 
+  describe '::setValueAtPosition', ->
+    beforeEach ->
+      table.addColumn('name')
+      table.addColumn('age')
+
+      table.addRow(['John Doe', 30])
+      table.addRow(['Jane Doe', 30])
+
+    it 'changes the value at the given position', ->
+      table.setValueAtPosition([1,1], 40)
+
+      expect(table.getRow(1)).toEqual(['Jane Doe', 40])
+
+    it 'emits a did-change-cell-value event', ->
+      spy = jasmine.createSpy('did-change-cell-value')
+      table.onDidChangeCellValue(spy)
+
+      table.setValueAtPosition([1,1], 40)
+
+      expect(spy).toHaveBeenCalled()
+
   # FIXME we can't be find the position of a primitive value if there's
   # duplicates
   xdescribe '::positionOfCell', ->
