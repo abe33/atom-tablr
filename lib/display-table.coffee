@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{Point, Emitter, CompositeDisposable} = require 'atom'
+{Point, Range, Emitter, CompositeDisposable} = require 'atom'
 Delegator = require 'delegato'
 Table = require './table'
 DisplayColumn = require './display-column'
@@ -44,6 +44,15 @@ class DisplayTable
   onDidChangeCellValue: (callback) ->
     @emitter.on 'did-change-cell-value', callback
 
+  onDidAddRow: (callback) ->
+    @emitter.on 'did-add-row', callback
+
+  onDidRemoveRow: (callback) ->
+    @emitter.on 'did-remove-row', callback
+
+  onDidChangeScreenRows: (callback) ->
+    @emitter.on 'did-change-screen-rows', callback
+
   subscribeToTable: ->
     @subscriptions.add @table.onDidAddColumn ({column, index}) =>
       @addScreenColumn(index, {name: column})
@@ -57,10 +66,11 @@ class DisplayTable
 
     @subscriptions.add @table.onDidAddRow ({index}) =>
       @rowHeights.splice(index, 0, undefined)
-      @updateScreenRows()
 
     @subscriptions.add @table.onDidRemoveRow ({index}) =>
       @rowHeights.splice(index, 1)
+
+    @subscriptions.add @table.onDidChangeRows (event) =>
       @updateScreenRows()
 
     @subscriptions.add @table.onDidChangeCellValue ({position, oldValue, newValue}) =>
@@ -93,20 +103,6 @@ class DisplayTable
   ##    ##       ##     ## ##       ##     ## ##     ## ##  ####       ##
   ##    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   ##     ######   #######  ########  #######  ##     ## ##    ##  ######
-
-  removeScreenColumn: (index, column) ->
-    screenColumn = @screenColumns[index]
-    @unsubscribeFromScreenColumn(screenColumn)
-    @screenColumns.splice(index, 1)
-    @computeScreenColumnOffsets()
-    @emitter.emit('did-remove-column', {screenColumn, column, index})
-
-  addScreenColumn: (index, options) ->
-    screenColumn = new DisplayColumn(options)
-    @subscribeToScreenColumn(screenColumn)
-    @screenColumns.splice(index, 0, screenColumn)
-    @computeScreenColumnOffsets()
-    @emitter.emit('did-add-column', {screenColumn, column: options.name, index})
 
   getScreenColumns: -> @screenColumns.slice()
 
@@ -166,6 +162,13 @@ class DisplayTable
           commit.redo()
           @getScreenColumn(index).setOptions(columnOptions)
 
+  addScreenColumn: (index, options) ->
+    screenColumn = new DisplayColumn(options)
+    @subscribeToScreenColumn(screenColumn)
+    @screenColumns.splice(index, 0, screenColumn)
+    @computeScreenColumnOffsets()
+    @emitter.emit('did-add-column', {screenColumn, column: options.name, index})
+
   removeColumn: (column, transaction=true) ->
     @removeColumnAt(@table.getColumnIndex(column), transaction)
 
@@ -182,6 +185,13 @@ class DisplayTable
           @getScreenColumn(index).setOptions(columnOptions)
         redo: (commit) =>
           commit.redo()
+
+  removeScreenColumn: (index, column) ->
+    screenColumn = @screenColumns[index]
+    @unsubscribeFromScreenColumn(screenColumn)
+    @screenColumns.splice(index, 1)
+    @computeScreenColumnOffsets()
+    @emitter.emit('did-remove-column', {screenColumn, column, index})
 
   computeScreenColumnOffsets: ->
     offsets = []
@@ -278,12 +288,45 @@ class DisplayTable
     @setRowHeightAt(index, options.height) if options.height?
 
     if transaction
+      rowOptions = _.clone(options)
       @table.ammendLastTransaction
         undo: (commit) =>
           commit.undo()
         redo: (commit) =>
           commit.redo()
-          @setRowHeightAt(index, options.height) if options.height?
+          @setRowHeightAt(index, rowOptions.height) if rowOptions.height?
+
+    modelIndex = @screenRowToModelRow(index)
+    @emitter.emit 'did-add-row', {row, screenIndex: index, index: modelIndex}
+
+    @emitter.emit 'did-change-screen-rows', {
+      oldRange: {start: modelIndex, end: modelIndex}
+      newRange: {start: modelIndex, end: modelIndex + 1}
+      oldScreenRange: {start: index, end: index}
+      newScreenRange: {start: index, end: index + 1}
+    }
+
+  addRows: (rows, options=[], transaction=true) ->
+    @addRowsAt(@table.getRowCount(), rows, options, transaction)
+
+  addRowsAt: (index, rows, options=[], transaction=true) ->
+    modelIndex = @screenRowToModelRow(index)
+    rows = rows.slice()
+
+    @table.addRowsAt(index, rows, transaction)
+    for row,i in rows
+      @setRowHeightAt(index + i, options[i]?.height) if options[i]?.height?
+      @emitter.emit 'did-add-row', {row, screenIndex: index, index: modelIndex}
+
+    if transaction
+      rowOptions = _.clone(options)
+      @table.ammendLastTransaction
+        undo: (commit) =>
+          commit.undo()
+        redo: (commit) =>
+          commit.redo()
+          for row,i in rows when rowOptions[i]?.height?
+            @setRowHeightAt(index + i, rowOptions[i]?.height)
 
   removeRow: (row, transaction=true) ->
     @removeRowAt(@table.getRowIndex(row), transaction)
@@ -297,6 +340,21 @@ class DisplayTable
         undo: (commit) =>
           commit.undo()
           @setRowHeightAt(index, rowHeight)
+        redo: (commit) =>
+          commit.redo()
+
+  removeRowsInRange: (range, transaction=true) ->
+    range = @table.rangeFrom(range)
+
+    rowHeights = (@rowHeights[index] for index in [range.start...range.end])
+    @table.removeRowsInRange(range, transaction)
+
+    if transaction
+      @table.ammendLastTransaction
+        undo: (commit) =>
+          commit.undo()
+          for i in [range.start...range.end]
+            @setRowHeightAt(i, rowHeights[i]) 
         redo: (commit) =>
           commit.redo()
 

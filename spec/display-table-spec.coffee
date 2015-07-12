@@ -207,6 +207,30 @@ fdescribe 'DisplayTable', ->
           expect(displayTable.getRowIndexAtPixelPosition(70)).toEqual(3)
           expect(displayTable.getScreenRowIndexAtPixelPosition(70)).toEqual(3)
 
+        it 'emits a did-add-row event with the screen row position', ->
+          spy = jasmine.createSpy('did-add-row')
+
+          displayTable.onDidAddRow(spy)
+
+          displayTable.addRow(['blood type', 'ab-'])
+
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls[0].args[0].screenIndex).toEqual(4)
+          expect(spy.calls[0].args[0].index).toEqual(4)
+
+        it 'emits a did-change-screen-rows event with the screen row range', ->
+          spy = jasmine.createSpy('did-change-screen-rows')
+
+          displayTable.onDidChangeScreenRows(spy)
+
+          displayTable.addRow(['blood type', 'ab-'])
+
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls[0].args[0].oldRange).toEqual({start: 4, end: 4})
+          expect(spy.calls[0].args[0].newRange).toEqual({start: 4, end: 5})
+          expect(spy.calls[0].args[0].oldScreenRange).toEqual({start: 4, end: 4})
+          expect(spy.calls[0].args[0].newScreenRange).toEqual({start: 4, end: 5})
+
       describe 'at the middle of the table', ->
         beforeEach ->
           displayTable.addRowAt(1, ['blood type', 'ab-'])
@@ -227,6 +251,30 @@ fdescribe 'DisplayTable', ->
         it 'returns the rows at given screen position', ->
           expect(displayTable.getRowIndexAtPixelPosition(50)).toEqual(2)
           expect(displayTable.getScreenRowIndexAtPixelPosition(50)).toEqual(2)
+
+        it 'emits a did-add-row event with the screen row position', ->
+          spy = jasmine.createSpy('did-add-row')
+
+          displayTable.onDidAddRow(spy)
+
+          displayTable.addRowAt(1, ['blood type', 'ab-'])
+
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls[0].args[0].screenIndex).toEqual(1)
+          expect(spy.calls[0].args[0].index).toEqual(1)
+
+        it 'emits a did-change-screen-rows event with the screen row ranges', ->
+          spy = jasmine.createSpy('did-change-screen-rows')
+
+          displayTable.onDidChangeScreenRows(spy)
+
+          displayTable.addRowAt(1, ['blood type', 'ab-'])
+
+          expect(spy).toHaveBeenCalled()
+          expect(spy.calls[0].args[0].oldRange).toEqual({start: 1, end: 1})
+          expect(spy.calls[0].args[0].newRange).toEqual({start: 1, end: 2})
+          expect(spy.calls[0].args[0].oldScreenRange).toEqual({start: 1, end: 1})
+          expect(spy.calls[0].args[0].newScreenRange).toEqual({start: 1, end: 2})
 
       describe 'before a row with a height', ->
         beforeEach ->
@@ -267,9 +315,48 @@ fdescribe 'DisplayTable', ->
         it 'computes the new table height', ->
           expect(displayTable.getContentHeight()).toEqual(160)
 
+    describe 'adding many rows', ->
+      beforeEach ->
+        displayTable.addRowsAt(1, [['blood type', 'ab-'],['foo', 'bar']])
+
+      it 'updates the screen rows', ->
+        expect(displayTable.getScreenRows().length).toEqual(5)
+        expect(displayTable.getScreenRow(1)).toEqual(['blood type', 'ab-'])
+        expect(displayTable.getScreenRow(2)).toEqual(['foo', 'bar'])
+        expect(displayTable.getScreenRow(3)).toEqual(['age', 30])
+
+      it 'updates the rows offsets', ->
+        expect(displayTable.getRowOffsetAt(1)).toEqual(20)
+        expect(displayTable.getRowOffsetAt(2)).toEqual(40)
+        expect(displayTable.getRowOffsetAt(3)).toEqual(60)
+        expect(displayTable.getRowOffsetAt(4)).toEqual(80)
+
+      it 'computes the new table height', ->
+        expect(displayTable.getContentHeight()).toEqual(100)
+
     describe 'removing a row', ->
       beforeEach ->
         displayTable.removeRowAt(1)
+
+      it 'updates the screen rows', ->
+        expect(displayTable.getScreenRows().length).toEqual(2)
+        expect(displayTable.getScreenRow(1)).toEqual(['gender', 'female'])
+
+      it 'updates the rows offsets', ->
+        expect(displayTable.getRowOffsetAt(1)).toEqual(20)
+
+      it 'computes the new table height', ->
+        expect(displayTable.getContentHeight()).toEqual(40)
+
+    describe 'removing many rows', ->
+      spy = null
+      beforeEach ->
+        spy = jasmine.createSpy('did-change-screen-rows')
+
+        displayTable.addRowAt(1, ['blood type', 'ab-'])
+        displayTable.onDidChangeScreenRows(spy)
+
+        displayTable.removeRowsInRange([1,3])
 
       it 'updates the screen rows', ->
         expect(displayTable.getScreenRows().length).toEqual(2)
@@ -460,6 +547,68 @@ fdescribe 'DisplayTable', ->
       expect(displayTable.getScreenRowCount()).toEqual(1)
       expect(displayTable.getScreenRow(0)).toEqual(['foo'])
       expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
+
+    it 'rolls back many rows addition', ->
+      displayTable.addColumn('key')
+      displayTable.clearUndoStack()
+
+      displayTable.addRows([
+        ['foo']
+        ['bar']
+      ], [
+        {height: 200}
+        {height: 400}
+      ])
+
+      expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
+      expect(displayTable.getScreenRowHeightAt(1)).toEqual(400)
+
+      displayTable.undo()
+
+      expect(displayTable.getScreenRowCount()).toEqual(0)
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+
+      displayTable.redo()
+
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)
+      expect(displayTable.getScreenRowCount()).toEqual(2)
+      expect(displayTable.getScreenRow(0)).toEqual(['foo'])
+      expect(displayTable.getScreenRow(1)).toEqual(['bar'])
+      expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
+      expect(displayTable.getScreenRowHeightAt(1)).toEqual(400)
+
+    it 'rolls back many rows deletion', ->
+      displayTable.addColumn('key')
+
+      displayTable.addRows([
+        ['foo']
+        ['bar']
+      ], [
+        {height: 200}
+        {height: 400}
+      ])
+
+      displayTable.clearUndoStack()
+
+      displayTable.removeRowsInRange([0,2])
+
+      displayTable.undo()
+
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+      expect(displayTable.getScreenRowCount()).toEqual(2)
+      expect(displayTable.getScreenRow(0)).toEqual(['foo'])
+      expect(displayTable.getScreenRow(1)).toEqual(['bar'])
+      expect(displayTable.getScreenRowHeightAt(0)).toEqual(200)
+      expect(displayTable.getScreenRowHeightAt(1)).toEqual(400)
+
+      displayTable.redo()
+
+      expect(displayTable.getScreenRowCount()).toEqual(0)
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)
 
     it 'rolls back a row deletion', ->
       displayTable.addColumn('key')
