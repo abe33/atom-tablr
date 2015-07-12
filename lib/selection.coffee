@@ -22,6 +22,8 @@ class Selection
 
   isEmpty: -> @range.isEmpty()
 
+  bounds: -> @range.bounds()
+
   getFirstSelectedRow: -> @range.start.row
 
   getLastSelectedRow: -> @range.end.row - 1

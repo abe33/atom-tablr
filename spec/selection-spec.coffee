@@ -40,6 +40,15 @@ describe 'Selection', ->
     it 'does not span several cells', ->
       expect(selection.spanMoreThanOneCell()).toBeFalsy()
 
+    it 'has empty bounds', ->
+      expect(selection.bounds()).toEqual({
+        top: 1
+        bottom: 1
+        left: 1
+        right: 1
+      })
+
+
   describe 'with a size of one cell', ->
     beforeEach ->
       cursor = new Cursor({tableEditor, position: new Point(1,1)})
@@ -55,10 +64,18 @@ describe 'Selection', ->
     it 'does not span several cells', ->
       expect(selection.spanMoreThanOneCell()).toBeFalsy()
 
+    it 'has the corresponding bounds', ->
+      expect(selection.bounds()).toEqual({
+        top: 1
+        bottom: 2
+        left: 1
+        right: 2
+      })
+
   describe 'that spans many cells', ->
     beforeEach ->
       cursor = new Cursor({tableEditor, position: new Point(1,1)})
-      range = new Range([1,1], [3,1])
+      range = new Range([1,1], [3,2])
       selection = new Selection({cursor, range, tableEditor})
 
     it 'is not empty', ->
@@ -66,6 +83,15 @@ describe 'Selection', ->
 
     it 'spans several cells', ->
       expect(selection.spanMoreThanOneCell()).toBeTruthy()
+
+    it 'has the corresponding bounds', ->
+      expect(selection.bounds()).toEqual({
+        top: 1
+        bottom: 3
+        left: 1
+        right: 2
+      })
+
 
   describe '::setRange', ->
     it 'sets the selection range', ->
