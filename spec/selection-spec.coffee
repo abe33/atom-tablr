@@ -85,6 +85,19 @@ fdescribe 'Selection', ->
 
       expect(selection.getRange()).toEqual([[1,0],[2,2]])
 
+    describe 'then expanding to the right', ->
+      it 'reduces the selection area from the left', ->
+        selection.expandLeft()
+        selection.expandRight()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,2]])
+
+      it 'inverses the selection direction with a delta bigger than the selection', ->
+        selection.expandLeft()
+        selection.expandRight(4)
+
+        expect(selection.getRange()).toEqual([[1,1],[2,3]])
+
   describe '::expandRight', ->
     beforeEach ->
       cursor = new Cursor({tableEditor, position: new Point(1,1)})
@@ -103,13 +116,26 @@ fdescribe 'Selection', ->
 
       expect(selection.getRange()).toEqual([[1,1],[2,3]])
 
+    describe 'then expanding to the left', ->
+      it 'reduces the selection area from the right', ->
+        selection.expandRight()
+        selection.expandLeft()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,2]])
+
+      it 'inverses the selection direction with a delta bigger than the selection', ->
+        selection.expandRight()
+        selection.expandLeft(4)
+
+        expect(selection.getRange()).toEqual([[1,0],[2,2]])
+
   describe '::expandUp', ->
     beforeEach ->
       cursor = new Cursor({tableEditor, position: new Point(1,1)})
       range = cursor.getRange()
       selection = new Selection({cursor, range, tableEditor})
 
-    it 'expands the selection to the left', ->
+    it 'expands the selection to the top', ->
       selection.expandUp()
 
       expect(selection.getRange()).toEqual([[0,1],[2,2]])
@@ -120,6 +146,19 @@ fdescribe 'Selection', ->
       selection.expandUp()
 
       expect(selection.getRange()).toEqual([[0,1],[2,2]])
+
+    describe 'then expanding to the bottom', ->
+      it 'reduces the selection area from the top', ->
+        selection.expandUp()
+        selection.expandDown()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,2]])
+
+      it 'inverses the selection direction with a delta bigger than the selection', ->
+        selection.expandUp()
+        selection.expandDown(4)
+
+        expect(selection.getRange()).toEqual([[1,1],[3,2]])
 
   describe '::expandDown', ->
     beforeEach ->
@@ -127,7 +166,7 @@ fdescribe 'Selection', ->
       range = cursor.getRange()
       selection = new Selection({cursor, range, tableEditor})
 
-    it 'expands the selection to the left', ->
+    it 'expands the selection to the bottom', ->
       selection.expandDown()
 
       expect(selection.getRange()).toEqual([[1,1],[3,2]])
@@ -138,3 +177,16 @@ fdescribe 'Selection', ->
       selection.expandDown()
 
       expect(selection.getRange()).toEqual([[1,1],[3,2]])
+
+    describe 'then expanding to the top', ->
+      it 'reduces the selection area from the bottom', ->
+        selection.expandDown()
+        selection.expandUp()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,2]])
+
+      it 'inverses the selection direction with a delta bigger than the selection', ->
+        selection.expandDown()
+        selection.expandUp(4)
+
+        expect(selection.getRange()).toEqual([[0,1],[2,2]])
