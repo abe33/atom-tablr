@@ -10,7 +10,20 @@ module.exports =
 class TableEditor
   Delegator.includeInto(this)
 
-  @delegatesMethods 'screenPosition', 'modelPosition', 'getValueAtPosition', 'getValueAtScreenPosition', 'getScreenRowCount', 'getScreenColumnCount', toProperty: 'displayTable'
+  @delegatesMethods(
+    'screenPosition', 'modelPosition',
+    'screenRowToModelRow', 'modelRowToScreenRow',
+    'getValueAtPosition', 'setValueAtPosition',
+    'getValueAtScreenPosition', 'setValueAtScreenPosition',
+    'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
+    'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getScreenRowIndexAtPixelPosition',
+    'onDidAddRow',
+    'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
+    'getScreenColumnWidth', 'getScreenColumnWidthAt', 'getScreenColumnOffsetAt'
+    'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt',
+    'sortBy',
+    toProperty: 'displayTable'
+  )
 
   constructor: (options={}) ->
     {@table} = options
