@@ -267,7 +267,7 @@ class DisplayTable
 
     return @getLastRowIndex()
 
-  getRowIndexAtPosition: (position) ->
+  getRowIndexAtPixelPosition: (position) ->
     @screenRowToModelRow(@getScreenRowIndexAtPixelPosition(position))
 
   addRow: (row, options={}, transaction=true) ->

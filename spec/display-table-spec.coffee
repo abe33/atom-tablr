@@ -1,7 +1,7 @@
 DisplayTable = require '../lib/display-table'
 Table = require '../lib/table'
 
-describe 'DisplayTable', ->
+fdescribe 'DisplayTable', ->
   [table, displayTable] = []
 
   beforeEach ->
@@ -170,7 +170,7 @@ describe 'DisplayTable', ->
       expect(displayTable.getScreenRowOffsetAt(2)).toEqual(40)
 
     it 'returns the rows at given screen position', ->
-      expect(displayTable.getRowIndexAtPosition(50)).toEqual(2)
+      expect(displayTable.getRowIndexAtPixelPosition(50)).toEqual(2)
       expect(displayTable.getScreenRowIndexAtPixelPosition(50)).toEqual(2)
 
     describe 'setting the height of a row', ->
@@ -204,7 +204,7 @@ describe 'DisplayTable', ->
           expect(displayTable.getContentHeight()).toEqual(80)
 
         it 'returns the rows at given screen position', ->
-          expect(displayTable.getRowIndexAtPosition(70)).toEqual(3)
+          expect(displayTable.getRowIndexAtPixelPosition(70)).toEqual(3)
           expect(displayTable.getScreenRowIndexAtPixelPosition(70)).toEqual(3)
 
       describe 'at the middle of the table', ->
@@ -225,7 +225,7 @@ describe 'DisplayTable', ->
           expect(displayTable.getContentHeight()).toEqual(80)
 
         it 'returns the rows at given screen position', ->
-          expect(displayTable.getRowIndexAtPosition(50)).toEqual(2)
+          expect(displayTable.getRowIndexAtPixelPosition(50)).toEqual(2)
           expect(displayTable.getScreenRowIndexAtPixelPosition(50)).toEqual(2)
 
       describe 'before a row with a height', ->
@@ -292,13 +292,13 @@ describe 'DisplayTable', ->
       it 'returns the rows at given screen position', ->
         displayTable.sortBy('key')
 
-        expect(displayTable.getRowIndexAtPosition(10)).toEqual(1)
+        expect(displayTable.getRowIndexAtPixelPosition(10)).toEqual(1)
         expect(displayTable.getScreenRowIndexAtPixelPosition(10)).toEqual(0)
 
-        expect(displayTable.getRowIndexAtPosition(30)).toEqual(2)
+        expect(displayTable.getRowIndexAtPixelPosition(30)).toEqual(2)
         expect(displayTable.getScreenRowIndexAtPixelPosition(30)).toEqual(1)
 
-        expect(displayTable.getRowIndexAtPosition(50)).toEqual(0)
+        expect(displayTable.getRowIndexAtPixelPosition(50)).toEqual(0)
         expect(displayTable.getScreenRowIndexAtPixelPosition(50)).toEqual(2)
 
       describe 'and there is already some custom height defined', ->
