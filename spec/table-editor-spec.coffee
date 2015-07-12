@@ -139,3 +139,43 @@ describe 'TableEditor', ->
         expect(tableEditor.getSelections().length).toEqual(1)
         expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
         expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
+    describe '::setSelectedRange', ->
+      it 'sets the selection range', ->
+        tableEditor.setSelectedRange([[0,0], [2,2]])
+
+        expect(tableEditor.getSelectedRange()).toEqual([[0,0], [2,2]])
+        expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]]])
+
+      describe 'when there is many selections', ->
+        it 'merges every selections into a single one', ->
+          tableEditor.addCursorAtScreenPosition([2,1])
+
+          tableEditor.setSelectedRange([[0,0], [2,2]])
+
+          expect(tableEditor.getSelectedRange()).toEqual([[0,0], [2,2]])
+          expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]]])
+          expect(tableEditor.getSelections().length).toEqual(1)
+          expect(tableEditor.getCursors().length).toEqual(1)
+
+    describe '::setSelectedRanges', ->
+      it 'throws an error if called without argument', ->
+        expect(-> tableEditor.setSelectedRanges()).toThrow()
+
+      it 'throws an error if called with an empty array', ->
+        expect(-> tableEditor.setSelectedRanges([])).toThrow()
+
+      it 'creates new selections based on the passed-in ranges', ->
+        tableEditor.setSelectedRanges([[[0,0], [2,2]], [[2,2],[3,3]]])
+
+        expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]], [[2,2],[3,3]]])
+        expect(tableEditor.getSelections().length).toEqual(2)
+        expect(tableEditor.getCursors().length).toEqual(2)
+
+      describe 'when defining a selection contained in another one', ->
+        it 'merges the selections', ->
+          tableEditor.setSelectedRanges([[[0,0], [2,2]], [[1,1],[2,2]]])
+
+          expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]]])
+          expect(tableEditor.getSelections().length).toEqual(1)
+          expect(tableEditor.getCursors().length).toEqual(1)

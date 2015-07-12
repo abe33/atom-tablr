@@ -52,9 +52,66 @@ class TableEditor
   getLastSelection: ->
     @selections[@selections.length - 1]
 
+  getSelectedRange: -> @getLastSelection().getRange()
+
+  setSelectedRange: (range) ->
+    @modifySelections (selection) => selection.setRange(range)
+
+  getSelectedRanges: ->
+    selection.getRange() for selection in @getSelections()
+
+  setSelectedRanges: (ranges) ->
+    unless ranges.length
+      throw new Error("Passed an empty array to setSelectedRanges")
+
+    selections = @getSelections()
+
+    for range,i in ranges
+      if selections.length
+        selection = selections.shift()
+        selection.setRange(range)
+      else
+        @addSelectionAtScreenRange(range)
+
+    selection.destroy() for selection in selections
+    @mergeSelections()
+
+  addSelectionAtScreenRange: (range) ->
+    range = Range.fromObject(range)
+
+    cursor = new Cursor({position: range.start, tableEditor: this})
+    selection = new Selection({cursor, range, tableEditor: this})
+    @selections.push selection
+    @cursors.push cursor
+    @emitter.emit 'did-add-selection', {selection, tableEditor: this}
+    @emitter.emit 'did-add-cursor', {cursor, tableEditor: this}
+
   removeSelection: (selection) ->
     @selections.splice(@selections.indexOf(selection), 1)
     @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
+
+  modifySelections: (fn) ->
+    fn(selection) for selection in @getSelections()
+    @mergeSelections()
+
+  mergeSelections: ->
+    remainingSelections = []
+    for selectionA in @getSelections()
+      isContained = false
+      for selectionB in @getSelections()
+        continue if selectionA is selectionB
+
+        if selectionB.getRange().containsRange(selectionA.getRange())
+          isContained = true
+          break
+
+      if isContained
+        selectionA.destroy()
+        selectionA.getCursor().destroy()
+      else
+        remainingSelections.push(selectionA)
+
+    @selections = remainingSelections
 
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
