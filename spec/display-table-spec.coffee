@@ -1,7 +1,7 @@
 DisplayTable = require '../lib/display-table'
 Table = require '../lib/table'
 
-fdescribe 'DisplayTable', ->
+describe 'DisplayTable', ->
   [table, displayTable] = []
 
   beforeEach ->
