@@ -1,3 +1,4 @@
+{Range} = require 'atom'
 
 module.exports =
 class Selection
@@ -14,7 +15,8 @@ class Selection
 
   getRange: -> @range
 
-  setRange: (@range) ->
+  setRange: (range) ->
+    @range = Range.fromObject(range)
 
   isEmpty: -> @range.isEmpty()
 
