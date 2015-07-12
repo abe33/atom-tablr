@@ -1,4 +1,4 @@
-{Range} = require 'atom'
+Range = require './range'
 
 module.exports =
 class Selection
@@ -17,6 +17,8 @@ class Selection
 
   setRange: (range) ->
     @range = Range.fromObject(range)
+    unless @range.containsPoint(@getCursor().getPosition())
+      @getCursor().setPosition(@range.start, false)
 
   isEmpty: -> @range.isEmpty()
 

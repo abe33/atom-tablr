@@ -15,9 +15,9 @@ class Cursor
 
   getPosition: -> @position
 
-  setPosition: (position) ->
+  setPosition: (position, resetSelection=true) ->
     @position = Point.fromObject(position)
-    @cursorMoved()
+    @cursorMoved(resetSelection)
 
   getRange: ->
     new Range(@position, {
@@ -53,6 +53,6 @@ class Cursor
     @position.column = newColumn
     @cursorMoved()
 
-  cursorMoved: ->
-    @selection.resetRangeOnCursor()
+  cursorMoved: (resetSelection=true) ->
+    @selection.resetRangeOnCursor() if resetSelection
     @emitter.emit 'did-change-position', this

@@ -5,7 +5,7 @@ Selection = require '../lib/selection'
 Cursor = require '../lib/cursor'
 Range = require '../lib/range'
 
-fdescribe 'Selection', ->
+describe 'Selection', ->
   [table, displayTable, tableEditor, selection, cursor] = []
 
   beforeEach ->
@@ -66,6 +66,18 @@ fdescribe 'Selection', ->
 
     it 'spans several cells', ->
       expect(selection.spanMoreThanOneCell()).toBeTruthy()
+
+  describe '::setRange', ->
+    it 'sets the selection range', ->
+      selection.setRange([[0,0],[2,2]])
+
+      expect(selection.getRange()).toEqual([[0,0],[2,2]])
+
+    it 'changes the cursor position if it is no longer contained', ->
+      selection.setRange([[0,0],[1,3]])
+
+      expect(selection.getRange()).toEqual([[0,0],[1,3]])
+      expect(selection.getCursor().getPosition()).toEqual([0,0])
 
   describe '::expandLeft', ->
     beforeEach ->
