@@ -18,6 +18,18 @@ class Selection
 
   isEmpty: -> @range.isEmpty()
 
+  expandLeft: ->
+    @range.start.column = Math.max(0, @range.start.column - 1)
+
+  expandRight: ->
+    @range.end.column = Math.min(@tableEditor.getScreenColumnCount(), @range.end.column + 1)
+
+  expandUp: ->
+    @range.start.row = Math.max(0, @range.start.row - 1)
+
+  expandDown: ->
+    @range.end.row = Math.min(@tableEditor.getScreenRowCount(), @range.end.row + 1)
+
   spanMoreThanOneCell: -> @range.spanMoreThanOneCell()
 
   resetRangeOnCursor: ->

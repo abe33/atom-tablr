@@ -5,7 +5,7 @@ Selection = require '../lib/selection'
 Cursor = require '../lib/cursor'
 Range = require '../lib/range'
 
-describe 'Selection', ->
+fdescribe 'Selection', ->
   [table, displayTable, tableEditor, selection, cursor] = []
 
   beforeEach ->
@@ -66,3 +66,75 @@ describe 'Selection', ->
 
     it 'spans several cells', ->
       expect(selection.spanMoreThanOneCell()).toBeTruthy()
+
+  describe '::expandLeft', ->
+    beforeEach ->
+      cursor = new Cursor({tableEditor, position: new Point(1,1)})
+      range = cursor.getRange()
+      selection = new Selection({cursor, range, tableEditor})
+
+    it 'expands the selection to the left', ->
+      selection.expandLeft()
+
+      expect(selection.getRange()).toEqual([[1,0],[2,2]])
+
+    it 'locks the selection when it reach the table bound', ->
+      selection.expandLeft()
+      selection.expandLeft()
+      selection.expandLeft()
+
+      expect(selection.getRange()).toEqual([[1,0],[2,2]])
+
+  describe '::expandRight', ->
+    beforeEach ->
+      cursor = new Cursor({tableEditor, position: new Point(1,1)})
+      range = cursor.getRange()
+      selection = new Selection({cursor, range, tableEditor})
+
+    it 'expands the selection to the left', ->
+      selection.expandRight()
+
+      expect(selection.getRange()).toEqual([[1,1],[2,3]])
+
+    it 'locks the selection when it reach the table bound', ->
+      selection.expandRight()
+      selection.expandRight()
+      selection.expandRight()
+
+      expect(selection.getRange()).toEqual([[1,1],[2,3]])
+
+  describe '::expandUp', ->
+    beforeEach ->
+      cursor = new Cursor({tableEditor, position: new Point(1,1)})
+      range = cursor.getRange()
+      selection = new Selection({cursor, range, tableEditor})
+
+    it 'expands the selection to the left', ->
+      selection.expandUp()
+
+      expect(selection.getRange()).toEqual([[0,1],[2,2]])
+
+    it 'locks the selection when it reach the table bound', ->
+      selection.expandUp()
+      selection.expandUp()
+      selection.expandUp()
+
+      expect(selection.getRange()).toEqual([[0,1],[2,2]])
+
+  describe '::expandDown', ->
+    beforeEach ->
+      cursor = new Cursor({tableEditor, position: new Point(1,1)})
+      range = cursor.getRange()
+      selection = new Selection({cursor, range, tableEditor})
+
+    it 'expands the selection to the left', ->
+      selection.expandDown()
+
+      expect(selection.getRange()).toEqual([[1,1],[3,2]])
+
+    it 'locks the selection when it reach the table bound', ->
+      selection.expandDown()
+      selection.expandDown()
+      selection.expandDown()
+
+      expect(selection.getRange()).toEqual([[1,1],[3,2]])
