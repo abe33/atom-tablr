@@ -46,8 +46,15 @@ class TableEditor
   getSelections: ->
     @selections.slice()
 
+  hasMultipleSelections: ->
+    @getSelections().length > 1
+
   getLastSelection: ->
     @selections[@selections.length - 1]
+
+  removeSelection: (selection) ->
+    @selections.splice(@selections.indexOf(selection), 1)
+    @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
 
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
@@ -85,10 +92,42 @@ class TableEditor
     @getValueAtScreenPosition(cursor.getPosition()) for cursor in @getCursors()
 
   addCursorAtPosition: (position) ->
-    @addCursorAtPosition(@screenPosition(position))
+    @addCursorAtScreenPosition(@screenPosition(position))
 
   addCursorAtScreenPosition: (position) ->
-    cursor = new Cursor({position, tableEditor: this})
+    position = Point.fromObject(position)
+    return if @cursors.some (cursor) -> cursor.getPosition().isEqual(position)
 
-    @selections.push new Selection({cursor, tableEditor: this})
+    cursor = new Cursor({position, tableEditor: this})
+    selection = new Selection({cursor, tableEditor: this})
+    @selections.push selection
     @cursors.push cursor
+    @emitter.emit 'did-add-selection', {selection, tableEditor: this}
+    @emitter.emit 'did-add-cursor', {cursor, tableEditor: this}
+
+  setCursorAtPosition: (position) ->
+    position = @screenPosition(position)
+    @moveCursors (cursor) -> cursor.setPosition(position)
+
+  setCursorAtScreenPosition: (position) ->
+    @moveCursors (cursor) -> cursor.setPosition(position)
+
+  removeCursor: (cursor) ->
+    @cursors.splice(@cursors.indexOf(cursor), 1)
+    @emitter.emit 'did-remove-cursor', {cursor, tableEditor: this}
+
+  moveCursors: (fn) ->
+    fn(cursor) for cursor in @getCursors()
+    @mergeCursors()
+
+  # Merge cursors that have the same screen position
+  mergeCursors: ->
+    positions = {}
+    for cursor in @getCursors()
+      position = cursor.getPosition().toString()
+      if positions.hasOwnProperty(position)
+        cursor.destroy()
+        cursor.selection.destroy()
+      else
+        positions[position] = true
+    return

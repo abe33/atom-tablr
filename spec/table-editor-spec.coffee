@@ -73,3 +73,69 @@ describe 'TableEditor', ->
     it 'returns undefined when asked for the value at cursor', ->
       expect(tableEditor.getCursorValue()).toEqual('age')
       expect(tableEditor.getCursorValues()).toEqual(['age'])
+
+    describe '::addCursorAtScreenPosition', ->
+      it 'adds a cursor', ->
+        tableEditor.addCursorAtScreenPosition([1,1])
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getSelections().length).toEqual(2)
+
+      it 'removes the duplicates when the new cursor has the same position as a previous cursor', ->
+        tableEditor.addCursorAtScreenPosition([0,0])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+
+    describe '::addCursorAtPosition', ->
+      it 'adds a cursor', ->
+        tableEditor.addCursorAtPosition([1,1])
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getSelections().length).toEqual(2)
+
+      it 'removes the duplicates when the new cursor has the same position as a previous cursor', ->
+        tableEditor.addCursorAtPosition([1,0])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+
+    describe '::setCursorAtScreenPosition', ->
+      it 'sets the cursor position', ->
+        tableEditor.setCursorAtScreenPosition([1,1])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
+        expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
+      it 'removes the duplicates when the new cursor has the same position as a previous cursor', ->
+        tableEditor.addCursorAtScreenPosition([2,1])
+        tableEditor.addCursorAtScreenPosition([1,2])
+
+        tableEditor.setCursorAtScreenPosition([1,1])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
+        expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
+    describe '::setCursorAtPosition', ->
+      it 'sets the cursor position', ->
+        tableEditor.setCursorAtPosition([2,1])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
+        expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
+      it 'removes the duplicates when the new cursor has the same position as a previous cursor', ->
+        tableEditor.addCursorAtScreenPosition([2,1])
+        tableEditor.addCursorAtScreenPosition([1,2])
+
+        tableEditor.setCursorAtPosition([2,1])
+
+        expect(tableEditor.getCursors().length).toEqual(1)
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
+        expect(tableEditor.getCursorPosition()).toEqual([2,1])

@@ -5,6 +5,9 @@ class Selection
     @cursor.selection = this
     @resetRangeOnCursor() unless @range?
 
+  destroy: ->
+    @tableEditor.removeSelection(this)
+
   getCursor: -> @cursor
 
   setCursor: (@cursor) ->
