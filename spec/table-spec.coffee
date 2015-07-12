@@ -247,7 +247,7 @@ describe 'Table', ->
             newRange: {start: 1, end: 3}
           })
 
-    describe 'removing a row', ->
+    describe '::removeRow', ->
       beforeEach ->
         spy = jasmine.createSpy 'removeRow'
 
@@ -287,7 +287,7 @@ describe 'Table', ->
       it 'throws an error with an index greater that the rows count', ->
         expect(-> table.removeRowAt(2)).toThrow()
 
-    describe 'removing many rows', ->
+    describe '::removeRowsInRange', ->
       beforeEach ->
         table.addRow key: 'foo', value: 'bar'
         table.addRow key: 'oof', value: 'rab'
@@ -311,19 +311,34 @@ describe 'Table', ->
           newRange: {start: 0, end: 0}
         })
 
-      describe 'with a range running to infinity', ->
-        it 'removes all the rows in the table', ->
-          table.removeRowsInRange([0, Infinity])
-
-          expect(table.getRowCount()).toEqual(0)
-
-    describe '::removeRowsInRange', ->
       it 'throws an error without range', ->
         expect(-> table.removeRowsInRange()).toThrow()
 
       it 'throws an error with an invalid range', ->
         expect(-> table.removeRowsInRange {start: 1}).toThrow()
         expect(-> table.removeRowsInRange [1]).toThrow()
+
+      describe 'with a range running to infinity', ->
+        it 'removes all the rows in the table', ->
+          table.removeRowsInRange([0, Infinity])
+
+          expect(table.getRowCount()).toEqual(0)
+
+    describe '::removeRowsAtIndices', ->
+      beforeEach ->
+        table.addRow key: 'foo', value: 'bar'
+        table.addRow key: 'oof', value: 'rab'
+        table.addRow key: 'ofo', value: 'arb'
+
+        spy = jasmine.createSpy 'removeRows'
+
+        table.onDidChangeRows spy
+
+      it 'removes the rows at indices', ->
+        table.removeRowsAtIndices([0,2])
+
+        expect(table.getRowCount()).toEqual(1)
+        expect(table.getRow(0)).toEqual(['oof','rab'])
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##

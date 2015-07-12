@@ -354,7 +354,22 @@ class DisplayTable
         undo: (commit) =>
           commit.undo()
           for i in [range.start...range.end]
-            @setRowHeightAt(i, rowHeights[i]) 
+            @setRowHeightAt(i, rowHeights[i])
+        redo: (commit) =>
+          commit.redo()
+
+  removeRowsInScreenRange: (range, transaction=true) ->
+    range = @table.rangeFrom(range)
+
+    rowHeights = (@rowHeights[index] for index in [range.start...range.end])
+    @table.removeRowsInRange(range, transaction)
+
+    if transaction
+      @table.ammendLastTransaction
+        undo: (commit) =>
+          commit.undo()
+          for i in [range.start...range.end]
+            @setRowHeightAt(i, rowHeights[i])
         redo: (commit) =>
           commit.redo()
 

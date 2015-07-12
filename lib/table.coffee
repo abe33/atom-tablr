@@ -208,10 +208,10 @@ class Table
 
     createdRows
 
-  removeRow: (row, batch=false) ->
+  removeRow: (row, batch=false, transaction=true) ->
     throw new Error "Can't remove an undefined row" unless row?
 
-    @removeRowAt(@rows.indexOf(row), batch)
+    @removeRowAt(@rows.indexOf(row), batch, transaction)
 
   removeRowAt: (index, batch=false, transaction=true) ->
     if index is -1 or index >= @rows.length
@@ -253,6 +253,11 @@ class Table
       @transaction
         undo: -> @addRowsAt(range.start, rowsValues, false)
         redo: -> @removeRowsInRange(range, false)
+
+  removeRowsAtIndices: (indices, transaction=true) ->
+    removedRows = (@rows[index] for index in indices).filter (row) -> row?
+
+    @removeRow(row, true, false) for row in removedRows
 
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows

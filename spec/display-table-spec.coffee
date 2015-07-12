@@ -368,6 +368,27 @@ describe 'DisplayTable', ->
       it 'computes the new table height', ->
         expect(displayTable.getContentHeight()).toEqual(40)
 
+    xdescribe 'removing many rows in screen range', ->
+      spy = null
+      beforeEach ->
+        spy = jasmine.createSpy('did-change-screen-rows')
+
+        displayTable.addRowAt(1, ['blood type', 'ab-'])
+        displayTable.sortBy('key')
+        displayTable.onDidChangeScreenRows(spy)
+
+        displayTable.removeRowsInScreenRange([1,3])
+
+      it 'updates the screen rows', ->
+        expect(displayTable.getScreenRows().length).toEqual(2)
+        expect(displayTable.getScreenRow(1)).toEqual(['name', 'Jane Doe'])
+
+      it 'updates the rows offsets', ->
+        expect(displayTable.getRowOffsetAt(1)).toEqual(20)
+
+      it 'computes the new table height', ->
+        expect(displayTable.getContentHeight()).toEqual(40)
+
     describe 'when a sort is applied', ->
       it 'changes the rows order accordingly to the key values', ->
         displayTable.sortBy('key')
