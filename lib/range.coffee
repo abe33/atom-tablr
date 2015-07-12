@@ -234,7 +234,7 @@ class Range
   #   endpoints. Defaults to false.
   containsRange: (otherRange) ->
     {start, end} = @constructor.fromObject(otherRange)
-    @containsPoint(start) and @containsPoint(end)
+    @containsPoint(start) and @containsPoint({row: end.row - 1, column: end.column - 1})
 
   # Public: Returns a {Boolean} indicating whether this range contains the given
   # point.
