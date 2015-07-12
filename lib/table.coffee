@@ -113,7 +113,6 @@ class Table
     if transaction
       @transaction
         undo: ->
-          console.log this
           @addColumnAt(index, column, false)
           @rows.forEach (row,i) -> row[index] = values[i]
         redo: -> @removeColumnAt(index, false)
@@ -176,7 +175,7 @@ class Table
     else
       @rows.splice index, 0, row
 
-    @emitter.emit 'did-add-row', {row}
+    @emitter.emit 'did-add-row', {row, index}
     unless batch
       @emitter.emit 'did-change-rows', {
         oldRange: {start: index, end: index}
@@ -221,7 +220,7 @@ class Table
     row = @rows[index]
     @rows.splice(index, 1)
 
-    @emitter.emit 'did-remove-row', {row}
+    @emitter.emit 'did-remove-row', {row, index}
     unless batch
       @emitter.emit 'did-change-rows', {
         oldRange: {start: index, end: index+1}
