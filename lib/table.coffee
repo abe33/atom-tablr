@@ -236,13 +236,13 @@ class Table
   removeRowsInRange: (range, transaction=true) ->
     range = @rangeFrom(range)
 
-    rowsValues = []
-
     range.end = @getRowCount() if range.end is Infinity
 
-    for i in [range.start...range.end]
-      rowsValues.push @rows[range.start].concat()
-      @removeRowAt(range.start, true)
+    removedRows = @rows.splice(range.start, range.end - range.start)
+
+    for row,i in removedRows
+      rowsValues = removedRows.slice() if transaction
+      @emitter.emit 'did-remove-row', {row, index: range.start + i}
 
     @emitter.emit 'did-change-rows', {
       oldRange: range
