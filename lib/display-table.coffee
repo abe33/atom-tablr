@@ -8,7 +8,7 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', toProperty: 'table'
+  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'rowRangeFrom', toProperty: 'table'
 
   rowOffsets: null
   columnOffsets: null
@@ -344,7 +344,7 @@ class DisplayTable
           commit.redo()
 
   removeRowsInRange: (range, transaction=true) ->
-    range = @table.rangeFrom(range)
+    range = @rowRangeFrom(range)
 
     rowHeights = (@rowHeights[index] for index in [range.start...range.end])
     @table.removeRowsInRange(range, transaction)
@@ -359,7 +359,7 @@ class DisplayTable
           commit.redo()
 
   removeRowsInScreenRange: (range, transaction=true) ->
-    range = @table.rangeFrom(range)
+    range = @table.rowRangeFrom(range)
 
     rowHeights = (@rowHeights[index] for index in [range.start...range.end])
     @table.removeRowsInRange(range, transaction)

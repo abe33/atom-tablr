@@ -147,7 +147,7 @@ class Table
   getRowCount: -> @rows.length
 
   getRowsInRange: (range) ->
-    range = @rangeFrom(range)
+    range = @rowRangeFrom(range)
     @rows[range.start...range.end]
 
   getFirstRow: -> @rows[0]
@@ -234,7 +234,7 @@ class Table
         redo: -> @removeRowAt(index, false, false)
 
   removeRowsInRange: (range, transaction=true) ->
-    range = @rangeFrom(range)
+    range = @rowRangeFrom(range)
 
     range.end = @getRowCount() if range.end is Infinity
 
@@ -270,7 +270,7 @@ class Table
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
 
-  rangeFrom: (range) ->
+  rowRangeFrom: (range) ->
     throw new Error "Can't remove rows with a range" unless range?
 
     range = {start: range[0], end: range[1]} if Array.isArray range

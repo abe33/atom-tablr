@@ -368,7 +368,7 @@ describe 'DisplayTable', ->
       it 'computes the new table height', ->
         expect(displayTable.getContentHeight()).toEqual(40)
 
-    xdescribe 'removing many rows in screen range', ->
+    describe 'removing many rows in screen range', ->
       spy = null
       beforeEach ->
         spy = jasmine.createSpy('did-change-screen-rows')
@@ -384,7 +384,8 @@ describe 'DisplayTable', ->
         expect(displayTable.getScreenRow(1)).toEqual(['name', 'Jane Doe'])
 
       it 'updates the rows offsets', ->
-        expect(displayTable.getRowOffsetAt(1)).toEqual(20)
+        expect(displayTable.getScreenRowOffsetAt(0)).toEqual(0)
+        expect(displayTable.getScreenRowOffsetAt(1)).toEqual(20)
 
       it 'computes the new table height', ->
         expect(displayTable.getContentHeight()).toEqual(40)
