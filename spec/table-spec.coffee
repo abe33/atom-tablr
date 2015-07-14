@@ -561,6 +561,32 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(0)
 
+      it 'rolls back a batched rows deletion by indices', ->
+        table.addRows [
+          ['foo', 'bar']
+          ['bar', 'baz']
+          ['baz', 'foo']
+        ]
+
+        table.clearUndoStack()
+
+        table.removeRowsAtIndices([0,2])
+
+        table.undo()
+
+        expect(table.getRowCount()).toEqual(3)
+        expect(table.undoStack.length).toEqual(0)
+        expect(table.redoStack.length).toEqual(1)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
+        expect(table.getRow(1)).toEqual(['bar', 'baz'])
+        expect(table.getRow(2)).toEqual(['baz', 'foo'])
+
+        table.redo()
+
+        expect(table.undoStack.length).toEqual(1)
+        expect(table.redoStack.length).toEqual(0)
+        expect(table.getRowCount()).toEqual(1)
+
       it 'rolls back a change in a column', ->
         table.clearUndoStack()
 
@@ -604,31 +630,6 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(0)
 
         expect(table.getRow(0)).toEqual(['hello', 'bar'])
-
-      xit 'rolls back a change in a row options', ->
-        table.addRows [
-          ['foo', 'bar']
-          ['bar', 'baz']
-        ]
-
-        table.clearUndoStack()
-
-        row = table.getRow(0)
-        row.height = 100
-
-        table.undo()
-
-        expect(table.undoStack.length).toEqual(0)
-        expect(table.redoStack.length).toEqual(1)
-
-        expect(row.height).toEqual(undefined)
-
-        table.redo()
-
-        expect(table.undoStack.length).toEqual(1)
-        expect(table.redoStack.length).toEqual(0)
-
-        expect(row.height).toEqual(100)
 
       describe '::clearUndoStack', ->
         it 'removes all the transactions in the undo stack', ->

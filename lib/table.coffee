@@ -259,6 +259,14 @@ class Table
 
     @removeRow(row, true, false) for row in removedRows
 
+    if transaction
+      indices = indices.slice()
+      @transaction
+        undo: ->
+          @addRowAt(index, removedRows[i], true, false) for index,i in indices
+        redo: ->
+          @removeRowsAtIndices(indices, false)
+
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
 
