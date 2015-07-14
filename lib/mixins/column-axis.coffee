@@ -5,7 +5,7 @@ class ColumnsAxis extends Mixin
   getActiveColumn: ->
     @table.getColumn(@activeCellPosition.column)
 
-  isActiveColumn: (column) ->
+  isCursorColumn: (column) ->
     @activeCellPosition.column is column
 
   isSelectedColumn: (column) ->

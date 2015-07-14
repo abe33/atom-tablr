@@ -1,6 +1,7 @@
 path = require 'path'
 
 Table = require '../lib/table'
+TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
 Column = require '../lib/display-column'
 Row = require '../lib/row'
@@ -51,8 +52,8 @@ isVisible = (node) ->
 
 mockConfirm = (response) -> spyOn(atom, 'confirm').andCallFake -> response
 
-xdescribe 'tableElement', ->
-  [tableElement, tableShadowRoot, table, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
+describe 'tableElement', ->
+  [tableElement, tableShadowRoot, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
@@ -75,13 +76,13 @@ xdescribe 'tableElement', ->
         fn()
 
   beforeEach ->
-    table = new Table
-    table.addColumn 'key'
-    table.addColumn 'value'
-    table.addColumn 'foo'
+    tableEditor = new TableEditor
+    tableEditor.addColumn 'key'
+    tableEditor.addColumn 'value'
+    tableEditor.addColumn 'foo'
 
     for i in [0...100]
-      table.addRow [
+      tableEditor.addRow [
         "row#{i}"
         i * 100
         if i % 2 is 0 then 'yes' else 'no'
@@ -93,7 +94,7 @@ xdescribe 'tableElement', ->
     atom.config.set 'table-edit.columnOverdraw', 2
     atom.config.set 'table-edit.minimumRowHeight', 10
 
-    tableElement = atom.views.getView(table)
+    tableElement = atom.views.getView(tableEditor)
     tableShadowRoot = tableElement.shadowRoot
 
     styleNode = document.createElement('style')
@@ -107,7 +108,7 @@ xdescribe 'tableElement', ->
     nextAnimationFrame()
 
   it 'holds a table', ->
-    expect(tableElement.getModel()).toEqual(table)
+    expect(tableElement.getModel()).toEqual(tableEditor)
 
   describe "instantiation", ->
     [element, container] = []
@@ -125,17 +126,12 @@ xdescribe 'tableElement', ->
       it 'creates a default model to boot the table', ->
         model = element.getModel()
         expect(model).toBeDefined()
-        expect(model.getColumnCount()).toEqual(1)
-        expect(model.getRowCount()).toEqual(1)
+        expect(model.getScreenColumnCount()).toEqual(1)
+        expect(model.getScreenRowCount()).toEqual(1)
 
       it 'renders the default model', ->
         cell = element.shadowRoot.querySelectorAll('atom-table-cell')
         expect(cell.length).toEqual(1)
-
-    it 'honors the absolute-columns-widths attribute', ->
-      container.innerHTML = "<atom-table-editor absolute-columns-widths>"
-      element = container.firstChild
-      expect(element.absoluteColumnsWidths).toBeTruthy()
 
   #     ######   #######  ##    ## ######## ######## ##    ## ########
   #    ##    ## ##     ## ###   ##    ##    ##       ###   ##    ##
@@ -173,17 +169,17 @@ xdescribe 'tableElement', ->
     it 'renders undefined cells based on a config', ->
       atom.config.set('table-edit.undefinedDisplay', 'foo')
 
-      tableElement.getActiveCell().setValue(undefined)
+      tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
-      expect(cells[0].textContent).toEqual('foo')
+      expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('foo')
 
     it 'renders undefined cells based on the view property', ->
       tableElement.undefinedDisplay = 'bar'
       atom.config.set('table-edit.undefinedDisplay', 'foo')
 
-      tableElement.getActiveCell().setValue(undefined)
+      tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
-      expect(cells[0].textContent).toEqual('bar')
+      expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('bar')
 
     it 'sets the proper width and height on the table rows container', ->
       bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
@@ -210,7 +206,9 @@ xdescribe 'tableElement', ->
 
       describe 'with a columns layout defined', ->
         beforeEach ->
-          tableElement.setColumnsWidths([100, 200, 300])
+          tableEditor.setScreenColumnWidthAt(0, 100)
+          tableEditor.setScreenColumnWidthAt(1, 200)
+          tableEditor.setScreenColumnWidthAt(2, 300)
           nextAnimationFrame()
 
         it 'modifies the columns width', ->
@@ -243,44 +241,22 @@ xdescribe 'tableElement', ->
 
       describe 'with alignments defined in the columns models', ->
         it 'sets the cells text-alignement using the model data', ->
-          table.getColumn(0).align = 'right'
-          table.getColumn(1).align = 'center'
+          tableEditor.getScreenColumn(0).align = 'right'
+          tableEditor.getScreenColumn(1).align = 'center'
 
           nextAnimationFrame()
 
-          expect(tableElement.getScreenCellAt(0,0).style.textAlign).toEqual('right')
-          expect(tableElement.getScreenCellAt(0,1).style.textAlign).toEqual('center')
-          expect(tableElement.getScreenCellAt(0,2).style.textAlign).toEqual('left')
-
-      describe 'with alignments defined in the view', ->
-        it 'sets the cells text-alignement with the view data', ->
-          tableElement.setColumnsAligns(['right', 'center'])
-          nextAnimationFrame()
-
-          expect(tableElement.getScreenCellAt(0,0).style.textAlign).toEqual('right')
-          expect(tableElement.getScreenCellAt(0,1).style.textAlign).toEqual('center')
-          expect(tableElement.getScreenCellAt(0,2).style.textAlign).toEqual('left')
-
-      describe 'with both alignments defined on the view and models', ->
-        it 'sets the cells text-alignement with the view data', ->
-          table.getColumn(0).align = 'left'
-          table.getColumn(1).align = 'right'
-          table.getColumn(2).align = 'center'
-
-          tableElement.setColumnsAligns(['right', 'center'])
-          nextAnimationFrame()
-
-          expect(tableElement.getScreenCellAt(0,0).style.textAlign).toEqual('right')
-          expect(tableElement.getScreenCellAt(0,1).style.textAlign).toEqual('center')
-          expect(tableElement.getScreenCellAt(0,2).style.textAlign).toEqual('center')
+          expect(tableElement.getScreenCellAtPosition([0,0]).style.textAlign).toEqual('right')
+          expect(tableElement.getScreenCellAtPosition([0,1]).style.textAlign).toEqual('center')
+          expect(tableElement.getScreenCellAtPosition([0,2]).style.textAlign).toEqual('left')
 
     describe 'with a custom cell renderer defined on a column', ->
       it 'uses the provided renderer to render the columns cells', ->
-        table.getColumn(2).cellRender = (cell) -> "foo: #{cell.value}"
+        tableEditor.getScreenColumn(2).cellRender = (cell) -> "foo: #{cell.value}"
 
         nextAnimationFrame()
 
-        expect(tableElement.getScreenCellAt(0,2).textContent).toEqual('foo: yes')
+        expect(tableElement.getScreenCellAtPosition([0,2]).textContent).toEqual('foo: yes')
 
   describe 'when scrolled by 100px', ->
     beforeEach ->
@@ -322,7 +298,7 @@ xdescribe 'tableElement', ->
   describe 'when the table rows are modified', ->
     describe 'by adding one at the end', ->
       it 'does not render new rows', ->
-        table.addRow ['foo', 'bar', 'baz']
+        tableEditor.addRow ['foo', 'bar', 'baz']
 
         nextAnimationFrame()
 
@@ -333,12 +309,12 @@ xdescribe 'tableElement', ->
       it 'updates the rows', ->
         expect(tableShadowRoot.querySelector('atom-table-cell').textContent).toEqual('row0')
 
-        table.addRowAt 0, ['foo', 'bar', 'baz']
+        tableEditor.addRowAt 0, ['foo', 'bar', 'baz']
 
         nextAnimationFrame()
 
         cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-        cell = tableElement.getScreenCellAt(0,0)
+        cell = tableElement.getScreenCellAtPosition([0,0])
         expect(cells.length).toEqual(18 * 3)
         expect(cell.dataset.row).toEqual('0')
         expect(cell.textContent).toEqual('foo')
@@ -348,21 +324,21 @@ xdescribe 'tableElement', ->
         cell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"]')
         expect(cell.textContent).toEqual('row6')
 
-        table.addRowAt 6, ['foo', 'bar', 'baz']
+        tableEditor.addRowAt 6, ['foo', 'bar', 'baz']
 
         nextAnimationFrame()
 
         cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-        cell = tableElement.getScreenCellAt(6,0)
+        cell = tableElement.getScreenCellAtPosition([6,0])
         expect(cells.length).toEqual(18 * 3)
         expect(cell.textContent).toEqual('foo')
 
     describe 'by updating the content of a row', ->
       it 'update the rows', ->
-        cell = tableElement.getScreenCellAt(6,0)
+        cell = tableElement.getScreenCellAtPosition([6,0])
         expect(cell.textContent).toEqual('row6')
 
-        table.getRow(6).key = 'foo'
+        tableEditor.setValueAtScreenPosition([6,0], 'foo')
 
         nextAnimationFrame()
 
@@ -370,7 +346,7 @@ xdescribe 'tableElement', ->
 
   describe 'setting a custom height for a row', ->
     beforeEach ->
-      tableElement.setRowHeightAt(2, 100)
+      tableEditor.setRowHeightAt(2, 100)
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
@@ -392,27 +368,30 @@ xdescribe 'tableElement', ->
       cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="3"]')[1]
       mousedown(cell)
 
-      expect(tableElement.getActiveCell().getValue()).toEqual(300)
+      expect(tableEditor.getLastCursor().getValue()).toEqual(300)
 
     it 'gives the size of the cell to the editor when starting an edit', ->
-      tableElement.activateCellAtPosition(row: 2, column: 0)
+      tableEditor.setCursorAtScreenPosition([2, 0])
       nextAnimationFrame()
       tableElement.startCellEdit()
 
       expect(tableElement.querySelector('atom-text-editor').offsetHeight).toEqual(100)
 
     it 'uses the offset to position the editor', ->
-      tableElement.activateCellAtPosition(row: 3, column: 0)
+      tableEditor.setCursorAtScreenPosition([3, 0])
       nextAnimationFrame()
       tableElement.startCellEdit()
 
-      editorTop = tableElement.querySelector('atom-text-editor').getBoundingClientRect().top
-      cellTop = tableShadowRoot.querySelector('atom-table-cell.active').getBoundingClientRect().top
-      expect(editorTop).toBeCloseTo(cellTop, -2)
+      editorBounds = tableElement.querySelector('atom-text-editor').getBoundingClientRect()
+      cellBounds = tableShadowRoot.querySelector('atom-table-cell.active').getBoundingClientRect()
+      expect(editorBounds.top).toBeCloseTo(cellBounds.top)
+      expect(editorBounds.left).toBeCloseTo(cellBounds.left)
+      expect(editorBounds.width).toBeCloseTo(cellBounds.width)
+      expect(editorBounds.height).toBeCloseTo(cellBounds.height)
 
     describe 'by changing the option on the row itself', ->
       beforeEach ->
-        table.getRow(2).height = 50
+        tableEditor.setScreenRowHeightAt(2, 50)
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
@@ -439,7 +418,7 @@ xdescribe 'tableElement', ->
         cell = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="14"] ')[1]
         mousedown(cell)
 
-        expect(tableElement.getActiveCell().getValue()).toEqual(1400)
+        expect(tableEditor.getLastCursor().getValue()).toEqual(1400)
 
     describe 'when scrolled all way down to the bottom edge', ->
       beforeEach ->
@@ -450,7 +429,7 @@ xdescribe 'tableElement', ->
         cell = tableShadowRoot.querySelector('atom-table-cell:nth-last-child(2)')
         mousedown(cell)
 
-        expect(tableElement.getActiveCell().getValue()).toEqual(9900)
+        expect(tableEditor.getLastCursor().getValue()).toEqual(9900)
 
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##
@@ -460,6 +439,7 @@ xdescribe 'tableElement', ->
   #    ##     ## ##       ##     ## ##     ## ##       ##    ##
   #    ##     ## ######## ##     ## ########  ######## ##     ##
 
+  ###
   it 'has a header', ->
     expect(tableShadowRoot.querySelector('.table-edit-header')).toExist()
 
@@ -547,9 +527,9 @@ xdescribe 'tableElement', ->
         mousedown(handle)
         mouseup(handle, x + 50, y)
 
-        expect(table.getColumn(0).width).toBeCloseTo(100)
-        expect(table.getColumn(1).width).toBeCloseTo(150)
-        expect(table.getColumn(2).width).toBeCloseTo(100)
+        expect(tableEditor.getColumn(0).width).toBeCloseTo(100)
+        expect(tableEditor.getColumn(1).width).toBeCloseTo(150)
+        expect(tableEditor.getColumn(2).width).toBeCloseTo(100)
 
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
@@ -600,29 +580,30 @@ xdescribe 'tableElement', ->
           expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
         it 'changes the cell value', ->
-          expect(tableElement.table.getColumn(0).name).toEqual('foobar')
+          expect(tableElement.tableEditor.getColumn(0).name).toEqual('foobar')
 
       describe 'table-edit:move-right', ->
         it 'confirms the current edit and moves the active cursor to the right', ->
-          previousActiveCell = tableElement.getActiveCell()
+          previousActiveCell = tableElement.getLastActiveCell()
           spyOn(tableElement, 'moveRight')
           editor.setText('Foo Bar')
           atom.commands.dispatch(editorElement, 'table-edit:move-right')
 
           expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.table.getColumn(0).name).toEqual('Foo Bar')
+          expect(tableElement.tableEditor.getColumn(0).name).toEqual('Foo Bar')
           expect(tableElement.moveRight).toHaveBeenCalled()
 
       describe 'table-edit:move-left', ->
         it 'confirms the current edit and moves the active cursor to the left', ->
-          previousActiveCell = tableElement.getActiveCell()
+          previousActiveCell = tableElement.getLastActiveCell()
           spyOn(tableElement, 'moveLeft')
           editor.setText('Foo Bar')
           atom.commands.dispatch(editorElement, 'table-edit:move-left')
 
           expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.table.getColumn(0).name).toEqual('Foo Bar')
+          expect(tableElement.tableEditor.getColumn(0).name).toEqual('Foo Bar')
           expect(tableElement.moveLeft).toHaveBeenCalled()
+  ###
 
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
@@ -631,7 +612,7 @@ xdescribe 'tableElement', ->
   #    ##    ##  ##     ##    ##       ##    ##       ##   ##
   #    ##    ##  ##     ##    ##       ##    ##       ##    ##
   #     ######    #######     ##       ##    ######## ##     ##
-
+  ###
   describe 'gutter', ->
     describe 'when scrolled', ->
       beforeEach ->
@@ -783,6 +764,7 @@ xdescribe 'tableElement', ->
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
           expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
+  ###
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -792,6 +774,7 @@ xdescribe 'tableElement', ->
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
 
+  ###
   it 'gains focus when mouse is pressed on the table view', ->
     mousedown(tableElement)
 
@@ -801,7 +784,7 @@ xdescribe 'tableElement', ->
     cell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="2"]')
     mousedown(cell)
 
-    expect(tableElement.getActiveCell().getValue()).toEqual('no')
+    expect(tableElement.getLastActiveCell().getValue()).toEqual('no')
 
   it 'does not focus the hidden input twice when multiple press occurs', ->
     spyOn(tableElement.hiddenInput, 'focus').andCallThrough()
@@ -814,7 +797,7 @@ xdescribe 'tableElement', ->
     expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
   it 'has an active cell', ->
-    activeCell = tableElement.getActiveCell()
+    activeCell = tableElement.getLastActiveCell()
     expect(activeCell).toBeDefined()
     expect(activeCell.getValue()).toEqual('row0')
 
@@ -848,24 +831,24 @@ xdescribe 'tableElement', ->
     it 'moves the active cell cursor to the right', ->
       tableElement.moveRight()
 
-      expect(tableElement.getActiveCell().getValue()).toEqual(0)
+      expect(tableElement.getLastActiveCell().getValue()).toEqual(0)
 
       tableElement.moveRight()
 
-      expect(tableElement.getActiveCell().getValue()).toEqual('yes')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('yes')
 
     it 'moves the active cell to the next row when on last cell of a row', ->
       tableElement.moveRight()
       tableElement.moveRight()
       tableElement.moveRight()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row1')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row1')
 
     it 'moves the active cell to the first row when on last cell of last row', ->
       tableElement.activeCellPosition.row = 99
       tableElement.activeCellPosition.column = 2
 
       tableElement.moveRight()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row0')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row0')
 
     xdescribe 'when the absoluteColumnsWidths setting is enabled', ->
       describe 'and the last column is partially hidden', ->
@@ -901,19 +884,19 @@ xdescribe 'tableElement', ->
 
     it 'moves the active cell to the last cell when on the first cell', ->
       tableElement.moveLeft()
-      expect(tableElement.getActiveCell().getValue()).toEqual('no')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('no')
 
     it 'moves the active cell cursor to the left', ->
       tableElement.moveRight()
       tableElement.moveLeft()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row0')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row0')
 
     it 'moves the active cell cursor to the upper row', ->
       tableElement.moveRight()
       tableElement.moveRight()
       tableElement.moveRight()
       tableElement.moveLeft()
-      expect(tableElement.getActiveCell().getValue()).toEqual('yes')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('yes')
 
   describe '::moveUp', ->
     it 'requests an update', ->
@@ -937,13 +920,13 @@ xdescribe 'tableElement', ->
 
     it 'moves the active cell to the last row when on the first row', ->
       tableElement.moveUp()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row99')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row99')
 
     it 'moves the active cell on the upper row', ->
       tableElement.activeCellPosition.row = 10
 
       tableElement.moveUp()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row9')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row9')
 
   describe '::moveDown', ->
     it 'requests an update', ->
@@ -967,13 +950,13 @@ xdescribe 'tableElement', ->
 
     it 'moves the active cell to the row below', ->
       tableElement.moveDown()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row1')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row1')
 
     it 'moves the active cell to the first row when on the last row', ->
       tableElement.activeCellPosition.row = 99
 
       tableElement.moveDown()
-      expect(tableElement.getActiveCell().getValue()).toEqual('row0')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row0')
 
   describe '::makeRowVisible', ->
     it 'scrolls the view until the passed-on row become visible', ->
@@ -987,7 +970,7 @@ xdescribe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:undo')
 
-      expect(table.undo).toHaveBeenCalled()
+      expect(tableEditor.undo).toHaveBeenCalled()
 
   describe 'core:redo', ->
     it 'triggers an redo on the table', ->
@@ -995,7 +978,7 @@ xdescribe 'tableElement', ->
 
       atom.commands.dispatch(tableElement, 'core:redo')
 
-      expect(table.redo).toHaveBeenCalled()
+      expect(tableEditor.redo).toHaveBeenCalled()
 
   describe 'core:page-down', ->
     beforeEach ->
@@ -1073,7 +1056,7 @@ xdescribe 'tableElement', ->
     it 'inserts a new row before the active row', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
 
-      expect(table.getRow(0).getValues()).toEqual([null, null, null])
+      expect(tableEditor.getRow(0).getValues()).toEqual([null, null, null])
 
     it 'refreshes the rows offsets', ->
       tableElement.setRowHeightAt(0, 60)
@@ -1085,7 +1068,7 @@ xdescribe 'tableElement', ->
 
     describe "when there's no rows in the table yet", ->
       beforeEach ->
-        table.removeRowsInRange([0, Infinity])
+        tableEditor.removeRowsInRange([0, Infinity])
 
       it 'creates a new row', ->
         atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
@@ -1096,14 +1079,14 @@ xdescribe 'tableElement', ->
     it 'inserts a new row after the active row', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-row-after')
 
-      expect(table.getRow(1).getValues()).toEqual([null, null, null])
+      expect(tableEditor.getRow(1).getValues()).toEqual([null, null, null])
 
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
       mockConfirm(0)
       atom.commands.dispatch(tableElement, 'table-edit:delete-row')
 
-      expect(table.getRow(0).getValues()).toEqual(['row1', 100, 'no'])
+      expect(tableEditor.getRow(0).getValues()).toEqual(['row1', 100, 'no'])
 
     it 'asks for a confirmation', ->
       mockConfirm(0)
@@ -1115,7 +1098,7 @@ xdescribe 'tableElement', ->
       mockConfirm(1)
       atom.commands.dispatch(tableElement, 'table-edit:delete-row')
 
-      expect(table.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
+      expect(tableEditor.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
 
     describe 'when the deleted row has a custom height', ->
       beforeEach ->
@@ -1135,36 +1118,36 @@ xdescribe 'tableElement', ->
     it 'inserts a new column before the active column', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
 
-      expect(table.getRow(0).getValues()).toEqual([null, 'row0', 0, 'yes'])
+      expect(tableEditor.getRow(0).getValues()).toEqual([null, 'row0', 0, 'yes'])
 
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
         atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
         atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
 
-        expect(table.getColumn(0).name).toEqual('untitled_1')
-        expect(table.getColumn(1).name).toEqual('untitled_0')
+        expect(tableEditor.getColumn(0).name).toEqual('untitled_1')
+        expect(tableEditor.getColumn(1).name).toEqual('untitled_0')
 
   describe 'table-edit:insert-column-after', ->
     it 'inserts a new column after the active column', ->
       atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
 
-      expect(table.getRow(0).getValues()).toEqual(['row0', null, 0, 'yes'])
+      expect(tableEditor.getRow(0).getValues()).toEqual(['row0', null, 0, 'yes'])
 
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
         atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
         atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
 
-        expect(table.getColumn(1).name).toEqual('untitled_1')
-        expect(table.getColumn(2).name).toEqual('untitled_0')
+        expect(tableEditor.getColumn(1).name).toEqual('untitled_1')
+        expect(tableEditor.getColumn(2).name).toEqual('untitled_0')
 
   describe 'table-edit:delete-column', ->
     it 'deletes the current active column', ->
       mockConfirm(0)
       atom.commands.dispatch(tableElement, 'table-edit:delete-column')
 
-      expect(table.getRow(0).getValues()).toEqual([0, 'yes'])
+      expect(tableEditor.getRow(0).getValues()).toEqual([0, 'yes'])
 
     it 'asks for a confirmation', ->
       mockConfirm(0)
@@ -1176,8 +1159,9 @@ xdescribe 'tableElement', ->
       mockConfirm(1)
       atom.commands.dispatch(tableElement, 'table-edit:delete-column')
 
-      expect(table.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
+      expect(tableEditor.getRow(0).getValues()).toEqual(['row0', 0, 'yes'])
 
+  ###
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
@@ -1186,6 +1170,7 @@ xdescribe 'tableElement', ->
   #    ##       ##     ##  ##     ##
   #    ######## ########  ####    ##
 
+  ###
   describe 'pressing a key when the table view has focus', ->
     beforeEach ->
       textInput(tableElement.hiddenInput, 'x')
@@ -1248,7 +1233,7 @@ xdescribe 'tableElement', ->
       expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
     it 'leaves the cell value as is', ->
-      expect(tableElement.getActiveCell().getValue()).toEqual('row0')
+      expect(tableElement.getLastActiveCell().getValue()).toEqual('row0')
 
   describe 'with an editor opened', ->
     [editor, editorElement] = []
@@ -1265,7 +1250,7 @@ xdescribe 'tableElement', ->
 
     describe 'table-edit:move-right', ->
       it 'confirms the current edit and moves the active cursor to the right', ->
-        previousActiveCell = tableElement.getActiveCell()
+        previousActiveCell = tableElement.getLastActiveCell()
         spyOn(tableElement, 'moveRight')
         editor.setText('Foo Bar')
         atom.commands.dispatch(editorElement, 'table-edit:move-right')
@@ -1276,7 +1261,7 @@ xdescribe 'tableElement', ->
 
     describe 'table-edit:move-left', ->
       it 'confirms the current edit and moves the active cursor to the left', ->
-        previousActiveCell = tableElement.getActiveCell()
+        previousActiveCell = tableElement.getLastActiveCell()
         spyOn(tableElement, 'moveLeft')
         editor.setText('Foo Bar')
         atom.commands.dispatch(editorElement, 'table-edit:move-left')
@@ -1298,11 +1283,11 @@ xdescribe 'tableElement', ->
           expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
         it 'changes the cell value', ->
-          expect(tableElement.getActiveCell().getValue()).toEqual('foobar')
+          expect(tableElement.getLastActiveCell().getValue()).toEqual('foobar')
 
       describe 'when the content of the editor did not changed', ->
         beforeEach ->
-          spyOn(tableElement.getActiveCell(), 'setValue').andCallThrough()
+          spyOn(tableElement.getLastActiveCell(), 'setValue').andCallThrough()
           atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
@@ -1312,8 +1297,8 @@ xdescribe 'tableElement', ->
           expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
         it 'leaves the cell value as is', ->
-          expect(tableElement.getActiveCell().getValue()).toEqual('row0')
-          expect(tableElement.getActiveCell().setValue).not.toHaveBeenCalled()
+          expect(tableElement.getLastActiveCell().getValue()).toEqual('row0')
+          expect(tableElement.getLastActiveCell().setValue).not.toHaveBeenCalled()
 
     describe 'clicking on another cell', ->
       beforeEach ->
@@ -1322,6 +1307,7 @@ xdescribe 'tableElement', ->
 
       it 'closes the editor', ->
         expect(tableElement.isEditing()).toBeFalsy()
+  ###
 
   #     ######  ######## ##       ########  ######  ########
   #    ##    ## ##       ##       ##       ##    ##    ##
@@ -1330,7 +1316,7 @@ xdescribe 'tableElement', ->
   #          ## ##       ##       ##       ##          ##
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
-
+  ###
   it 'has a selection', ->
     expect(tableElement.getSelection()).toEqual([[0,0], [0,0]])
 
@@ -1380,8 +1366,8 @@ xdescribe 'tableElement', ->
 
     it 'positions the selection box over the cells', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      firstCell = tableElement.getScreenCellAt(2,0)
-      lastCell = tableElement.getScreenCellAt(3,2)
+      firstCell = tableElement.getScreenCellAtPosition([2,0])
+      lastCell = tableElement.getScreenCellAtPosition([3,2])
 
       selectionBoxOffset = selectionBox.getBoundingClientRect()
       firstCellOffset = firstCell.getBoundingClientRect()
@@ -1393,7 +1379,7 @@ xdescribe 'tableElement', ->
 
     it 'positions the selection box handle at the bottom right corner', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      lastCell = tableElement.getScreenCellAt(3,2)
+      lastCell = tableElement.getScreenCellAtPosition([3,2])
       lastCellOffset = lastCell.getBoundingClientRect()
       selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
 
@@ -1406,8 +1392,8 @@ xdescribe 'tableElement', ->
 
       selectionBox = tableShadowRoot.querySelector('.selection-box')
       cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      firstCell = tableElement.getScreenCellAt(2,1)
-      lastCell = tableElement.getScreenCellAt(3,2)
+      firstCell = tableElement.getScreenCellAtPosition([2,1])
+      lastCell = tableElement.getScreenCellAtPosition([3,2])
 
       selectionBoxOffset = selectionBox.getBoundingClientRect()
       firstCellOffset = firstCell.getBoundingClientRect()
@@ -1426,8 +1412,8 @@ xdescribe 'tableElement', ->
 
       it 'positions the selection box over the cells', ->
         cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-        firstCell = tableElement.getScreenCellAt(2,0)
-        lastCell = tableElement.getScreenCellAt(3,1)
+        firstCell = tableElement.getScreenCellAtPosition([2,0])
+        lastCell = tableElement.getScreenCellAtPosition([3,1])
 
         selectionBoxOffset = selectionBox.getBoundingClientRect()
         firstCellOffset = firstCell.getBoundingClientRect()
@@ -1697,6 +1683,7 @@ xdescribe 'tableElement', ->
 
       it 'expands the selection to the right', ->
         expect(tableElement.getSelection()).toEqual([[2,0],[2,2]])
+  ###
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
@@ -1706,6 +1693,7 @@ xdescribe 'tableElement', ->
   #    ##    ## ##     ## ##    ##     ##     ##  ##   ### ##    ##
   #     ######   #######  ##     ##    ##    #### ##    ##  ######
 
+  ###
   describe 'sorting', ->
     describe 'when a column have been set as the table order', ->
       beforeEach ->
@@ -1717,7 +1705,7 @@ xdescribe 'tableElement', ->
 
       it 'leaves the active cell position as it was before', ->
         expect(tableElement.activeCellPosition).toEqual([0,0])
-        expect(tableElement.getActiveCell()).toEqual(table.getValueAtPosition([99,0]))
+        expect(tableElement.getLastActiveCell()).toEqual(tableEditor.getValueAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
         expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)
@@ -1739,7 +1727,7 @@ xdescribe 'tableElement', ->
 
         it 'opens the editor at the cell position', ->
           editorOffset = tableElement.querySelector('atom-text-editor').getBoundingClientRect()
-          cellOffset = tableElement.getScreenCellAt(0,0).getBoundingClientRect()
+          cellOffset = tableElement.getScreenCellAtPosition([0,0]).getBoundingClientRect()
 
           expect(editorOffset.top).toBeCloseTo(cellOffset.top, -1)
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -1)
@@ -1762,3 +1750,4 @@ xdescribe 'tableElement', ->
 
         it 'reorder the table in its initial order', ->
           expect(tableShadowRoot.querySelector('atom-table-cell').textContent).toEqual('row0')
+  ###

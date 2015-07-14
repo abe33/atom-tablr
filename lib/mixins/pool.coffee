@@ -24,6 +24,7 @@ class Pool extends Mixin
           @#{plural}Container.appendChild instance
 
         instance.tableElement = this
+        instance.tableEditor = @getModel()
         instance.setModel(model)
         @used#{Plural}.push(instance)
 

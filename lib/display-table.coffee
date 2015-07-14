@@ -41,9 +41,6 @@ class DisplayTable
   onDidRenameColumn: (callback) ->
     @emitter.on 'did-rename-column', callback
 
-  onDidChangeColumnName: (callback) ->
-    @emitter.on 'did-change-column-options', callback
-
   onDidChangeColumnOption: (callback) ->
     @emitter.on 'did-change-column-options', callback
 
@@ -58,6 +55,9 @@ class DisplayTable
 
   onDidChangeScreenRows: (callback) ->
     @emitter.on 'did-change-screen-rows', callback
+
+  onDidChangeRowHeight: (callback) ->
+    @emitter.on 'did-change-row-height', callback
 
   subscribeToTable: ->
     @subscriptions.add @table.onDidAddColumn ({column, index}) =>
@@ -136,11 +136,13 @@ class DisplayTable
   getScreenColumnWidthAt: (index) ->
     @screenColumns[index]?.width ? @getScreenColumnWidth()
 
+  getScreenColumnAlignAt: (index) ->
+    @screenColumns[index]?.align
+
   setScreenColumnWidthAt: (index, width) ->
     minWidth = @getMinimumScreenColumnWidth()
     width = minWidth if width < minWidth
     @screenColumns[index]?.width = width
-    @computeScreenColumnOffsets()
 
   getScreenColumnOffsetAt: (column) -> @screenColumnOffsets[column]
 
@@ -213,16 +215,15 @@ class DisplayTable
     subs = new CompositeDisposable
     @screenColumnsSubscriptions.set(screenColumn, subs)
 
-    subs.add screenColumn.onDidChangeName ({oldName, newName, column}) =>
+    subs.add screenColumn.onDidChangeName ({oldName, newName}) =>
       @table.changeColumnName(oldName, newName)
-      @emitter.emit 'did-change-column-options', {
-        oldName, newName, column, index: @screenColumns.indexOf(event.column)
-      }
 
     subs.add screenColumn.onDidChangeOption (event) =>
       newEvent = _.clone(event)
       newEvent.index = @screenColumns.indexOf(event.column)
       @emitter.emit 'did-change-column-options', newEvent
+
+      @computeScreenColumnOffsets() if event.option is 'width'
 
   unsubscribeFromScreenColumn: (screenColumn) ->
     subs = @screenColumnsSubscriptions.get(screenColumn)
@@ -282,6 +283,7 @@ class DisplayTable
     height = minHeight if height < minHeight
     @rowHeights[index] = height
     @computeRowOffsets()
+    @emitter.emit 'did-change-row-height', {height, row: index}
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 

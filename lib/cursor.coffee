@@ -19,6 +19,8 @@ class Cursor
 
   getPosition: -> @position
 
+  getValue: -> @tableEditor.getValueAtScreenPosition(@getPosition())
+
   setPosition: (position, resetSelection=true) ->
     @position = Point.fromObject(position)
     @cursorMoved(resetSelection)

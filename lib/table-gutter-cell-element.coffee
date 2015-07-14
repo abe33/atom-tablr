@@ -14,8 +14,8 @@ class TableGutterCellElement extends HTMLElement
     @label.textContent = row + 1
     @className = classes.join(' ')
     @style.cssText = "
-      height: #{@tableElement.getScreenRowHeightAt(row)}px;
-      top: #{@tableElement.getScreenRowOffsetAt(row)}px;
+      height: #{@tableEditor.getScreenRowHeightAt(row)}px;
+      top: #{@tableEditor.getScreenRowOffsetAt(row)}px;
     "
 
   isReleased: -> @released
@@ -27,8 +27,8 @@ class TableGutterCellElement extends HTMLElement
 
   getGutterCellClasses: (row) ->
     classes = []
-    classes.push 'active-row' if @tableElement.isActiveRow(row)
-    classes.push 'selected' if @tableElement.isSelectedRow(row)
+    # classes.push 'active-row' if @tableElement.isCursorRow(row)
+    # classes.push 'selected' if @tableElement.isSelectedRow(row)
     classes
 
 module.exports = TableGutterCellElement = document.registerElement 'atom-table-gutter-cell', prototype: TableGutterCellElement.prototype

@@ -245,7 +245,10 @@ class Range
   containsPoint: (point) ->
     point = Point.fromObject(point)
 
-    point.row >= @start.row and point.row < @end.row and point.column >= @start.column and point.column < @end.column
+    @containsRow(point.row) and @containsColumn(point.column)
+
+  containsRow: (row) -> @start.row <= row < @end.row
+  containsColumn: (column) -> @start.column <= column < @end.column
 
   # Public: Returns a string representation of the range.
   toString: ->

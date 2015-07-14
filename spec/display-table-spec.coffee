@@ -123,14 +123,6 @@ describe 'DisplayTable', ->
         displayTable.changeColumnName('key', 'foo')
         expect(displayTable.getScreenColumn(0).name).toEqual('foo')
 
-      describe 'directly from the screen column', ->
-        it 'updates the column name both in the table and the display table', ->
-          column = displayTable.getScreenColumn(0)
-          column.name = 'foo'
-
-          expect(column.name).toEqual('foo')
-          expect(table.getColumn(0)).toEqual('foo')
-
     describe 'setting the width of a column', ->
       beforeEach ->
         displayTable.setScreenColumnWidthAt(0, 200)

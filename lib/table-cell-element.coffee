@@ -13,11 +13,11 @@ class TableCellElement extends HTMLElement
     @dataset.row = row
     @dataset.column = column
     @style.cssText = """
-      width: #{@tableElement.getScreenColumnWidthAt(column)}px;
-      left: #{@tableElement.getScreenColumnOffsetAt(column)}px;
-      height: #{@tableElement.getScreenRowHeightAt(row)}px;
-      top: #{@tableElement.getScreenRowOffsetAt(row)}px;
-      text-align: #{@tableElement.getColumnAlign(column) ? 'left'};
+      width: #{@tableEditor.getScreenColumnWidthAt(column)}px;
+      left: #{@tableEditor.getScreenColumnOffsetAt(column)}px;
+      height: #{@tableEditor.getScreenRowHeightAt(row)}px;
+      top: #{@tableEditor.getScreenRowOffsetAt(row)}px;
+      text-align: #{@tableEditor.getScreenColumnAlignAt(column)};
     """
 
   isReleased: -> @released
@@ -31,16 +31,16 @@ class TableCellElement extends HTMLElement
 
   getCellClasses: (cell, column, row) ->
     classes = ['table-edit-cell']
-    if @tableElement.isActiveCell(cell)
+    if @tableElement.isCursorCell([row, column])
       classes.push 'active'
-    else if @tableElement.isActiveColumn(column)
+    else if @tableElement.isCursorColumn(column)
       classes.push 'active-column'
-    else if @tableElement.isActiveRow(row)
+    else if @tableElement.isCursorRow(row)
       classes.push 'active-row'
 
-    classes.push 'selected' if @tableElement.isSelectedPosition([row, column])
+    classes.push 'selected' if @tableElement.isSelectedCell([row, column])
 
-    classes.push 'order' if @tableElement.order is cell.getColumn().name
+    classes.push 'order' if @tableElement.order is cell.column.name
 
     classes
 

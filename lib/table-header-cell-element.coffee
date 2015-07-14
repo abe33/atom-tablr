@@ -16,9 +16,9 @@ class TableHeaderCellElement extends HTMLElement
     @className = classes.join(' ')
     @dataset.column = index
     @style.cssText = "
-      width: #{@tableElement.getScreenColumnWidthAt(index)}px;
-      left: #{@tableElement.getScreenColumnOffsetAt(index)}px;
-      text-align: #{@tableElement.getColumnAlign(index) ? 'left'};
+      width: #{@tableEditor.getScreenColumnWidthAt(index)}px;
+      left: #{@tableEditor.getScreenColumnOffsetAt(index)}px;
+      text-align: #{@tableEditor.getScreenColumnAlignAt(index) ? 'left'};
     "
 
   isReleased: -> @released
@@ -30,12 +30,12 @@ class TableHeaderCellElement extends HTMLElement
 
   getHeaderCellClasses: (column, index) ->
     classes = []
-    classes.push 'active-column' if @tableElement.isActiveColumn(index)
+    classes.push 'active-column' if @tableElement.isCursorColumn(index)
 
-    if @tableElement.order is column.name
+    if @tableEditor.order is column.name
       classes.push 'order'
 
-      if @tableElement.direction is 1
+      if @tableEditor.direction is 1
         classes.push 'ascending'
       else
         classes.push 'descending'

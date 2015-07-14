@@ -5,7 +5,7 @@ class RowsAxis extends Mixin
   getActiveRow: ->
     @table.getRow(@activeCellPosition.row)
 
-  isActiveRow: (row) ->
+  isCursorRow: (row) ->
     @activeCellPosition.row is row
 
   isSelectedRow: (row) ->

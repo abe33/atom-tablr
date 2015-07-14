@@ -1,9 +1,11 @@
+Delegator = require 'delegato'
 {Point, Range, TextEditor} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 {EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 
 Table = require './table'
+TableEditor = require './table-editor'
 TableCellElement = require './table-cell-element'
 TableHeaderCellElement = require './table-header-cell-element'
 TableGutterCellElement = require './table-gutter-cell-element'
@@ -22,8 +24,8 @@ class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
   EventsDelegation.includeInto(this)
   SpacePenDSL.includeInto(this)
-  Axis.includeInto(this)
   Pool.includeInto(this)
+  Delegator.includeInto(this)
 
   @useShadowRoot()
 
@@ -55,20 +57,12 @@ class TableElement extends HTMLElement
   @pool 'headerCell', 'headerCells'
   @pool 'gutterCell', 'gutterCells'
 
-  gutter: false
-  rowOffsets: null
-  columnOffsets: null
-  absoluteColumnsWidths: false
-
   createdCallback: ->
     @cells = []
     @headerCells = []
     @gutterCells = []
 
-    @activeCellPosition = new Point
     @subscriptions = new CompositeDisposable
-
-    @absoluteColumnsWidths = @hasAttribute('absolute-columns-widths')
 
     @subscribeToContent()
     @subscribeToConfig()
@@ -86,8 +80,8 @@ class TableElement extends HTMLElement
 
     @subscriptions.add atom.commands.add 'atom-table-editor',
       'core:confirm': => @startCellEdit()
-      'core:undo': => @table.undo()
-      'core:redo': => @table.redo()
+      'core:undo': => @tableEditor.undo()
+      'core:redo': => @tableEditor.redo()
       'core:move-left': => @moveLeft()
       'core:move-right': => @moveRight()
       'core:move-up': => @moveUp()
@@ -146,7 +140,7 @@ class TableElement extends HTMLElement
         @stopEdit() if @isEditing()
 
         if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
-          @activateCellAtPosition position
+          @tableEditor.setCursorAtScreenPosition position
 
         @startDrag(e)
         @focus()
@@ -170,17 +164,8 @@ class TableElement extends HTMLElement
         @requestUpdate() if @attached
       'table-edit.pageMovesAmount': (@configPageMovesAmount) =>
         @requestUpdate() if @attached
-      'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
-      'table-edit.rowHeight': (@configRowHeight) =>
-        if @table?
-          @computeRowOffsets()
-          @requestUpdate() if @attached
       'table-edit.rowOverdraw': (@configRowOverdraw) =>
         @requestUpdate() if @attached
-      'table-edit.columnWidth': (@configColumnWidth) =>
-        if @table?
-          @computeColumnOffsets()
-          @requestUpdate() if @attached
       'table-edit.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
 
@@ -203,8 +188,6 @@ class TableElement extends HTMLElement
 
   attachedCallback: ->
     @buildModel() unless @getModel()?
-    @computeRowOffsets()
-    @computeColumnOffsets()
     @subscriptions.add atom.views.pollDocument => @pollDOM()
     @measureHeightAndWidth()
     @requestUpdate()
@@ -241,10 +224,10 @@ class TableElement extends HTMLElement
   #    ##     ## ##     ## ##     ## ##       ##
   #    ##     ##  #######  ########  ######## ########
 
-  getModel: -> @table
+  getModel: -> @tableEditor
 
   buildModel: ->
-    model = new Table
+    model = new TableEditor
     model.addColumn('untitled')
     model.addRow()
     @setModel(model)
@@ -252,34 +235,30 @@ class TableElement extends HTMLElement
   setModel: (table) ->
     return unless table?
 
-    @unsetModel() if @table?
+    @unsetModel() if @tableEditor?
 
-    @table = table
-    @modelSubscriptions = new CompositeDisposable()
-    @modelSubscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
-    @modelSubscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
-    @modelSubscriptions.add @table.onDidChangeColumnOption =>
-      @computeColumnOffsets()
-      @requestUpdate()
-    @modelSubscriptions.add @table.onDidChangeRows =>
-      @updateScreenRows()
-      @computeRowOffsets()
-      @requestUpdate()
-    @modelSubscriptions.add @table.onDidChangeRowsOptions =>
-      @computeRowOffsets()
-      @requestUpdate()
+    @tableEditor = table
+    @modelSubscriptions = subs = new CompositeDisposable()
+    subs.add @tableEditor.onDidAddColumn (e) => @onColumnAdded(e)
+    subs.add @tableEditor.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
+    subs.add @tableEditor.onDidChangeColumnOption => @requestUpdate()
+    subs.add @tableEditor.onDidChangeScreenRows => @requestUpdate()
+    subs.add @tableEditor.onDidChangeRowHeight => @requestUpdate()
+    subs.add @tableEditor.onDidChangeCellValue => @requestUpdate()
+    subs.add @tableEditor.onDidAddCursor => @requestUpdate()
+    subs.add @tableEditor.onDidRemoveCursor => @requestUpdate()
+    subs.add @tableEditor.onDidChangeCursorPosition => @requestUpdate()
+    subs.add @tableEditor.onDidAddSelection => @requestUpdate()
+    subs.add @tableEditor.onDidRemoveSelection => @requestUpdate()
+    subs.add @tableEditor.onDidChangeSelectionRange => @requestUpdate()
 
-    @subscribeToColumn(column) for column in @table.getColumns()
-
-    @updateScreenRows()
-    @updateScreenColumns()
-    @setSelectionFromActiveCell()
     @requestUpdate()
 
   unsetModel: ->
     @modelSubscriptions.dispose()
     @modelSubscriptions = null
-    @table = null
+    @tableEditor = null
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -288,6 +267,13 @@ class TableElement extends HTMLElement
   #    ##   ##   ##     ## ##  ##  ##       ##
   #    ##    ##  ##     ## ##  ##  ## ##    ##
   #    ##     ##  #######   ###  ###   ######
+
+  isCursorRow: (row) ->
+    @tableEditor.getCursors().some (cursor) -> cursor.getPosition().row is row
+
+  isSelectedRow: (row) ->
+    @tableEditor.getSelections().some (selection) ->
+      selection.getRowRange().containsRow(row)
 
   getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
 
@@ -301,11 +287,21 @@ class TableElement extends HTMLElement
 
   getRowResizeRuler: -> @rowRuler
 
-  insertRowBefore: -> @table.addRowAt(@activeCellPosition.row)
+  insertRowBefore: -> @tableEditor.addRowAt(@activeCellPosition.row)
 
-  insertRowAfter: -> @table.addRowAt(@activeCellPosition.row + 1)
+  insertRowAfter: -> @tableEditor.addRowAt(@activeCellPosition.row + 1)
 
-  @axis 'y', 'height', 'top', 'row', 'rows'
+  getFirstVisibleRow: ->
+    @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop)
+
+  getLastVisibleRow: ->
+    scrollViewHeight = @getRowsScrollContainer().clientHeight
+
+    @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop + scrollViewHeight)
+
+  getRowOverdraw: -> @rowOverdraw ? @configRowOverdraw
+
+  setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
@@ -315,15 +311,10 @@ class TableElement extends HTMLElement
   #    ##    ## ##     ## ##       ##     ## ##     ## ##   ### ##    ##
   #     ######   #######  ########  #######  ##     ## ##    ##  ######
 
-  getColumnAlign: (col) ->
-    @columnsAligns?[col] ? @table.getColumn(col).align
+  getColumnAlign: (col) -> @tableEditor.getScreenColumn(col).align
 
   getColumnsAligns: ->
-    [0...@table.getColumnCount()].map (col) =>
-      @columnsAligns?[col] ? @table.getColumn(col).align
-
-  setColumnsAligns: (@columnsAligns) ->
-    @requestUpdate()
+    @tableEditor.getScreenColumns().map (column) -> column.align
 
   setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
 
@@ -344,33 +335,30 @@ class TableElement extends HTMLElement
   getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
 
   insertColumnBefore: ->
-    @table.addColumnAt(@activeCellPosition.column, @getNewColumnName())
+    @tableEditor.addColumnAt(@activeCellPosition.column, @getNewColumnName())
 
   insertColumnAfter: ->
-    @table.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
+    @tableEditor.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
-  onColumnAdded: ({column}) ->
-    @updateScreenColumns()
-    @subscribeToColumn(column)
-    @requestUpdate()
+  getFirstVisibleColumn: ->
+    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
 
-  onColumnRemoved: ({column, index}) ->
-    @updateScreenColumns()
-    @unsubscribeFromColumn(column)
-    @requestUpdate()
+  getLastVisibleColumn: ->
+    scrollViewWidth = @getColumnsScrollContainer().clientWidth
 
-  subscribeToColumn: (column) ->
-    @columnSubscriptions ?= {}
-    subscription = @columnSubscriptions[column.id] = new CompositeDisposable
+    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft + scrollViewWidth)
 
-    subscription.add column.onDidChangeName => @requestUpdate()
-    subscription.add column.onDidChangeOption => @requestUpdate()
+  getColumnOverdraw: -> @columnOverdraw ? @configColumnOverdraw
 
-  unsubscribeFromColumn: (column) ->
-    @columnSubscriptions[column.id]?.dispose()
-    delete @columnSubscriptions[column.id]
+  setColumnOverdraw: (@columnOverdraw) -> @requestUpdate()
 
-  @axis 'x', 'width', 'left', 'column', 'columns'
+  isCursorColumn: (column) ->
+    @tableEditor.getCursors().some (cursor) ->
+      cursor.getPosition().column is column
+
+  isSelectedColumn: (column) ->
+    @tableEditor.getSelections().some (selection) ->
+      selection.getRowRange().containsColumn(column)
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
@@ -380,68 +368,49 @@ class TableElement extends HTMLElement
   #    ##    ## ##       ##       ##       ##    ##
   #     ######  ######## ######## ########  ######
 
-  getActiveCell: ->
-    @table.getValueAtPosition(@modelPosition(@activeCellPosition))
-
-  isActiveCell: (cell) -> @getActiveCell() is cell
-
-  isSelectedCell: (cell) -> @isSelectedPosition(@table.positionOfCell(cell))
-
-  activateCell: (cell) ->
-    @activateCellAtPosition(@table.positionOfCell(cell))
-
-  activateCellAtPosition: (position) ->
-    return unless position?
-
-    position = Point.fromObject(position)
-
-    @activeCellPosition = position
-    @afterActiveCellMove()
-
   cellScreenRect: (position) ->
-    {top, left} = @cellScreenPosition(position)
+    {top, left, width, height} = @tableEditor.getScreenCellRect(position)
 
-    width = @getScreenColumnWidthAt(position.column)
-    height = @getScreenRowHeightAt(position.row)
+    bodyOffset = @getRowsOffsetContainer().getBoundingClientRect()
+    tableOffset = @getBoundingClientRect()
+
+    top += bodyOffset.top - tableOffset.top
+    left += bodyOffset.left - tableOffset.left
 
     {top, left, width, height}
 
   cellScreenPosition: (position) ->
-    {top, left} = @cellScrollPosition(position)
+    {top, left} = @tableEditor.getScreenCellPosition(position)
 
     {
       top: top + @getRowsOffsetContainer().getBoundingClientRect().top,
       left: left + @getColumnsOffsetContainer().getBoundingClientRect().left
     }
 
-  cellScrollPosition: (position) ->
-    position = Point.fromObject(position)
-    {
-      top: @getScreenRowOffsetAt(position.row)
-      left: @getScreenColumnOffsetAt(position.column)
-    }
-
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
 
-    row = @findRowAtScreenPosition(y)
-    column = @findColumnAtScreenPosition(x)
+    bodyOffset = @getRowsOffsetContainer().getBoundingClientRect()
+
+    y -= bodyOffset.top
+    x -= bodyOffset.left
+
+    row = @tableEditor.getScreenRowIndexAtPixelPosition(y)
+    column = @tableEditor.getScreenColumnIndexAtPixelPosition(x)
 
     {row, column}
-
-  screenPosition: (position) ->
-    {row, column} = Point.fromObject(position)
-
-    {row: @modelRowToScreenRow(row), column: @modelColumnToScreenColumn(column)}
-
-  modelPosition: (position) ->
-    {row, column} = Point.fromObject(position)
-
-    {row: @screenRowToModelRow(row), column: @screenColumnToModelColumn(column)}
 
   makeCellVisible: (position) ->
     @makeRowVisible(position.row)
     @makeColumnVisible(position.column)
+
+  isCursorCell: (position) ->
+    @tableEditor.getCursors().some (cursor) ->
+      cursor.getPosition().isEqual(position)
+
+  isSelectedCell: (position) ->
+    @tableEditor.getSelections().some (selection) ->
+      selection.getRange().containsPoint(position)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -456,12 +425,12 @@ class TableElement extends HTMLElement
   hasFocus: -> this is document.activeElement
 
   moveRight: ->
-    if @activeCellPosition.column + 1 < @table.getColumnCount()
+    if @activeCellPosition.column + 1 < @tableEditor.getColumnCount()
       @activeCellPosition.column++
     else
       @activeCellPosition.column = 0
 
-      if @activeCellPosition.row + 1 < @table.getRowCount()
+      if @activeCellPosition.row + 1 < @tableEditor.getRowCount()
         @activeCellPosition.row++
       else
         @activeCellPosition.row = 0
@@ -490,7 +459,7 @@ class TableElement extends HTMLElement
     @afterActiveCellMove()
 
   moveDown: ->
-    if @activeCellPosition.row + 1 < @table.getRowCount()
+    if @activeCellPosition.row + 1 < @tableEditor.getRowCount()
       @activeCellPosition.row++
     else
       @activeCellPosition.row = 0
@@ -525,7 +494,7 @@ class TableElement extends HTMLElement
 
   pageDown: ->
     amount = @getPageMovesAmount()
-    if @activeCellPosition.row + amount < @table.getRowCount()
+    if @activeCellPosition.row + amount < @tableEditor.getRowCount()
       @activeCellPosition.row += amount
     else
       @activeCellPosition.row = @getLastRow()
@@ -565,8 +534,9 @@ class TableElement extends HTMLElement
 
     @editing = true
 
-    activeCell = @getActiveCell()
-    activeCellRect = @cellScreenRect(@activeCellPosition)
+    cursor = @tableEditor.getLastCursor()
+    position = cursor.getPosition()
+    activeCellRect = @cellScreenRect(position)
 
     @editorElement.style.top = @toUnit(activeCellRect.top)
     @editorElement.style.left = @toUnit(activeCellRect.left)
@@ -574,21 +544,24 @@ class TableElement extends HTMLElement
     @editorElement.style.height = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
 
-    @editorElement.dataset.column = activeCell.column.name
-    @editorElement.dataset.row = @activeCellPosition.row + 1
+    @editorElement.dataset.column = @tableEditor.getScreenColumn(position.column).name
+    @editorElement.dataset.row = position.row + 1
 
     @editorElement.focus()
 
-    @editor.setText(String(activeCell.getValue() ? @getUndefinedDisplay()))
+    @editor.setText(String(cursor.getValue() ? @getUndefinedDisplay()))
 
     @editor.getBuffer().history.clearUndoStack()
     @editor.getBuffer().history.clearRedoStack()
 
   confirmCellEdit: ->
     @stopEdit()
-    activeCell = @getActiveCell()
+    cursor = @tableEditor.getLastCursor()
+    position = cursor.getPosition()
+
     newValue = @editor.getText()
-    activeCell.setValue(newValue) unless newValue is activeCell.getValue()
+    unless newValue is activeCell.getValue()
+      @tableEditor.setValueAtScreenPosition(position, ewValue)
 
   startColumnEdit: ({target, pageX, pageY}) =>
     @createTextEditor() unless @editor?
@@ -1029,7 +1002,7 @@ class TableElement extends HTMLElement
       @updateRequested = false
 
   update: =>
-    return unless @table?
+    return unless @tableEditor?
     firstVisibleRow = @getFirstVisibleRow()
     lastVisibleRow = @getLastVisibleRow()
     firstVisibleColumn = @getFirstVisibleColumn()
@@ -1044,11 +1017,11 @@ class TableElement extends HTMLElement
 
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
-    lastRow = Math.min @table.getRowCount(), lastVisibleRow + rowOverdraw
+    lastRow = Math.min @tableEditor.getScreenRowCount(), lastVisibleRow + rowOverdraw
     visibleRows = [firstRow...lastRow]
     oldVisibleRows = [@firstRenderedRow...@lastRenderedRow]
 
-    columns = @table.getColumns()
+    columns = @tableEditor.getScreenColumns()
     columnOverdraw = @getColumnOverdraw()
     firstColumn = Math.max 0, firstVisibleColumn - columnOverdraw
     lastColumn = Math.min columns.length, lastVisibleColumn + columnOverdraw
@@ -1117,11 +1090,7 @@ class TableElement extends HTMLElement
     for row in [intactFirstRow...intactLastRow]
       @gutterCells[row]?.setModel({row})
       for column in [intactFirstColumn...intactLastColumn]
-        @cells[column][row]?.setModel({
-          row
-          column
-          cell: @getScreenRow(row).getCell(column)
-        })
+        @cells[column][row]?.setModel(@getCellObjectAtPosition([row, column]))
     for column in [intactFirstColumn...intactLastColumn]
       @headerCells[column]?.setModel({column: columns[column], index: column})
 
@@ -1133,47 +1102,59 @@ class TableElement extends HTMLElement
 
   updateWidthAndHeight: ->
     @tableCells.style.cssText = """
-    height: #{@getContentHeight()}px;
-    width: #{@getContentWidth()}px;
+    height: #{@tableEditor.getContentHeight()}px;
+    width: #{@tableEditor.getContentWidth()}px;
     """
     @tableGutter.style.cssText = """
-    height: #{@getContentHeight()}px;
+    height: #{@tableEditor.getContentHeight()}px;
     """
     @tableHeaderCells.style.cssText = """
-    width: #{@getContentWidth()}px;
+    width: #{@tableEditor.getContentWidth()}px;
     """
 
-    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @table.getRowCount()
+    @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @tableEditor.getScreenRowCount()
 
   updateScroll: ->
     @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
     @getGutter().scrollTop = @getRowsContainer().scrollTop
 
   updateSelection: ->
-    if @selectionSpansManyCells()
-      {top, left, width, height} = @selectionScrollRect()
-      @tableSelectionBox.style.cssText = """
-      top: #{top}px;
-      left: #{left}px;
-      height: #{height}px;
-      width: #{width}px;
-      """
-      @tableSelectionBoxHandle.style.cssText = """
-      top: #{top + height}px;
-      left: #{left + width}px;
-      """
-    else
-      @tableSelectionBox.style.cssText = "display: none"
-      @tableSelectionBoxHandle.style.cssText = "display: none"
+    # if @selectionSpansManyCells()
+    #   {top, left, width, height} = @selectionScrollRect()
+    #   @tableEditorSelectionBox.style.cssText = """
+    #   top: #{top}px;
+    #   left: #{left}px;
+    #   height: #{height}px;
+    #   width: #{width}px;
+    #   """
+    #   @tableEditorSelectionBoxHandle.style.cssText = """
+    #   top: #{top + height}px;
+    #   left: #{left + width}px;
+    #   """
+    # else
+    #   @tableEditorSelectionBox.style.cssText = "display: none"
+    #   @tableEditorSelectionBoxHandle.style.cssText = "display: none"
 
-  getScreenCellAt: (row, column) -> @cells[column][row]
+  getScreenCellAtPosition: (position) ->
+    position = Point.fromObject(position)
+    @cells[position.column][position.row]
 
   appendCell: (row, column) ->
     @cells[column] ?= []
     return @cells[column][row] if @cells[column][row]?
 
-    cell = @getScreenRow(row).getCell(column)
-    @cells[column][row] = @requestCell({cell, column, row})
+    @cells[column][row] = @requestCell(@getCellObjectAtPosition([row, column]))
+
+  getCellObjectAtPosition: (position) ->
+    {row, column} = Point.fromObject(position)
+
+    {
+      cell:
+        value: @tableEditor.getValueAtScreenPosition([row, column])
+        column: @tableEditor.getScreenColumn(column)
+      column
+      row
+    }
 
   disposeCell: (row, column) ->
     cell = @cells[column]?[row]
@@ -1218,7 +1199,7 @@ class TableElement extends HTMLElement
 module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
 
 TableElement.registerViewProvider = ->
-  atom.views.addViewProvider Table, (model) ->
+  atom.views.addViewProvider TableEditor, (model) ->
     element = new TableElement
     element.setModel(model)
     element

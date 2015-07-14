@@ -10,18 +10,25 @@ module.exports =
 class TableEditor
   Delegator.includeInto(this)
 
+  @delegatesProperties(
+    'order', 'direction',
+    toProperty: 'displayTable'
+  )
   @delegatesMethods(
     'screenPosition', 'modelPosition',
     'screenRowToModelRow', 'modelRowToScreenRow',
+    'getContentWidth', 'getContentHeight',
     'getValueAtPosition', 'setValueAtPosition',
     'getValueAtScreenPosition', 'setValueAtScreenPosition',
     'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getScreenRowIndexAtPixelPosition',
-    'onDidAddRow', 'onDidRemoveRow',
+    'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
-    'getScreenColumnWidth', 'getScreenColumnWidthAt', 'getScreenColumnOffsetAt'
+    'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition',
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt',
-    'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidChangeColumnName',
+    'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn',
+    'getScreenCellRect', 'getScreenCellPosition',
+    'onDidChangeCellValue',
     'sortBy',
     toProperty: 'displayTable'
   )
