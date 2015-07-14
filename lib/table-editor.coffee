@@ -21,7 +21,7 @@ class TableEditor
     'getValueAtPosition', 'setValueAtPosition',
     'getValueAtScreenPosition', 'setValueAtScreenPosition',
     'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
-    'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getScreenRowIndexAtPixelPosition',
+    'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
     'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition',
@@ -29,7 +29,7 @@ class TableEditor
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn',
     'getScreenCellRect', 'getScreenCellPosition',
     'onDidChangeCellValue',
-    'sortBy',
+    'sortBy', 'toggleSortDirection', 'resetSort',
     toProperty: 'displayTable'
   )
 
@@ -215,3 +215,51 @@ class TableEditor
       else
         positions[position] = true
     return
+
+  moveUp: (delta=1) -> @moveCursors (cursor) -> @cursor.moveUp(delta)
+
+  moveDown: (delta=1) -> @moveCursors (cursor) -> @cursor.moveDown(delta)
+
+  moveLeft: (delta=1) -> @moveCursors (cursor) -> @cursor.moveLeft(delta)
+
+  moveRight: (delta=1) -> @moveCursors (cursor) -> @cursor.moveRight(delta)
+
+  moveToTop: -> @moveCursors (cursor) -> @cursor.moveRight(delta)
+
+  moveToBottom: ->
+    end = @getLastRow()
+    return if @activeCellPosition.row is end
+
+    @activeCellPosition.row = end
+    @afterActiveCellMove()
+
+  moveToLeft: ->
+    return if @activeCellPosition.column is 0
+
+    @activeCellPosition.column = 0
+    @afterActiveCellMove()
+
+  moveToRight: ->
+    end = @getLastColumn()
+    return if @activeCellPosition.column is end
+
+    @activeCellPosition.column = end
+    @afterActiveCellMove()
+
+  pageDown: ->
+    amount = @getPageMovesAmount()
+    if @activeCellPosition.row + amount < @tableEditor.getRowCount()
+      @activeCellPosition.row += amount
+    else
+      @activeCellPosition.row = @getLastRow()
+
+    @afterActiveCellMove()
+
+  pageUp: ->
+    amount = @getPageMovesAmount()
+    if @activeCellPosition.row - amount >= 0
+      @activeCellPosition.row -= amount
+    else
+      @activeCellPosition.row = 0
+
+    @afterActiveCellMove()

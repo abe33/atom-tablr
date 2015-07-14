@@ -113,15 +113,15 @@ class TableElement extends HTMLElement
 
     @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
-        columnIndex = @findColumnAtScreenPosition(e.pageX, e.pageY)
-        if column = @getScreenColumn(columnIndex)
-          if column.name is @order
-            if @direction is -1
-              @resetSort()
+        columnIndex = @getScreenColumnIndexAtPixelPosition(e.pageX, e.pageY)
+        if column = @tableEditor.getScreenColumn(columnIndex)
+          if column.name is @tableEditor.order
+            if @tableEditor.direction is -1
+              @tableEditor.resetSort()
             else
-              @toggleSortDirection()
+              @tableEditor.toggleSortDirection()
           else
-            @sortBy(column.name)
+            @tableEditor.sortBy(column.name)
 
     @subscriptions.add @subscribeTo @getRowsContainer(),
       'scroll': (e) => @requestUpdate()
@@ -275,7 +275,8 @@ class TableElement extends HTMLElement
     @tableEditor.getSelections().some (selection) ->
       selection.getRowRange().containsRow(row)
 
-  getRowRange: (row) -> Range.fromObject([[row, 0], [row, @getLastColumn()]])
+  getRowRange: (row) ->
+    Range.fromObject([[row, 0], [row, @tableEditor.getLastColumnIndex()]])
 
   getRowsContainer: -> @tableRows
 
@@ -303,6 +304,39 @@ class TableElement extends HTMLElement
 
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
+  getScreenRowIndexAtPixelPosition: (y) ->
+    y -= @getRowsOffsetContainer().getBoundingClientRect().left
+
+    @tableEditor.getScreenRowIndexAtPixelPosition(y)
+
+  rowScreenPosition: (row) ->
+    top = @tableEditor.getScreenRowOffsetAt(row)
+
+    content = @getRowsScrollContainer()
+    contentOffset = content.getBoundingClientRect()
+
+    top + contentOffset.top
+
+  makeRowVisible: (row) ->
+    container = @getRowsScrollContainer()
+    rowHeight = @tableEditor.getScreenRowHeightAt(row)
+
+    scrollViewHeight = container.offsetHeight
+    currentScrollTop = container.scrollTop
+
+    rowOffset = @tableEditor.getScreenRowOffsetAt(row)
+
+    scrollTopAsFirstVisibleRow = rowOffset
+    scrollTopAsLastVisibleRow = rowOffset - (scrollViewHeight - rowHeight)
+
+    return if scrollTopAsFirstVisibleRow >= currentScrollTop and
+              scrollTopAsFirstVisibleRow + rowHeight <= currentScrollTop + scrollViewHeight
+
+    if rowOffset > currentScrollTop
+      container.scrollTop = scrollTopAsLastVisibleRow
+    else
+      container.scrollTop = scrollTopAsFirstVisibleRow
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -319,7 +353,7 @@ class TableElement extends HTMLElement
   setAbsoluteColumnsWidths: (@absoluteColumnsWidths) -> @requestUpdate()
 
   setColumnsWidths: (columnsWidths) ->
-    @getScreenColumn(i).width = w for w,i in columnsWidths
+    @tableEditor.getScreenColumn(i).width = w for w,i in columnsWidths
     @requestUpdate()
 
   getColumnsContainer: -> @tableHeaderRow
@@ -341,12 +375,12 @@ class TableElement extends HTMLElement
     @tableEditor.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
 
   getFirstVisibleColumn: ->
-    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
+    @getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
 
   getLastVisibleColumn: ->
     scrollViewWidth = @getColumnsScrollContainer().clientWidth
 
-    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft + scrollViewWidth)
+    @getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft + scrollViewWidth)
 
   getColumnOverdraw: -> @columnOverdraw ? @configColumnOverdraw
 
@@ -359,6 +393,39 @@ class TableElement extends HTMLElement
   isSelectedColumn: (column) ->
     @tableEditor.getSelections().some (selection) ->
       selection.getRowRange().containsColumn(column)
+
+  getScreenColumnIndexAtPixelPosition: (x) ->
+    x -= @getColumnsOffsetContainer().getBoundingClientRect().left
+
+    @tableEditor.getScreenColumnIndexAtPixelPosition(x)
+
+  columnScreenPosition: (column) ->
+    left = @tableEditor.getScreenColumnOffsetAt(column)
+
+    content = @getColumnsScrollContainer()
+    contentOffset = content.getBoundingClientRect()
+
+    left + contentOffset.left
+
+  makeColumnVisible: (column) ->
+    container = @getColumnsScrollContainer()
+    columnWidth = @tableEditor.getScreenColumnWidthAt(column)
+
+    scrollViewWidth = container.offsetWidth
+    currentScrollLeft = container.scrollLeft
+
+    columnOffset = @tableEditorgetScreenColumnOffsetAt(column)
+
+    scrollLeftAsFirstVisibleColumn = columnOffset
+    scrollLeftAsLastVisibleColumn = columnOffset - (scrollViewWidth - columnWidth)
+
+    return if scrollLeftAsFirstVisibleColumn >= currentScrollLeft and
+              scrollLeftAsFirstVisibleColumn + columnWidth <= currentScrollLeft + scrollViewWidth
+
+    if columnOffset > currentScrollLeft
+      container.scrollLeft = scrollLeftAsLastVisibleColumn
+    else
+      container.scrollLeft = scrollLeftAsFirstVisibleColumn
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
@@ -570,8 +637,8 @@ class TableElement extends HTMLElement
 
     @editing = true
 
-    columnIndex = @findColumnAtScreenPosition(pageX, pageY)
-    if @columnUnderEdit = @getScreenColumn(columnIndex)
+    columnIndex = @getScreenColumnIndexAtPixelPosition(pageX, pageY)
+    if @columnUnderEdit = @tableEditor.getScreenColumn(columnIndex)
       columnRect = target.parentNode.getBoundingClientRect()
 
       @editorElement.style.top = @toUnit(columnRect.top)
@@ -824,7 +891,7 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    row = @findRowAtScreenPosition(e.pageY)
+    row = @getScreenRowIndexAtPixelPosition(e.pageY)
     @setSelection(@getRowRange(row)) if row?
 
     @initializeDragEvents @body,
@@ -833,7 +900,7 @@ class TableElement extends HTMLElement
 
   gutterDrag: (e) ->
     if @dragging
-      row = @findRowAtScreenPosition(e.pageY)
+      row = @getScreenRowIndexAtPixelPosition(e.pageY)
 
       if row < @activeCellPosition.row
         @selection.start.row = row
@@ -860,7 +927,7 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    row = @findRowAtScreenPosition(e.pageY)
+    row = @getScreenRowIndexAtPixelPosition(e.pageY)
 
     handle = e.target
     handleHeight = handle.offsetHeight
@@ -869,7 +936,7 @@ class TableElement extends HTMLElement
 
     initial = {row, handle, handleHeight, dragOffset}
 
-    rulerTop = @getScreenRowOffsetAt(row) + @getScreenRowHeightAt(row)
+    rulerTop = @tableEditor.getScreenRowOffsetAt(row) + @tableEditor.getScreenRowHeightAt(row)
 
     ruler = @getRowResizeRuler()
     ruler.classList.add('visible')
@@ -882,7 +949,7 @@ class TableElement extends HTMLElement
   rowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
     if @dragging
       ruler = @getRowResizeRuler()
-      rulerTop = Math.max(@getMinimumRowHeight(), pageY - @body.getBoundingClientRect().top + dragOffset + handleHeight - ruler.offsetHeight)
+      rulerTop = Math.max(@tableEditor.getMinimumRowHeight(), pageY - @body.getBoundingClientRect().top + dragOffset + handleHeight - ruler.offsetHeight)
       ruler.style.top = @toUnit(rulerTop)
 
   endRowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
@@ -890,7 +957,7 @@ class TableElement extends HTMLElement
 
     rowY = @rowScreenPosition(row) - @getRowsScrollContainer().scrollTop
     newRowHeight = pageY - rowY + dragOffset + handleHeight
-    @setScreenRowHeightAt(row, Math.max(@getMinimumRowHeight(), newRowHeight))
+    @tableEditor.setScreenRowHeightAt(row, Math.max(@tableEditor.getMinimumRowHeight(), newRowHeight))
     @getRowResizeRuler().classList.remove('visible')
 
     @dragSubscription.dispose()
@@ -930,8 +997,8 @@ class TableElement extends HTMLElement
 
     moveX = pageX - startX
 
-    column = @getScreenColumn(position)
-    width = @getScreenColumnWidthAt(position)
+    column = @tableEditor.getScreenColumn(position)
+    width = @tableEditor.getScreenColumnWidthAt(position)
     column.width = width + moveX
 
     @getColumnResizeRuler().classList.remove('visible')
@@ -1086,6 +1153,7 @@ class TableElement extends HTMLElement
         for column in [@lastRenderedColumn...lastColumn]
           @appendHeaderCell(columns[column], column)
           @appendCell(row, column) for row in visibleRows
+
 
     for row in [intactFirstRow...intactLastRow]
       @gutterCells[row]?.setModel({row})

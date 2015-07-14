@@ -400,9 +400,6 @@ class DisplayTable
 
     @rowOffsets = offsets
 
-  sortBy: (@order, @direction=1) ->
-    @updateScreenRows()
-
   updateScreenRows: ->
     rows = @table.getRows()
     @screenRows = rows.concat()
@@ -479,3 +476,22 @@ class DisplayTable
     height = @getScreenRowHeightAt(position.row)
 
     {top, left, width, height}
+
+  ##     ######   #######  ########  ########
+  ##    ##    ## ##     ## ##     ##    ##
+  ##    ##       ##     ## ##     ##    ##
+  ##     ######  ##     ## ########     ##
+  ##          ## ##     ## ##   ##      ##
+  ##    ##    ## ##     ## ##    ##     ##
+  ##     ######   #######  ##     ##    ##
+
+  sortBy: (@order, @direction=1) ->
+    @updateScreenRows()
+
+  toggleSortDirection: ->
+    @direction *= -1
+    @updateScreenRows()
+
+  resetSort: ->
+    @order = null
+    @updateScreenRows()

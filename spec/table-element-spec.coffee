@@ -274,9 +274,9 @@ describe 'tableElement', ->
     it 'translates the content by the amount of scroll', ->
       expect(tableElement.getRowsContainer().scrollTop).toEqual(100)
 
-    it 'does not render new rows', ->
+    it 'renders new rows', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-      expect(cells.length).toEqual(18 * 3)
+      expect(cells.length).toEqual(23 * 3)
 
   describe 'when scrolled by 300px', ->
     beforeEach ->
@@ -439,7 +439,6 @@ describe 'tableElement', ->
   #    ##     ## ##       ##     ## ##     ## ##       ##    ##
   #    ##     ## ######## ##     ## ########  ######## ##     ##
 
-  ###
   it 'has a header', ->
     expect(tableShadowRoot.querySelector('.table-edit-header')).toExist()
 
@@ -484,16 +483,16 @@ describe 'tableElement', ->
         mousedown(column)
 
       it 'changes the sort order to use the clicked column', ->
-        expect(tableElement.order).toEqual('foo')
-        expect(tableElement.direction).toEqual(1)
+        expect(tableEditor.order).toEqual('foo')
+        expect(tableEditor.direction).toEqual(1)
 
       describe 'a second time', ->
         beforeEach ->
           mousedown(column)
 
         it 'toggles the sort direction', ->
-          expect(tableElement.order).toEqual('foo')
-          expect(tableElement.direction).toEqual(-1)
+          expect(tableEditor.order).toEqual('foo')
+          expect(tableEditor.direction).toEqual(-1)
 
       describe 'a third time', ->
         beforeEach ->
@@ -501,7 +500,7 @@ describe 'tableElement', ->
           mousedown(column)
 
         it 'removes the sorting order', ->
-          expect(tableElement.order).toBeNull()
+          expect(tableEditor.order).toBeNull()
 
       describe 'when the columns size have been changed', ->
         beforeEach ->
@@ -512,8 +511,8 @@ describe 'tableElement', ->
           mousedown(column)
 
         it 'changes the sort order to use the clicked column', ->
-          expect(tableElement.order).toEqual('value')
-          expect(tableElement.direction).toEqual(1)
+          expect(tableEditor.order).toEqual('value')
+          expect(tableEditor.direction).toEqual(1)
 
     describe 'dragging a resize handle', ->
       beforeEach ->
@@ -527,9 +526,9 @@ describe 'tableElement', ->
         mousedown(handle)
         mouseup(handle, x + 50, y)
 
-        expect(tableEditor.getColumn(0).width).toBeCloseTo(100)
-        expect(tableEditor.getColumn(1).width).toBeCloseTo(150)
-        expect(tableEditor.getColumn(2).width).toBeCloseTo(100)
+        expect(tableEditor.getScreenColumn(0).width).toBeCloseTo(100)
+        expect(tableEditor.getScreenColumn(1).width).toBeCloseTo(150)
+        expect(tableEditor.getScreenColumn(2).width).toBeCloseTo(100)
 
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
@@ -580,30 +579,27 @@ describe 'tableElement', ->
           expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
 
         it 'changes the cell value', ->
-          expect(tableElement.tableEditor.getColumn(0).name).toEqual('foobar')
+          expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
 
       describe 'table-edit:move-right', ->
         it 'confirms the current edit and moves the active cursor to the right', ->
-          previousActiveCell = tableElement.getLastActiveCell()
           spyOn(tableElement, 'moveRight')
           editor.setText('Foo Bar')
           atom.commands.dispatch(editorElement, 'table-edit:move-right')
 
           expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.tableEditor.getColumn(0).name).toEqual('Foo Bar')
           expect(tableElement.moveRight).toHaveBeenCalled()
+          expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
 
       describe 'table-edit:move-left', ->
         it 'confirms the current edit and moves the active cursor to the left', ->
-          previousActiveCell = tableElement.getLastActiveCell()
           spyOn(tableElement, 'moveLeft')
           editor.setText('Foo Bar')
           atom.commands.dispatch(editorElement, 'table-edit:move-left')
 
           expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.tableEditor.getColumn(0).name).toEqual('Foo Bar')
           expect(tableElement.moveLeft).toHaveBeenCalled()
-  ###
+          expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
 
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
@@ -612,7 +608,7 @@ describe 'tableElement', ->
   #    ##    ##  ##     ##    ##       ##    ##       ##   ##
   #    ##    ##  ##     ##    ##       ##    ##       ##    ##
   #     ######    #######     ##       ##    ######## ##     ##
-  ###
+
   describe 'gutter', ->
     describe 'when scrolled', ->
       beforeEach ->
@@ -640,15 +636,15 @@ describe 'tableElement', ->
         expect(gutter.querySelectorAll('atom-table-gutter-cell .row-resize-handle').length)
         .toEqual(18)
 
-      describe 'pressing the mouse on a gutter cell', ->
+      xdescribe 'pressing the mouse on a gutter cell', ->
         beforeEach ->
           cell = gutter.querySelectorAll('atom-table-gutter-cell')[2]
           mousedown(cell)
           nextAnimationFrame()
 
         it 'selects the whole line', ->
-          expect(tableElement.activeCellPosition).toEqual([2,0])
-          expect(tableElement.getSelection()).toEqual([[2,0],[2,2]])
+          expect(tableEditor.getLastCursor().getPosition()).toEqual([2,0])
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[2,0],[2,2]])
 
         describe 'then dragging the mouse down', ->
           beforeEach ->
@@ -657,8 +653,8 @@ describe 'tableElement', ->
             nextAnimationFrame()
 
           it 'expands the selection with the covered rows', ->
-            expect(tableElement.activeCellPosition).toEqual([2,0])
-            expect(tableElement.getSelection()).toEqual([[2,0],[4,2]])
+            expect(tableEditor.getLastCursor().getPosition()).toEqual([2,0])
+            expect(tableElement.getLastSelection().getRange()).toEqual([[2,0],[4,2]])
 
           describe 'until reaching the bottom of the view', ->
             beforeEach ->
@@ -676,10 +672,10 @@ describe 'tableElement', ->
               nextAnimationFrame()
 
             it 'changes the selection using the active cell as pivot', ->
-              expect(tableElement.activeCellPosition).toEqual([2,0])
-              expect(tableElement.getSelection()).toEqual([[0,0],[2,2]])
+              expect(tableEditor.getLastCursor().getPosition()).toEqual([2,0])
+              expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[2,2]])
 
-      describe 'dragging the mouse over gutter cells and reaching the top of the view', ->
+      xdescribe 'dragging the mouse over gutter cells and reaching the top of the view', ->
         it 'scrolls the view', ->
           tableElement.setScrollTop(300)
           nextAnimationFrame()
@@ -700,7 +696,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mouseup(handle, x, y + 50)
 
-          expect(tableElement.getRowHeightAt(2)).toEqual(70)
+          expect(tableEditor.getRowHeightAt(2)).toEqual(70)
 
         it 'displays a ruler when the drag have begun', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -743,7 +739,7 @@ describe 'tableElement', ->
 
           mouseup(handle, x, y - 20)
 
-          expect(tableElement.getRowHeightAt(2)).toEqual(10)
+          expect(tableEditor.getRowHeightAt(2)).toEqual(10)
 
       describe 'when an editor is opened', ->
         [editor, editorElement] = []
@@ -764,7 +760,6 @@ describe 'tableElement', ->
           expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
           expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
-  ###
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##

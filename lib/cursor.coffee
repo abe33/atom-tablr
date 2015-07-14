@@ -31,29 +31,29 @@ class Cursor
       column: Math.min(@tableEditor.getScreenColumnCount(), @position.column + 1)
     })
 
-  moveUp: ->
-    newRow = @position.row - 1
+  moveUp: (delta=1) ->
+    newRow = @position.row - delta
     newRow = @tableEditor.getScreenRowCount() - 1 if newRow < 0
 
     @position.row = newRow
     @cursorMoved()
 
-  moveDown: ->
-    newRow = @position.row + 1
+  moveDown: (delta=1) ->
+    newRow = @position.row + delta
     newRow = 0 if newRow >= @tableEditor.getScreenRowCount()
 
     @position.row = newRow
     @cursorMoved()
 
-  moveLeft: ->
-    newColumn = @position.column - 1
+  moveLeft: (delta=1) ->
+    newColumn = @position.column - delta
     newColumn = @tableEditor.getScreenColumnCount() - 1 if newColumn < 0
 
     @position.column = newColumn
     @cursorMoved()
 
-  moveRight: ->
-    newColumn = @position.column + 1
+  moveRight: (delta=1) ->
+    newColumn = @position.column + delta
     newColumn = 0 if newColumn >= @tableEditor.getScreenColumnCount()
 
     @position.column = newColumn
