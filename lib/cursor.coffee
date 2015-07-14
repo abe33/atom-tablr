@@ -59,6 +59,30 @@ class Cursor
     @position.column = newColumn
     @cursorMoved()
 
+  moveToTop: ->
+    @moveUp(@position.row)
+
+  moveToBottom: ->
+    @moveDown(@tableEditor.getScreenRowCount() - @position.row - 1)
+
+  moveToLeft: ->
+    @moveLeft(@position.column)
+
+  moveToRight: ->
+    @moveRight(@tableEditor.getScreenColumnCount() - @position.column - 1)
+
+  pageUp: ->
+    @moveUp(atom.config.get('table-edit.pageMovesAmount'))
+
+  pageDown: ->
+    @moveDown(atom.config.get('table-edit.pageMovesAmount'))
+
+  pageLeft: ->
+    @moveLeft(atom.config.get('table-edit.pageMovesAmount'))
+
+  pageRight: ->
+    @moveRight(atom.config.get('table-edit.pageMovesAmount'))
+
   cursorMoved: (resetSelection=true) ->
     @selection.resetRangeOnCursor() if resetSelection
     eventObject = cursor: this

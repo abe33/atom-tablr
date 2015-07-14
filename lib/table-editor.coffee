@@ -224,42 +224,18 @@ class TableEditor
 
   moveRight: (delta=1) -> @moveCursors (cursor) -> @cursor.moveRight(delta)
 
-  moveToTop: -> @moveCursors (cursor) -> @cursor.moveRight(delta)
+  moveToTop: -> @moveCursors (cursor) -> @cursor.moveToTop()
 
-  moveToBottom: ->
-    end = @getLastRow()
-    return if @activeCellPosition.row is end
+  moveToBottom: -> @moveCursors (cursor) -> @cursor.moveToBottom()
 
-    @activeCellPosition.row = end
-    @afterActiveCellMove()
+  moveToLeft: -> @moveCursors (cursor) -> @cursor.moveToLeft()
 
-  moveToLeft: ->
-    return if @activeCellPosition.column is 0
+  moveToRight: -> @moveCursors (cursor) -> @cursor.moveToRight()
 
-    @activeCellPosition.column = 0
-    @afterActiveCellMove()
+  pageUp: -> @moveCursors (cursor) -> @cursor.pageUp()
 
-  moveToRight: ->
-    end = @getLastColumn()
-    return if @activeCellPosition.column is end
+  pageDown: -> @moveCursors (cursor) -> @cursor.pageDown()
 
-    @activeCellPosition.column = end
-    @afterActiveCellMove()
+  pageLeft: -> @moveCursors (cursor) -> @cursor.pageLeft()
 
-  pageDown: ->
-    amount = @getPageMovesAmount()
-    if @activeCellPosition.row + amount < @tableEditor.getRowCount()
-      @activeCellPosition.row += amount
-    else
-      @activeCellPosition.row = @getLastRow()
-
-    @afterActiveCellMove()
-
-  pageUp: ->
-    amount = @getPageMovesAmount()
-    if @activeCellPosition.row - amount >= 0
-      @activeCellPosition.row -= amount
-    else
-      @activeCellPosition.row = 0
-
-    @afterActiveCellMove()
+  pageRight: -> @moveCursors (cursor) -> @cursor.pageRight()

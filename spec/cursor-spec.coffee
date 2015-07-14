@@ -13,6 +13,7 @@ describe 'Cursor', ->
     atom.config.set 'table-edit.minimuColumnWidth', 10
     atom.config.set 'table-edit.rowHeight', 20
     atom.config.set 'table-edit.minimumRowHeight', 10
+    atom.config.set 'table-edit.pageMovesAmount', 3
 
     table = new Table
 
@@ -99,3 +100,59 @@ describe 'Cursor', ->
         cursor.moveRight()
         cursor.moveRight()
         expect(cursor.position).toEqual([1,0])
+
+  describe '::moveToTop', ->
+    it 'moves the cursor all the way to the top', ->
+      cursor.moveToTop()
+
+      expect(cursor.position).toEqual([0,1])
+
+  describe '::moveToBottom', ->
+    it 'moves the cursor all the way to the bottom', ->
+      cursor.moveToBottom()
+
+      expect(cursor.position).toEqual([2,1])
+
+  describe '::moveToLeft', ->
+    it 'moves the cursor all the way to the left', ->
+      cursor.moveToLeft()
+
+      expect(cursor.position).toEqual([1,0])
+
+  describe '::moveToRight', ->
+    it 'moves the cursor all the way to the right', ->
+      cursor.moveToRight()
+
+      expect(cursor.position).toEqual([1,2])
+
+  describe '::pageUp', ->
+    it 'moves the cursor by the amount of page moves', ->
+      spyOn(cursor, 'moveUp')
+
+      cursor.pageUp()
+
+      expect(cursor.moveUp).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
+
+  describe '::pageDown', ->
+    it 'moves the cursor by the amount of page moves', ->
+      spyOn(cursor, 'moveDown')
+
+      cursor.pageDown()
+
+      expect(cursor.moveDown).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
+
+  describe '::pageLeft', ->
+    it 'moves the cursor by the amount of page moves', ->
+      spyOn(cursor, 'moveLeft')
+
+      cursor.pageLeft()
+
+      expect(cursor.moveLeft).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
+
+  describe '::pageRight', ->
+    it 'moves the cursor by the amount of page moves', ->
+      spyOn(cursor, 'moveRight')
+
+      cursor.pageRight()
+
+      expect(cursor.moveRight).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
