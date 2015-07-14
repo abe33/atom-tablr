@@ -17,10 +17,11 @@ class TableEditor
     'getValueAtScreenPosition', 'setValueAtScreenPosition',
     'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getScreenRowIndexAtPixelPosition',
-    'onDidAddRow',
+    'onDidAddRow', 'onDidRemoveRow',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
     'getScreenColumnWidth', 'getScreenColumnWidthAt', 'getScreenColumnOffsetAt'
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt',
+    'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidChangeColumnName',
     'sortBy',
     toProperty: 'displayTable'
   )

@@ -41,6 +41,12 @@ class DisplayTable
   onDidRenameColumn: (callback) ->
     @emitter.on 'did-rename-column', callback
 
+  onDidChangeColumnName: (callback) ->
+    @emitter.on 'did-change-column-options', callback
+
+  onDidChangeColumnOption: (callback) ->
+    @emitter.on 'did-change-column-options', callback
+
   onDidChangeCellValue: (callback) ->
     @emitter.on 'did-change-cell-value', callback
 
@@ -207,11 +213,20 @@ class DisplayTable
     subs = new CompositeDisposable
     @screenColumnsSubscriptions.set(screenColumn, subs)
 
-    subs.add screenColumn.onDidChangeName ({oldName, newName}) =>
+    subs.add screenColumn.onDidChangeName ({oldName, newName, column}) =>
       @table.changeColumnName(oldName, newName)
+      @emitter.emit 'did-change-column-options', {
+        oldName, newName, column, index: @screenColumns.indexOf(event.column)
+      }
+
+    subs.add screenColumn.onDidChangeOption (event) =>
+      newEvent = _.clone(event)
+      newEvent.index = @screenColumns.indexOf(event.column)
+      @emitter.emit 'did-change-column-options', newEvent
 
   unsubscribeFromScreenColumn: (screenColumn) ->
     subs = @screenColumnsSubscriptions.get(screenColumn)
+    @screenColumnsSubscriptions.delete(screenColumn)
     subs?.dispose()
 
   ##    ########   #######  ##      ##  ######

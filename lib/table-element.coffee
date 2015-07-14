@@ -258,7 +258,7 @@ class TableElement extends HTMLElement
     @modelSubscriptions = new CompositeDisposable()
     @modelSubscriptions.add @table.onDidAddColumn (e) => @onColumnAdded(e)
     @modelSubscriptions.add @table.onDidRemoveColumn (e) => @onColumnRemoved(e)
-    @modelSubscriptions.add @table.onDidChangeColumnsOptions =>
+    @modelSubscriptions.add @table.onDidChangeColumnOption =>
       @computeColumnOffsets()
       @requestUpdate()
     @modelSubscriptions.add @table.onDidChangeRows =>
