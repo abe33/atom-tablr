@@ -43,29 +43,6 @@ class Selection
 
   getLastSelectedColumn: -> @range.end.column - 1
 
-  expandLeft: (delta=1) ->
-    if @expandedRight()
-      newColumn = @range.end.column - delta
-      if newColumn <= @getFirstSelectedColumn()
-        @range.end.column = @getFirstSelectedColumn() + 1
-        @range.start.column = Math.max(0, newColumn)
-      else
-        @range.end.column = newColumn
-    else
-      @range.start.column = Math.max(0, @range.start.column - delta)
-
-  expandRight: (delta=1) ->
-    columnCount = @tableEditor.getScreenColumnCount()
-    if @expandedLeft()
-      newColumn = @range.start.column + delta
-      if newColumn > @range.end.column
-        @range.start.column = @getLastSelectedColumn()
-        @range.end.column = Math.min(columnCount, newColumn)
-      else
-        @range.start.column = newColumn
-    else
-      @range.end.column = Math.min(columnCount, @range.end.column + delta)
-
   expandUp: (delta=1) ->
     if @expandedDown()
       newRow = @range.end.row - delta
@@ -89,13 +66,44 @@ class Selection
     else
       @range.end.row = Math.min(@tableEditor.getScreenRowCount(), @range.end.row + delta)
 
-  expandedRight: ->
-    @getCursor().getPosition().column is @getFirstSelectedColumn() and
-    @getCursor().getPosition().column isnt @getLastSelectedColumn()
+  expandLeft: (delta=1) ->
+    if @expandedRight()
+      newColumn = @range.end.column - delta
+      if newColumn <= @getFirstSelectedColumn()
+        @range.end.column = @getFirstSelectedColumn() + 1
+        @range.start.column = Math.max(0, newColumn)
+      else
+        @range.end.column = newColumn
+    else
+      @range.start.column = Math.max(0, @range.start.column - delta)
 
-  expandedLeft: ->
-    @getCursor().getPosition().column is @getLastSelectedColumn() and
-    @getCursor().getPosition().column isnt @getFirstSelectedColumn()
+  expandRight: (delta=1) ->
+    columnCount = @tableEditor.getScreenColumnCount()
+    if @expandedLeft()
+      newColumn = @range.start.column + delta
+      if newColumn > @range.end.column
+        @range.start.column = @getLastSelectedColumn()
+        @range.end.column = Math.min(columnCount, newColumn)
+      else
+        @range.start.column = newColumn
+    else
+      @range.end.column = Math.min(columnCount, @range.end.column + delta)
+
+  expandToTop: ->
+    if @expandedDown()
+      end = @range.start.row + 1
+      @range.start.row = 0
+      @range.end.row = end
+    else
+      @range.start.row = 0
+
+  expandToBottom: ->
+    if @expandedUp()
+      start = @range.end.row - 1
+      @range.start.row = start
+      @range.end.row = @tableEditor.getScreenRowCount()
+    else
+      @range.end.row = @tableEditor.getScreenRowCount()
 
   expandedUp: ->
     @getCursor().getPosition().row is @getLastSelectedRow() and
@@ -104,6 +112,14 @@ class Selection
   expandedDown: ->
     @getCursor().getPosition().row is @getFirstSelectedRow() and
     @getCursor().getPosition().row isnt @getLastSelectedRow()
+
+  expandedRight: ->
+    @getCursor().getPosition().column is @getFirstSelectedColumn() and
+    @getCursor().getPosition().column isnt @getLastSelectedColumn()
+
+  expandedLeft: ->
+    @getCursor().getPosition().column is @getLastSelectedColumn() and
+    @getCursor().getPosition().column isnt @getFirstSelectedColumn()
 
   spanMoreThanOneCell: -> @range.spanMoreThanOneCell()
 

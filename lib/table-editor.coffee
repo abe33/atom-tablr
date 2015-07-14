@@ -117,6 +117,18 @@ class TableEditor
     @selections.splice(@selections.indexOf(selection), 1)
     @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
 
+  expandUp: (delta) ->
+    @modifySelections (selection) -> selection.expandUp(delta)
+
+  expandDown: (delta) ->
+    @modifySelections (selection) -> selection.expandDown(delta)
+
+  expandLeft: (delta) ->
+    @modifySelections (selection) -> selection.expandLeft(delta)
+
+  expandRight: (delta) ->
+    @modifySelections (selection) -> selection.expandRight(delta)
+
   modifySelections: (fn) ->
     fn(selection) for selection in @getSelections()
     @mergeSelections()
