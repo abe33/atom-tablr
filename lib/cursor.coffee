@@ -47,14 +47,25 @@ class Cursor
 
   moveLeft: (delta=1) ->
     newColumn = @position.column - delta
-    newColumn = @tableEditor.getScreenColumnCount() - 1 if newColumn < 0
+
+    if newColumn < 0
+      newColumn = @tableEditor.getScreenColumnCount() - 1
+      newRow = @position.row - 1
+      newRow = @tableEditor.getScreenRowCount() - 1 if newRow < 0
+
+      @position.row = newRow
 
     @position.column = newColumn
     @cursorMoved()
 
   moveRight: (delta=1) ->
     newColumn = @position.column + delta
-    newColumn = 0 if newColumn >= @tableEditor.getScreenColumnCount()
+    if newColumn >= @tableEditor.getScreenColumnCount()
+      newColumn = 0
+      newRow = @position.row + 1
+      newRow = 0 if newRow >= @tableEditor.getScreenRowCount()
+
+      @position.row = newRow
 
     @position.column = newColumn
     @cursorMoved()
@@ -72,16 +83,24 @@ class Cursor
     @moveRight(@tableEditor.getScreenColumnCount() - @position.column - 1)
 
   pageUp: ->
-    @moveUp(atom.config.get('table-edit.pageMovesAmount'))
+    newRow = @position.row - atom.config.get('table-edit.pageMovesAmount')
+    @position.row = Math.max 0, newRow
+    @cursorMoved()
 
   pageDown: ->
-    @moveDown(atom.config.get('table-edit.pageMovesAmount'))
+    newRow = @position.row + atom.config.get('table-edit.pageMovesAmount')
+    @position.row = Math.min @tableEditor.getLastRowIndex(), newRow
+    @cursorMoved()
 
   pageLeft: ->
-    @moveLeft(atom.config.get('table-edit.pageMovesAmount'))
+    newColumn = @position.column - atom.config.get('table-edit.pageMovesAmount')
+    @position.column = Math.max 0, newColumn
+    @cursorMoved()
 
   pageRight: ->
-    @moveRight(atom.config.get('table-edit.pageMovesAmount'))
+    newColumn = @position.column + atom.config.get('table-edit.pageMovesAmount')
+    @position.column = Math.min @tableEditor.getLastColumnIndex(), newColumn
+    @cursorMoved()
 
   cursorMoved: (resetSelection=true) ->
     @selection.resetRangeOnCursor() if resetSelection

@@ -79,10 +79,10 @@ describe 'Cursor', ->
       expect(selection.range).toEqual([[1,0], [2,1]])
 
     describe 'when it goes outside the bounds', ->
-      it 'moves to the end of the table', ->
+      it 'moves to the end of the previous row', ->
         cursor.moveLeft()
         cursor.moveLeft()
-        expect(cursor.position).toEqual([1,2])
+        expect(cursor.position).toEqual([0,2])
 
   describe '::moveRight', ->
     it 'moves the cursor right', ->
@@ -96,10 +96,10 @@ describe 'Cursor', ->
       expect(selection.range).toEqual([[1,2], [2,3]])
 
     describe 'when it goes outside the bounds', ->
-      it 'moves to the beginning of the table', ->
+      it 'moves to the beginning of the next row', ->
         cursor.moveRight()
         cursor.moveRight()
-        expect(cursor.position).toEqual([1,0])
+        expect(cursor.position).toEqual([2,0])
 
   describe '::moveToTop', ->
     it 'moves the cursor all the way to the top', ->

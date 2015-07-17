@@ -360,6 +360,9 @@ class DisplayTable
         redo: (commit) =>
           commit.redo()
 
+  removeScreenRowAt: (row, transaction=true) ->
+    @removeRowAt(@screenRowToModelRow(row))
+
   removeRowsInRange: (range, transaction=true) ->
     range = @rowRangeFrom(range)
 

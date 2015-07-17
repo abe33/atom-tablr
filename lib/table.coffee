@@ -236,8 +236,6 @@ class Table
   removeRowsInRange: (range, transaction=true) ->
     range = @rowRangeFrom(range)
 
-    range.end = @getRowCount() if range.end is Infinity
-
     removedRows = @rows.splice(range.start, range.end - range.start)
 
     for row,i in removedRows
@@ -277,6 +275,9 @@ class Table
 
     unless range.start? and range.end?
       throw new Error "Invalid range #{range}"
+
+    range.start = 0 if range.start < 0
+    range.end = @getRowCount() if range.end > @getRowCount()
 
     range
 

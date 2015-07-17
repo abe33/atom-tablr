@@ -1,10 +1,11 @@
 _ = require 'underscore-plus'
-{Point, Range, Emitter, CompositeDisposable} = require 'atom'
+{Point, Emitter, CompositeDisposable} = require 'atom'
 Delegator = require 'delegato'
 Table = require './table'
 DisplayTable = require './display-table'
 Cursor = require './cursor'
 Selection = require './selection'
+Range = require './range'
 
 module.exports =
 class TableEditor
@@ -20,8 +21,9 @@ class TableEditor
     'getContentWidth', 'getContentHeight',
     'getValueAtPosition', 'setValueAtPosition',
     'getValueAtScreenPosition', 'setValueAtScreenPosition',
-    'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
-    'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition',
+    'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange',
+    'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
+    'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
     'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition',
@@ -30,6 +32,7 @@ class TableEditor
     'getScreenCellRect', 'getScreenCellPosition',
     'onDidChangeCellValue',
     'sortBy', 'toggleSortDirection', 'resetSort',
+    'undo', 'redo', 'clearUndoStack', 'clearRedoStack',
     toProperty: 'displayTable'
   )
 
@@ -82,6 +85,14 @@ class TableEditor
   getSelectedRange: -> @getLastSelection().getRange()
 
   setSelectedRange: (range) ->
+    @modifySelections (selection) => selection.setRange(range)
+
+  setSelectedRow: (row) ->
+    range = @getRowRange(row)
+    @modifySelections (selection) => selection.setRange(range)
+
+  setSelectedRowRange: (range) ->
+    range = @getRowsRange(range)
     @modifySelections (selection) => selection.setRange(range)
 
   getSelectedRanges: ->
@@ -151,6 +162,19 @@ class TableEditor
         remainingSelections.push(selectionA)
 
     @selections = remainingSelections
+
+  getRowRange: (row) ->
+    Range.fromObject([
+      [row, 0]
+      [row + 1, @getScreenColumnCount()]
+    ])
+
+  getRowsRange: (range) ->
+    range = @rowRangeFrom(range)
+    Range.fromObject([
+      [range.start, 0]
+      [range.end + 1, @getScreenColumnCount()]
+    ])
 
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
@@ -228,26 +252,26 @@ class TableEditor
         positions[position] = true
     return
 
-  moveUp: (delta=1) -> @moveCursors (cursor) -> @cursor.moveUp(delta)
+  moveUp: (delta=1) -> @moveCursors (cursor) -> cursor.moveUp(delta)
 
-  moveDown: (delta=1) -> @moveCursors (cursor) -> @cursor.moveDown(delta)
+  moveDown: (delta=1) -> @moveCursors (cursor) -> cursor.moveDown(delta)
 
-  moveLeft: (delta=1) -> @moveCursors (cursor) -> @cursor.moveLeft(delta)
+  moveLeft: (delta=1) -> @moveCursors (cursor) -> cursor.moveLeft(delta)
 
-  moveRight: (delta=1) -> @moveCursors (cursor) -> @cursor.moveRight(delta)
+  moveRight: (delta=1) -> @moveCursors (cursor) -> cursor.moveRight(delta)
 
-  moveToTop: -> @moveCursors (cursor) -> @cursor.moveToTop()
+  moveToTop: -> @moveCursors (cursor) -> cursor.moveToTop()
 
-  moveToBottom: -> @moveCursors (cursor) -> @cursor.moveToBottom()
+  moveToBottom: -> @moveCursors (cursor) -> cursor.moveToBottom()
 
-  moveToLeft: -> @moveCursors (cursor) -> @cursor.moveToLeft()
+  moveToLeft: -> @moveCursors (cursor) -> cursor.moveToLeft()
 
-  moveToRight: -> @moveCursors (cursor) -> @cursor.moveToRight()
+  moveToRight: -> @moveCursors (cursor) -> cursor.moveToRight()
 
-  pageUp: -> @moveCursors (cursor) -> @cursor.pageUp()
+  pageUp: -> @moveCursors (cursor) -> cursor.pageUp()
 
-  pageDown: -> @moveCursors (cursor) -> @cursor.pageDown()
+  pageDown: -> @moveCursors (cursor) -> cursor.pageDown()
 
-  pageLeft: -> @moveCursors (cursor) -> @cursor.pageLeft()
+  pageLeft: -> @moveCursors (cursor) -> cursor.pageLeft()
 
-  pageRight: -> @moveCursors (cursor) -> @cursor.pageRight()
+  pageRight: -> @moveCursors (cursor) -> cursor.pageRight()

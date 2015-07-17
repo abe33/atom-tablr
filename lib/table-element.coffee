@@ -1,5 +1,5 @@
 Delegator = require 'delegato'
-{Point, Range, TextEditor} = require 'atom'
+{Point, TextEditor} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 {EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
@@ -9,9 +9,8 @@ TableEditor = require './table-editor'
 TableCellElement = require './table-cell-element'
 TableHeaderCellElement = require './table-header-cell-element'
 TableGutterCellElement = require './table-gutter-cell-element'
-Axis = require './mixins/axis'
+Range = require './range'
 Pool = require './mixins/pool'
-
 PIXEL = 'px'
 
 stopPropagationAndDefault = (f) -> (e) ->
@@ -102,10 +101,10 @@ class TableElement extends HTMLElement
       'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
       'table-edit:insert-row-before': => @insertRowBefore()
       'table-edit:insert-row-after': => @insertRowAfter()
-      'table-edit:delete-row': => @deleteActiveRow()
+      'table-edit:delete-row': => @deleteCursorRow()
       'table-edit:insert-column-before': => @insertColumnBefore()
       'table-edit:insert-column-after': => @insertColumnAfter()
-      'table-edit:delete-column': => @deleteActiveColumn()
+      'table-edit:delete-column': => @deleteCursorColumn()
 
     @subscriptions.add @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
@@ -239,8 +238,8 @@ class TableElement extends HTMLElement
 
     @tableEditor = table
     @modelSubscriptions = subs = new CompositeDisposable()
-    subs.add @tableEditor.onDidAddColumn (e) => @onColumnAdded(e)
-    subs.add @tableEditor.onDidRemoveColumn (e) => @onColumnRemoved(e)
+    subs.add @tableEditor.onDidAddColumn (e) => @requestUpdate()
+    subs.add @tableEditor.onDidRemoveColumn (e) => @requestUpdate()
     subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
     subs.add @tableEditor.onDidChangeColumnOption => @requestUpdate()
     subs.add @tableEditor.onDidChangeScreenRows => @requestUpdate()
@@ -288,9 +287,14 @@ class TableElement extends HTMLElement
 
   getRowResizeRuler: -> @rowRuler
 
-  insertRowBefore: -> @tableEditor.addRowAt(@activeCellPosition.row)
+  insertRowBefore: ->
+    @tableEditor.addRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))
 
-  insertRowAfter: -> @tableEditor.addRowAt(@activeCellPosition.row + 1)
+  insertRowAfter: ->
+    @tableEditor.addRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row + 1))
+
+  deleteCursorRow: ->
+    @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))
 
   getFirstVisibleRow: ->
     @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop)
@@ -305,7 +309,7 @@ class TableElement extends HTMLElement
   setRowOverdraw: (@rowOverdraw) -> @requestUpdate()
 
   getScreenRowIndexAtPixelPosition: (y) ->
-    y -= @getRowsOffsetContainer().getBoundingClientRect().left
+    y -= @getRowsOffsetContainer().getBoundingClientRect().top
 
     @tableEditor.getScreenRowIndexAtPixelPosition(y)
 
@@ -369,10 +373,13 @@ class TableElement extends HTMLElement
   getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
 
   insertColumnBefore: ->
-    @tableEditor.addColumnAt(@activeCellPosition.column, @getNewColumnName())
+    @tableEditor.addColumnAt(@tableEditor.getCursorPosition().column, @getNewColumnName())
 
   insertColumnAfter: ->
-    @tableEditor.addColumnAt(@activeCellPosition.column + 1, @getNewColumnName())
+    @tableEditor.addColumnAt(@tableEditor.getCursorPosition().column + 1, @getNewColumnName())
+
+  deleteCursorColumn: ->
+    @tableEditor.removeColumnAt(@tableEditor.getCursorPosition().column)
 
   getFirstVisibleColumn: ->
     @getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
@@ -414,7 +421,7 @@ class TableElement extends HTMLElement
     scrollViewWidth = container.offsetWidth
     currentScrollLeft = container.scrollLeft
 
-    columnOffset = @tableEditorgetScreenColumnOffsetAt(column)
+    columnOffset = @tableEditor.getScreenColumnOffsetAt(column)
 
     scrollLeftAsFirstVisibleColumn = columnOffset
     scrollLeftAsLastVisibleColumn = columnOffset - (scrollViewWidth - columnWidth)
@@ -468,6 +475,7 @@ class TableElement extends HTMLElement
     {row, column}
 
   makeCellVisible: (position) ->
+    position = Point.fromObject(position)
     @makeRowVisible(position.row)
     @makeColumnVisible(position.column)
 
@@ -491,96 +499,48 @@ class TableElement extends HTMLElement
 
   hasFocus: -> this is document.activeElement
 
-  moveRight: ->
-    if @activeCellPosition.column + 1 < @tableEditor.getColumnCount()
-      @activeCellPosition.column++
-    else
-      @activeCellPosition.column = 0
-
-      if @activeCellPosition.row + 1 < @tableEditor.getRowCount()
-        @activeCellPosition.row++
-      else
-        @activeCellPosition.row = 0
-
-    @afterActiveCellMove()
-
   moveLeft: ->
-    if @activeCellPosition.column - 1 >= 0
-      @activeCellPosition.column--
-    else
-      @activeCellPosition.column = @getLastColumn()
+    @tableEditor.moveLeft()
+    @afterCursorMove()
 
-      if @activeCellPosition.row - 1 >= 0
-        @activeCellPosition.row--
-      else
-        @activeCellPosition.row = @getLastRow()
-
-    @afterActiveCellMove()
+  moveRight: ->
+    @tableEditor.moveRight()
+    @afterCursorMove()
 
   moveUp: ->
-    if @activeCellPosition.row - 1 >= 0
-      @activeCellPosition.row--
-    else
-      @activeCellPosition.row = @getLastRow()
-
-    @afterActiveCellMove()
+    @tableEditor.moveUp()
+    @afterCursorMove()
 
   moveDown: ->
-    if @activeCellPosition.row + 1 < @tableEditor.getRowCount()
-      @activeCellPosition.row++
-    else
-      @activeCellPosition.row = 0
-
-    @afterActiveCellMove()
+    @tableEditor.moveDown()
+    @afterCursorMove()
 
   moveToTop: ->
-    return if @activeCellPosition.row is 0
-
-    @activeCellPosition.row = 0
-    @afterActiveCellMove()
+    @tableEditor.moveToTop()
+    @afterCursorMove()
 
   moveToBottom: ->
-    end = @getLastRow()
-    return if @activeCellPosition.row is end
-
-    @activeCellPosition.row = end
-    @afterActiveCellMove()
-
-  moveToLeft: ->
-    return if @activeCellPosition.column is 0
-
-    @activeCellPosition.column = 0
-    @afterActiveCellMove()
+    @tableEditor.moveToBottom()
+    @afterCursorMove()
 
   moveToRight: ->
-    end = @getLastColumn()
-    return if @activeCellPosition.column is end
+    @tableEditor.moveToRight()
+    @afterCursorMove()
 
-    @activeCellPosition.column = end
-    @afterActiveCellMove()
-
-  pageDown: ->
-    amount = @getPageMovesAmount()
-    if @activeCellPosition.row + amount < @tableEditor.getRowCount()
-      @activeCellPosition.row += amount
-    else
-      @activeCellPosition.row = @getLastRow()
-
-    @afterActiveCellMove()
+  moveToLeft: ->
+    @tableEditor.moveToLeft()
+    @afterCursorMove()
 
   pageUp: ->
-    amount = @getPageMovesAmount()
-    if @activeCellPosition.row - amount >= 0
-      @activeCellPosition.row -= amount
-    else
-      @activeCellPosition.row = 0
+    @tableEditor.pageUp()
+    @afterCursorMove()
 
-    @afterActiveCellMove()
+  pageDown: ->
+    @tableEditor.pageDown()
+    @afterCursorMove()
 
-  afterActiveCellMove: ->
-    @setSelectionFromActiveCell()
-    @requestUpdate()
-    @makeCellVisible(@activeCellPosition)
+  afterCursorMove: ->
+    @makeCellVisible(@tableEditor.getLastCursor().getPosition())
 
   getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
 
@@ -889,37 +849,38 @@ class TableElement extends HTMLElement
   startGutterDrag: (e) ->
     return if @dragging
 
-    @dragging = true
-
     row = @getScreenRowIndexAtPixelPosition(e.pageY)
-    @setSelection(@getRowRange(row)) if row?
+    return unless row?
+
+    @dragging = true
+    @tableEditor.setSelectedRow(row)
 
     @initializeDragEvents @body,
-      'mousemove': stopPropagationAndDefault (e) => @gutterDrag(e)
-      'mouseup': stopPropagationAndDefault (e) => @endGutterDrag(e)
+      'mousemove': stopPropagationAndDefault (e) =>
+        @gutterDrag(e, startRow: row)
+      'mouseup': stopPropagationAndDefault (e) =>
+        @endGutterDrag(e, startRow: row)
 
-  gutterDrag: (e) ->
+  gutterDrag: ({pageY}, {startRow}) ->
     if @dragging
-      row = @getScreenRowIndexAtPixelPosition(e.pageY)
+      console.log 'here'
+      row = @getScreenRowIndexAtPixelPosition(pageY)
 
-      if row < @activeCellPosition.row
-        @selection.start.row = row
-        @selection.end.row = @activeCellPosition.row
-      else if row > @activeCellPosition.row
-        @selection.end.row = row
-        @selection.start.row = @activeCellPosition.row
+      if row > startRow
+        @tableEditor.setSelectedRowRange([startRow, row])
+      else if row < startRow
+        @tableEditor.setSelectedRowRange([row, startRow])
       else
-        @selection.end.row = @activeCellPosition.row
-        @selection.start.row = @activeCellPosition.row
+        @tableEditor.setSelectedRow(row)
 
       @scrollDuringDrag(row)
       @requestUpdate()
 
-  endGutterDrag: (e) ->
+  endGutterDrag: (e,o) ->
     return unless @dragging
 
     @dragSubscription.dispose()
-    @gutterDrag(e)
+    @gutterDrag(e,o)
     @dragging = false
 
   startRowResizeDrag: (e) ->
