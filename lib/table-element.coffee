@@ -598,8 +598,8 @@ class TableElement extends HTMLElement
     position = cursor.getPosition()
 
     newValue = @editor.getText()
-    unless newValue is activeCell.getValue()
-      @tableEditor.setValueAtScreenPosition(position, ewValue)
+    unless newValue is cursor.getValue()
+      @tableEditor.setValueAtScreenPosition(position, newValue)
 
   startColumnEdit: ({target, pageX, pageY}) =>
     @createTextEditor() unless @editor?
@@ -987,28 +987,6 @@ class TableElement extends HTMLElement
     @dragSubscription = new CompositeDisposable
     for event,callback of events
       @dragSubscription.add @addDisposableEventListener object, event, callback
-
-  #     ######   #######  ########  ######## #### ##    ##  ######
-  #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##
-  #    ##       ##     ## ##     ##    ##     ##  ####  ## ##
-  #     ######  ##     ## ########     ##     ##  ## ## ## ##   ####
-  #          ## ##     ## ##   ##      ##     ##  ##  #### ##    ##
-  #    ##    ## ##     ## ##    ##     ##     ##  ##   ### ##    ##
-  #     ######   #######  ##     ##    ##    #### ##    ##  ######
-
-  sortBy: (@order, @direction=1) ->
-    @updateScreenRows()
-    @requestUpdate()
-
-  toggleSortDirection: ->
-    @direction *= -1
-    @updateScreenRows()
-    @requestUpdate()
-
-  resetSort: ->
-    @order = null
-    @updateScreenRows()
-    @requestUpdate()
 
   #    ##     ## ########  ########     ###    ######## ########
   #    ##     ## ##     ## ##     ##   ## ##      ##    ##

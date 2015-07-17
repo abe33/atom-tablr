@@ -1100,7 +1100,7 @@ describe 'tableElement', ->
   #    ##       ##     ##  ##     ##
   #    ######## ########  ####    ##
 
-  ###
+
   describe 'pressing a key when the table view has focus', ->
     beforeEach ->
       textInput(tableElement.hiddenInput, 'x')
@@ -1217,7 +1217,7 @@ describe 'tableElement', ->
 
       describe 'when the content of the editor did not changed', ->
         beforeEach ->
-          spyOn(tableEditor.getLastCursor(), 'setValue').andCallThrough()
+          spyOn(tableEditor, 'setValueAtScreenPosition').andCallThrough()
           atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
@@ -1228,7 +1228,7 @@ describe 'tableElement', ->
 
         it 'leaves the cell value as is', ->
           expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
-          expect(tableEditor.getLastCursor().setValue).not.toHaveBeenCalled()
+          expect(tableEditor.setValueAtScreenPosition).not.toHaveBeenCalled()
 
     describe 'clicking on another cell', ->
       beforeEach ->
@@ -1237,7 +1237,6 @@ describe 'tableElement', ->
 
       it 'closes the editor', ->
         expect(tableElement.isEditing()).toBeFalsy()
-  ###
 
   #     ######  ######## ##       ########  ######  ########
   #    ##    ## ##       ##       ##       ##    ##    ##
@@ -1623,30 +1622,27 @@ describe 'tableElement', ->
   #    ##    ## ##     ## ##    ##     ##     ##  ##   ### ##    ##
   #     ######   #######  ##     ##    ##    #### ##    ##  ######
 
-  ###
   describe 'sorting', ->
     describe 'when a column have been set as the table order', ->
       beforeEach ->
-        tableElement.sortBy 'value', -1
+        tableEditor.sortBy 'value', -1
         nextAnimationFrame()
 
       it 'sorts the rows accordingly', ->
-        expect(tableShadowRoot.querySelector('atom-table-cell').textContent).toEqual('row99')
+        expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('row99')
 
       it 'leaves the cursor position as it was before', ->
-        expect(tableElement.activeCellPosition).toEqual([0,0])
-        expect(tableEditor.getLastCursor()).toEqual(tableEditor.getValueAtPosition([99,0]))
+        expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
+        expect(tableEditor.getCursorPosition()).toEqual([99,0])
+        expect(tableEditor.getLastCursor().getValue()).toEqual(tableEditor.getValueAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
         expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)
 
-      it 'decorates the table cells with a class', ->
-        expect(tableShadowRoot.querySelectorAll('atom-table-cell.order').length).toBeGreaterThan(1)
-
       it 'decorates the table header cell with a class', ->
         expect(tableShadowRoot.querySelectorAll('atom-table-header-cell.order.descending').length).toEqual(1)
 
-        tableElement.toggleSortDirection()
+        tableEditor.toggleSortDirection()
         nextAnimationFrame()
 
         expect(tableShadowRoot.querySelectorAll('atom-table-header-cell.order.ascending').length).toEqual(1)
@@ -1664,20 +1660,15 @@ describe 'tableElement', ->
 
       describe '::toggleSortDirection', ->
         it 'changes the direction of the table sort', ->
-          tableElement.toggleSortDirection()
+          tableEditor.toggleSortDirection()
           nextAnimationFrame()
 
-          expect(tableElement.direction).toEqual(1)
-          expect(tableShadowRoot.querySelector('atom-table-cell').textContent).toEqual('row0')
+          expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('row0')
 
       describe '::resetSort', ->
         beforeEach ->
-          tableElement.resetSort()
+          tableEditor.resetSort()
           nextAnimationFrame()
 
-        it 'clears the value for table order', ->
-          expect(tableElement.order).toBeNull()
-
         it 'reorder the table in its initial order', ->
-          expect(tableShadowRoot.querySelector('atom-table-cell').textContent).toEqual('row0')
-  ###
+          expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('row0')

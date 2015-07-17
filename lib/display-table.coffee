@@ -490,11 +490,29 @@ class DisplayTable
 
   sortBy: (@order, @direction=1) ->
     @updateScreenRows()
+    @emitter.emit 'did-change-screen-rows', {
+      oldRange: {start: 0, end: @getRowCount()}
+      newRange: {start: 0, end: @getRowCount()}
+      oldScreenRange: {start: 0, end: @getRowCount()}
+      newScreenRange: {start: 0, end: @getRowCount()}
+    }
 
   toggleSortDirection: ->
     @direction *= -1
     @updateScreenRows()
+    @emitter.emit 'did-change-screen-rows', {
+      oldRange: {start: 0, end: @getRowCount()}
+      newRange: {start: 0, end: @getRowCount()}
+      oldScreenRange: {start: 0, end: @getRowCount()}
+      newScreenRange: {start: 0, end: @getRowCount()}
+    }
 
   resetSort: ->
     @order = null
     @updateScreenRows()
+    @emitter.emit 'did-change-screen-rows', {
+      oldRange: {start: 0, end: @getRowCount()}
+      newRange: {start: 0, end: @getRowCount()}
+      oldScreenRange: {start: 0, end: @getRowCount()}
+      newScreenRange: {start: 0, end: @getRowCount()}
+    }
