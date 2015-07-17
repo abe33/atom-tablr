@@ -125,34 +125,14 @@ describe 'Cursor', ->
 
       expect(cursor.position).toEqual([1,2])
 
-  describe '::pageUp', ->
+  xdescribe '::pageUp', ->
     it 'moves the cursor by the amount of page moves', ->
-      spyOn(cursor, 'moveUp')
 
-      cursor.pageUp()
-
-      expect(cursor.moveUp).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
-
-  describe '::pageDown', ->
+  xdescribe '::pageDown', ->
     it 'moves the cursor by the amount of page moves', ->
-      spyOn(cursor, 'moveDown')
 
-      cursor.pageDown()
-
-      expect(cursor.moveDown).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
-
-  describe '::pageLeft', ->
+  xdescribe '::pageLeft', ->
     it 'moves the cursor by the amount of page moves', ->
-      spyOn(cursor, 'moveLeft')
 
-      cursor.pageLeft()
-
-      expect(cursor.moveLeft).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
-
-  describe '::pageRight', ->
+  xdescribe '::pageRight', ->
     it 'moves the cursor by the amount of page moves', ->
-      spyOn(cursor, 'moveRight')
-
-      cursor.pageRight()
-
-      expect(cursor.moveRight).toHaveBeenCalledWith(atom.config.get 'table-edit.pageMovesAmount')
