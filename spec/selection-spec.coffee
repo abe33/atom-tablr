@@ -234,15 +234,44 @@ describe 'Selection', ->
         expect(selection.getRange()).toEqual([[1,1],[3,2]])
 
       it 'inverses the selection direction when expanded down', ->
-        selection.expandDown()
+        selection.expandUp()
         selection.expandToBottom()
 
         expect(selection.getRange()).toEqual([[1,1],[3,2]])
 
-    describe '::expandToRight', ->
-
     describe '::expandToLeft', ->
+      it 'expands the selection to the left', ->
+        selection.expandToLeft()
+
+        expect(selection.getRange()).toEqual([[1,0],[2,2]])
+
+      it 'inverses the selection direction when expanded on right', ->
+        selection.expandRight()
+        selection.expandToLeft()
+
+        expect(selection.getRange()).toEqual([[1,0],[2,2]])
+
+    describe '::expandToRight', ->
+      it 'expands the selection to the right', ->
+        selection.expandToRight()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,3]])
+
+      it 'inverses the selection direction when expanded down', ->
+        selection.expandLeft()
+        selection.expandToRight()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,3]])
 
     describe '::selectAll', ->
+      it 'selects the whole table range', ->
+        selection.selectAll()
+
+        expect(selection.getRange()).toEqual([[0,0],[3,3]])
 
     describe '::selectNone', ->
+      it 'resets the range to the one of the cursor', ->
+        selection.selectAll()
+        selection.selectNone()
+
+        expect(selection.getRange()).toEqual([[1,1],[2,2]])

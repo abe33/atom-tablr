@@ -43,6 +43,16 @@ class Selection
 
   getLastSelectedColumn: -> @range.end.column - 1
 
+  selectAll: ->
+    @range.start.row = 0
+    @range.start.column = 0
+
+    @range.end.row = @tableEditor.getScreenRowCount()
+    @range.end.column = @tableEditor.getScreenColumnCount()
+
+  selectNone: ->
+    @range = @cursor.getRange()
+
   expandUp: (delta=1) ->
     if @expandedDown()
       newRow = @range.end.row - delta
@@ -104,6 +114,22 @@ class Selection
       @range.end.row = @tableEditor.getScreenRowCount()
     else
       @range.end.row = @tableEditor.getScreenRowCount()
+
+  expandToLeft: ->
+    if @expandedRight()
+      end = @range.start.column + 1
+      @range.start.column = 0
+      @range.end.column = end
+    else
+      @range.start.column = 0
+
+  expandToRight: ->
+    if @expandedLeft()
+      start = @range.end.column - 1
+      @range.start.column = start
+      @range.end.column = @tableEditor.getScreenColumnCount()
+    else
+      @range.end.column = @tableEditor.getScreenColumnCount()
 
   expandedUp: ->
     @getCursor().getPosition().row is @getLastSelectedRow() and
