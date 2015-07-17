@@ -91,6 +91,8 @@ class TableElement extends HTMLElement
       'table-edit:move-to-beginning-of-line': => @moveToLeft()
       'core:page-up': => @pageUp()
       'core:page-down': => @pageDown()
+      'core:page-left': => @pageLeft()
+      'core:page-right': => @pageRight()
       'core:select-right': => @expandSelectionRight()
       'core:select-left': => @expandSelectionLeft()
       'core:select-up': => @expandSelectionUp()
@@ -538,6 +540,15 @@ class TableElement extends HTMLElement
   pageDown: ->
     @tableEditor.pageDown()
     @afterCursorMove()
+
+  pageLeft: ->
+    @tableEditor.pageLeft()
+    @afterCursorMove()
+
+  pageRight: ->
+    @tableEditor.pageRight()
+    @afterCursorMove()
+
 
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getLastCursor().getPosition())
