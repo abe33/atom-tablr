@@ -77,37 +77,6 @@ class TableElement extends HTMLElement
           @startCellEdit()
           @editor.setText(e.data)
 
-    @subscriptions.add atom.commands.add 'atom-table-editor',
-      'core:confirm': => @startCellEdit()
-      'core:undo': => @tableEditor.undo()
-      'core:redo': => @tableEditor.redo()
-      'core:move-left': => @moveLeft()
-      'core:move-right': => @moveRight()
-      'core:move-up': => @moveUp()
-      'core:move-down': => @moveDown()
-      'core:move-to-top': => @moveToTop()
-      'core:move-to-bottom': => @moveToBottom()
-      'table-edit:move-to-end-of-line': => @moveToRight()
-      'table-edit:move-to-beginning-of-line': => @moveToLeft()
-      'core:page-up': => @pageUp()
-      'core:page-down': => @pageDown()
-      'core:page-left': => @pageLeft()
-      'core:page-right': => @pageRight()
-      'core:select-right': => @expandSelectionRight()
-      'core:select-left': => @expandSelectionLeft()
-      'core:select-up': => @expandSelectionUp()
-      'core:select-down': => @expandSelectionDown()
-      'table-edit:select-to-end-of-line': => @expandSelectionToEndOfLine()
-      'table-edit:select-to-beginning-of-line': => @expandSelectionToBeginningOfLine()
-      'table-edit:select-to-end-of-table': => @expandSelectionToEndOfTable()
-      'table-edit:select-to-beginning-of-table': => @expandSelectionToBeginningOfTable()
-      'table-edit:insert-row-before': => @insertRowBefore()
-      'table-edit:insert-row-after': => @insertRowAfter()
-      'table-edit:delete-row': => @deleteCursorRow()
-      'table-edit:insert-column-before': => @insertColumnBefore()
-      'table-edit:insert-column-after': => @insertColumnAfter()
-      'table-edit:delete-column': => @deleteCursorColumn()
-
     @subscriptions.add @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
       'click': stopPropagationAndDefault()
@@ -274,7 +243,7 @@ class TableElement extends HTMLElement
 
   isSelectedRow: (row) ->
     @tableEditor.getSelections().some (selection) ->
-      selection.getRowRange().containsRow(row)
+      selection.getRange().containsRow(row)
 
   getRowRange: (row) ->
     Range.fromObject([[row, 0], [row, @tableEditor.getLastColumnIndex()]])
@@ -575,9 +544,10 @@ class TableElement extends HTMLElement
     cursor = @tableEditor.getLastCursor()
     position = cursor.getPosition()
     activeCellRect = @cellScreenRect(position)
+    bounds = @getBoundingClientRect()
 
-    @editorElement.style.top = @toUnit(activeCellRect.top)
-    @editorElement.style.left = @toUnit(activeCellRect.left)
+    @editorElement.style.top = @toUnit(activeCellRect.top + bounds.top)
+    @editorElement.style.left = @toUnit(activeCellRect.left + bounds.left)
     @editorElement.style.width = @toUnit(activeCellRect.width)
     @editorElement.style.height = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
@@ -688,122 +658,45 @@ class TableElement extends HTMLElement
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
 
-  isSelectedPosition: (position) ->
-    position = Point.fromObject(position)
-
-    position.row >= @selection.start.row and
-    position.row <= @selection.end.row and
-    position.column >= @selection.start.column and
-    position.column <= @selection.end.column
-
-  getSelection: -> @selection
-
-  selectionScrollRect: ->
-    {top, left} = @cellScrollPosition(@selection.start)
-    width = 0
-    height = 0
-
-    for col in [@selection.start.column..@selection.end.column]
-      width += @getScreenColumnWidthAt(col)
-
-    for row in [@selection.start.row..@selection.end.row]
-      height += @getScreenRowHeightAt(row)
-
-    {top, left, width, height}
-
-  setSelection: (selection) ->
-    @selection = Range.fromObject(selection)
-    @activeCellPosition = @selection.start.copy()
-    @requestUpdate()
-
-  setSelectionFromActiveCell: ->
-    @selection = Range.fromObject([
-      [@activeCellPosition.row, @activeCellPosition.column]
-      [@activeCellPosition.row, @activeCellPosition.column]
-    ])
-
   expandSelectionRight: ->
-    if @selectionExpandedLeft()
-      @selection.start.column = Math.min(@selection.start.column + 1, @getLastColumn())
-    else
-      @selection.end.column = Math.min(@selection.end.column + 1, @getLastColumn())
-
+    @tableEditor.expandRight()
+    @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column)
     @requestUpdate()
 
   expandSelectionLeft: ->
-    if @selectionExpandedRight()
-      @selection.end.column = Math.max(@selection.end.column - 1, 0)
-    else
-      @selection.start.column = Math.max(@selection.start.column - 1, 0)
-
+    @tableEditor.expandLeft()
+    @makeColumnVisible(@tableEditor.getLastSelection().getRange().start.column)
     @requestUpdate()
 
   expandSelectionUp: ->
-    row = if @selectionExpandedDown()
-      @selection.end.row = Math.max(@selection.end.row - 1, 0)
-    else
-      @selection.start.row = Math.max(@selection.start.row - 1, 0)
-
-    @makeRowVisible(row)
+    @tableEditor.expandUp()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().start.row)
     @requestUpdate()
 
   expandSelectionDown: ->
-    row = if @selectionExpandedUp()
-      @selection.start.row = Math.min(@selection.start.row + 1, @getLastRow())
-    else
-      @selection.end.row = Math.min(@selection.end.row + 1, @getLastRow())
-
-    @makeRowVisible(row)
+    @tableEditor.expandDown()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row)
     @requestUpdate()
 
   expandSelectionToEndOfLine: ->
-    @selection.start.column = @activeCellPosition.column
-    @selection.end.column = @getLastColumn()
+    @tableEditor.expandToRight()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.column)
     @requestUpdate()
 
   expandSelectionToBeginningOfLine: ->
-    @selection.start.column = 0
-    @selection.end.column = @activeCellPosition.column
+    @tableEditor.expandToLeft()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().start.column)
     @requestUpdate()
 
   expandSelectionToEndOfTable: ->
-    @selection.start.row = @activeCellPosition.row
-    @selection.end.row = @getLastRow()
-
-    @makeRowVisible(@selection.end.row)
+    @tableEditor.expandToBottom()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row)
     @requestUpdate()
 
   expandSelectionToBeginningOfTable: ->
-    @selection.start.row = 0
-    @selection.end.row = @activeCellPosition.row
-
-    @makeRowVisible(@selection.start.row)
+    @tableEditor.expandToTop()
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().start.row)
     @requestUpdate()
-
-  selectionExpandedRight: ->
-    @activeCellPosition.column is @selection.start.column and
-    @activeCellPosition.column isnt @selection.end.column
-
-  selectionExpandedLeft: ->
-    @activeCellPosition.column is @selection.end.column and
-    @activeCellPosition.column isnt @selection.start.column
-
-  selectionExpandedUp: ->
-    @activeCellPosition.row is @selection.end.row and
-    @activeCellPosition.row isnt @selection.start.row
-
-  selectionExpandedDown: ->
-    @activeCellPosition.row is @selection.start.row and
-    @activeCellPosition.row isnt @selection.end.row
-
-  selectionSpansManyCells: ->
-    @selectionSpansManyColumns() or @selectionSpansManyRows()
-
-  selectionSpansManyColumns: ->
-    @selection.start.column isnt @selection.end.column
-
-  selectionSpansManyRows: ->
-    @selection.start.row isnt @selection.end.row
 
   #    ########    ####    ########
   #    ##     ##  ##  ##   ##     ##
@@ -826,26 +719,31 @@ class TableElement extends HTMLElement
     if @dragging
       {pageX, pageY} = e
       {row, column} = @cellPositionAtScreenPosition pageX, pageY
+      cursorPosition = @tableEditor.getLastCursor().getPosition()
+      selection = @tableEditor.getLastSelection()
+      newRange = new Range
 
-      if row < @activeCellPosition.row
-        @selection.start.row = row
-        @selection.end.row = @activeCellPosition.row
-      else if row > @activeCellPosition.row
-        @selection.end.row = row
-        @selection.start.row = @activeCellPosition.row
+      if row < cursorPosition.row
+        newRange.start.row = row
+        newRange.end.row = cursorPosition.row + 1
+      else if row > cursorPosition.row
+        newRange.end.row = row + 1
+        newRange.start.row = cursorPosition.row
       else
-        @selection.end.row = @activeCellPosition.row
-        @selection.start.row = @activeCellPosition.row
+        newRange.end.row = cursorPosition.row + 1
+        newRange.start.row = cursorPosition.row
 
-      if column < @activeCellPosition.column
-        @selection.start.column = column
-        @selection.end.column = @activeCellPosition.column
-      else if column > @activeCellPosition.column
-        @selection.end.column = column
-        @selection.start.column = @activeCellPosition.column
+      if column < cursorPosition.column
+        newRange.start.column = column
+        newRange.end.column = cursorPosition.column + 1
+      else if column > cursorPosition.column
+        newRange.end.column = column + 1
+        newRange.start.column = cursorPosition.column
       else
-        @selection.end.column = @activeCellPosition.column
-        @selection.start.column = @activeCellPosition.column
+        newRange.end.column = cursorPosition.column + 1
+        newRange.start.column = cursorPosition.column
+
+      selection.setRange(newRange)
 
       @scrollDuringDrag(row)
       @requestUpdate()
@@ -1137,21 +1035,32 @@ class TableElement extends HTMLElement
     @getGutter().scrollTop = @getRowsContainer().scrollTop
 
   updateSelection: ->
-    # if @selectionSpansManyCells()
-    #   {top, left, width, height} = @selectionScrollRect()
-    #   @tableEditorSelectionBox.style.cssText = """
-    #   top: #{top}px;
-    #   left: #{left}px;
-    #   height: #{height}px;
-    #   width: #{width}px;
-    #   """
-    #   @tableEditorSelectionBoxHandle.style.cssText = """
-    #   top: #{top + height}px;
-    #   left: #{left + width}px;
-    #   """
-    # else
-    #   @tableEditorSelectionBox.style.cssText = "display: none"
-    #   @tableEditorSelectionBoxHandle.style.cssText = "display: none"
+    if @tableEditor.getLastSelection().spanMoreThanOneCell()
+      {top, left, right, bottom} = @selectionScrollRect()
+      height = bottom - top
+      width = right - left
+      console.log top, left, right, bottom, width, height
+      @tableSelectionBox.style.cssText = """
+      top: #{top}px;
+      left: #{left}px;
+      height: #{height}px;
+      width: #{width}px;
+      """
+      @tableSelectionBoxHandle.style.cssText = """
+      top: #{top + height}px;
+      left: #{left + width}px;
+      """
+    else
+      @tableSelectionBox.style.cssText = "display: none"
+      @tableSelectionBoxHandle.style.cssText = "display: none"
+
+  selectionScrollRect: ->
+    range = @tableEditor.getLastSelection().getRange()
+
+    left: @tableEditor.getScreenColumnOffsetAt(range.start.column)
+    top: @tableEditor.getScreenRowOffsetAt(range.start.row)
+    right: @tableEditor.getScreenColumnOffsetAt(range.end.column - 1) + @tableEditor.getScreenColumnWidthAt(range.end.column - 1)
+    bottom: @tableEditor.getScreenRowOffsetAt(range.end.row - 1) + @tableEditor.getScreenRowHeightAt(range.end.row - 1)
 
   getScreenCellAtPosition: (position) ->
     position = Point.fromObject(position)
@@ -1205,6 +1114,45 @@ class TableElement extends HTMLElement
   floatToPixel: (w) -> @toUnit(w)
 
   toUnit: (value, unit=PIXEL) -> "#{value}#{unit}"
+
+#     ######  ##     ## ########
+#    ##    ## ###   ### ##     ##
+#    ##       #### #### ##     ##
+#    ##       ## ### ## ##     ##
+#    ##       ##     ## ##     ##
+#    ##    ## ##     ## ##     ##
+#     ######  ##     ## ########
+
+atom.commands.add 'atom-table-editor',
+  'core:confirm': -> @startCellEdit()
+  'core:undo': -> @tableEditor.undo()
+  'core:redo': -> @tableEditor.redo()
+  'core:move-left': -> @moveLeft()
+  'core:move-right': -> @moveRight()
+  'core:move-up': -> @moveUp()
+  'core:move-down': -> @moveDown()
+  'core:move-to-top': -> @moveToTop()
+  'core:move-to-bottom': -> @moveToBottom()
+  'table-edit:move-to-end-of-line': -> @moveToRight()
+  'table-edit:move-to-beginning-of-line': -> @moveToLeft()
+  'core:page-up': -> @pageUp()
+  'core:page-down': -> @pageDown()
+  'core:page-left': -> @pageLeft()
+  'core:page-right': -> @pageRight()
+  'core:select-right': -> @expandSelectionRight()
+  'core:select-left': -> @expandSelectionLeft()
+  'core:select-up': -> @expandSelectionUp()
+  'core:select-down': -> @expandSelectionDown()
+  'table-edit:select-to-end-of-line': -> @expandSelectionToEndOfLine()
+  'table-edit:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
+  'table-edit:select-to-end-of-table': -> @expandSelectionToEndOfTable()
+  'table-edit:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
+  'table-edit:insert-row-before': -> @insertRowBefore()
+  'table-edit:insert-row-after': -> @insertRowAfter()
+  'table-edit:delete-row': -> @deleteCursorRow()
+  'table-edit:insert-column-before': -> @insertColumnBefore()
+  'table-edit:insert-column-after': -> @insertColumnAfter()
+  'table-edit:delete-column': -> @deleteCursorColumn()
 
 #    ######## ##       ######## ##     ## ######## ##    ## ########
 #    ##       ##       ##       ###   ### ##       ###   ##    ##

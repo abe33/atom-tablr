@@ -1,5 +1,5 @@
 TableEdit = require '../lib/table-edit'
-Table = require '../lib/table'
+TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
 
 # Use the command `window:run-package-specs` (cmd-alt-ctrl-p) to run specs.
@@ -18,6 +18,6 @@ describe "TableEdit", ->
       waitsForPromise -> atom.workspace.open('sample.csv').then (t) -> table = t
 
     it 'opens a table editor for the file', ->
-      expect(table instanceof Table).toBeTruthy()
-      expect(table.getColumnCount()).toEqual(3)
-      expect(table.getRowCount()).toEqual(2)
+      expect(table instanceof TableEditor).toBeTruthy()
+      expect(table.getScreenColumnCount()).toEqual(3)
+      expect(table.getScreenRowCount()).toEqual(2)

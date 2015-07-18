@@ -1,6 +1,6 @@
 fs = require 'fs'
 csv = require 'csv'
-[Table, TableElement, url] = []
+[TableEditor, TableElement, url] = []
 
 module.exports =
   config:
@@ -27,7 +27,7 @@ module.exports =
       default: 2
 
   activate: (state) ->
-    Table ?= require './table'
+    TableEditor ?= require './table-editor'
     TableElement ?= require './table-element'
     TableElement.registerViewProvider(true)
 
@@ -43,7 +43,7 @@ module.exports =
         csv.parse fileContent, (err, data) ->
           return reject(err) if err?
 
-          table = new Table
+          table = new TableEditor
           return data if data.length is 0
 
           table.addColumn(column, {}, false) for column in data.shift()
@@ -62,7 +62,7 @@ module.exports =
         when 'small' then @getSmallTable()
 
   getSmallTable: ->
-    table = new Table
+    table = new TableEditor
 
     table.addColumn 'key', width: 150, align: 'right'
     table.addColumn 'value', width: 150, align: 'center'
@@ -80,7 +80,7 @@ module.exports =
     return table
 
   getLargeTable: ->
-    table = new Table
+    table = new TableEditor
 
     table.addColumn 'key', width: 150, align: 'right'
     table.addColumn 'value', width: 150, align: 'center'

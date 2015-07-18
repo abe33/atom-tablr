@@ -27,8 +27,8 @@ class TableGutterCellElement extends HTMLElement
 
   getGutterCellClasses: (row) ->
     classes = []
-    # classes.push 'active-row' if @tableElement.isCursorRow(row)
-    # classes.push 'selected' if @tableElement.isSelectedRow(row)
+    classes.push 'active-row' if @tableElement.isCursorRow(row)
+    classes.push 'selected' if @tableElement.isSelectedRow(row)
     classes
 
 module.exports = TableGutterCellElement = document.registerElement 'atom-table-gutter-cell', prototype: TableGutterCellElement.prototype

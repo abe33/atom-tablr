@@ -803,138 +803,131 @@ describe 'tableElement', ->
   describe '::moveRight', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
-    it 'is triggered on core:move-right', ->
-      spyOn(tableElement, 'moveRight')
-
-      atom.commands.dispatch(tableElement, 'core:move-right')
-
-      expect(tableElement.moveRight).toHaveBeenCalled()
-
     it 'moves the cursor cursor to the right', ->
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
 
       expect(tableEditor.getLastCursor().getValue()).toEqual(0)
 
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
 
       expect(tableEditor.getLastCursor().getValue()).toEqual('yes')
 
     it 'moves the cursor to the next row when on last cell of a row', ->
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
+      tableElement.moveRight()
+      tableElement.moveRight()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row1')
 
     it 'moves the cursor to the first row when on last cell of last row', ->
       tableEditor.setCursorAtScreenPosition([99, 2])
 
-      atom.commands.dispatch(tableElement, 'core:move-right')
+      tableElement.moveRight()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
   describe '::moveLeft', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveLeft()
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveLeft()
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
     it 'is triggered on core:move-left', ->
       spyOn(tableElement, 'moveLeft')
 
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveLeft()
 
       expect(tableElement.moveLeft).toHaveBeenCalled()
 
     it 'moves the cursor to the last cell when on the first cell', ->
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveLeft()
       expect(tableEditor.getLastCursor().getValue()).toEqual('no')
 
     it 'moves the cursor cursor to the left', ->
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveRight()
+      tableElement.moveLeft()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
     it 'moves the cursor cursor to the upper row', ->
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-right')
-      atom.commands.dispatch(tableElement, 'core:move-left')
+      tableElement.moveRight()
+      tableElement.moveRight()
+      tableElement.moveRight()
+      tableElement.moveLeft()
       expect(tableEditor.getLastCursor().getValue()).toEqual('yes')
 
   describe '::moveUp', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      atom.commands.dispatch(tableElement, 'core:move-up')
+      tableElement.moveUp()
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      atom.commands.dispatch(tableElement, 'core:move-up')
+      tableElement.moveUp()
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
     it 'is triggered on core:move-up', ->
       spyOn(tableElement, 'moveUp')
 
-      atom.commands.dispatch(tableElement, 'core:move-up')
+      tableElement.moveUp()
 
       expect(tableElement.moveUp).toHaveBeenCalled()
 
     it 'moves the cursor to the last row when on the first row', ->
-      atom.commands.dispatch(tableElement, 'core:move-up')
+      tableElement.moveUp()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row99')
 
     it 'moves the cursor on the upper row', ->
       tableEditor.setCursorAtScreenPosition([10, 0])
 
-      atom.commands.dispatch(tableElement, 'core:move-up')
+      tableElement.moveUp()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row9')
 
   describe '::moveDown', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      atom.commands.dispatch(tableElement, 'core:move-down')
+      tableElement.moveDown()
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      atom.commands.dispatch(tableElement, 'core:move-down')
+      tableElement.moveDown()
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
     it 'is triggered on core:move-down', ->
       spyOn(tableElement, 'moveDown')
 
-      atom.commands.dispatch(tableElement, 'core:move-down')
+      tableElement.moveDown()
 
       expect(tableElement.moveDown).toHaveBeenCalled()
 
     it 'moves the cursor to the row below', ->
-      atom.commands.dispatch(tableElement, 'core:move-down')
+      tableElement.moveDown()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row1')
 
     it 'moves the cursor to the first row when on the last row', ->
       tableEditor.setCursorAtScreenPosition([99, 0])
 
-      atom.commands.dispatch(tableElement, 'core:move-down')
+      tableElement.moveDown()
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
   describe '::makeRowVisible', ->
@@ -943,35 +936,19 @@ describe 'tableElement', ->
 
       expect(tableElement.getRowsContainer().scrollTop).toEqual(849)
 
-  describe 'core:undo', ->
-    it 'triggers an undo on the table', ->
-      spyOn(tableEditor, 'undo')
-
-      atom.commands.dispatch(tableElement, 'core:undo')
-
-      expect(tableEditor.undo).toHaveBeenCalled()
-
-  describe 'core:redo', ->
-    it 'triggers an redo on the table', ->
-      spyOn(tableEditor, 'redo')
-
-      atom.commands.dispatch(tableElement, 'core:redo')
-
-      expect(tableEditor.redo).toHaveBeenCalled()
-
   describe 'core:page-down', ->
     beforeEach ->
       atom.config.set 'table-edit.pageMovesAmount', 20
 
     it 'moves the cursor 20 rows below', ->
-      atom.commands.dispatch(tableElement, 'core:page-down')
+      tableElement.pageDown()
 
       expect(tableEditor.getCursorPosition().row).toEqual(20)
 
     it 'stops to the last row without looping', ->
       tableEditor.setCursorAtScreenPosition([90, 0])
 
-      atom.commands.dispatch(tableElement, 'core:page-down')
+      tableElement.pageDown()
 
       expect(tableEditor.getCursorPosition().row).toEqual(99)
 
@@ -979,7 +956,7 @@ describe 'tableElement', ->
       it 'moves the cursor 30 rows below', ->
         atom.config.set 'table-edit.pageMovesAmount', 30
 
-        atom.commands.dispatch(tableElement, 'core:page-down')
+        tableElement.pageDown()
 
         expect(tableEditor.getCursorPosition().row).toEqual(30)
 
@@ -990,14 +967,14 @@ describe 'tableElement', ->
     it 'moves the cursor 20 rows up', ->
       tableEditor.setCursorAtScreenPosition([20, 0])
 
-      atom.commands.dispatch(tableElement, 'core:page-up')
+      tableElement.pageUp()
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
     it 'stops to the first cell without looping', ->
       tableEditor.setCursorAtScreenPosition([10, 0])
 
-      atom.commands.dispatch(tableElement, 'core:page-up')
+      tableElement.pageUp()
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
@@ -1008,7 +985,7 @@ describe 'tableElement', ->
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
-      atom.commands.dispatch(tableElement, 'core:move-to-top')
+      tableElement.moveToTop()
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
@@ -1019,19 +996,19 @@ describe 'tableElement', ->
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
-      atom.commands.dispatch(tableElement, 'core:move-to-bottom')
+      tableElement.moveToBottom()
 
       expect(tableEditor.getCursorPosition().row).toEqual(99)
 
   describe 'table-edit:insert-row-before', ->
     it 'inserts a new row before the active row', ->
-      atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
+      tableElement.insertRowBefore()
 
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, undefined, undefined])
 
     it 'refreshes the rows offsets', ->
       tableEditor.setScreenRowHeightAt(0, 60)
-      atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
+      tableElement.insertRowBefore()
 
       expect(tableEditor.getScreenRowHeightAt(0)).toEqual(tableEditor.getRowHeight())
       expect(tableEditor.getScreenRowHeightAt(1)).toEqual(60)
@@ -1042,53 +1019,53 @@ describe 'tableElement', ->
         tableEditor.removeRowsInRange([0, Infinity])
 
       it 'creates a new row', ->
-        atom.commands.dispatch(tableElement, 'table-edit:insert-row-before')
+        tableElement.insertRowBefore()
 
         expect(tableEditor.getScreenRowHeightAt(0)).toEqual(tableEditor.getRowHeight())
 
   describe 'table-edit:insert-row-after', ->
     it 'inserts a new row after the active row', ->
-      atom.commands.dispatch(tableElement, 'table-edit:insert-row-after')
+      tableElement.insertRowAfter()
 
       expect(tableEditor.getScreenRow(1)).toEqual([undefined, undefined, undefined])
 
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
-      atom.commands.dispatch(tableElement, 'table-edit:delete-row')
+      tableElement.deleteCursorRow()
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
 
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->
-      atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
+      tableElement.insertColumnBefore()
 
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, 'row0', 0, 'yes'])
 
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
-        atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
-        atom.commands.dispatch(tableElement, 'table-edit:insert-column-before')
+        tableElement.insertColumnBefore()
+        tableElement.insertColumnBefore()
 
         expect(tableEditor.getScreenColumn(0).name).toEqual('untitled_1')
         expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_0')
 
   describe 'table-edit:insert-column-after', ->
     it 'inserts a new column after the active column', ->
-      atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
+      tableElement.insertColumnAfter()
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row0', undefined, 0, 'yes'])
 
     describe 'called several times', ->
       it 'creates incremental names for columns', ->
-        atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
-        atom.commands.dispatch(tableElement, 'table-edit:insert-column-after')
+        tableElement.insertColumnAfter()
+        tableElement.insertColumnAfter()
 
         expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_1')
         expect(tableEditor.getScreenColumn(2).name).toEqual('untitled_0')
 
   describe 'table-edit:delete-column', ->
     it 'deletes the current active column', ->
-      atom.commands.dispatch(tableElement, 'table-edit:delete-column')
+      tableElement.deleteCursorColumn()
 
       expect(tableEditor.getScreenRow(0)).toEqual([0, 'yes'])
 
@@ -1245,374 +1222,361 @@ describe 'tableElement', ->
   #          ## ##       ##       ##       ##          ##
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
-  ###
-  it 'has a selection', ->
-    expect(tableElement.getSelection()).toEqual([[0,0], [0,0]])
+  describe '', ->
+    it 'has a selection', ->
+      expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0], [1,1]])
 
-  describe 'selection', ->
-    it 'follows the cursor when it moves', ->
-      atom.config.set 'table-edit.pageMovesAmount', 10
-      tableElement.pageDown()
-      atom.commands.dispatch(tableElement, 'core:move-right')
+    describe 'selection', ->
+      it 'follows the cursor when it moves', ->
+        atom.config.set 'table-edit.pageMovesAmount', 10
+        tableElement.pageDown()
+        tableElement.moveRight()
 
-      expect(tableElement.getSelection()).toEqual([[10,1], [10,1]])
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[10,1], [11,2]])
 
-    it 'can spans on several rows and columns', ->
-      tableElement.setSelection([[2,0],[3,2]])
+      it 'can spans on several rows and columns', ->
+        tableEditor.setSelectedRange([[2,0],[4,3]])
 
-      expect(tableElement.getSelection()).toEqual([[2,0],[3,2]])
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[2,0],[4,3]])
 
-    it 'marks the cells covered by the selection with a selected class', ->
-      tableElement.setSelection([[2,0],[3,2]])
+      it 'marks the cells covered by the selection with a selected class', ->
+        tableEditor.setSelectedRange([[2,0],[4,3]])
 
-      nextAnimationFrame()
-
-      expect(tableShadowRoot.querySelectorAll('atom-table-cell.selected').length).toEqual(6)
-
-    it 'marks the row number with a selected class', ->
-      tableElement.setSelection([[2,0],[3,2]])
-
-      nextAnimationFrame()
-
-      expect(tableShadowRoot.querySelectorAll('atom-table-gutter-cell.selected').length).toEqual(2)
-  describe 'when the selection spans only one cell', ->
-    it 'does not render the selection box', ->
-      expect(tableShadowRoot.querySelector('.selection-box').style.display).toEqual('none')
-      expect(tableShadowRoot.querySelector('.selection-box-handle').style.display).toEqual('none')
-
-  describe 'when the selection spans many cells', ->
-    [selectionBox, selectionBoxHandle] = []
-
-    beforeEach ->
-      tableElement.setSelection([[2,0],[3,2]])
-      nextAnimationFrame()
-      selectionBox = tableShadowRoot.querySelector('.selection-box')
-      selectionBoxHandle = tableShadowRoot.querySelector('.selection-box-handle')
-
-    it 'renders the selection box', ->
-      expect(selectionBox).toExist()
-      expect(selectionBoxHandle).toExist()
-
-    it 'positions the selection box over the cells', ->
-      cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      firstCell = tableElement.getScreenCellAtPosition([2,0])
-      lastCell = tableElement.getScreenCellAtPosition([3,2])
-
-      selectionBoxOffset = selectionBox.getBoundingClientRect()
-      firstCellOffset = firstCell.getBoundingClientRect()
-
-      expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
-      expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
-      expect(selectionBox.offsetWidth).toEqual(300)
-      expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
-
-    it 'positions the selection box handle at the bottom right corner', ->
-      cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      lastCell = tableElement.getScreenCellAtPosition([3,2])
-      lastCellOffset = lastCell.getBoundingClientRect()
-      selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
-
-      expect(selectionBoxHandleOffset.top).toBeCloseTo(lastCellOffset.bottom, -1)
-      expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
-
-    it 'positions the selection box over the cells', ->
-      tableElement.setSelection([[2,1],[3,2]])
-      nextAnimationFrame()
-
-      selectionBox = tableShadowRoot.querySelector('.selection-box')
-      cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-      firstCell = tableElement.getScreenCellAtPosition([2,1])
-      lastCell = tableElement.getScreenCellAtPosition([3,2])
-
-      selectionBoxOffset = selectionBox.getBoundingClientRect()
-      firstCellOffset = firstCell.getBoundingClientRect()
-      lastCellOffset = lastCell.getBoundingClientRect()
-
-      expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, 0)
-      expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, 0)
-      expect(selectionBox.offsetWidth).toBeCloseTo(lastCellOffset.right - firstCellOffset.left, -1)
-      expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, 0)
-
-    describe 'when the columns widths have been changed', ->
-      beforeEach ->
-        tableElement.setColumnsWidths([0.1, 0.1, 0.8])
-        tableElement.setSelection([[2,0],[3,1]])
         nextAnimationFrame()
+
+        expect(tableShadowRoot.querySelectorAll('atom-table-cell.selected').length).toEqual(6)
+
+      it 'marks the row number with a selected class', ->
+        tableEditor.setSelectedRange([[2,0],[4,3]])
+
+        nextAnimationFrame()
+
+        expect(tableShadowRoot.querySelectorAll('atom-table-gutter-cell.selected').length).toEqual(2)
+    describe 'when the selection spans only one cell', ->
+      it 'does not render the selection box', ->
+        expect(tableShadowRoot.querySelector('.selection-box').style.display).toEqual('none')
+        expect(tableShadowRoot.querySelector('.selection-box-handle').style.display).toEqual('none')
+
+    describe 'when the selection spans many cells', ->
+      [selectionBox, selectionBoxHandle] = []
+
+      beforeEach ->
+        tableEditor.setSelectedRange([[2,0],[4,3]])
+        nextAnimationFrame()
+        selectionBox = tableShadowRoot.querySelector('.selection-box')
+        selectionBoxHandle = tableShadowRoot.querySelector('.selection-box-handle')
+
+      it 'renders the selection box', ->
+        expect(selectionBox).toExist()
+        expect(selectionBoxHandle).toExist()
 
       it 'positions the selection box over the cells', ->
         cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
         firstCell = tableElement.getScreenCellAtPosition([2,0])
-        lastCell = tableElement.getScreenCellAtPosition([3,1])
+        lastCell = tableElement.getScreenCellAtPosition([3,2])
 
         selectionBoxOffset = selectionBox.getBoundingClientRect()
         firstCellOffset = firstCell.getBoundingClientRect()
 
-        expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, -1)
-        expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, -1)
-        expect(selectionBox.offsetWidth).toBeCloseTo(firstCell.offsetWidth + lastCell.offsetWidth, -1)
-        expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, -1)
+        expect(selectionBoxOffset.top).toEqual(firstCellOffset.top)
+        expect(selectionBoxOffset.left).toEqual(firstCellOffset.left)
+        expect(selectionBox.offsetWidth).toEqual(300)
+        expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
-  describe '::setSelection', ->
-    it 'change the cursor so that the upper left cell is active', ->
-      tableElement.setSelection([[4,0],[6,2]])
+      it 'positions the selection box handle at the bottom right corner', ->
+        cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
+        lastCell = tableElement.getScreenCellAtPosition([3,2])
+        lastCellOffset = lastCell.getBoundingClientRect()
+        selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
 
-      expect(tableElement.activeCellPosition).toEqual([4,0])
+        expect(selectionBoxHandleOffset.top).toBeCloseTo(lastCellOffset.bottom, -1)
+        expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
 
-  describe '::selectionSpansManyCells', ->
-    it 'returns true when the selection as at least two cells', ->
-      tableElement.setSelection([[4,0],[6,2]])
+      it 'positions the selection box over the cells', ->
+        tableEditor.setSelectedRange([[2,1],[4,3]])
+        nextAnimationFrame()
 
-      expect(tableElement.selectionSpansManyCells()).toBeTruthy()
+        selectionBox = tableShadowRoot.querySelector('.selection-box')
+        cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
+        firstCell = tableElement.getScreenCellAtPosition([2,1])
+        lastCell = tableElement.getScreenCellAtPosition([3,2])
 
-  describe 'core:select-right', ->
-    it 'expands the selection by one cell on the right', ->
-      atom.commands.dispatch(tableElement, 'core:select-right')
-      expect(tableElement.getSelection()).toEqual([[0,0],[0,1]])
+        selectionBoxOffset = selectionBox.getBoundingClientRect()
+        firstCellOffset = firstCell.getBoundingClientRect()
+        lastCellOffset = lastCell.getBoundingClientRect()
 
-    it 'stops at the last column', ->
-      atom.commands.dispatch(tableElement, 'core:select-right')
-      atom.commands.dispatch(tableElement, 'core:select-right')
-      atom.commands.dispatch(tableElement, 'core:select-right')
+        expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, 0)
+        expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, 0)
+        expect(selectionBox.offsetWidth).toBeCloseTo(lastCellOffset.right - firstCellOffset.left, -1)
+        expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, 0)
 
-      expect(tableElement.getSelection()).toEqual([[0,0],[0,2]])
+      describe 'when the columns widths have been changed', ->
+        beforeEach ->
+          tableElement.setColumnsWidths([0.1, 0.1, 0.8])
+          tableEditor.setSelectedRange([[2,0],[4,2]])
+          nextAnimationFrame()
 
-    describe 'then triggering core:select-left', ->
-      it 'collapse the selection back to the left', ->
-        tableElement.activateCellAtPosition([0,1])
+        it 'positions the selection box over the cells', ->
+          cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
+          firstCell = tableElement.getScreenCellAtPosition([2,0])
+          lastCell = tableElement.getScreenCellAtPosition([3,1])
 
-        atom.commands.dispatch(tableElement, 'core:select-right')
-        atom.commands.dispatch(tableElement, 'core:select-left')
+          selectionBoxOffset = selectionBox.getBoundingClientRect()
+          firstCellOffset = firstCell.getBoundingClientRect()
 
-        expect(tableElement.getSelection()).toEqual([[0,1],[0,1]])
+          expect(selectionBoxOffset.top).toBeCloseTo(firstCellOffset.top, -1)
+          expect(selectionBoxOffset.left).toBeCloseTo(firstCellOffset.left, -1)
+          expect(selectionBox.offsetWidth).toBeCloseTo(firstCell.offsetWidth + lastCell.offsetWidth, -1)
+          expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, -1)
 
-  describe 'core:select-left', ->
-    beforeEach ->
-      tableElement.activateCellAtPosition([0,2])
+    describe 'core:select-right', ->
+      it 'expands the selection by one cell on the right', ->
+        tableElement.expandSelectionRight()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
 
-    it 'expands the selection by one cell on the left', ->
-      atom.commands.dispatch(tableElement, 'core:select-left')
-      expect(tableElement.getSelection()).toEqual([[0,1],[0,2]])
+      it 'stops at the last column', ->
+        tableElement.expandSelectionRight()
+        tableElement.expandSelectionRight()
+        tableElement.expandSelectionRight()
 
-    it 'stops at the first column', ->
-      atom.commands.dispatch(tableElement, 'core:select-left')
-      atom.commands.dispatch(tableElement, 'core:select-left')
-      atom.commands.dispatch(tableElement, 'core:select-left')
-      expect(tableElement.getSelection()).toEqual([[0,0],[0,2]])
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-    describe 'then triggering core:select-right', ->
-      it 'collapse the selection back to the right', ->
-        tableElement.activateCellAtPosition([0,1])
+      describe 'then triggering core:select-left', ->
+        it 'collapse the selection back to the left', ->
+          tableEditor.setCursorAtScreenPosition([0,1])
 
-        atom.commands.dispatch(tableElement, 'core:select-left')
-        atom.commands.dispatch(tableElement, 'core:select-right')
+          tableElement.expandSelectionRight()
+          tableElement.expandSelectionLeft()
 
-        expect(tableElement.getSelection()).toEqual([[0,1],[0,1]])
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,2]])
 
-  describe 'core:select-up', ->
-    beforeEach ->
-      tableElement.activateCellAtPosition([2,0])
+    describe 'core:select-left', ->
+      beforeEach ->
+        tableEditor.setCursorAtScreenPosition([0,2])
 
-    it 'expands the selection by one cell to the top', ->
-      atom.commands.dispatch(tableElement, 'core:select-up')
-      expect(tableElement.getSelection()).toEqual([[1,0],[2,0]])
+      it 'expands the selection by one cell on the left', ->
+        tableElement.expandSelectionLeft()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 
-    it 'stops at the first row', ->
-      atom.commands.dispatch(tableElement, 'core:select-up')
-      atom.commands.dispatch(tableElement, 'core:select-up')
-      atom.commands.dispatch(tableElement, 'core:select-up')
-      expect(tableElement.getSelection()).toEqual([[0,0],[2,0]])
+      it 'stops at the first column', ->
+        tableElement.expandSelectionLeft()
+        tableElement.expandSelectionLeft()
+        tableElement.expandSelectionLeft()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-    it 'scrolls the view to make the added row visible', ->
-      tableElement.setScrollTop(200)
-      tableElement.activateCellAtPosition([10,0])
+      describe 'then triggering core:select-right', ->
+        it 'collapse the selection back to the right', ->
+          tableEditor.setCursorAtScreenPosition([0,1])
 
-      atom.commands.dispatch(tableElement, 'core:select-up')
+          tableElement.expandSelectionLeft()
+          tableElement.expandSelectionRight()
 
-      expect(tableElement.getRowsContainer().scrollTop).toEqual(180)
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,2]])
 
-    describe 'then triggering core:select-down', ->
-      it 'collapse the selection back to the bottom', ->
-        tableElement.activateCellAtPosition([1,0])
+    describe 'core:select-up', ->
+      beforeEach ->
+        tableEditor.setCursorAtScreenPosition([2,0])
 
-        atom.commands.dispatch(tableElement, 'core:select-up')
-        atom.commands.dispatch(tableElement, 'core:select-down')
+      it 'expands the selection by one cell to the top', ->
+        tableElement.expandSelectionUp()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[3,1]])
 
-        expect(tableElement.getSelection()).toEqual([[1,0],[1,0]])
+      it 'stops at the first row', ->
+        tableElement.expandSelectionUp()
+        tableElement.expandSelectionUp()
+        tableElement.expandSelectionUp()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[3,1]])
 
-  describe 'core:select-down', ->
-    beforeEach ->
-      tableElement.activateCellAtPosition([97,0])
+      it 'scrolls the view to make the added row visible', ->
+        tableElement.setScrollTop(200)
+        tableEditor.setCursorAtScreenPosition([10,0])
 
-    it 'expands the selection by one cell to the bottom', ->
-      atom.commands.dispatch(tableElement, 'core:select-down')
-      expect(tableElement.getSelection()).toEqual([[97,0],[98,0]])
+        tableElement.expandSelectionUp()
 
-    it 'stops at the last row', ->
-      atom.commands.dispatch(tableElement, 'core:select-down')
-      atom.commands.dispatch(tableElement, 'core:select-down')
-      atom.commands.dispatch(tableElement, 'core:select-down')
-      expect(tableElement.getSelection()).toEqual([[97,0],[99,0]])
+        expect(tableElement.getRowsContainer().scrollTop).toEqual(180)
 
-    it 'scrolls the view to make the added row visible', ->
-      tableElement.activateCellAtPosition([8,0])
+      describe 'then triggering core:select-down', ->
+        it 'collapse the selection back to the bottom', ->
+          tableEditor.setCursorAtScreenPosition([1,0])
 
-      atom.commands.dispatch(tableElement, 'core:select-down')
+          tableElement.expandSelectionUp()
+          tableElement.expandSelectionDown()
 
-      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,1]])
 
-    describe 'then triggering core:select-up', ->
-      it 'collapse the selection back to the bottom', ->
-        tableElement.activateCellAtPosition([1,0])
+    describe 'core:select-down', ->
+      beforeEach ->
+        tableEditor.setCursorAtScreenPosition([97,0])
 
-        atom.commands.dispatch(tableElement, 'core:select-down')
-        atom.commands.dispatch(tableElement, 'core:select-up')
+      it 'expands the selection by one cell to the bottom', ->
+        tableElement.expandSelectionDown()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[97,0],[99,1]])
 
-        expect(tableElement.getSelection()).toEqual([[1,0],[1,0]])
+      it 'stops at the last row', ->
+        tableElement.expandSelectionDown()
+        tableElement.expandSelectionDown()
+        tableElement.expandSelectionDown()
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[97,0],[100,1]])
 
-  describe 'table-edit:select-to-end-of-line', ->
-    it 'expands the selection to the end of the current row', ->
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-line')
+      it 'scrolls the view to make the added row visible', ->
+        tableEditor.setCursorAtScreenPosition([8,0])
 
-      expect(tableElement.getSelection()).toEqual([[0,0],[0,2]])
+        tableElement.expandSelectionDown()
 
-    describe 'then triggering table-edit:select-to-beginning-of-line', ->
-      it 'expands the selection to the beginning of the current row', ->
-        tableElement.activateCellAtPosition([0,1])
+        expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-line')
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-line')
+      describe 'then triggering core:select-up', ->
+        it 'collapse the selection back to the bottom', ->
+          tableEditor.setCursorAtScreenPosition([1,0])
 
-        expect(tableElement.getSelection()).toEqual([[0,0],[0,1]])
+          tableElement.expandSelectionDown()
+          tableElement.expandSelectionUp()
 
-  describe 'table-edit:select-to-beginning-of-line', ->
-    it 'expands the selection to the beginning of the current row', ->
-      tableElement.activateCellAtPosition([0,2])
-
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-line')
-
-      expect(tableElement.getSelection()).toEqual([[0,0],[0,2]])
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,1]])
 
     describe 'table-edit:select-to-end-of-line', ->
       it 'expands the selection to the end of the current row', ->
-        tableElement.activateCellAtPosition([0,1])
+        tableElement.expandSelectionToBeginningOfTable()
 
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-line')
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-line')
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-        expect(tableElement.getSelection()).toEqual([[0,1],[0,2]])
+      describe 'then triggering table-edit:select-to-beginning-of-line', ->
+        it 'expands the selection to the beginning of the current row', ->
+          tableEditor.setCursorAtScreenPosition([0,1])
 
-  describe 'table-edit:select-to-end-of-table', ->
-    it 'expands the selection to the end of the table', ->
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
+          tableElement.expandSelectionToBeginningOfTable()
+          tableElement.expandSelectionToBeginningOfLine()
 
-      expect(tableElement.getSelection()).toEqual([[0,0],[99,0]])
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
 
-    it 'scrolls the view to make the added row visible', ->
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
+    describe 'table-edit:select-to-beginning-of-line', ->
+      it 'expands the selection to the beginning of the current row', ->
+        tableEditor.setCursorAtScreenPosition([0,2])
 
-      expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
+        tableElement.expandSelectionToBeginningOfLine()
 
-    describe 'then triggering table-edit:select-to-beginning-of-table', ->
-      it 'expands the selection to the beginning of the table', ->
-        tableElement.activateCellAtPosition([1,0])
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
+      describe 'table-edit:select-to-end-of-line', ->
+        it 'expands the selection to the end of the current row', ->
+          tableEditor.setCursorAtScreenPosition([0,1])
 
-        expect(tableElement.getSelection()).toEqual([[0,0],[1,0]])
+          tableElement.expandSelectionToBeginningOfLine()
+          tableElement.expandSelectionToBeginningOfTable()
 
-  describe 'table-edit:select-to-beginning-of-table', ->
-    it 'expands the selection to the beginning of the table', ->
-      tableElement.activateCellAtPosition([2,0])
-
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
-
-      expect(tableElement.getSelection()).toEqual([[0,0],[2,0]])
-
-    it 'scrolls the view to make the added row visible', ->
-      tableElement.activateCellAtPosition([99,0])
-
-      atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
-
-      expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 
     describe 'table-edit:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
-        tableElement.activateCellAtPosition([1,0])
+        tableElement.expandSelectionToEndOfTable()
 
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-beginning-of-table')
-        atom.commands.dispatch(tableElement, 'table-edit:select-to-end-of-table')
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[100,1]])
 
-        expect(tableElement.getSelection()).toEqual([[1,0],[99,0]])
+      it 'scrolls the view to make the added row visible', ->
+        tableElement.expandSelectionToEndOfTable()
 
-  describe 'dragging the mouse pressed over cell', ->
-    it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="2"]')
+        expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
-      mousedown(startCell)
-      mousemove(endCell)
+      describe 'then triggering table-edit:select-to-beginning-of-table', ->
+        it 'expands the selection to the beginning of the table', ->
+          tableEditor.setCursorAtScreenPosition([1,0])
 
-      expect(tableElement.getSelection()).toEqual([[3,0],[6,2]])
+          tableElement.expandSelectionToEndOfTable()
+          tableElement.expandSelectionToBeginningOfTable()
 
-      mousedown(endCell)
-      mousemove(startCell)
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[2,1]])
 
-      expect(tableElement.getSelection()).toEqual([[3,0],[6,2]])
+    describe 'table-edit:select-to-beginning-of-table', ->
+      it 'expands the selection to the beginning of the table', ->
+        tableEditor.setCursorAtScreenPosition([2,0])
 
-    it 'scrolls the view when the selection reach the last row', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="9"][data-column="2"]')
+        tableElement.expandSelectionToBeginningOfTable()
 
-      mousedown(startCell)
-      mousemove(endCell)
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[3,1]])
 
-      expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
+      it 'scrolls the view to make the added row visible', ->
+        tableEditor.setCursorAtScreenPosition([99,0])
 
-    it 'scrolls the view when the selection reach the first row', ->
-      tableElement.setScrollTop(300)
-      nextAnimationFrame()
+        tableElement.expandSelectionToBeginningOfTable()
 
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="11"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="8"][data-column="2"]')
+        expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
 
-      mousedown(startCell)
-      mousemove(endCell)
+      describe 'table-edit:select-to-end-of-table', ->
+        it 'expands the selection to the end of the table', ->
+          tableEditor.setCursorAtScreenPosition([1,0])
 
-      expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
+          tableElement.expandSelectionToBeginningOfTable()
+          tableElement.expandSelectionToEndOfTable()
 
-  describe 'when the columns widths have been changed', ->
-    beforeEach ->
-      tableElement.setColumnsWidths([100, 200, 300])
-      nextAnimationFrame()
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[100,1]])
 
-    it 'creates a selection with the cells from the mouse movements', ->
-      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="1"]')
+    describe 'dragging the mouse pressed over cell', ->
+      it 'creates a selection with the cells from the mouse movements', ->
+        startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+        endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="2"]')
 
-      mousedown(startCell)
-      mousemove(endCell)
+        mousedown(startCell)
+        mousemove(endCell)
 
-      expect(tableElement.getSelection()).toEqual([[3,0],[6,1]])
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,3]])
 
-  describe 'dragging the selection box handle', ->
-    [handle, handleOffset] = []
+        mousedown(endCell)
+        mousemove(startCell)
 
-    beforeEach ->
-      tableElement.setSelection([[2,0],[2,1]])
-      nextAnimationFrame()
-      handle = tableShadowRoot.querySelector('.selection-box-handle')
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,3]])
 
-      mousedown(handle)
+      it 'scrolls the view when the selection reach the last row', ->
+        startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
+        endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="9"][data-column="2"]')
 
-    describe 'to the right', ->
+        mousedown(startCell)
+        mousemove(endCell)
+
+        expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
+
+      it 'scrolls the view when the selection reach the first row', ->
+        tableElement.setScrollTop(300)
+        nextAnimationFrame()
+
+        startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="11"][data-column="0"]')
+        endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="8"][data-column="2"]')
+
+        mousedown(startCell)
+        mousemove(endCell)
+
+        expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
+
+    describe 'when the columns widths have been changed', ->
       beforeEach ->
-        handleOffset = handle.getBoundingClientRect()
-        mousemove(handle, handleOffset.left + 50, handleOffset.top-2)
+        tableElement.setColumnsWidths([100, 200, 300])
+        nextAnimationFrame()
 
-      it 'expands the selection to the right', ->
-        expect(tableElement.getSelection()).toEqual([[2,0],[2,2]])
-  ###
+      it 'creates a selection with the cells from the mouse movements', ->
+        startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+        endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="1"]')
+
+        mousedown(startCell)
+        mousemove(endCell)
+
+        expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,2]])
+
+    describe 'dragging the selection box handle', ->
+      [handle, handleOffset] = []
+
+      beforeEach ->
+        tableEditor.setSelectedRange([[2,0],[3,2]])
+        nextAnimationFrame()
+        handle = tableShadowRoot.querySelector('.selection-box-handle')
+
+        mousedown(handle)
+
+      describe 'to the right', ->
+        beforeEach ->
+          handleOffset = handle.getBoundingClientRect()
+          mousemove(handle, handleOffset.left + 50, handleOffset.top-2)
+
+        it 'expands the selection to the right', ->
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[2,0],[3,3]])
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##

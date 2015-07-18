@@ -47,6 +47,15 @@ class TableEditor
 
     @addCursorAtScreenPosition(new Point(0,0))
 
+    disposable = @displayTable.onDidChangeScreenRows =>
+      selection = @getLastSelection()
+      selection.selectNone() if selection.isEmpty()
+      disposable.dispose()
+
+  getTitle: -> 'Table'
+
+  getLongTitle: -> 'Table'
+
   onDidAddCursor: (callback) ->
     @emitter.on 'did-add-cursor', callback
 
@@ -139,6 +148,18 @@ class TableEditor
 
   expandRight: (delta) ->
     @modifySelections (selection) -> selection.expandRight(delta)
+
+  expandToTop: (delta) ->
+    @modifySelections (selection) -> selection.expandToTop(delta)
+
+  expandToBottom: (delta) ->
+    @modifySelections (selection) -> selection.expandToBottom(delta)
+
+  expandToLeft: (delta) ->
+    @modifySelections (selection) -> selection.expandToLeft(delta)
+
+  expandToRight: (delta) ->
+    @modifySelections (selection) -> selection.expandToRight(delta)
 
   modifySelections: (fn) ->
     fn(selection) for selection in @getSelections()
