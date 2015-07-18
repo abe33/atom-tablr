@@ -1436,7 +1436,7 @@ describe 'tableElement', ->
 
     describe 'table-edit:select-to-end-of-line', ->
       it 'expands the selection to the end of the current row', ->
-        tableElement.expandSelectionToBeginningOfTable()
+        tableElement.expandSelectionToEndOfLine()
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
@@ -1444,7 +1444,7 @@ describe 'tableElement', ->
         it 'expands the selection to the beginning of the current row', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
-          tableElement.expandSelectionToBeginningOfTable()
+          tableElement.expandSelectionToEndOfLine()
           tableElement.expandSelectionToBeginningOfLine()
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
@@ -1462,7 +1462,7 @@ describe 'tableElement', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
           tableElement.expandSelectionToBeginningOfLine()
-          tableElement.expandSelectionToBeginningOfTable()
+          tableElement.expandSelectionToEndOfLine()
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 

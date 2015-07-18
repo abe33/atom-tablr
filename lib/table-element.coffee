@@ -294,11 +294,10 @@ class TableElement extends HTMLElement
 
   makeRowVisible: (row) ->
     container = @getRowsScrollContainer()
-    rowHeight = @tableEditor.getScreenRowHeightAt(row)
-
     scrollViewHeight = container.offsetHeight
     currentScrollTop = container.scrollTop
 
+    rowHeight = @tableEditor.getScreenRowHeightAt(row)
     rowOffset = @tableEditor.getScreenRowOffsetAt(row)
 
     scrollTopAsFirstVisibleRow = rowOffset
@@ -660,7 +659,7 @@ class TableElement extends HTMLElement
 
   expandSelectionRight: ->
     @tableEditor.expandRight()
-    @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column)
+    @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
     @requestUpdate()
 
   expandSelectionLeft: ->
@@ -675,12 +674,12 @@ class TableElement extends HTMLElement
 
   expandSelectionDown: ->
     @tableEditor.expandDown()
-    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row)
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row - 1)
     @requestUpdate()
 
   expandSelectionToEndOfLine: ->
     @tableEditor.expandToRight()
-    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.column)
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
     @requestUpdate()
 
   expandSelectionToBeginningOfLine: ->
@@ -690,7 +689,7 @@ class TableElement extends HTMLElement
 
   expandSelectionToEndOfTable: ->
     @tableEditor.expandToBottom()
-    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row)
+    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.row - 1)
     @requestUpdate()
 
   expandSelectionToBeginningOfTable: ->
