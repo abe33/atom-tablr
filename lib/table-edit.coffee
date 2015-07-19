@@ -52,6 +52,7 @@ module.exports =
           tableEditor.addRows(data)
           table.clearUndoStack()
           table.modified = false
+          table.updateCachedContents()
 
           resolve(tableEditor)
 
