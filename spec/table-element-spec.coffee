@@ -4,8 +4,6 @@ Table = require '../lib/table'
 TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
 Column = require '../lib/display-column'
-Row = require '../lib/row'
-Cell = require '../lib/cell'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
 stylesheetPath = path.resolve __dirname, '..', 'styles', 'table-edit.less'
