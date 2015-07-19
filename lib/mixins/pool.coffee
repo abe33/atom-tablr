@@ -37,7 +37,12 @@ class Pool extends Mixin
         @unused#{Plural}.push(instance)
         instance.release(false)
 
-      total#{Plural}Count: -> @used#{Plural}.length + @unused#{Plural}.length
+      total#{Singular}Count: -> @used#{Plural}.length + @unused#{Plural}.length
+
+      clear#{Plural}: ->
+        instance.release(false) for instance in @used#{Plural}
+        @used#{Plural} = []
+        @unused#{Plural} = []
     """
 
     sandbox = {Mixin, atom, console}

@@ -19,6 +19,27 @@ describe 'Table', ->
     it 'raises an exception', ->
       expect(-> table.addRow {}).toThrow()
 
+  describe 'when destroyed', ->
+    beforeEach ->
+      table.addColumn('name')
+      table.addColumn('age')
+
+      table.addRow(['John Doe', 30])
+      table.addRow(['Jane Doe', 30])
+
+      table.destroy()
+
+    it 'clears its content', ->
+      expect(table.getRowCount()).toEqual(0)
+      expect(table.getColumnCount()).toEqual(0)
+
+    it 'throws an error when adding a row', ->
+      expect(-> table.addRow(['foo'])).toThrow()
+      expect(-> table.addRows([['foo']])).toThrow()
+
+    it 'throws an error when adding a column', ->
+      expect(-> table.addColumn('foo')).toThrow()
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##

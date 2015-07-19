@@ -38,6 +38,22 @@ describe 'DisplayTable', ->
       expect(displayTable.getContentWidth()).toEqual(200)
       expect(displayTable.getContentHeight()).toEqual(60)
 
+    describe 'when destroyed', ->
+      beforeEach ->
+        displayTable.destroy()
+
+      it 'destroys its table', ->
+        expect(table.isDestroyed()).toBeTruthy()
+
+      it 'is destroyed', ->
+        expect(displayTable.isDestroyed()).toBeTruthy()
+
+      it 'clears its screen columns', ->
+        expect(displayTable.getScreenColumnCount()).toEqual(0)
+        expect(displayTable.getScreenRowCount()).toEqual(0)
+        expect(displayTable.rowOffsets).toEqual([])
+        expect(displayTable.columnOffsets).toEqual([])
+
     ##      ######   #######  ##       ##     ## ##     ## ##    ##  ######
     ##     ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
     ##     ##       ##     ## ##       ##     ## #### #### ####  ## ##

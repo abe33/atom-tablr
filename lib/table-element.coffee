@@ -167,8 +167,9 @@ class TableElement extends HTMLElement
     @attached = false
 
   destroy: ->
-    @subscriptions.dispose()
-    @remove()
+    @tableEditor.destroy()
+
+  isDestroyed: -> @destroyed
 
   remove: ->
     @parentNode?.removeChild(this)
@@ -203,6 +204,8 @@ class TableElement extends HTMLElement
     @setModel(model)
 
   setModel: (table) ->
+    if @isDestroyed()
+      throw new Error "Can't set the model of a destroyed TableElement"
     return unless table?
 
     @unsetModel() if @tableEditor?
@@ -222,6 +225,15 @@ class TableElement extends HTMLElement
     subs.add @tableEditor.onDidAddSelection => @requestUpdate()
     subs.add @tableEditor.onDidRemoveSelection => @requestUpdate()
     subs.add @tableEditor.onDidChangeSelectionRange => @requestUpdate()
+    subs.add @tableEditor.onDidDestroy =>
+      @unsetModel()
+      @subscriptions.dispose()
+      @destroyed = true
+      @subscriptions = null
+      @clearCells()
+      @clearGutterCells()
+      @clearHeaderCells()
+      @remove()
 
     @requestUpdate()
 
@@ -908,7 +920,7 @@ class TableElement extends HTMLElement
     @getRowsContainer().scrollLeft
 
   requestUpdate: (@hasChanged=true) =>
-    return if @updateRequested
+    return if @destroyed or @updateRequested
 
     @updateRequested = true
     requestAnimationFrame =>

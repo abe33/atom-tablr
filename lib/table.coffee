@@ -15,7 +15,16 @@ class Table
     @columns = []
     @rows = []
     @emitter = new Emitter
-    @columnSubscriptions = {}
+
+  destroy: ->
+    return if @destroyed
+    @emitter.emit 'did-destroy', this
+    @emitter.dispose()
+    @columns = []
+    @rows = []
+    @destroyed = true
+
+  isDestroyed: -> @destroyed
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##
@@ -46,6 +55,9 @@ class Table
   onDidChangeCellValue: (callback) ->
     @emitter.on 'did-change-cell-value', callback
 
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -70,6 +82,7 @@ class Table
     @addColumnAt(@columns.length, name, transaction, event)
 
   addColumnAt: (index, column, transaction=true, event=true) ->
+    throw new Error "Can't add column to a destroyed table" if @isDestroyed()
     throw new Error "Can't add column #{column} at index #{index}" if index < 0
     throw new Error "Can't add column without a name" unless column?
 
@@ -158,7 +171,8 @@ class Table
     @addRowAt(@rows.length, values, batch, transaction)
 
   addRowAt: (index, values={}, batch=false, transaction=true) ->
-    throw new Error "Can't add column #{name} at index #{index}" if index < 0
+    throw new Error "Can't add row to a destroyed table" if @isDestroyed()
+    throw new Error "Can't add row #{values} at index #{index}" if index < 0
 
     if @columns.length is 0
       throw new Error "Can't add rows to a table without column"
@@ -193,6 +207,8 @@ class Table
     @addRowsAt(@rows.length, rows, transaction)
 
   addRowsAt: (index, rows, transaction=true) ->
+    throw new Error "Can't add rows to a destroyed table" if @isDestroyed()
+
     createdRows = rows.map (row,i) => @addRowAt(index+i, row, true)
 
     @emitter.emit 'did-change-rows', {

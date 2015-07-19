@@ -131,6 +131,30 @@ describe 'tableElement', ->
         cell = element.shadowRoot.querySelectorAll('atom-table-cell')
         expect(cell.length).toEqual(1)
 
+  describe 'when the table is destroyed', ->
+    beforeEach ->
+      tableEditor.destroy()
+
+    it 'is destroyed', ->
+      expect(tableElement.isDestroyed()).toBeTruthy()
+
+    it 'removes its model', ->
+      expect(tableElement.getModel()).toBeNull()
+
+    it 'clears its cell pools', ->
+      expect(tableElement.totalCellCount()).toEqual(0)
+      expect(tableElement.totalGutterCellCount()).toEqual(0)
+      expect(tableElement.totalHeaderCellCount()).toEqual(0)
+
+    it 'no longer accepts update request', ->
+      tableElement.updateRequested = false
+      tableElement.requestUpdate()
+
+      expect(tableElement.updateRequested).toBeFalsy()
+
+    it 'throws an exception if an attempt is made to set its model again', ->
+      expect(-> tableElement.setModel(tableEditor)).toThrow()
+
   #     ######   #######  ##    ## ######## ######## ##    ## ########
   #    ##    ## ##     ## ###   ##    ##    ##       ###   ##    ##
   #    ##       ##     ## ####  ##    ##    ##       ####  ##    ##

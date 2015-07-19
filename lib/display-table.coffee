@@ -8,7 +8,7 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'rowRangeFrom', toProperty: 'table'
+  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'rowRangeFrom', 'destroy', toProperty: 'table'
 
   rowOffsets: null
   columnOffsets: null
@@ -31,6 +31,9 @@ class DisplayTable
     @rowHeights = @table.getColumns().map (column) => @getRowHeight()
     @computeScreenColumnOffsets()
     @updateScreenRows()
+
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
 
   onDidAddColumn: (callback) ->
     @emitter.on 'did-add-column', callback
@@ -86,6 +89,23 @@ class DisplayTable
       }
       @emitter.emit 'did-change-cell-value', newEvent
 
+    @subscriptions.add @table.onDidDestroy (event) =>
+      @unsubscribeFromScreenColumn(column) for column in @screenColumns
+      @rowOffsets = []
+      @rowHeights = []
+      @columnOffsets = []
+      @screenColumns = []
+      @screenRows = []
+      @screenToModelRowsMap = {}
+      @modelToScreenRowsMap = {}
+      @destroyed = true
+      @emitter.emit 'did-destroy', this
+      @emitter.dispose()
+      @emitter = null
+      @subscriptions.dispose()
+      @subscriptions = null
+      @table = null
+
   subscribeToConfig: ->
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
@@ -101,6 +121,8 @@ class DisplayTable
   observeConfig: (configs) ->
     for config, callback of configs
       @subscriptions.add atom.config.observe config, callback
+
+  isDestroyed: -> @destroyed
 
   ##     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   ##    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##

@@ -33,6 +33,7 @@ class TableEditor
     'onDidChangeCellValue',
     'sortBy', 'toggleSortDirection', 'resetSort',
     'undo', 'redo', 'clearUndoStack', 'clearRedoStack',
+    'destroy',
     toProperty: 'displayTable'
   )
 
@@ -48,14 +49,31 @@ class TableEditor
 
     @addCursorAtScreenPosition(new Point(0,0))
 
-    disposable = @displayTable.onDidChangeScreenRows =>
+    rowsSubscription = @displayTable.onDidChangeScreenRows =>
       selection = @getLastSelection()
       selection.selectNone() if selection.isEmpty()
-      disposable.dispose()
+      rowsSubscription.dispose()
+
+    @subscriptions.add rowsSubscription
+    @subscriptions.add @displayTable.onDidDestroy =>
+      cursor.destroy() for cursor in @cursors
+      @destroyed = true
+      @emitter.emit 'did-destroy', this
+      @emitter.dispose()
+      @emitter = null
+      @subscriptions.dispose()
+      @subscriptions = null
+      @displayTable = null
+      @table = null
+
+  isDestroyed: -> @destroyed
 
   getTitle: -> 'Table'
 
   getLongTitle: -> 'Table'
+
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
 
   onDidAddCursor: (callback) ->
     @emitter.on 'did-add-cursor', callback

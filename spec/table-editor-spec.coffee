@@ -74,6 +74,21 @@ describe 'TableEditor', ->
       expect(tableEditor.getCursorValue()).toEqual('age')
       expect(tableEditor.getCursorValues()).toEqual(['age'])
 
+    describe 'when destroyed', ->
+      beforeEach ->
+        tableEditor.destroy()
+
+      it 'destroys its table and display table', ->
+        expect(table.isDestroyed()).toBeTruthy()
+        expect(displayTable.isDestroyed()).toBeTruthy()
+
+      it 'is destroyed', ->
+        expect(tableEditor.isDestroyed()).toBeTruthy()
+
+      it 'removes its cursors and selections', ->
+        expect(tableEditor.getCursors().length).toEqual(0)
+        expect(tableEditor.getSelections().length).toEqual(0)
+
     ##     ######  ##     ## ########   ######   #######  ########   ######
     ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
     ##    ##       ##     ## ##     ## ##       ##     ## ##     ## ##
