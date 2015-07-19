@@ -42,6 +42,7 @@ class TableEditor
     @displayTable = new DisplayTable({@table})
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
+    @cursorSubscriptions = new WeakMap
     @cursors = []
     @selections = []
 
@@ -73,6 +74,31 @@ class TableEditor
 
   onDidChangeSelectionRange: (callback) ->
     @emitter.on 'did-change-selection-range', callback
+
+  createCursorAndSelection: (position, range) ->
+    position = Point.fromObject(position)
+    range = Range.fromObject(range) if range?
+
+    cursor = new Cursor({position: position, tableEditor: this})
+    selection = new Selection({cursor, range, tableEditor: this})
+
+    @selections.push selection
+    @cursors.push cursor
+
+    @emitter.emit 'did-add-selection', {selection, tableEditor: this}
+    @emitter.emit 'did-add-cursor', {cursor, tableEditor: this}
+
+    @cursorSubscriptions.set cursor, cursor.onDidDestroy =>
+      @cursors.splice(@cursors.indexOf(cursor), 1)
+      @emitter.emit 'did-remove-cursor', {cursor, tableEditor: this}
+      @cursorSubscriptions.get(cursor).dispose()
+      @cursorSubscriptions.delete(cursor)
+
+    @cursorSubscriptions.set selection, selection.onDidDestroy =>
+      @selections.splice(@selections.indexOf(selection), 1)
+      @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
+      @cursorSubscriptions.get(selection).dispose()
+      @cursorSubscriptions.delete(selection)
 
   ##     ######  ######## ##       ########  ######  ########
   ##    ##    ## ##       ##       ##       ##    ##    ##
@@ -121,21 +147,15 @@ class TableEditor
         @addSelectionAtScreenRange(range)
 
     selection.destroy() for selection in selections
+
     @mergeSelections()
 
   addSelectionAtScreenRange: (range) ->
     range = Range.fromObject(range)
-
-    cursor = new Cursor({position: range.start, tableEditor: this})
-    selection = new Selection({cursor, range, tableEditor: this})
-    @selections.push selection
-    @cursors.push cursor
-    @emitter.emit 'did-add-selection', {selection, tableEditor: this}
-    @emitter.emit 'did-add-cursor', {cursor, tableEditor: this}
+    @createCursorAndSelection(range.start, range)
 
   removeSelection: (selection) ->
-    @selections.splice(@selections.indexOf(selection), 1)
-    @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
+    selection.destroy()
 
   expandUp: (delta) ->
     @modifySelections (selection) -> selection.expandUp(delta)
@@ -178,7 +198,6 @@ class TableEditor
 
       if isContained
         selectionA.destroy()
-        selectionA.getCursor().destroy()
       else
         remainingSelections.push(selectionA)
 
@@ -239,12 +258,7 @@ class TableEditor
     position = Point.fromObject(position)
     return if @cursors.some (cursor) -> cursor.getPosition().isEqual(position)
 
-    cursor = new Cursor({position, tableEditor: this})
-    selection = new Selection({cursor, tableEditor: this})
-    @selections.push selection
-    @cursors.push cursor
-    @emitter.emit 'did-add-selection', {selection, tableEditor: this}
-    @emitter.emit 'did-add-cursor', {cursor, tableEditor: this}
+    @createCursorAndSelection(position)
 
   setCursorAtPosition: (position) ->
     position = @screenPosition(position)
@@ -254,8 +268,7 @@ class TableEditor
     @moveCursors (cursor) -> cursor.setPosition(position)
 
   removeCursor: (cursor) ->
-    @cursors.splice(@cursors.indexOf(cursor), 1)
-    @emitter.emit 'did-remove-cursor', {cursor, tableEditor: this}
+    cursor.destroy()
 
   moveCursors: (fn) ->
     fn(cursor) for cursor in @getCursors()
@@ -268,7 +281,6 @@ class TableEditor
       position = cursor.getPosition().toString()
       if positions.hasOwnProperty(position)
         cursor.destroy()
-        cursor.selection.destroy()
       else
         positions[position] = true
     return

@@ -13,9 +13,21 @@ class Cursor
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 
+  bind: (@binding) ->
+    {@selection} = @binding
+    @bindingSubscription = @binding.onDidDestroy =>
+      @emitter.emit('did-destroy', this)
+      @emitter.dispose()
+      @bindingSubscription.dispose()
+      @binding = null
+      @bindingSubscription = null
+      @destroyed = null
+
   destroy: ->
-    @tableEditor.removeCursor(this)
-    @emitter.emit('did-destroy', this)
+    return if @isDestroyed()
+    @binding.destroy()
+
+  isDestroyed: -> @destroyed
 
   getPosition: -> @position
 

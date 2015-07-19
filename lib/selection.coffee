@@ -1,22 +1,36 @@
 {Emitter} = require 'atom'
 Range = require './range'
+CursorSelectionBinding = require './cursor-selection-binding'
 
 module.exports =
 class Selection
   constructor: ({@range, @cursor, @tableEditor}) ->
-    @cursor.selection = this
+    @binding = new CursorSelectionBinding({@cursor, selection: this})
+    @cursor.bind(@binding)
     @range = @cursor.getRange() unless @range?
     @emitter = new Emitter
 
-  onDidChangeRange: (callback) ->
-    @emitter.on 'did-change-range', callback
+    @bindingSubscription = @binding.onDidDestroy =>
+      @emitter.emit('did-destroy', this)
+      @emitter.dispose()
+      @bindingSubscription.dispose()
+      @binding = null
+      @cursor = null
+      @bindingSubscription = null
+      @destroyed = true
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 
+  onDidChangeRange: (callback) ->
+    @emitter.on 'did-change-range', callback
+
   destroy: ->
-    @tableEditor.removeSelection(this)
-    @emitter.emit('did-destroy', this)
+    return if @isDestroyed()
+    
+    @binding.destroy()
+
+  isDestroyed: -> @destroyed
 
   getCursor: -> @cursor
 

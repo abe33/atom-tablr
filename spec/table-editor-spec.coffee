@@ -74,6 +74,14 @@ describe 'TableEditor', ->
       expect(tableEditor.getCursorValue()).toEqual('age')
       expect(tableEditor.getCursorValues()).toEqual(['age'])
 
+    ##     ######  ##     ## ########   ######   #######  ########   ######
+    ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
+    ##    ##       ##     ## ##     ## ##       ##     ## ##     ## ##
+    ##    ##       ##     ## ########   ######  ##     ## ########   ######
+    ##    ##       ##     ## ##   ##         ## ##     ## ##   ##         ##
+    ##    ##    ## ##     ## ##    ##  ##    ## ##     ## ##    ##  ##    ##
+    ##     ######   #######  ##     ##  ######   #######  ##     ##  ######
+
     describe '::addCursorAtScreenPosition', ->
       it 'adds a cursor', ->
         tableEditor.addCursorAtScreenPosition([1,1])
@@ -188,6 +196,14 @@ describe 'TableEditor', ->
         expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
         expect(tableEditor.getCursorPosition()).toEqual([2,1])
 
+    ##      ######  ######## ##       ########  ######  ########  ######
+    ##     ##    ## ##       ##       ##       ##    ##    ##    ##    ##
+    ##     ##       ##       ##       ##       ##          ##    ##
+    ##      ######  ######   ##       ######   ##          ##     ######
+    ##           ## ##       ##       ##       ##          ##          ##
+    ##     ##    ## ##       ##       ##       ##    ##    ##    ##    ##
+    ##      ######  ######## ######## ########  ######     ##     ######
+
     describe '::setSelectedRange', ->
       it 'sets the selection range', ->
         tableEditor.setSelectedRange([[0,0], [2,2]])
@@ -219,6 +235,14 @@ describe 'TableEditor', ->
         expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]], [[2,2],[3,3]]])
         expect(tableEditor.getSelections().length).toEqual(2)
         expect(tableEditor.getCursors().length).toEqual(2)
+
+      it 'destroys selection when there is less ranges', ->
+        tableEditor.setSelectedRanges([[[0,0], [2,2]], [[2,2],[3,3]]])
+        tableEditor.setSelectedRanges([[[1,1], [2,2]]])
+
+        expect(tableEditor.getSelectedRanges()).toEqual([[[1,1], [2,2]]])
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getCursors().length).toEqual(1)
 
       describe 'when defining a selection contained in another one', ->
         it 'merges the selections', ->
