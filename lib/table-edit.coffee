@@ -43,13 +43,17 @@ module.exports =
         csv.parse fileContent, (err, data) ->
           return reject(err) if err?
 
-          table = new TableEditor
-          return data if data.length is 0
+          tableEditor = new TableEditor
+          return resolve(tableEditor) if data.length is 0
 
-          table.addColumn(column, {}, false) for column in data.shift()
-          table.addRows(data)
+          {table} = tableEditor
 
-          resolve(table)
+          tableEditor.addColumn(column, {}, false) for column in data.shift()
+          tableEditor.addRows(data)
+          table.clearUndoStack()
+          table.modified = false
+
+          resolve(tableEditor)
 
     atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
@@ -79,6 +83,7 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
+    table.getTable().modified = false
 
     return table
 
@@ -107,5 +112,6 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
+    table.getTable().modified = false
 
     return table

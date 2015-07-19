@@ -25,7 +25,17 @@ class Table
     @rows = []
     @destroyed = true
 
-  isModified: -> @modified
+  isModified: ->
+    console.log @modified
+    @modified
+
+  emitModifiedStatusChange: (modified=true) ->
+    return if modified is @modified
+
+    console.log 'emit did-change-modified'
+
+    @modified = modified
+    @emitter.emit 'did-change-modified', modified
 
   isDestroyed: -> @destroyed
 
@@ -38,15 +48,15 @@ class Table
       result = @saveHandler(this)
       if result instanceof Promise
         result.then =>
-          @modified = false
+          @emitModifiedStatusChange(false)
           @emitter.emit 'did-save', this
         result.catch (reason) ->
           console.error reason
       else
-        @modified = !result
+        @emitModifiedStatusChange(!result)
         @emitter.emit 'did-save', this unless @modified
     else
-      @modified = false
+      @emitModifiedStatusChange(false)
       @emitter.emit 'did-save', this
 
   setSaveHandler: (@saveHandler) ->
@@ -64,6 +74,9 @@ class Table
 
   onDidSave: (callback) ->
     @emitter.on 'did-save', callback
+
+  onDidChangeModified: (callback) ->
+    @emitter.on 'did-change-modified', callback
 
   onDidAddColumn: (callback) ->
     @emitter.on 'did-add-column', callback
@@ -128,7 +141,7 @@ class Table
     else
       @columns.splice index, 0, column
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-add-column', {column, index} if event
 
     if transaction
@@ -153,7 +166,7 @@ class Table
     @columns.splice(index, 1)
     row.splice(index, 1) for row in @rows
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-remove-column', {column, index} if event
 
     if transaction
@@ -167,7 +180,7 @@ class Table
     index = @columns.indexOf(column)
 
     @columns[index] = newName
-    @modified = true
+    @emitModifiedStatusChange()
 
     if event
       @emitter.emit('did-rename-column', {oldName: column, newName, index})
@@ -176,10 +189,10 @@ class Table
       @transaction
         undo: ->
           @columns[index] = column
-          @modified = true
+          @emitModifiedStatusChange()
         redo: ->
           @columns[index] = newName
-          @modified = true
+          @emitModifiedStatusChange()
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -227,7 +240,7 @@ class Table
     else
       @rows.splice index, 0, row
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-add-row', {row, index}
 
     unless batch
@@ -276,7 +289,7 @@ class Table
     row = @rows[index]
     @rows.splice(index, 1)
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-remove-row', {row, index}
     unless batch
       @emitter.emit 'did-change-rows', {
@@ -299,7 +312,7 @@ class Table
       rowsValues = removedRows.slice() if transaction
       @emitter.emit 'did-remove-row', {row, index: range.start + i}
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-change-rows', {
       oldRange: range
       newRange: {start: range.start, end: range.start}
@@ -368,7 +381,7 @@ class Table
     oldValue = @rows[position.row]?[position.column]
     @rows[position.row]?[position.column] = value
 
-    @modified = true
+    @emitModifiedStatusChange()
     @emitter.emit 'did-change-cell-value', {position, oldValue, newValue: value}
 
     if transaction

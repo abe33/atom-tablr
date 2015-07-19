@@ -89,6 +89,9 @@ class TableEditor
   onDidChangeSelectionRange: (callback) ->
     @emitter.on 'did-change-selection-range', callback
 
+  onDidChangeModified: (callback) ->
+    @getTable().onDidChangeModified(callback)
+
   getTable: -> @table
 
   getTitle: -> 'Table'
