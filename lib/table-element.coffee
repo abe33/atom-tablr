@@ -388,14 +388,6 @@ class TableElement extends HTMLElement
 
     @tableEditor.getScreenColumnIndexAtPixelPosition(x)
 
-  columnScreenPosition: (column) ->
-    left = @tableEditor.getScreenColumnOffsetAt(column)
-
-    content = @getColumnsScrollContainer()
-    contentOffset = content.getBoundingClientRect()
-
-    left + contentOffset.left
-
   makeColumnVisible: (column) ->
     container = @getColumnsScrollContainer()
     columnWidth = @tableEditor.getScreenColumnWidthAt(column)
@@ -434,14 +426,6 @@ class TableElement extends HTMLElement
     left += bodyOffset.left - tableOffset.left
 
     {top, left, width, height}
-
-  cellScreenPosition: (position) ->
-    {top, left} = @tableEditor.getScreenCellPosition(position)
-
-    {
-      top: top + @getRowsOffsetContainer().getBoundingClientRect().top,
-      left: left + @getColumnsOffsetContainer().getBoundingClientRect().left
-    }
 
   cellPositionAtScreenPosition: (x,y) ->
     return unless x? and y?
@@ -783,7 +767,6 @@ class TableElement extends HTMLElement
 
   gutterDrag: ({pageY}, {startRow}) ->
     if @dragging
-      console.log 'here'
       row = @getScreenRowIndexAtPixelPosition(pageY)
 
       if row > startRow
@@ -1050,7 +1033,6 @@ class TableElement extends HTMLElement
       {top, left, right, bottom} = @selectionScrollRect()
       height = bottom - top
       width = right - left
-      console.log top, left, right, bottom, width, height
       @tableSelectionBox.style.cssText = """
       top: #{top}px;
       left: #{left}px;
