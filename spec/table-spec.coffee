@@ -40,6 +40,91 @@ describe 'Table', ->
     it 'throws an error when adding a column', ->
       expect(-> table.addColumn('foo')).toThrow()
 
+  describe '::save', ->
+    describe 'when modified', ->
+      beforeEach ->
+        table.addColumn('name')
+        table.addColumn('age')
+
+        table.addRow(['John Doe', 30])
+        table.addRow(['Jane Doe', 30])
+
+        expect(table.isModified()).toBeTruthy()
+
+      it 'is marked as saved', ->
+        table.save()
+
+        expect(table.isModified()).toBeFalsy()
+
+    describe 'with a synchronous save handler', ->
+      it 'calls the handler on save', ->
+        calls = []
+        table.addColumn('age')
+        table.setSaveHandler -> calls.push 'save'
+        table.onDidSave -> calls.push 'did-save'
+
+        table.save()
+
+        expect(calls).toEqual(['save', 'did-save'])
+
+      it 'marks the table as saved if the handler returned true', ->
+        table.addColumn('age')
+        table.setSaveHandler -> true
+        table.save()
+
+        expect(table.isModified()).toBeFalsy()
+
+      it 'leaves the table as modified if the handler returned false', ->
+        table.addColumn('age')
+        table.setSaveHandler -> false
+        table.save()
+
+        expect(table.isModified()).toBeTruthy()
+
+      describe 'when not modified', ->
+        it 'does nothing', ->
+          calls = []
+          table.setSaveHandler -> calls.push 'save'
+          table.onDidSave -> calls.push 'did-save'
+
+          table.save()
+
+          expect(calls).toEqual([])
+
+    describe 'with an asynchronous save handler', ->
+      promise = null
+      it 'calls the handler on save', ->
+        calls = []
+        table.addColumn('age')
+        table.setSaveHandler -> promise = new Promise (resolve) ->
+          calls.push('save')
+          resolve()
+        table.onDidSave -> calls.push 'did-save'
+
+        table.save()
+
+        waitsForPromise -> promise
+
+        runs -> expect(calls).toEqual(['save', 'did-save'])
+
+      it 'marks the table as saved if the handler resolve the promise', ->
+        table.addColumn('age')
+        table.setSaveHandler -> promise = new Promise (resolve) -> resolve()
+        table.save()
+
+        waitsForPromise -> promise
+
+        runs -> expect(table.isModified()).toBeFalsy()
+
+      it 'leaves the table as modified if the handler reject the promise', ->
+        table.addColumn('age')
+        table.setSaveHandler -> promise = new Promise (resolve) -> reject()
+        table.save()
+
+        waitsForPromise shouldReject: true, -> promise
+
+        runs -> expect(table.isModified()).toBeTruthy()
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -57,6 +142,9 @@ describe 'Table', ->
       expect(table.getColumnCount()).toEqual(2)
       expect(table.getColumn(0)).toEqual('key')
       expect(table.getColumn(1)).toEqual('value')
+
+    it 'is marked as modified', ->
+      expect(table.isModified()).toBeTruthy()
 
     it 'raises an exception when adding a column whose name already exist in table', ->
       expect(-> table.addColumn('key')).toThrow()
@@ -126,6 +214,17 @@ describe 'Table', ->
       it 'throws an error with an index greater that the columns count', ->
         expect(-> table.removeColumnAt(2)).toThrow()
 
+      describe 'when saved', ->
+        beforeEach ->
+          table.addRow ['foo', 'bar']
+          table.addRow ['oof', 'rab']
+          table.save()
+
+          table.removeColumn('value')
+
+        it 'is marked as modified', ->
+          expect(table.isModified()).toBeTruthy()
+
     describe 'changing a column name', ->
       beforeEach ->
         row = table.addRow ['foo', 'bar']
@@ -135,6 +234,16 @@ describe 'Table', ->
 
       it 'changes the column name', ->
         expect(table.getColumn(1)).toEqual('content')
+
+      describe 'when saved', ->
+        beforeEach ->
+          table.addRow ['foo', 'bar']
+          table.save()
+
+          table.changeColumnName 'value', 'content'
+
+        it 'is marked as modified', ->
+          expect(table.isModified()).toBeTruthy()
 
     #    ########   #######  ##      ##  ######
     #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -146,6 +255,11 @@ describe 'Table', ->
 
     describe 'adding a row', ->
       describe 'with an object', ->
+        it 'is marked as modified', ->
+          table.addRow key: 'foo', value: 'bar'
+
+          expect(table.isModified()).toBeTruthy()
+
         it 'creates a row containing the values', ->
           table.addRow key: 'foo', value: 'bar'
 
@@ -240,6 +354,9 @@ describe 'Table', ->
       it 'adds the rows in the table', ->
         expect(table.getRowCount()).toEqual(2)
 
+      it 'is marked as modified', ->
+        expect(table.isModified()).toBeTruthy()
+
       it 'dispatch only one did-change-rows event', ->
         expect(spy).toHaveBeenCalled()
         expect(spy.calls.length).toEqual(1)
@@ -308,6 +425,14 @@ describe 'Table', ->
       it 'throws an error with an index greater that the rows count', ->
         expect(-> table.removeRowAt(2)).toThrow()
 
+      describe 'when saved', ->
+        beforeEach ->
+          table.save()
+          table.removeRow(row)
+
+        it 'is marked as modified', ->
+          expect(table.isModified()).toBeTruthy()
+
     describe '::removeRowsInRange', ->
       beforeEach ->
         table.addRow key: 'foo', value: 'bar'
@@ -345,6 +470,14 @@ describe 'Table', ->
 
           expect(table.getRowCount()).toEqual(0)
 
+      describe 'when saved', ->
+        beforeEach ->
+          table.save()
+          table.removeRowsInRange([0,2])
+
+        it 'is marked as modified', ->
+          expect(table.isModified()).toBeTruthy()
+
     describe '::removeRowsAtIndices', ->
       beforeEach ->
         table.addRow key: 'foo', value: 'bar'
@@ -360,6 +493,14 @@ describe 'Table', ->
 
         expect(table.getRowCount()).toEqual(1)
         expect(table.getRow(0)).toEqual(['oof','rab'])
+
+      describe 'when saved', ->
+        beforeEach ->
+          table.save()
+          table.removeRowsAtIndices([0,2])
+
+        it 'is marked as modified', ->
+          expect(table.isModified()).toBeTruthy()
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
@@ -411,6 +552,14 @@ describe 'Table', ->
 
       expect(spy).toHaveBeenCalled()
 
+    describe 'when saved', ->
+      beforeEach ->
+        table.save()
+        table.setValueAtPosition([1,1], 40)
+
+      it 'is marked as modified', ->
+        expect(table.isModified()).toBeTruthy()
+
   # FIXME we can't be find the position of a primitive value if there's
   # duplicates
   xdescribe '::positionOfCell', ->
@@ -454,14 +603,18 @@ describe 'Table', ->
     it 'rolls back a column addition', ->
       table.addColumn('key')
 
+      table.save()
       table.undo()
 
+      expect(table.isModified()).toBeTruthy()
       expect(table.getColumnCount()).toEqual(0)
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
 
+      table.save()
       table.redo()
 
+      expect(table.isModified()).toBeTruthy()
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnCount()).toEqual(1)
@@ -477,8 +630,10 @@ describe 'Table', ->
 
       table.removeColumn(column)
 
+      table.save()
       table.undo()
 
+      expect(table.isModified()).toBeTruthy()
       expect(table.getColumnCount()).toEqual(1)
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
@@ -487,8 +642,10 @@ describe 'Table', ->
       expect(table.getRow(1)).toEqual(['bar'])
       expect(table.getRow(2)).toEqual(['baz'])
 
+      table.save()
       table.redo()
 
+      expect(table.isModified()).toBeTruthy()
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnCount()).toEqual(0)
@@ -503,14 +660,18 @@ describe 'Table', ->
 
         row = table.addRow ['foo', 'bar']
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getRowCount()).toEqual(0)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(1)
@@ -524,14 +685,18 @@ describe 'Table', ->
           ['bar', 'baz']
         ]
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getRowCount()).toEqual(0)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(2)
@@ -545,15 +710,19 @@ describe 'Table', ->
 
         table.removeRowAt(0)
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getRowCount()).toEqual(1)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(0)
@@ -568,16 +737,20 @@ describe 'Table', ->
 
         table.removeRowsInRange([0,2])
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getRowCount()).toEqual(2)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
         expect(table.getRow(1)).toEqual(['bar', 'baz'])
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(0)
@@ -593,8 +766,10 @@ describe 'Table', ->
 
         table.removeRowsAtIndices([0,2])
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getRowCount()).toEqual(3)
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
@@ -602,8 +777,10 @@ describe 'Table', ->
         expect(table.getRow(1)).toEqual(['bar', 'baz'])
         expect(table.getRow(2)).toEqual(['baz', 'foo'])
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(1)
@@ -613,17 +790,19 @@ describe 'Table', ->
 
         table.changeColumnName('value', 'foo')
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getColumn(1)).toEqual('value')
-
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.getColumn(1)).toEqual('foo')
-
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
 
@@ -638,18 +817,20 @@ describe 'Table', ->
         table.setValueAtPosition([0,0], 'hello')
         expect(table.getRow(0)).toEqual(['hello', 'bar'])
 
+        table.save()
         table.undo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
-
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
+        table.save()
         table.redo()
 
+        expect(table.isModified()).toBeTruthy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
-
         expect(table.getRow(0)).toEqual(['hello', 'bar'])
 
       describe '::clearUndoStack', ->

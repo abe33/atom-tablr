@@ -12,7 +12,7 @@ class TableEditor
   Delegator.includeInto(this)
 
   @delegatesProperties(
-    'order', 'direction',
+    'order', 'direction', 'onDidSave', 'onWillSave', 'setSaveHandler',
     toProperty: 'displayTable'
   )
   @delegatesMethods(
@@ -36,6 +36,8 @@ class TableEditor
     'destroy',
     toProperty: 'displayTable'
   )
+
+  @delegatesMethods 'save', 'isModified', toProperty: 'table'
 
   constructor: (options={}) ->
     {@table} = options
@@ -66,12 +68,6 @@ class TableEditor
       @displayTable = null
       @table = null
 
-  isDestroyed: -> @destroyed
-
-  getTitle: -> 'Table'
-
-  getLongTitle: -> 'Table'
-
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 
@@ -92,6 +88,14 @@ class TableEditor
 
   onDidChangeSelectionRange: (callback) ->
     @emitter.on 'did-change-selection-range', callback
+
+  getTable: -> @table
+
+  getTitle: -> 'Table'
+
+  getLongTitle: -> 'Table'
+
+  isDestroyed: -> @destroyed
 
   createCursorAndSelection: (position, range) ->
     position = Point.fromObject(position)
