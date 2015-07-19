@@ -33,7 +33,7 @@ class Pool extends Mixin
       release#{Singular}: (instance) ->
         return if instance.isReleased()
 
-        @used#{Plural} = @used#{Plural}.filter (i) -> i isnt instance
+        @used#{Plural}.splice(@used#{Plural}.indexOf(instance), 1)
         @unused#{Plural}.push(instance)
         instance.release(false)
 
