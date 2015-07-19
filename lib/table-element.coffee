@@ -717,6 +717,9 @@ class TableElement extends HTMLElement
       selection = @tableEditor.getLastSelection()
       newRange = new Range
 
+      row = Math.max(0, row)
+      column = Math.max(0, column)
+
       if row < cursorPosition.row
         newRange.start.row = row
         newRange.end.row = cursorPosition.row + 1
