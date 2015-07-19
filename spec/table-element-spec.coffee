@@ -298,7 +298,7 @@ describe 'tableElement', ->
 
     it 'renders new rows', ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell')
-      expect(cells.length).toEqual(23 * 3)
+      expect(cells.length).toEqual(18 * 3)
 
   describe 'when scrolled by 300px', ->
     beforeEach ->

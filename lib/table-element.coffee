@@ -364,12 +364,12 @@ class TableElement extends HTMLElement
     @tableEditor.removeColumnAt(@tableEditor.getCursorPosition().column)
 
   getFirstVisibleColumn: ->
-    @getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
+    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
 
   getLastVisibleColumn: ->
     scrollViewWidth = @getColumnsScrollContainer().clientWidth
 
-    @getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft + scrollViewWidth)
+    @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft + scrollViewWidth)
 
   getColumnOverdraw: -> @columnOverdraw ? @configColumnOverdraw
 
@@ -512,7 +512,6 @@ class TableElement extends HTMLElement
   pageRight: ->
     @tableEditor.pageRight()
     @afterCursorMove()
-
 
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getLastCursor().getPosition())
