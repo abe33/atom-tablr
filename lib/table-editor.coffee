@@ -21,7 +21,7 @@ class TableEditor
     'getContentWidth', 'getContentHeight',
     'getValueAtPosition', 'setValueAtPosition',
     'getValueAtScreenPosition', 'setValueAtScreenPosition',
-    'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange',
+    'getRow', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'addRows', 'addRowsAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange',
     'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',

@@ -47,7 +47,7 @@ module.exports =
           return data if data.length is 0
 
           table.addColumn(column, {}, false) for column in data.shift()
-          table.addRow(row) for row in data
+          table.addRows(data)
 
           resolve(table)
 
@@ -68,12 +68,15 @@ module.exports =
     table.addColumn 'value', width: 150, align: 'center'
     table.addColumn 'locked', width: 150, align: 'left'
 
+    rows = []
     for i in [0...100]
-      table.addRow [
+      rows.push [
         "row#{i}"
         Math.random() * 100
         if i % 2 is 0 then 'yes' else 'no'
       ]
+
+    table.addRows(rows)
 
     table.clearUndoStack()
 
@@ -87,6 +90,7 @@ module.exports =
     for i in [0..100]
       table.addColumn 'column_' + i, width: 150, align: 'left'
 
+    rows = []
     for i in [0...1000]
       data = [
         "row#{i}"
@@ -98,7 +102,9 @@ module.exports =
         else
           data.push Math.random() * 100
 
-      table.addRow data
+      rows.push data
+
+    table.addRows(rows)
 
     table.clearUndoStack()
 
