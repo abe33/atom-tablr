@@ -25,14 +25,10 @@ class Table
     @rows = []
     @destroyed = true
 
-  isModified: ->
-    console.log @modified
-    @modified
+  isModified: -> @cachedContents isnt @getCacheContent()
 
   emitModifiedStatusChange: (modified=true) ->
     return if modified is @modified
-
-    console.log 'emit did-change-modified'
 
     @modified = modified
     @emitter.emit 'did-change-modified', modified
@@ -49,17 +45,29 @@ class Table
       if result instanceof Promise
         result.then =>
           @emitModifiedStatusChange(false)
+          @updateCachedContents()
           @emitter.emit 'did-save', this
         result.catch (reason) ->
           console.error reason
       else
         @emitModifiedStatusChange(!result)
-        @emitter.emit 'did-save', this unless @modified
+
+        unless @modified
+          @updateCachedContents()
+          @emitter.emit 'did-save', this
     else
       @emitModifiedStatusChange(false)
+      @updateCachedContents()
       @emitter.emit 'did-save', this
 
   setSaveHandler: (@saveHandler) ->
+
+  updateCachedContents: ->
+    @cachedContents = @getCacheContent()
+
+  getCacheContent: ->
+    console.log res = @columns.concat(@rows).join('\n')
+    res
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##

@@ -230,9 +230,9 @@ describe 'Table', ->
         row = table.addRow ['foo', 'bar']
         table.addRow ['oof', 'rab']
 
-        table.changeColumnName 'value', 'content'
 
       it 'changes the column name', ->
+        table.changeColumnName 'value', 'content'
         expect(table.getColumn(1)).toEqual('content')
 
       describe 'when saved', ->
@@ -611,10 +611,9 @@ describe 'Table', ->
       expect(table.undoStack.length).toEqual(0)
       expect(table.redoStack.length).toEqual(1)
 
-      table.save()
       table.redo()
 
-      expect(table.isModified()).toBeTruthy()
+      expect(table.isModified()).toBeFalsy()
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnCount()).toEqual(1)
@@ -642,10 +641,9 @@ describe 'Table', ->
       expect(table.getRow(1)).toEqual(['bar'])
       expect(table.getRow(2)).toEqual(['baz'])
 
-      table.save()
       table.redo()
 
-      expect(table.isModified()).toBeTruthy()
+      expect(table.isModified()).toBeFalsy()
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(table.getColumnCount()).toEqual(0)
@@ -668,10 +666,9 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(1)
@@ -693,10 +690,9 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(2)
@@ -719,10 +715,9 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(0)
@@ -747,10 +742,9 @@ describe 'Table', ->
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
         expect(table.getRow(1)).toEqual(['bar', 'baz'])
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(0)
@@ -777,10 +771,9 @@ describe 'Table', ->
         expect(table.getRow(1)).toEqual(['bar', 'baz'])
         expect(table.getRow(2)).toEqual(['baz', 'foo'])
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRowCount()).toEqual(1)
@@ -798,10 +791,9 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(0)
         expect(table.redoStack.length).toEqual(1)
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.getColumn(1)).toEqual('foo')
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
@@ -825,10 +817,9 @@ describe 'Table', ->
         expect(table.redoStack.length).toEqual(1)
         expect(table.getRow(0)).toEqual(['foo', 'bar'])
 
-        table.save()
         table.redo()
 
-        expect(table.isModified()).toBeTruthy()
+        expect(table.isModified()).toBeFalsy()
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRow(0)).toEqual(['hello', 'bar'])
