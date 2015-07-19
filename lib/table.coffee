@@ -66,8 +66,7 @@ class Table
     @cachedContents = @getCacheContent()
 
   getCacheContent: ->
-    console.log res = @columns.concat(@rows).join('\n')
-    res
+    res = @columns.concat(@rows).join('\n')
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##
