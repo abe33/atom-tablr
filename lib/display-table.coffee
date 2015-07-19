@@ -81,6 +81,7 @@ class DisplayTable
 
     @subscriptions.add @table.onDidChangeRows (event) =>
       @updateScreenRows()
+      @emitter.emit 'did-change-screen-rows', event
 
     @subscriptions.add @table.onDidChangeCellValue ({position, oldValue, newValue}) =>
       newEvent = {
@@ -338,13 +339,6 @@ class DisplayTable
     modelIndex = @screenRowToModelRow(index)
     @emitter.emit 'did-add-row', {row, screenIndex: index, index: modelIndex}
 
-    @emitter.emit 'did-change-screen-rows', {
-      oldRange: {start: modelIndex, end: modelIndex}
-      newRange: {start: modelIndex, end: modelIndex + 1}
-      oldScreenRange: {start: index, end: index}
-      newScreenRange: {start: index, end: index + 1}
-    }
-
   addRows: (rows, options=[], transaction=true) ->
     @addRowsAt(@table.getRowCount(), rows, options, transaction)
 
@@ -513,8 +507,6 @@ class DisplayTable
   sortBy: (@order, @direction=1) ->
     @updateScreenRows()
     @emitter.emit 'did-change-screen-rows', {
-      oldRange: {start: 0, end: @getRowCount()}
-      newRange: {start: 0, end: @getRowCount()}
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
@@ -523,8 +515,6 @@ class DisplayTable
     @direction *= -1
     @updateScreenRows()
     @emitter.emit 'did-change-screen-rows', {
-      oldRange: {start: 0, end: @getRowCount()}
-      newRange: {start: 0, end: @getRowCount()}
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
@@ -533,8 +523,6 @@ class DisplayTable
     @order = null
     @updateScreenRows()
     @emitter.emit 'did-change-screen-rows', {
-      oldRange: {start: 0, end: @getRowCount()}
-      newRange: {start: 0, end: @getRowCount()}
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
