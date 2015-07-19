@@ -65,7 +65,7 @@ atom-table-editor {
       display: none;
     }
 
-    &::before {
+    &[data-row]::before {
       content:  '#' attr(data-row) ' ' attr(data-column);
       position: absolute;
       top: 0;
