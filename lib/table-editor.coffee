@@ -12,7 +12,7 @@ class TableEditor
   Delegator.includeInto(this)
 
   @delegatesProperties(
-    'order', 'direction', 'onDidSave', 'onWillSave', 'setSaveHandler',
+    'order', 'direction',
     toProperty: 'displayTable'
   )
   @delegatesMethods(
@@ -36,8 +36,10 @@ class TableEditor
     'destroy',
     toProperty: 'displayTable'
   )
-
-  @delegatesMethods 'save', 'isModified', toProperty: 'table'
+  @delegatesMethods(
+    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterOpen',
+    toProperty: 'table'
+  )
 
   constructor: (options={}) ->
     {@table} = options
@@ -124,6 +126,16 @@ class TableEditor
       @emitter.emit 'did-remove-selection', {selection, tableEditor: this}
       @cursorSubscriptions.get(selection).dispose()
       @cursorSubscriptions.delete(selection)
+
+  getColumnName: (index) ->
+    base = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z'.split(' ')
+
+    quotient = Math.floor(index / 26)
+
+    if quotient > 0
+      @getColumnName(quotient) & base[index % 26]
+    else
+      base[index % 26]
 
   ##     ######  ######## ##       ########  ######  ########
   ##    ##    ## ##       ##       ##       ##    ##    ##

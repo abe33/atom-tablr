@@ -18,5 +18,8 @@
     "delegato": "1.x",
     "coffee-script": "1.7.x",
     "csv": "~0.4.5"
+  },
+  "devDependencies": {
+    "temp": "~0.8.0"
   }
 }
