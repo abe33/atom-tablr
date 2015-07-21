@@ -50,9 +50,7 @@ module.exports =
 
           tableEditor.addColumn(column, {}, false) for column in data.shift()
           tableEditor.addRows(data)
-          table.clearUndoStack()
-          table.modified = false
-          table.updateCachedContents()
+          table.initializeAfterOpen()
 
           resolve(tableEditor)
 

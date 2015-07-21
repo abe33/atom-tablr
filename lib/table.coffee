@@ -15,7 +15,6 @@ class Table
     @columns = []
     @rows = []
     @emitter = new Emitter
-    @lastModified = false
 
   destroy: ->
     return if @destroyed
@@ -26,6 +25,11 @@ class Table
     @destroyed = true
 
   isModified: -> @cachedContents isnt @getCacheContent()
+
+  initializeAfterOpen: ->
+    @clearUndoStack()
+    @updateCachedContents()
+    @lastModified = false
 
   emitModifiedStatusChange: ->
     modified = @isModified()
@@ -45,9 +49,9 @@ class Table
       saved = @saveHandler(this)
       if saved instanceof Promise
         saved.then =>
-          @emitModifiedStatusChange()
           @updateCachedContents()
           @emitter.emit 'did-save', this
+          @emitModifiedStatusChange()
         saved.catch (reason) ->
           console.error reason
       else
@@ -57,9 +61,9 @@ class Table
           @updateCachedContents()
           @emitter.emit 'did-save', this
     else
-      @emitModifiedStatusChange()
       @updateCachedContents()
       @emitter.emit 'did-save', this
+      @emitModifiedStatusChange()
 
   setSaveHandler: (@saveHandler) ->
 
