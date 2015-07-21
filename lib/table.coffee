@@ -15,7 +15,7 @@ class Table
     @columns = []
     @rows = []
     @emitter = new Emitter
-    @modified = false
+    @lastModified = false
 
   destroy: ->
     return if @destroyed
@@ -27,36 +27,37 @@ class Table
 
   isModified: -> @cachedContents isnt @getCacheContent()
 
-  emitModifiedStatusChange: (modified=true) ->
-    return if modified is @modified
+  emitModifiedStatusChange: ->
+    modified = @isModified()
+    return if @lastModified is modified
 
-    @modified = modified
     @emitter.emit 'did-change-modified', modified
+    @lastModified = modified
 
   isDestroyed: -> @destroyed
 
   save: ->
-    return unless @modified
+    return unless @lastModified
 
     @emitter.emit 'will-save', this
 
     if @saveHandler?
-      result = @saveHandler(this)
-      if result instanceof Promise
-        result.then =>
-          @emitModifiedStatusChange(false)
+      saved = @saveHandler(this)
+      if saved instanceof Promise
+        saved.then =>
+          @emitModifiedStatusChange()
           @updateCachedContents()
           @emitter.emit 'did-save', this
-        result.catch (reason) ->
+        saved.catch (reason) ->
           console.error reason
       else
-        @emitModifiedStatusChange(!result)
+        @emitModifiedStatusChange()
 
-        unless @modified
+        if saved
           @updateCachedContents()
           @emitter.emit 'did-save', this
     else
-      @emitModifiedStatusChange(false)
+      @emitModifiedStatusChange()
       @updateCachedContents()
       @emitter.emit 'did-save', this
 
@@ -66,7 +67,7 @@ class Table
     @cachedContents = @getCacheContent()
 
   getCacheContent: ->
-    res = @columns.concat(@rows).join('\n')
+    res = [@columns].concat(@rows).join('\n')
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##
