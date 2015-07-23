@@ -21,6 +21,8 @@
   position: absolute;
 }
 
+atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
+[data-type="CSVEditor"] .title::before,
 [data-type="TableEditor"] .title::before {
   font-family: "Octicons Regular";
   text-align: center;
@@ -28,6 +30,7 @@
   margin-right: 5px;
   color: @text-color-info;
   position: relative;
+  vertical-align: middle;
   top: 1px;
   font-family: 'Octicons Regular';
   font-weight: normal;

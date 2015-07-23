@@ -94,12 +94,6 @@ class TableEditor
   onDidChangeModified: (callback) ->
     @getTable().onDidChangeModified(callback)
 
-  getTable: -> @table
-
-  getTitle: -> 'Table'
-
-  getLongTitle: -> 'Table'
-
   isDestroyed: -> @destroyed
 
   createCursorAndSelection: (position, range) ->

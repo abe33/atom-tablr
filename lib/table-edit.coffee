@@ -1,4 +1,4 @@
-[TableEditor, TableElement, CSVTable, url] = []
+[TableEditor, TableElement, CSVEditor, CSVEditorElement, url] = []
 
 module.exports =
   config:
@@ -27,7 +27,7 @@ module.exports =
   activate: (state) ->
     TableEditor ?= require './table-editor'
     TableElement ?= require './table-element'
-    TableElement.registerViewProvider(true)
+    TableElement.registerViewProvider()
 
     atom.commands.add 'atom-workspace',
       'table-edit:demo-large': => atom.workspace.open('table://large')
@@ -36,10 +36,12 @@ module.exports =
     atom.workspace.addOpener (uriToOpen) ->
       return unless /\.csv$/.test uriToOpen
 
-      CSVTable ?= require './csv-table'
+      unless CSVEditorElement?
+        CSVEditor ?= require './csv-editor'
+        CSVEditorElement = require './csv-editor-element'
+        CSVEditorElement.registerViewProvider()
 
-      csvTable = new CSVTable(uriToOpen)
-      csvTable.open()
+      new CSVEditor(uriToOpen)
 
     atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
