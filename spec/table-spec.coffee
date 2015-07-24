@@ -118,7 +118,8 @@ describe 'Table', ->
 
       it 'leaves the table as modified if the handler reject the promise', ->
         table.addColumn('age')
-        table.setSaveHandler -> promise = new Promise (resolve) -> reject()
+        table.setSaveHandler ->
+          promise = new Promise (resolve, reject) -> reject()
         table.save()
 
         waitsForPromise shouldReject: true, -> promise
