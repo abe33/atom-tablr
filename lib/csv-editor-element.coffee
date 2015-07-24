@@ -17,7 +17,7 @@ class CSVEditorElement extends HTMLElement
             @div class: 'setting-title', "Remember my choice for this file"
 
         @div class: 'editor-choices', =>
-          @div class: 'table-editor', =>
+          @div class: 'table-editor', outlet: 'tableSettingsForm', =>
             @button outlet: 'openTableEditorButton', class: 'btn btn-lg', 'Open Table Editor'
 
             @div class: 'control-group row-separators', =>
@@ -46,7 +46,6 @@ class CSVEditorElement extends HTMLElement
                 @input type: 'radio', value: "-", name: 'separator', id: 'dash'
                 @label class: 'btn', for: 'dash', "-"
 
-
             @div class: 'control-group quotes', =>
               @div class: 'setting-title', 'Quotes'
 
@@ -72,7 +71,18 @@ class CSVEditorElement extends HTMLElement
       click: => @model.openTextEditor()
 
     @subscriptions.add @subscribeTo @openTableEditorButton,
-      click: => @model.openTableEditor()
+      click: =>
+        previousAlert = @querySelector('.alert')
+        if previousAlert?
+          previousAlert.parentNode.removeChild(previousAlert)
+
+        @model.openTableEditor().catch (reason) =>
+          alert = document.createElement('div')
+          alert.classList.add('alert')
+          alert.classList.add('alert-danger')
+          alert.textContent = reason.message
+
+          @tableSettingsForm.appendChild(alert)
 
   setModel: (@model) ->
     @subscriptions.add @model.onDidOpen (editor) =>

@@ -128,3 +128,23 @@ describe "CSVEditor", ->
             it 'marks the table editor as saved', ->
               expect(tableEditor.isModified()).toBeFalsy()
               expect(csvEditor.isModified()).toBeFalsy()
+
+        describe 'when the file cannot be parsed with the default', ->
+          beforeEach ->
+            openFixture('semi-colon.csv')
+
+            runs ->
+              tableEditorButton = csvEditorElement.openTableEditorButton
+              click(tableEditorButton)
+
+            waitsFor -> csvEditorElement.querySelector('.alert')
+
+          it 'displays the error in the settings form', ->
+            expect(csvEditorElement.querySelector('.alert')).toExist()
+
+          describe 'clicking again on the open button', ->
+            it 'clears the previously created alert', ->
+              tableEditorButton = csvEditorElement.openTableEditorButton
+              click(tableEditorButton)
+
+              expect(csvEditorElement.querySelector('.alert')).not.toExist()
