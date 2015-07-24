@@ -43,7 +43,7 @@ class CSVEditor
       pane.activateItem(editor)
 
   openTableEditor: ->
-    @openCSV.then (@editor) =>
+    @openCSV().then (@editor) =>
       @emitter.emit('did-open', @editor)
 
   destroy: ->
@@ -66,7 +66,7 @@ class CSVEditor
           tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
 
         tableEditor.addRows(data)
-        tableEditor.setSaveHandler(@save)
+        tableEditor.setSaveHandler(@saveCSV)
         tableEditor.initializeAfterOpen()
 
         resolve(tableEditor)

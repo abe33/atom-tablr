@@ -1,4 +1,5 @@
 @import "ui-variables";
+@import "buttons";
 
 .flex-container {
   position: relative;
@@ -448,6 +449,110 @@ atom-table-editor {
           border: 1px solid fadeout(@background-color-info, 50%);
         }
       }
+    }
+  }
+}
+
+//     ######   ######  ##     ##
+//    ##    ## ##    ## ##     ##
+//    ##       ##       ##     ##
+//    ##        ######  ##     ##
+//    ##             ##  ##   ##
+//    ##    ## ##    ##   ## ##
+//     ######   ######     ###
+
+atom-csv-editor {
+  color: @text-color;
+  position: relative;
+
+  .settings-view {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    .settings-panel > .setting-title {
+      font-size: 2em;
+      font-weight: light;
+    }
+
+    .settings-panel > .controls label {
+      margin: 10px 0;
+    }
+
+    label * {
+      display: inline-block;
+    }
+
+    .editor-choices {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .text-editor {
+      position: relative;
+
+      &::before {
+        content: '';
+        height: 100%;
+        width: 1px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        background-image: linear-gradient(
+          0deg,
+          fadeout(@background-color-selected, 100%),
+          fadeout(@background-color-selected, 0%), fadeout(@background-color-selected, 100%)
+        );
+      }
+    }
+    .text-editor, .table-editor {
+      padding: 60px;
+      text-align: left;
+    }
+
+    .btn + .control-group {
+      margin-top: 18px;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+    }
+    .control-group > .setting-title {
+      flex: 1 1 0;
+    }
+
+    input[type="radio"] {
+      display: none;
+    }
+    input[type="radio"] + label {
+      .btn;
+    }
+
+    .separators .btn {
+      width: 30px;
+    }
+    .quotes .btn {
+      width: 45px;
+    }
+
+    input:first-child + label {
+      border-radius: @component-border-radius 0 0 @component-border-radius !important;
+    }
+    input:not(:first-child) + label {
+      border-left: 0 !important;
+    }
+
+    input[type="radio"]:checked + label {
+      background: @button-background-color-selected;
+      color: @text-color-selected;
     }
   }
 }
