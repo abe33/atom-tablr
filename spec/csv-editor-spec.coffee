@@ -9,7 +9,7 @@ TableElement = require '../lib/table-element'
 
 {click} = require './helpers/events'
 
-fdescribe "CSVEditor", ->
+describe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
 
   beforeEach ->
@@ -82,18 +82,34 @@ fdescribe "CSVEditor", ->
         it 'leaves the table in a unmodified state', ->
           expect(tableEditor.isModified()).toBeFalsy()
 
-        xdescribe 'when the table is modified', ->
+        it 'clears the csv editor content and replace it with a table element', ->
+          waitsFor ->
+            tableEditorElement = csvEditorElement.querySelector('atom-table-editor')
+
+          runs ->
+            expect(tableEditorElement).toExist()
+            expect(csvEditorElement.children.length).toEqual(1)
+
+        describe 'when the table is modified', ->
           beforeEach ->
-            tableEditor.addRow ['Bill', 45, 'male']
-            tableEditor.addRow ['Bonnie', 42, 'female']
+            waitsFor ->
+              csvEditorElement.querySelector('atom-table-editor')
+
+            runs ->
+              tableEditor.addRow ['Bill', 45, 'male']
+              tableEditor.addRow ['Bonnie', 42, 'female']
+
+          it 'marks the table editor as saved', ->
+            expect(tableEditor.isModified()).toBeTruthy()
+            expect(csvEditor.isModified()).toBeTruthy()
 
           describe 'when saved', ->
             spy = null
             beforeEach ->
               spy = jasmine.createSpy('did-save')
-              table.onDidSave(spy)
+              tableEditor.onDidSave(spy)
 
-              table.save()
+              tableEditor.save()
 
               waitsFor -> spy.callCount > 0
 
@@ -110,4 +126,5 @@ fdescribe "CSVEditor", ->
               """)
 
             it 'marks the table editor as saved', ->
-              expect(table.isModified()).toBeFalsy()
+              expect(tableEditor.isModified()).toBeFalsy()
+              expect(csvEditor.isModified()).toBeFalsy()

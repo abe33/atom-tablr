@@ -29,11 +29,16 @@ class CSVEditor
 
   isDestroyed: -> @destroyed
 
+  isModified: -> @editor?.isModified() ? false
+
   onDidOpen: (callback) ->
     @emitter.on 'did-open', callback
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
+
+  onDidChangeModified: (callback) ->
+    @emitter.on 'did-change-modified', callback
 
   openTextEditor: ->
     atom.project.open(@uriToOpen).then (editor) =>
@@ -44,6 +49,9 @@ class CSVEditor
 
   openTableEditor: ->
     @openCSV().then (@editor) =>
+      @subscriptions.add @editor.onDidChangeModified (status) =>
+        @emitter.emit 'did-change-modified', status
+
       @emitter.emit('did-open', @editor)
 
   destroy: ->
@@ -66,16 +74,19 @@ class CSVEditor
           tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
 
         tableEditor.addRows(data)
-        tableEditor.setSaveHandler(@saveCSV)
+        tableEditor.setSaveHandler(@save)
         tableEditor.initializeAfterOpen()
 
         resolve(tableEditor)
 
-  saveCSV: (editor) =>
+  save: =>
+    @saveAs(@getPath())
+
+  saveAs: (path) ->
     new Promise (resolve, reject) =>
-      csv.stringify editor.getRows(), @options, (err, data) =>
+      csv.stringify @editor.getTable().getRows(), @options, (err, data) =>
         return reject(err) if err?
 
-        fs.writeFile @uriToOpen, data, (err) =>
+        fs.writeFile path, data, (err) =>
           return reject(err) if err?
           resolve()

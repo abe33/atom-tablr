@@ -20,11 +20,26 @@ class CSVEditorElement extends HTMLElement
           @div class: 'table-editor', =>
             @button outlet: 'openTableEditorButton', class: 'btn btn-lg', 'Open Table Editor'
 
-            @div class: 'control-group separators', =>
-              @div class: 'setting-title', 'Separators'
+            @div class: 'control-group row-separators', =>
+              @div class: 'setting-title', 'Rows separator'
 
               @div class: 'controls btn-group', =>
-                @input type: 'radio', value: ',', name: 'separator', id: 'comma'
+                @input type: 'radio', value: 'auto', name: 'row-separator', id: 'auto', checked: true
+                @label class: 'btn', for: 'auto', 'auto'
+                @input type: 'radio', value: 'unix', name: 'row-separator', id: 'unix'
+                @label class: 'btn', for: 'unix', 'unix'
+                @input type: 'radio', value: 'mac', name: 'row-separator', id: 'mac'
+                @label class: 'btn', for: 'mac', 'mac'
+                @input type: 'radio', value: 'windows', name: 'row-separator', id: 'windows'
+                @label class: 'btn', for: 'windows', 'windows'
+                @input type: 'radio', value: 'unicode', name: 'row-separator', id: 'unicode'
+                @label class: 'btn', for: 'unicode', 'unicode'
+
+            @div class: 'control-group separators', =>
+              @div class: 'setting-title', 'Separator'
+
+              @div class: 'controls btn-group', =>
+                @input type: 'radio', value: ',', name: 'separator', id: 'comma', checked: true
                 @label class: 'btn', for: 'comma', ','
                 @input type: 'radio', value: ";", name: 'separator', id: 'semi-colon'
                 @label class: 'btn', for: 'semi-colon', ";"
@@ -36,10 +51,16 @@ class CSVEditorElement extends HTMLElement
               @div class: 'setting-title', 'Quotes'
 
               @div class: 'controls btn-group', =>
-                @input type: 'radio', value: '"', name: 'quotes', id: 'double-quote'
+                @input type: 'radio', value: '"', name: 'quotes', id: 'double-quote', checked: true
                 @label class: 'btn', for: 'double-quote', '"…"'
                 @input type: 'radio', value: "'", name: 'quotes', id: 'simple-quote'
                 @label class: 'btn', for: 'simple-quote', "'…'"
+
+            @div class: 'control-group header', =>
+              @label class: 'setting-title', for: 'header', 'Header'
+              @input type: 'checkbox', value: '"', name: 'header', id: 'header'
+
+            @div class: 'table-preview', outlet: 'tablePreview'
 
           @div class: 'text-editor', =>
             @button outlet: 'openTextEditorButton', class: 'btn btn-lg', 'Open Text Editor'
@@ -55,7 +76,11 @@ class CSVEditorElement extends HTMLElement
 
   setModel: (@model) ->
     @subscriptions.add @model.onDidOpen (editor) =>
+      @innerHTML = ''
       @appendChild(atom.views.getView(editor))
+
+      @subscriptions.dispose()
+      @subscriptions = new CompositeDisposable
 
 module.exports = CSVEditorElement = document.registerElement 'atom-csv-editor', prototype: CSVEditorElement.prototype
 

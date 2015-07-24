@@ -465,6 +465,14 @@ atom-csv-editor {
   color: @text-color;
   position: relative;
 
+  atom-table-editor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+
   .settings-view {
     position: absolute;
     display: flex;
@@ -513,9 +521,13 @@ atom-csv-editor {
         );
       }
     }
+
     .text-editor, .table-editor {
       padding: 60px;
       text-align: left;
+    }
+    .table-editor {
+      text-align: right;
     }
 
     .btn + .control-group {
@@ -524,9 +536,25 @@ atom-csv-editor {
     .control-group {
       display: flex;
       align-items: center;
+      text-align: left;
+
+      input[type='checkbox'] {
+        margin-left: 0;
+        margin-right: 0;
+      }
     }
     .control-group > .setting-title {
       flex: 1 1 0;
+    }
+
+    .control-group.row-separators {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .setting-title {
+        flex: auto;
+        margin-bottom: 10px;
+      }
     }
 
     input[type="radio"] {
