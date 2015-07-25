@@ -13,6 +13,10 @@ describe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
 
   beforeEach ->
+    jasmineContent = document.body.querySelector('#jasmine-content')
+    workspaceElement = atom.views.getView(atom.workspace)
+    jasmineContent.appendChild(workspaceElement)
+
     waitsForPromise -> atom.packages.activatePackage('table-edit')
 
   describe 'when a csv file is opened', ->
@@ -99,7 +103,7 @@ describe "CSVEditor", ->
               tableEditor.addRow ['Bill', 45, 'male']
               tableEditor.addRow ['Bonnie', 42, 'female']
 
-          it 'marks the table editor as saved', ->
+          it 'marks the table editor as modified', ->
             expect(tableEditor.isModified()).toBeTruthy()
             expect(csvEditor.isModified()).toBeTruthy()
 
@@ -131,7 +135,8 @@ describe "CSVEditor", ->
 
         describe 'when the file cannot be parsed with the default', ->
           beforeEach ->
-            openFixture('semi-colon.csv')
+            tableEditor = tableEditorElement = null
+            openFixture('invalid.csv')
 
             runs ->
               tableEditorButton = csvEditorElement.openTableEditorButton
@@ -148,3 +153,50 @@ describe "CSVEditor", ->
               click(tableEditorButton)
 
               expect(csvEditorElement.querySelector('.alert')).not.toExist()
+
+        describe 'changing the settings', ->
+          beforeEach ->
+            tableEditor = tableEditorElement = null
+            openFixture('semi-colon.csv')
+
+            runs ->
+              csvEditorElement.querySelector('#semi-colon').checked = true
+              csvEditor.onDidOpen (editor) ->
+                tableEditor = editor
+
+              tableEditorButton = csvEditorElement.openTableEditorButton
+              click(tableEditorButton)
+
+            waitsFor -> tableEditor?
+
+          it 'now parses the table data properly', ->
+            expect(tableEditor).toBeDefined()
+
+          describe 'when modified and saved', ->
+            spy = null
+            beforeEach ->
+              tableEditor.addRow ['Bill', 45, 'male']
+              tableEditor.addRow ['Bonnie', 42, 'female']
+
+              spy = jasmine.createSpy('did-save')
+              tableEditor.onDidSave(spy)
+
+              tableEditor.save()
+
+              waitsFor -> spy.callCount > 0
+
+            it 'save the new csv content on disk', ->
+              content = fs.readFileSync(csvDest)
+
+              expect(String(content)).toEqual("""
+              name;age;gender
+              Jane;32;female
+              John;30;male
+              Bill;45;male
+              Bonnie;42;female
+
+              """)
+
+            it 'marks the table editor as saved', ->
+              expect(tableEditor.isModified()).toBeFalsy()
+              expect(csvEditor.isModified()).toBeFalsy()

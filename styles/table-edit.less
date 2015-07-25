@@ -473,6 +473,10 @@ atom-csv-editor {
     bottom: 0;
   }
 
+  .alert {
+    margin-top: 20px;
+  }
+
   .settings-view {
     position: absolute;
     display: flex;
@@ -547,13 +551,29 @@ atom-csv-editor {
       flex: 1 1 0;
     }
 
-    .control-group.row-separators {
+    .control-group.row-delimiters {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: stretch;
+
+      .controls:last-child {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+
+      .controls:first-child {
+        flex-direction: row;
+        display: flex;
+        margin-bottom: 10px;
+        align-items: center;
+
+        atom-text-editor {
+          width: 70px;
+        }
+      }
 
       .setting-title {
-        flex: auto;
-        margin-bottom: 10px;
+        flex: 1 1 0;
       }
     }
 

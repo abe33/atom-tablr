@@ -47,7 +47,7 @@ class CSVEditor
 
       pane.activateItem(editor)
 
-  openTableEditor: ->
+  openTableEditor: (@options={}) ->
     @openCSV().then (@editor) =>
       @subscriptions.add @editor.onDidChangeModified (status) =>
         @emitter.emit 'did-change-modified', status
@@ -64,7 +64,7 @@ class CSVEditor
   openCSV: ->
     new Promise (resolve, reject) =>
       fileContent = fs.readFileSync(@uriToOpen)
-      csv.parse fileContent, (err, data) =>
+      csv.parse String(fileContent), @options, (err, data) =>
         return reject(err) if err?
 
         tableEditor = new TableEditor
