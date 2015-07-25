@@ -27,7 +27,7 @@ describe "CSVEditor", ->
 
       projectPath = temp.mkdirSync('table-edit-project')
       csvDest = path.join(projectPath, fixtureName)
-      fs.writeFileSync(csvDest, fs.readFileSync(csvFixture))
+      fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
 
       atom.project.setPaths([projectPath])
 
@@ -110,10 +110,11 @@ describe "CSVEditor", ->
           describe 'when saved', ->
             spy = null
             beforeEach ->
-              spy = jasmine.createSpy('did-save')
-              tableEditor.onDidSave(spy)
+              runs ->
+                spy = jasmine.createSpy('did-save')
+                tableEditor.onDidSave(spy)
 
-              tableEditor.save()
+                tableEditor.save()
 
               waitsFor -> spy.callCount > 0
 
@@ -126,7 +127,6 @@ describe "CSVEditor", ->
               John,30,male
               Bill,45,male
               Bonnie,42,female
-
               """)
 
             it 'marks the table editor as saved', ->
@@ -154,7 +154,7 @@ describe "CSVEditor", ->
 
               expect(csvEditorElement.querySelector('.alert')).not.toExist()
 
-        describe 'changing the settings', ->
+        describe 'changing the delimiter settings', ->
           beforeEach ->
             tableEditor = tableEditorElement = null
             openFixture('semi-colon.csv')
@@ -175,13 +175,19 @@ describe "CSVEditor", ->
           describe 'when modified and saved', ->
             spy = null
             beforeEach ->
+              spy = jasmine.createSpy('did-save')
+              tableEditor.onDidChangeScreenRows(spy)
+
               tableEditor.addRow ['Bill', 45, 'male']
               tableEditor.addRow ['Bonnie', 42, 'female']
 
-              spy = jasmine.createSpy('did-save')
-              tableEditor.onDidSave(spy)
+              waitsFor -> spy.callCount > 0
 
-              tableEditor.save()
+              runs ->
+                spy = jasmine.createSpy('did-save')
+                tableEditor.onDidSave(spy)
+
+                tableEditor.save()
 
               waitsFor -> spy.callCount > 0
 
@@ -194,8 +200,113 @@ describe "CSVEditor", ->
               John;30;male
               Bill;45;male
               Bonnie;42;female
-
               """)
+
+            it 'marks the table editor as saved', ->
+              expect(tableEditor.isModified()).toBeFalsy()
+              expect(csvEditor.isModified()).toBeFalsy()
+
+        describe 'changing the header settings', ->
+          beforeEach ->
+            tableEditor = tableEditorElement = null
+            openFixture('sample.csv')
+
+            runs ->
+              csvEditorElement.querySelector('#header').checked = true
+              csvEditor.onDidOpen (editor) ->
+                tableEditor = editor
+
+              tableEditorButton = csvEditorElement.openTableEditorButton
+              click(tableEditorButton)
+
+            waitsFor -> tableEditor?
+
+          it 'now parses the table data properly', ->
+            expect(tableEditor).toBeDefined()
+            expect(tableEditor.getScreenColumnCount()).toEqual(3)
+            expect(tableEditor.getColumns()).toEqual(['name', 'age', 'gender'])
+            expect(tableEditor.getScreenRowCount()).toEqual(2)
+
+          describe 'when modified and saved', ->
+            spy = null
+            beforeEach ->
+              spy = jasmine.createSpy('did-save')
+              tableEditor.onDidChangeScreenRows(spy)
+
+              tableEditor.addRow ['Bill', 45, 'male']
+              tableEditor.addRow ['Bonnie', 42, 'female']
+
+              waitsFor -> spy.callCount > 0
+
+              runs ->
+                spy = jasmine.createSpy('did-save')
+                tableEditor.onDidSave(spy)
+
+                tableEditor.save()
+
+              waitsFor -> spy.callCount > 0
+
+            it 'save the new csv content on disk', ->
+              content = fs.readFileSync(csvDest)
+
+              expect(String(content)).toEqual("""
+              name,age,gender
+              Jane,32,female
+              John,30,male
+              Bill,45,male
+              Bonnie,42,female
+              """)
+
+
+            it 'marks the table editor as saved', ->
+              expect(tableEditor.isModified()).toBeFalsy()
+              expect(csvEditor.isModified()).toBeFalsy()
+
+        describe 'changing the row delimiter settings', ->
+          beforeEach ->
+            tableEditor = tableEditorElement = null
+            openFixture('custom-row-delimiter.csv')
+
+            runs ->
+              csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
+              csvEditorElement.querySelector('#custom-row-delimiter').checked = true
+              csvEditor.onDidOpen (editor) ->
+                tableEditor = editor
+
+              tableEditorButton = csvEditorElement.openTableEditorButton
+              click(tableEditorButton)
+
+            waitsFor -> tableEditor?
+
+          it 'now parses the table data properly', ->
+            expect(tableEditor).toBeDefined()
+            expect(tableEditor.getScreenColumnCount()).toEqual(2)
+            expect(tableEditor.getScreenRowCount()).toEqual(2)
+
+          describe 'when modified and saved', ->
+            spy = null
+            beforeEach ->
+              spy = jasmine.createSpy('did-save')
+              tableEditor.onDidChangeScreenRows(spy)
+
+              tableEditor.addRow ['GHI', 56]
+              tableEditor.addRow ['JKL', 78]
+
+              waitsFor -> spy.callCount > 0
+
+              runs ->
+                spy = jasmine.createSpy('did-save')
+                tableEditor.onDidSave(spy)
+
+                tableEditor.save()
+
+              waitsFor -> spy.callCount > 0
+
+            it 'save the new csv content on disk', ->
+              content = fs.readFileSync(csvDest)
+
+              expect(String(content))
+              .toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
 
             it 'marks the table editor as saved', ->
               expect(tableEditor.isModified()).toBeFalsy()

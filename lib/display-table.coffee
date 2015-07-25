@@ -8,7 +8,10 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  @delegatesMethods 'changeColumnName', 'undo', 'redo', 'getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'rowRangeFrom', 'destroy', toProperty: 'table'
+  @delegatesMethods(
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'rowRangeFrom', 'destroy',
+    toProperty: 'table'
+  )
 
   rowOffsets: null
   columnOffsets: null

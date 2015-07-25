@@ -70,8 +70,12 @@ class CSVEditor
         tableEditor = new TableEditor
         return resolve(tableEditor) if data.length is 0
 
-        for i in [0...data[0].length]
-          tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
+        if @options.header
+          for column in data.shift()
+            tableEditor.addColumn(column, {}, false)
+        else
+          for i in [0...data[0].length]
+            tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
 
         tableEditor.addRows(data)
         tableEditor.setSaveHandler(@save)
@@ -84,6 +88,8 @@ class CSVEditor
 
   saveAs: (path) ->
     new Promise (resolve, reject) =>
+      if @options.header
+        @options.columns = @editor.getColumns()
       csv.stringify @editor.getTable().getRows(), @options, (err, data) =>
         return reject(err) if err?
 

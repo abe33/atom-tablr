@@ -490,8 +490,11 @@ atom-csv-editor {
     bottom: 0;
 
     .settings-panel > .setting-title {
-      font-size: 2em;
-      font-weight: light;
+      font-size: 1.4em;
+
+      &:first-child {
+        font-size: 2em;
+      }
     }
 
     .settings-panel > .controls label {
@@ -527,11 +530,15 @@ atom-csv-editor {
     }
 
     .text-editor, .table-editor {
-      padding: 60px;
+      padding: 40px 60px;
       text-align: left;
     }
     .table-editor {
       text-align: right;
+      padding-left: 20px;
+    }
+    .text-editor {
+      padding-right: 20px;
     }
 
     .btn + .control-group {
@@ -551,7 +558,35 @@ atom-csv-editor {
       flex: 1 1 0;
     }
 
-    .control-group.row-delimiters {
+    .split-panel {
+      display: flex;
+      flex-direction: row;
+
+      .left-panel, .right-panel {
+        padding: 20px 0;
+        flex: 1 1 0;
+      }
+
+      .right-panel {
+        padding-left: 20px
+      }
+      .left-panel {
+        padding-right: 20px
+      }
+
+      .right-panel label:not(.btn) {
+        padding: 0;
+        padding-right: 20px;
+        margin: 0;
+      }
+    }
+
+
+    .control-group.row-delimiters,
+    .control-group.delimiters,
+    .control-group.escapes,
+    .control-group.comments,
+    .control-group.quotes {
       flex-direction: column;
       align-items: stretch;
 
@@ -569,6 +604,7 @@ atom-csv-editor {
 
         atom-text-editor {
           width: 70px;
+          height: 24px;
         }
       }
 
@@ -584,11 +620,10 @@ atom-csv-editor {
       .btn;
     }
 
-    .separators .btn {
-      width: 30px;
-    }
-    .quotes .btn {
-      width: 45px;
+    .quotes .btn,
+    .escapes .btn,
+    .delimiters .btn {
+      min-width: 30px;
     }
 
     input:first-child + label {
