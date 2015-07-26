@@ -42,7 +42,6 @@ class CSVEditor
     @emitter.on 'did-change-modified', callback
 
   applyChoice: ->
-    console.log 'choice applied'
     if @choice?
       switch @choice
         when 'TextEditor' then @openTextEditor(@options)
