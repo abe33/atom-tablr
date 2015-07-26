@@ -11,7 +11,7 @@ TableElement = require '../lib/table-element'
 
 WRITE_TIMEOUT = 400
 
-describe "CSVEditor", ->
+fdescribe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
 
   beforeEach ->
@@ -282,6 +282,7 @@ describe "CSVEditor", ->
 
           it 'now parses the table data properly', ->
             expect(tableEditor).toBeDefined()
+            console.log tableEditor.getTable().getRows().join('\n') + 'end'
             expect(tableEditor.getScreenColumnCount()).toEqual(2)
             expect(tableEditor.getScreenRowCount()).toEqual(2)
 
