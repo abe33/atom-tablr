@@ -22,7 +22,7 @@ describe "CSVEditor", ->
     waitsForPromise -> atom.packages.activatePackage('table-edit')
 
   describe 'when a csv file is opened', ->
-    [csvDest, projectPath, openSpy, destroySpy] = []
+    [csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
 
     sleep = (ms) ->
       start = new Date
@@ -41,6 +41,24 @@ describe "CSVEditor", ->
         atom.workspace.open(fixtureName).then (t) ->
           csvEditor = t
           csvEditorElement = atom.views.getView(csvEditor)
+
+    modifyAndSave = (block) ->
+      waitsFor ->
+        csvEditorElement.querySelector('atom-table-editor')
+
+      runs block
+
+      runs ->
+        expect(tableEditor.isModified()).toBeTruthy()
+        expect(csvEditor.isModified()).toBeTruthy()
+
+        spyOn(fs, 'writeFile').andCallFake (path, data, callback) ->
+          savedContent = data
+          callback()
+
+        tableEditor.save()
+
+      waitsFor -> fs.writeFile.callCount > 0
 
     beforeEach ->
       openFixture('sample.csv')
@@ -101,8 +119,6 @@ describe "CSVEditor", ->
 
     describe 'when the user choose to open a table editor', ->
       describe 'with the default options', ->
-        [tableEditor, tableEditorElement] = []
-
         beforeEach ->
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
@@ -132,34 +148,13 @@ describe "CSVEditor", ->
 
         describe 'when the table is modified', ->
           beforeEach ->
-            waitsFor ->
-              csvEditorElement.querySelector('atom-table-editor')
-
-            runs ->
+            modifyAndSave ->
               tableEditor.addRow ['Bill', 45, 'male']
               tableEditor.addRow ['Bonnie', 42, 'female']
 
-          it 'marks the table editor as modified', ->
-            expect(tableEditor.isModified()).toBeTruthy()
-            expect(csvEditor.isModified()).toBeTruthy()
-
           describe 'when saved', ->
-            spy = null
-            beforeEach ->
-              runs ->
-                spy = jasmine.createSpy('did-save')
-                tableEditor.onDidSave(spy)
-
-                tableEditor.save()
-
-              waitsFor -> spy.callCount > 0
-
-              waitsFor sleep WRITE_TIMEOUT
-
             it 'save the new csv content on disk', ->
-              content = fs.readFileSync(csvDest)
-
-              expect(String(content)).toEqual("""
+              expect(savedContent).toEqual("""
               name,age,gender
               Jane,32,female
               John,30,male
@@ -211,30 +206,13 @@ describe "CSVEditor", ->
             expect(tableEditor).toBeDefined()
 
           describe 'when modified and saved', ->
-            spy = null
             beforeEach ->
-              spy = jasmine.createSpy('did-save')
-              tableEditor.onDidChangeScreenRows(spy)
-
-              tableEditor.addRow ['Bill', 45, 'male']
-              tableEditor.addRow ['Bonnie', 42, 'female']
-
-              waitsFor -> spy.callCount > 0
-
-              runs ->
-                spy = jasmine.createSpy('did-save')
-                tableEditor.onDidSave(spy)
-
-                tableEditor.save()
-
-              waitsFor -> spy.callCount > 0
-
-              waitsFor sleep WRITE_TIMEOUT
+              modifyAndSave ->
+                tableEditor.addRow ['Bill', 45, 'male']
+                tableEditor.addRow ['Bonnie', 42, 'female']
 
             it 'save the new csv content on disk', ->
-              content = fs.readFileSync(csvDest)
-
-              expect(String(content)).toEqual("""
+              expect(savedContent).toEqual("""
               name;age;gender
               Jane;32;female
               John;30;male
@@ -268,30 +246,13 @@ describe "CSVEditor", ->
             expect(tableEditor.getScreenRowCount()).toEqual(2)
 
           describe 'when modified and saved', ->
-            spy = null
             beforeEach ->
-              spy = jasmine.createSpy('did-save')
-              tableEditor.onDidChangeScreenRows(spy)
-
-              tableEditor.addRow ['Bill', 45, 'male']
-              tableEditor.addRow ['Bonnie', 42, 'female']
-
-              waitsFor -> spy.callCount > 0
-
-              runs ->
-                spy = jasmine.createSpy('did-save')
-                tableEditor.onDidSave(spy)
-
-                tableEditor.save()
-
-              waitsFor -> spy.callCount > 0
-
-              waitsFor sleep WRITE_TIMEOUT
+              modifyAndSave ->
+                tableEditor.addRow ['Bill', 45, 'male']
+                tableEditor.addRow ['Bonnie', 42, 'female']
 
             it 'save the new csv content on disk', ->
-              content = fs.readFileSync(csvDest)
-
-              expect(String(content)).toEqual("""
+              expect(savedContent).toEqual("""
               name,age,gender
               Jane,32,female
               John,30,male
@@ -325,31 +286,13 @@ describe "CSVEditor", ->
             expect(tableEditor.getScreenRowCount()).toEqual(2)
 
           describe 'when modified and saved', ->
-            spy = null
             beforeEach ->
-              spy = jasmine.createSpy('did-save')
-              tableEditor.onDidChangeScreenRows(spy)
-
-              tableEditor.addRow ['GHI', 56]
-              tableEditor.addRow ['JKL', 78]
-
-              waitsFor -> spy.callCount > 0
-
-              runs ->
-                spy = jasmine.createSpy('did-save')
-                tableEditor.onDidSave(spy)
-
-                tableEditor.save()
-
-              waitsFor -> spy.callCount > 0
-
-              waitsFor sleep WRITE_TIMEOUT
+              modifyAndSave ->
+                tableEditor.addRow ['GHI', 56]
+                tableEditor.addRow ['JKL', 78]
 
             it 'save the new csv content on disk', ->
-              content = fs.readFileSync(csvDest)
-
-              expect(String(content))
-              .toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
+              expect(savedContent).toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
 
             it 'marks the table editor as saved', ->
               expect(tableEditor.isModified()).toBeFalsy()
