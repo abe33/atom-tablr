@@ -87,6 +87,7 @@ module.exports =
   getSmallTable: ->
     table = new TableEditor
 
+    table.lockModifiedStatus()
     table.addColumn 'key', width: 150, align: 'right'
     table.addColumn 'value', width: 150, align: 'center'
     table.addColumn 'locked', width: 150, align: 'left'
@@ -102,13 +103,14 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
-    table.getTable().modified = false
-
+    table.initializeAfterOpen()
+    table.unlockModifiedStatus()
     return table
 
   getLargeTable: ->
     table = new TableEditor
 
+    table.lockModifiedStatus()
     table.addColumn 'key', width: 150, align: 'right'
     table.addColumn 'value', width: 150, align: 'center'
     for i in [0..100]
@@ -131,6 +133,7 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
-    table.getTable().modified = false
+    table.initializeAfterOpen()
+    table.unlockModifiedStatus()
 
     return table

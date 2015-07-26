@@ -79,6 +79,7 @@ class CSVEditor
 
         tableEditor = new TableEditor
         return resolve(tableEditor) if data.length is 0
+        tableEditor.lockModifiedStatus()
 
         if @options.header
           for column in data.shift()
@@ -90,6 +91,7 @@ class CSVEditor
         tableEditor.addRows(data)
         tableEditor.setSaveHandler(@save)
         tableEditor.initializeAfterOpen()
+        tableEditor.unlockModifiedStatus()
 
         resolve(tableEditor)
 

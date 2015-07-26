@@ -31,7 +31,16 @@ class Table
     @updateCachedContents()
     @lastModified = false
 
+  lockModifiedStatus: ->
+    @modifiedLock = true
+
+  unlockModifiedStatus: ->
+    @modifiedLock = false
+    @emitModifiedStatusChange()
+
   emitModifiedStatusChange: ->
+    return if @modifiedLock
+
     modified = @isModified()
     return if @lastModified is modified
 

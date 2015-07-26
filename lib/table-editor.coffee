@@ -37,7 +37,7 @@ class TableEditor
     toProperty: 'displayTable'
   )
   @delegatesMethods(
-    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterOpen',
+    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterOpen', 'lockModifiedStatus', 'unlockModifiedStatus',
     toProperty: 'table'
   )
 
@@ -69,6 +69,8 @@ class TableEditor
       @subscriptions = null
       @displayTable = null
       @table = null
+
+  getTitle: -> 'Table'
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback

@@ -11,6 +11,7 @@ TableElement = require '../lib/table-element'
 
 CHANGE_TIMEOUT = 400
 
+
 describe "CSVEditor", ->
   [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
 
