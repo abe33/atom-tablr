@@ -97,7 +97,7 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
-          csvEditorElement.querySelector('#remember-choice').checked = true
+          csvEditorElement.querySelector('[id^="remember-choice"]').checked = true
 
           destroySpy = jasmine.createSpy('did-destroy')
           csvEditor.onDidDestroy(destroySpy)
@@ -198,7 +198,7 @@ describe "CSVEditor", ->
         openFixture('semi-colon.csv')
 
         runs ->
-          csvEditorElement.querySelector('#semi-colon').checked = true
+          csvEditorElement.querySelector('[id^="semi-colon"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
@@ -237,7 +237,7 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
-          csvEditorElement.querySelector('#header').checked = true
+          csvEditorElement.querySelector('[id^="header"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
@@ -280,7 +280,7 @@ describe "CSVEditor", ->
 
         runs ->
           csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
-          csvEditorElement.querySelector('#custom-row-delimiter').checked = true
+          csvEditorElement.querySelector('[id^="custom-row-delimiter"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
