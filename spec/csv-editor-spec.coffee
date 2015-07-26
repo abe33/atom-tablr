@@ -282,7 +282,6 @@ describe "CSVEditor", ->
 
           it 'now parses the table data properly', ->
             expect(tableEditor).toBeDefined()
-            console.log tableEditor.getTable().getRows().join('\n') + 'end'
             expect(tableEditor.getScreenColumnCount()).toEqual(2)
             expect(tableEditor.getScreenRowCount()).toEqual(2)
 
