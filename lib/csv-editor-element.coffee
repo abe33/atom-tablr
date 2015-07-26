@@ -1,6 +1,7 @@
 {CompositeDisposable} = require 'atom'
 {SpacePenDSL, EventsDelegation} = require 'atom-utils'
 CSVEditor = require './csv-editor'
+TableEditor = require './table-editor'
 
 module.exports =
 class CSVEditorElement extends HTMLElement
@@ -140,7 +141,7 @@ class CSVEditorElement extends HTMLElement
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add @subscribeTo @openTextEditorButton,
-      click: => @model.openTextEditor()
+      click: => @model.openTextEditor(@collectOptions())
 
     @subscriptions.add @subscribeTo @openTableEditorButton,
       click: =>
@@ -186,6 +187,7 @@ class CSVEditorElement extends HTMLElement
 
   collectOptions: ->
     options =
+      remember: @querySelector('#remember-choice').checked
       header: @querySelector('#header').checked
       eof: @querySelector('#eof').checked
       quoted: @querySelector('#quoted').checked
@@ -231,12 +233,16 @@ class CSVEditorElement extends HTMLElement
     options
 
   setModel: (@model) ->
-    @subscriptions.add @model.onDidOpen (editor) =>
+    @subscriptions.add @model.onDidOpen ({editor}) =>
+      return unless editor instanceof TableEditor
+
       @innerHTML = ''
       @appendChild(atom.views.getView(editor))
 
       @subscriptions.dispose()
       @subscriptions = new CompositeDisposable
+
+    @model.applyChoice()
 
 module.exports = CSVEditorElement = document.registerElement 'atom-csv-editor', prototype: CSVEditorElement.prototype
 

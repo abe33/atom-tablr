@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 fs = require 'fs'
 csv = require 'csv'
 path = require 'path'
@@ -6,7 +7,7 @@ TableEditor = require './table-editor'
 
 module.exports =
 class CSVEditor
-  constructor: (@uriToOpen, @options={}) ->
+  constructor: (@uriToOpen, @options={}, @choice) ->
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
 
@@ -40,9 +41,17 @@ class CSVEditor
   onDidChangeModified: (callback) ->
     @emitter.on 'did-change-modified', callback
 
-  openTextEditor: ->
+  applyChoice: ->
+    console.log 'choice applied'
+    if @choice?
+      switch @choice
+        when 'TextEditor' then @openTextEditor(@options)
+        when 'TableEditor' then @openTableEditor(@options)
+
+  openTextEditor: (@options={}) ->
     atom.project.open(@uriToOpen).then (editor) =>
       pane = atom.workspace.paneForItem(this)
+      @emitter.emit('did-open', {editor, options: _.clone(@options)})
       @destroy()
 
       pane.activateItem(editor)
@@ -52,7 +61,7 @@ class CSVEditor
       @subscriptions.add @editor.onDidChangeModified (status) =>
         @emitter.emit 'did-change-modified', status
 
-      @emitter.emit('did-open', @editor)
+      @emitter.emit('did-open', {@editor, options: _.clone(options)})
 
   destroy: ->
     return if @destroyed
@@ -64,7 +73,9 @@ class CSVEditor
   openCSV: ->
     new Promise (resolve, reject) =>
       fileContent = fs.readFileSync(@uriToOpen)
-      csv.parse String(fileContent), @options, (err, data) =>
+      options = _.clone(@options)
+
+      csv.parse String(fileContent), options, (err, data) =>
         return reject(err) if err?
 
         tableEditor = new TableEditor
@@ -88,9 +99,10 @@ class CSVEditor
 
   saveAs: (path) ->
     new Promise (resolve, reject) =>
-      if @options.header
-        @options.columns = @editor.getColumns()
-      csv.stringify @editor.getTable().getRows(), @options, (err, data) =>
+      options = _.clone(@options)
+      options.columns = @editor.getColumns() if options.header
+
+      csv.stringify @editor.getTable().getRows(), options, (err, data) =>
         return reject(err) if err?
 
         fs.writeFile path, data, (err) =>

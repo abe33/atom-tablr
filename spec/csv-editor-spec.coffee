@@ -9,6 +9,8 @@ TableElement = require '../lib/table-element'
 
 {click} = require './helpers/events'
 
+WRITE_TIMEOUT = 200
+
 describe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
 
@@ -20,7 +22,11 @@ describe "CSVEditor", ->
     waitsForPromise -> atom.packages.activatePackage('table-edit')
 
   describe 'when a csv file is opened', ->
-    [csvDest, projectPath, openSpy] = []
+    [csvDest, projectPath, openSpy, destroySpy] = []
+
+    sleep = (ms) ->
+      start = new Date
+      -> new Date - start >= ms
 
     openFixture = (fixtureName) ->
       csvFixture = path.join(__dirname, 'fixtures', fixtureName)
@@ -31,9 +37,10 @@ describe "CSVEditor", ->
 
       atom.project.setPaths([projectPath])
 
-      waitsForPromise -> atom.workspace.open(fixtureName).then (t) ->
-        csvEditor = t
-        csvEditorElement = atom.views.getView(csvEditor)
+      waitsForPromise ->
+        atom.workspace.open(fixtureName).then (t) ->
+          csvEditor = t
+          csvEditorElement = atom.views.getView(csvEditor)
 
     beforeEach ->
       openFixture('sample.csv')
@@ -46,13 +53,14 @@ describe "CSVEditor", ->
 
     describe 'when the user choose to open a text editor', ->
       beforeEach ->
-        openSpy = jasmine.createSpy('did-destroy')
-        csvEditor.onDidDestroy(openSpy)
+        destroySpy = jasmine.createSpy('did-destroy')
+        csvEditor.onDidDestroy(destroySpy)
 
         textEditorButton = csvEditorElement.openTextEditorButton
         click(textEditorButton)
 
-        waitsFor -> openSpy.callCount > 0
+        waitsFor ->
+          destroySpy.callCount > 0
 
       it 'opens a new text editor for that file', ->
         expect(atom.workspace.getActiveTextEditor()).toBeDefined()
@@ -63,12 +71,40 @@ describe "CSVEditor", ->
       it 'destroys the csv editor pane item', ->
         expect(atom.workspace.getActivePane().getItems().length).toEqual(1)
 
+      describe 'when the remember choice setting is enabled', ->
+        beforeEach ->
+          csvEditor.destroy()
+
+          openFixture('sample.csv')
+
+          runs ->
+            csvEditorElement.querySelector('#remember-choice').checked = true
+
+            destroySpy = jasmine.createSpy('did-destroy')
+            csvEditor.onDidDestroy(destroySpy)
+
+            textEditorButton = csvEditorElement.openTextEditorButton
+            click(textEditorButton)
+
+          waitsFor -> destroySpy.callCount > 0
+
+          runs ->
+            csvEditor.destroy()
+
+          waitsForPromise ->
+            atom.workspace.open(path.join(projectPath, 'sample.json')).then (t) ->
+              csvEditor = t
+              csvEditorElement = atom.views.getView(csvEditor)
+
+        it 'does not show the choice form again', ->
+          expect(atom.workspace.getActiveTextEditor()).toBeDefined()
+
     describe 'when the user choose to open a table editor', ->
       describe 'with the default options', ->
         [tableEditor, tableEditorElement] = []
 
         beforeEach ->
-          csvEditor.onDidOpen (editor) ->
+          csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
           tableEditorButton = csvEditorElement.openTableEditorButton
@@ -118,6 +154,8 @@ describe "CSVEditor", ->
 
               waitsFor -> spy.callCount > 0
 
+              waitsFor sleep WRITE_TIMEOUT
+
             it 'save the new csv content on disk', ->
               content = fs.readFileSync(csvDest)
 
@@ -161,7 +199,7 @@ describe "CSVEditor", ->
 
             runs ->
               csvEditorElement.querySelector('#semi-colon').checked = true
-              csvEditor.onDidOpen (editor) ->
+              csvEditor.onDidOpen ({editor}) ->
                 tableEditor = editor
 
               tableEditorButton = csvEditorElement.openTableEditorButton
@@ -191,6 +229,8 @@ describe "CSVEditor", ->
 
               waitsFor -> spy.callCount > 0
 
+              waitsFor sleep WRITE_TIMEOUT
+
             it 'save the new csv content on disk', ->
               content = fs.readFileSync(csvDest)
 
@@ -213,7 +253,7 @@ describe "CSVEditor", ->
 
             runs ->
               csvEditorElement.querySelector('#header').checked = true
-              csvEditor.onDidOpen (editor) ->
+              csvEditor.onDidOpen ({editor}) ->
                 tableEditor = editor
 
               tableEditorButton = csvEditorElement.openTableEditorButton
@@ -246,6 +286,8 @@ describe "CSVEditor", ->
 
               waitsFor -> spy.callCount > 0
 
+              waitsFor sleep WRITE_TIMEOUT
+
             it 'save the new csv content on disk', ->
               content = fs.readFileSync(csvDest)
 
@@ -256,7 +298,6 @@ describe "CSVEditor", ->
               Bill,45,male
               Bonnie,42,female
               """)
-
 
             it 'marks the table editor as saved', ->
               expect(tableEditor.isModified()).toBeFalsy()
@@ -270,7 +311,7 @@ describe "CSVEditor", ->
             runs ->
               csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
               csvEditorElement.querySelector('#custom-row-delimiter').checked = true
-              csvEditor.onDidOpen (editor) ->
+              csvEditor.onDidOpen ({editor}) ->
                 tableEditor = editor
 
               tableEditorButton = csvEditorElement.openTableEditorButton
@@ -301,6 +342,8 @@ describe "CSVEditor", ->
                 tableEditor.save()
 
               waitsFor -> spy.callCount > 0
+
+              waitsFor sleep WRITE_TIMEOUT
 
             it 'save the new csv content on disk', ->
               content = fs.readFileSync(csvDest)

@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 [TableEditor, TableElement, CSVEditor, CSVEditorElement, url] = []
 
 module.exports =
@@ -33,7 +34,7 @@ module.exports =
       'table-edit:demo-large': => atom.workspace.open('table://large')
       'table-edit:demo-small': => atom.workspace.open('table://small')
 
-    atom.workspace.addOpener (uriToOpen) ->
+    atom.workspace.addOpener (uriToOpen) =>
       return unless /\.csv$/.test uriToOpen
 
       unless CSVEditorElement?
@@ -41,7 +42,21 @@ module.exports =
         CSVEditorElement = require './csv-editor-element'
         CSVEditorElement.registerViewProvider()
 
-      new CSVEditor(uriToOpen)
+      choice = @getChoiceForPath(uriToOpen)
+      options = _.clone @getOptionsForPath(uriToOpen)
+
+      return atom.project.open(uriToOpen) if choice is 'TextEditor'
+
+      csvEditor = new CSVEditor(uriToOpen, options, choice)
+
+      disposable = csvEditor.onDidOpen ({editor, options}) =>
+        disposable.dispose()
+
+        @storeOptionsForPath(uriToOpen, options)
+        if options.remember
+          @storeChoiceForPath(uriToOpen, editor.constructor.name)
+
+      csvEditor
 
     atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
@@ -52,6 +67,22 @@ module.exports =
       switch host
         when 'large' then @getLargeTable()
         when 'small' then @getSmallTable()
+
+  getChoiceForPath: (path) ->
+    @pathsOptions?[path]?.choice
+
+  storeChoiceForPath: (path, choice) ->
+    @pathsOptions ?= {}
+    @pathsOptions[path] ?= {}
+    @pathsOptions[path].choice = choice
+
+  getOptionsForPath: (path) ->
+    @pathsOptions?[path]?.options
+
+  storeOptionsForPath: (path, options) ->
+    @pathsOptions ?= {}
+    @pathsOptions[path] ?= {}
+    @pathsOptions[path].options = options
 
   getSmallTable: ->
     table = new TableEditor
