@@ -11,7 +11,7 @@ TableElement = require '../lib/table-element'
 
 WRITE_TIMEOUT = 400
 
-fdescribe "CSVEditor", ->
+describe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
 
   beforeEach ->
