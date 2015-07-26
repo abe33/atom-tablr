@@ -261,10 +261,10 @@ class Table
     else
       @rows.splice index, 0, row
 
-    @emitModifiedStatusChange()
     @emitter.emit 'did-add-row', {row, index}
 
     unless batch
+      @emitModifiedStatusChange()
       @emitter.emit 'did-change-rows', {
         oldRange: {start: index, end: index}
         newRange: {start: index, end: index+1}
@@ -285,6 +285,7 @@ class Table
 
     createdRows = rows.map (row,i) => @addRowAt(index+i, row, true)
 
+    @emitModifiedStatusChange()
     @emitter.emit 'did-change-rows', {
       oldRange: {start: index, end: index}
       newRange: {start: index, end: index+rows.length}
@@ -310,9 +311,9 @@ class Table
     row = @rows[index]
     @rows.splice(index, 1)
 
-    @emitModifiedStatusChange()
     @emitter.emit 'did-remove-row', {row, index}
     unless batch
+      @emitModifiedStatusChange()
       @emitter.emit 'did-change-rows', {
         oldRange: {start: index, end: index+1}
         newRange: {start: index, end: index}
