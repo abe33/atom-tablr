@@ -25,7 +25,7 @@ module.exports =
       type: 'integer'
       default: 2
 
-  activate: (state) ->
+  activate: ({@pathOptions}) ->
     TableEditor ?= require './table-editor'
     TableElement ?= require './table-element'
     TableElement.registerViewProvider()
@@ -69,20 +69,20 @@ module.exports =
         when 'small' then @getSmallTable()
 
   getChoiceForPath: (path) ->
-    @pathsOptions?[path]?.choice
+    @pathOptions?[path]?.choice
 
   storeChoiceForPath: (path, choice) ->
-    @pathsOptions ?= {}
-    @pathsOptions[path] ?= {}
-    @pathsOptions[path].choice = choice
+    @pathOptions ?= {}
+    @pathOptions[path] ?= {}
+    @pathOptions[path].choice = choice
 
   getOptionsForPath: (path) ->
-    @pathsOptions?[path]?.options
+    @pathOptions?[path]?.options
 
   storeOptionsForPath: (path, options) ->
-    @pathsOptions ?= {}
-    @pathsOptions[path] ?= {}
-    @pathsOptions[path].options = options
+    @pathOptions ?= {}
+    @pathOptions[path] ?= {}
+    @pathOptions[path].options = options
 
   getSmallTable: ->
     table = new TableEditor
@@ -137,3 +137,6 @@ module.exports =
     table.unlockModifiedStatus()
 
     return table
+
+  serialize: ->
+    {@pathOptions}
