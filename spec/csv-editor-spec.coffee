@@ -9,73 +9,75 @@ TableElement = require '../lib/table-element'
 
 {click} = require './helpers/events'
 
-WRITE_TIMEOUT = 400
+CHANGE_TIMEOUT = 400
 
 describe "CSVEditor", ->
-  [csvEditor, csvEditorElement] = []
+  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
 
   beforeEach ->
+    [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
+
     jasmineContent = document.body.querySelector('#jasmine-content')
     workspaceElement = atom.views.getView(atom.workspace)
     jasmineContent.appendChild(workspaceElement)
 
     waitsForPromise -> atom.packages.activatePackage('table-edit')
 
+  sleep = (ms) ->
+    start = new Date
+    -> new Date - start >= ms
+
+  openFixture = (fixtureName) ->
+    csvFixture = path.join(__dirname, 'fixtures', fixtureName)
+
+    projectPath = temp.mkdirSync('table-edit-project')
+    csvDest = path.join(projectPath, fixtureName)
+    fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
+
+    atom.project.setPaths([projectPath])
+
+    waitsForPromise ->
+      atom.workspace.open(fixtureName).then (t) ->
+        csvEditor = t
+        csvEditorElement = atom.views.getView(csvEditor)
+
+  modifyAndSave = (block) ->
+    waitsFor ->
+      csvEditorElement.querySelector('atom-table-editor')
+
+    runs block
+
+    runs ->
+      expect(tableEditor.isModified()).toBeTruthy()
+      expect(csvEditor.isModified()).toBeTruthy()
+
+      spyOn(fs, 'writeFile').andCallFake (path, data, callback) ->
+        savedContent = data
+        callback()
+
+      tableEditor.save()
+
+    waitsFor -> fs.writeFile.callCount > 0
+
+  afterEach ->
+    temp.cleanup()
+
   describe 'when a csv file is opened', ->
-    [csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
-
-    sleep = (ms) ->
-      start = new Date
-      -> new Date - start >= ms
-
-    openFixture = (fixtureName) ->
-      csvFixture = path.join(__dirname, 'fixtures', fixtureName)
-
-      projectPath = temp.mkdirSync('table-edit-project')
-      csvDest = path.join(projectPath, fixtureName)
-      fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
-
-      atom.project.setPaths([projectPath])
-
-      waitsForPromise ->
-        atom.workspace.open(fixtureName).then (t) ->
-          csvEditor = t
-          csvEditorElement = atom.views.getView(csvEditor)
-
-    modifyAndSave = (block) ->
-      waitsFor ->
-        csvEditorElement.querySelector('atom-table-editor')
-
-      runs block
-
-      runs ->
-        expect(tableEditor.isModified()).toBeTruthy()
-        expect(csvEditor.isModified()).toBeTruthy()
-
-        spyOn(fs, 'writeFile').andCallFake (path, data, callback) ->
-          savedContent = data
-          callback()
-
-        tableEditor.save()
-
-      waitsFor -> fs.writeFile.callCount > 0
-
-    beforeEach ->
-      openFixture('sample.csv')
-
-    afterEach ->
-      temp.cleanup()
-
     it 'opens a csv editor for the file', ->
-      expect(csvEditor instanceof CSVEditor).toBeTruthy()
+      openFixture('sample.csv')
+      runs ->
+        expect(csvEditor instanceof CSVEditor).toBeTruthy()
 
     describe 'when the user choose to open a text editor', ->
       beforeEach ->
-        destroySpy = jasmine.createSpy('did-destroy')
-        csvEditor.onDidDestroy(destroySpy)
+        openFixture('sample.csv')
 
-        textEditorButton = csvEditorElement.openTextEditorButton
-        click(textEditorButton)
+        runs ->
+          destroySpy = jasmine.createSpy('did-destroy')
+          csvEditor.onDidDestroy(destroySpy)
+
+          textEditorButton = csvEditorElement.openTextEditorButton
+          click(textEditorButton)
 
         waitsFor ->
           destroySpy.callCount > 0
@@ -89,42 +91,46 @@ describe "CSVEditor", ->
       it 'destroys the csv editor pane item', ->
         expect(atom.workspace.getActivePane().getItems().length).toEqual(1)
 
-      describe 'when the remember choice setting is enabled', ->
-        beforeEach ->
+    describe 'when the remember choice setting is enabled', ->
+      beforeEach ->
+        openFixture('sample.csv')
+
+        runs ->
+          csvEditorElement.querySelector('#remember-choice').checked = true
+
+          destroySpy = jasmine.createSpy('did-destroy')
+          csvEditor.onDidDestroy(destroySpy)
+
+        waitsFor sleep CHANGE_TIMEOUT
+
+        runs ->
+          textEditorButton = csvEditorElement.openTextEditorButton
+          click(textEditorButton)
+
+        waitsFor -> destroySpy.callCount > 0
+
+        runs ->
           csvEditor.destroy()
 
-          openFixture('sample.csv')
+        waitsForPromise ->
+          atom.workspace.open(path.join(projectPath, 'sample.json')).then (t) ->
+            csvEditor = t
+            csvEditorElement = atom.views.getView(csvEditor)
 
-          runs ->
-            csvEditorElement.querySelector('#remember-choice').checked = true
-
-            destroySpy = jasmine.createSpy('did-destroy')
-            csvEditor.onDidDestroy(destroySpy)
-
-            textEditorButton = csvEditorElement.openTextEditorButton
-            click(textEditorButton)
-
-          waitsFor -> destroySpy.callCount > 0
-
-          runs ->
-            csvEditor.destroy()
-
-          waitsForPromise ->
-            atom.workspace.open(path.join(projectPath, 'sample.json')).then (t) ->
-              csvEditor = t
-              csvEditorElement = atom.views.getView(csvEditor)
-
-        it 'does not show the choice form again', ->
-          expect(atom.workspace.getActiveTextEditor()).toBeDefined()
+      it 'does not show the choice form again', ->
+        expect(atom.workspace.getActiveTextEditor()).toBeDefined()
 
     describe 'when the user choose to open a table editor', ->
       describe 'with the default options', ->
         beforeEach ->
-          csvEditor.onDidOpen ({editor}) ->
-            tableEditor = editor
+          openFixture('sample.csv')
 
-          tableEditorButton = csvEditorElement.openTableEditorButton
-          click(tableEditorButton)
+          runs ->
+            csvEditor.onDidOpen ({editor}) ->
+              tableEditor = editor
+
+            tableEditorButton = csvEditorElement.openTableEditorButton
+            click(tableEditorButton)
 
           waitsFor -> tableEditor?
 
@@ -166,134 +172,139 @@ describe "CSVEditor", ->
               expect(tableEditor.isModified()).toBeFalsy()
               expect(csvEditor.isModified()).toBeFalsy()
 
-        describe 'when the file cannot be parsed with the default', ->
-          beforeEach ->
-            tableEditor = tableEditorElement = null
-            openFixture('invalid.csv')
+    describe 'when the file cannot be parsed with the default', ->
+      beforeEach ->
+        openFixture('invalid.csv')
 
-            runs ->
-              tableEditorButton = csvEditorElement.openTableEditorButton
-              click(tableEditorButton)
+        runs ->
+          tableEditorButton = csvEditorElement.openTableEditorButton
+          click(tableEditorButton)
 
-            waitsFor -> csvEditorElement.querySelector('.alert')
+        waitsFor -> csvEditorElement.querySelector('.alert')
 
-          it 'displays the error in the settings form', ->
-            expect(csvEditorElement.querySelector('.alert')).toExist()
+      it 'displays the error in the settings form', ->
+        expect(csvEditorElement.querySelector('.alert')).toExist()
 
-          describe 'clicking again on the open button', ->
-            it 'clears the previously created alert', ->
-              tableEditorButton = csvEditorElement.openTableEditorButton
-              click(tableEditorButton)
+      describe 'clicking again on the open button', ->
+        it 'clears the previously created alert', ->
+          tableEditorButton = csvEditorElement.openTableEditorButton
+          click(tableEditorButton)
 
-              expect(csvEditorElement.querySelector('.alert')).not.toExist()
+          expect(csvEditorElement.querySelector('.alert')).not.toExist()
 
-        describe 'changing the delimiter settings', ->
-          beforeEach ->
-            tableEditor = tableEditorElement = null
-            openFixture('semi-colon.csv')
+    describe 'changing the delimiter settings', ->
+      beforeEach ->
+        openFixture('semi-colon.csv')
 
-            runs ->
-              csvEditorElement.querySelector('#semi-colon').checked = true
-              csvEditor.onDidOpen ({editor}) ->
-                tableEditor = editor
+        runs ->
+          csvEditorElement.querySelector('#semi-colon').checked = true
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
 
-              tableEditorButton = csvEditorElement.openTableEditorButton
-              click(tableEditorButton)
+        waitsFor sleep CHANGE_TIMEOUT
 
-            waitsFor -> tableEditor?
+        runs ->
+          tableEditorButton = csvEditorElement.openTableEditorButton
+          click(tableEditorButton)
 
-          it 'now parses the table data properly', ->
-            expect(tableEditor).toBeDefined()
+        waitsFor -> tableEditor?
 
-          describe 'when modified and saved', ->
-            beforeEach ->
-              modifyAndSave ->
-                tableEditor.addRow ['Bill', 45, 'male']
-                tableEditor.addRow ['Bonnie', 42, 'female']
+      it 'now parses the table data properly', ->
+        expect(tableEditor).toBeDefined()
 
-            it 'save the new csv content on disk', ->
-              expect(savedContent).toEqual("""
-              name;age;gender
-              Jane;32;female
-              John;30;male
-              Bill;45;male
-              Bonnie;42;female
-              """)
+      describe 'when modified and saved', ->
+        beforeEach ->
+          modifyAndSave ->
+            tableEditor.addRow ['Bill', 45, 'male']
+            tableEditor.addRow ['Bonnie', 42, 'female']
 
-            it 'marks the table editor as saved', ->
-              expect(tableEditor.isModified()).toBeFalsy()
-              expect(csvEditor.isModified()).toBeFalsy()
+        it 'save the new csv content on disk', ->
+          expect(savedContent).toEqual("""
+          name;age;gender
+          Jane;32;female
+          John;30;male
+          Bill;45;male
+          Bonnie;42;female
+          """)
 
-        describe 'changing the header settings', ->
-          beforeEach ->
-            tableEditor = tableEditorElement = null
-            openFixture('sample.csv')
+        it 'marks the table editor as saved', ->
+          expect(tableEditor.isModified()).toBeFalsy()
+          expect(csvEditor.isModified()).toBeFalsy()
 
-            runs ->
-              csvEditorElement.querySelector('#header').checked = true
-              csvEditor.onDidOpen ({editor}) ->
-                tableEditor = editor
+    describe 'changing the header settings', ->
+      beforeEach ->
+        openFixture('sample.csv')
 
-              tableEditorButton = csvEditorElement.openTableEditorButton
-              click(tableEditorButton)
+        runs ->
+          csvEditorElement.querySelector('#header').checked = true
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
 
-            waitsFor -> tableEditor?
+        waitsFor sleep CHANGE_TIMEOUT
 
-          it 'now parses the table data properly', ->
-            expect(tableEditor).toBeDefined()
-            expect(tableEditor.getScreenColumnCount()).toEqual(3)
-            expect(tableEditor.getColumns()).toEqual(['name', 'age', 'gender'])
-            expect(tableEditor.getScreenRowCount()).toEqual(2)
+        runs ->
+          tableEditorButton = csvEditorElement.openTableEditorButton
+          click(tableEditorButton)
 
-          describe 'when modified and saved', ->
-            beforeEach ->
-              modifyAndSave ->
-                tableEditor.addRow ['Bill', 45, 'male']
-                tableEditor.addRow ['Bonnie', 42, 'female']
+        waitsFor -> tableEditor?
 
-            it 'save the new csv content on disk', ->
-              expect(savedContent).toEqual("""
-              name,age,gender
-              Jane,32,female
-              John,30,male
-              Bill,45,male
-              Bonnie,42,female
-              """)
+      it 'now parses the table data properly', ->
+        expect(tableEditor).toBeDefined()
+        expect(tableEditor.getScreenColumnCount()).toEqual(3)
+        expect(tableEditor.getColumns()).toEqual(['name', 'age', 'gender'])
+        expect(tableEditor.getScreenRowCount()).toEqual(2)
 
-            it 'marks the table editor as saved', ->
-              expect(tableEditor.isModified()).toBeFalsy()
-              expect(csvEditor.isModified()).toBeFalsy()
+      describe 'when modified and saved', ->
+        beforeEach ->
+          modifyAndSave ->
+            tableEditor.addRow ['Bill', 45, 'male']
+            tableEditor.addRow ['Bonnie', 42, 'female']
 
-        describe 'changing the row delimiter settings', ->
-          beforeEach ->
-            tableEditor = tableEditorElement = null
-            openFixture('custom-row-delimiter.csv')
+        it 'save the new csv content on disk', ->
+          expect(savedContent).toEqual("""
+          name,age,gender
+          Jane,32,female
+          John,30,male
+          Bill,45,male
+          Bonnie,42,female
+          """)
 
-            runs ->
-              csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
-              csvEditorElement.querySelector('#custom-row-delimiter').checked = true
-              csvEditor.onDidOpen ({editor}) ->
-                tableEditor = editor
+        it 'marks the table editor as saved', ->
+          expect(tableEditor.isModified()).toBeFalsy()
+          expect(csvEditor.isModified()).toBeFalsy()
 
-              tableEditorButton = csvEditorElement.openTableEditorButton
-              click(tableEditorButton)
+    describe 'changing the row delimiter settings', ->
+      beforeEach ->
+        openFixture('custom-row-delimiter.csv')
 
-            waitsFor -> tableEditor?
+        runs ->
+          csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
+          csvEditorElement.querySelector('#custom-row-delimiter').checked = true
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
 
-          it 'now parses the table data properly', ->
-            expect(tableEditor).toBeDefined()
-            expect(tableEditor.getScreenColumnCount()).toEqual(2)
-            expect(tableEditor.getScreenRowCount()).toEqual(2)
+        waitsFor sleep CHANGE_TIMEOUT
 
-          describe 'when modified and saved', ->
-            beforeEach ->
-              modifyAndSave ->
-                tableEditor.addRow ['GHI', 56]
-                tableEditor.addRow ['JKL', 78]
+        runs ->
+          tableEditorButton = csvEditorElement.openTableEditorButton
+          click(tableEditorButton)
 
-            it 'save the new csv content on disk', ->
-              expect(savedContent).toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
+        waitsFor -> tableEditor?
 
-            it 'marks the table editor as saved', ->
-              expect(tableEditor.isModified()).toBeFalsy()
-              expect(csvEditor.isModified()).toBeFalsy()
+      it 'now parses the table data properly', ->
+        expect(tableEditor).toBeDefined()
+        expect(tableEditor.getScreenColumnCount()).toEqual(2)
+        expect(tableEditor.getScreenRowCount()).toEqual(2)
+
+      describe 'when modified and saved', ->
+        beforeEach ->
+          modifyAndSave ->
+            tableEditor.addRow ['GHI', 56]
+            tableEditor.addRow ['JKL', 78]
+
+        it 'save the new csv content on disk', ->
+          expect(savedContent).toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
+
+        it 'marks the table editor as saved', ->
+          expect(tableEditor.isModified()).toBeFalsy()
+          expect(csvEditor.isModified()).toBeFalsy()
