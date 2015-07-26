@@ -9,7 +9,7 @@ TableElement = require '../lib/table-element'
 
 {click} = require './helpers/events'
 
-WRITE_TIMEOUT = 200
+WRITE_TIMEOUT = 400
 
 describe "CSVEditor", ->
   [csvEditor, csvEditorElement] = []
