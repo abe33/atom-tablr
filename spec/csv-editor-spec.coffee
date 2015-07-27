@@ -77,7 +77,7 @@ describe "CSVEditor", ->
           destroySpy = jasmine.createSpy('did-destroy')
           csvEditor.onDidDestroy(destroySpy)
 
-          textEditorButton = csvEditorElement.openTextEditorButton
+          textEditorButton = csvEditorElement.form.openTextEditorButton
           click(textEditorButton)
 
         waitsFor ->
@@ -105,7 +105,7 @@ describe "CSVEditor", ->
         waitsFor sleep CHANGE_TIMEOUT
 
         runs ->
-          textEditorButton = csvEditorElement.openTextEditorButton
+          textEditorButton = csvEditorElement.form.openTextEditorButton
           click(textEditorButton)
 
         waitsFor -> destroySpy.callCount > 0
@@ -130,7 +130,7 @@ describe "CSVEditor", ->
             csvEditor.onDidOpen ({editor}) ->
               tableEditor = editor
 
-            tableEditorButton = csvEditorElement.openTableEditorButton
+            tableEditorButton = csvEditorElement.form.openTableEditorButton
             click(tableEditorButton)
 
           waitsFor -> tableEditor?
@@ -178,7 +178,7 @@ describe "CSVEditor", ->
         openFixture('invalid.csv')
 
         runs ->
-          tableEditorButton = csvEditorElement.openTableEditorButton
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
         waitsFor -> csvEditorElement.querySelector('.alert')
@@ -188,7 +188,7 @@ describe "CSVEditor", ->
 
       describe 'clicking again on the open button', ->
         it 'clears the previously created alert', ->
-          tableEditorButton = csvEditorElement.openTableEditorButton
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
           expect(csvEditorElement.querySelector('.alert')).not.toExist()
@@ -205,7 +205,7 @@ describe "CSVEditor", ->
         waitsFor sleep CHANGE_TIMEOUT
 
         runs ->
-          tableEditorButton = csvEditorElement.openTableEditorButton
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
         waitsFor -> tableEditor?
@@ -244,7 +244,7 @@ describe "CSVEditor", ->
         waitsFor sleep CHANGE_TIMEOUT
 
         runs ->
-          tableEditorButton = csvEditorElement.openTableEditorButton
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
         waitsFor -> tableEditor?
@@ -287,7 +287,7 @@ describe "CSVEditor", ->
         waitsFor sleep CHANGE_TIMEOUT
 
         runs ->
-          tableEditorButton = csvEditorElement.openTableEditorButton
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
         waitsFor -> tableEditor?
