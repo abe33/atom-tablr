@@ -30,7 +30,7 @@ class CSVEditorFormElement extends HTMLElement
 
     radiosOnly = (options={}) =>
       {name, label} = options
-      @div class: "control-group #{name}", =>
+      @div class: "control-group with-radios #{name}", =>
         @label class: 'setting-title', label
         radios(options)
 
@@ -132,9 +132,10 @@ class CSVEditorFormElement extends HTMLElement
 
           radiosOnly {
             name: 'trim'
-            label: 'Trim Fields'
-            selected: 'both'
+            label: 'Trim'
+            selected: 'no'
             options:
+              no: 'no'
               left: 'left'
               right: 'right'
               both: 'both'

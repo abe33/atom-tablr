@@ -473,17 +473,22 @@ atom-csv-editor {
     bottom: 0;
   }
 
+  atom-csv-editor-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    overflow: auto;
+  }
+
   .alert {
     margin-top: 20px;
   }
 
   .settings-view {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
     left: 0;
     right: 0;
     top: 0;
@@ -530,15 +535,21 @@ atom-csv-editor {
     }
 
     .text-editor, .table-editor {
-      padding: 40px 60px;
-      text-align: left;
+      flex: 1 1 0;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 0;
     }
-    .table-editor {
-      text-align: right;
-      padding-left: 20px;
-    }
-    .text-editor {
-      padding-right: 20px;
+
+    .btn-group {
+      display: flex;
+      flex-direction: row;
+
+      .btn {
+        flex: 1 0 0;
+        min-width: -webkit-min-content;
+      }
     }
 
     .btn + .control-group {
@@ -562,54 +573,53 @@ atom-csv-editor {
       display: flex;
       flex-direction: row;
 
-      .left-panel, .right-panel {
-        padding: 20px 0;
+      .panel {
+        padding: 20px;
         flex: 1 1 0;
+        min-width: 250px;
       }
 
-      .right-panel {
-        padding-left: 20px
-      }
-      .left-panel {
-        padding-right: 20px
-      }
-
-      .right-panel label:not(.btn) {
+      .controls > label:not(.btn) {
         padding: 0;
         padding-right: 20px;
         margin: 0;
       }
     }
 
+    .control-group {
+      &.with-radios, &.with-text-editor {
+        flex-direction: column;
+        align-items: stretch;
 
-    .control-group.row-delimiters,
-    .control-group.delimiters,
-    .control-group.escapes,
-    .control-group.comments,
-    .control-group.quotes {
-      flex-direction: column;
-      align-items: stretch;
-
-      .controls:last-child {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-      }
-
-      .controls:first-child {
-        flex-direction: row;
-        display: flex;
-        margin-bottom: 10px;
-        align-items: center;
-
-        atom-text-editor {
-          width: 70px;
+        .setting-title {
           height: 24px;
+          flex: 1 0;
         }
       }
 
-      .setting-title {
-        flex: 1 1 0;
+      &.with-text-editor {
+        .controls:last-child {
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+        }
+
+        .controls:first-child {
+          flex-direction: row;
+          display: flex;
+          margin-bottom: 10px;
+          align-items: center;
+
+          atom-text-editor {
+            width: 70px;
+            height: 24px;
+          }
+        }
+      }
+      &.with-radios {
+        .setting-title {
+          margin-bottom: 10px;
+        }
       }
     }
 
