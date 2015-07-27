@@ -41,7 +41,7 @@ class CSVEditorFormElement extends HTMLElement
           @label class: 'setting-title', label
           @tag 'atom-text-editor', outlet: "#{outlet}TextEditorElement", mini: true
 
-        options.options["custom-#{name}"] = 'custom'
+        options.options["custom"] = 'custom'
         radios(options)
 
       CSVEditorFormElement::__bindings__ ?= []
