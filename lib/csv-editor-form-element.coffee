@@ -18,12 +18,15 @@ class CSVEditorFormElement extends HTMLElement
       .replace('\r','\\r')
       .replace('\t','\\t')
 
+    normalizeValue = (value) ->
+      value?.replace('"','&quot;')
+
     radios = (options) =>
       {name, label, options, outlet, selected} = options
 
       @div class: 'controls btn-group', =>
         for optionName, value of options
-          inputOption = type: 'radio', value: value.replace('"','&quot;'), name: name, id: "#{optionName}-#{name}-#{id}"
+          inputOption = type: 'radio', value: normalizeValue(value), name: name, id: "#{optionName}-#{name}-#{id}"
           inputOption.checked = true if selected is optionName
           @input(inputOption)
           @label class: 'btn', for: "#{optionName}-#{name}-#{id}", labelFromValue(value)
@@ -44,6 +47,9 @@ class CSVEditorFormElement extends HTMLElement
         options.options["custom"] = 'custom'
         radios(options)
 
+      reversedOptions = {}
+      reversedOptions[v] = k for k,v of options.options
+
       CSVEditorFormElement::__bindings__ ?= []
       CSVEditorFormElement::initializeBindings ?= ->
         @__bindings__.forEach (f) => f.call(this)
@@ -55,6 +61,18 @@ class CSVEditorFormElement extends HTMLElement
             @querySelector("#custom-#{name}-#{id}")?.checked = true
           else
             @querySelector("##{selected}-#{name}-#{id}")?.checked = true
+
+      CSVEditorFormElement::__defaults__ ?= []
+      CSVEditorFormElement::initializeDefaults ?= (options) ->
+        @__defaults__.forEach (f) => f.call(this, options)
+      CSVEditorFormElement::__defaults__.push (options) ->
+        value = options[outlet]
+        optionName = reversedOptions[value]
+        if optionName? and radio = @querySelector("##{optionName}-#{name}-#{id}")
+          radio.setAttribute('checked', true)
+        else if value?
+          @["#{outlet}TextEditor"].setText(value)
+          @querySelector("#custom-#{name}-#{id}")?.checked = true
 
     @div class: 'settings-panel', =>
       @div class: 'setting-title', 'Choose between table and text editor:'
@@ -181,6 +199,20 @@ class CSVEditorFormElement extends HTMLElement
 
   cleanMessages: ->
     @messagesContainer.innerHTML = ''
+
+  setModel: (options={}) ->
+    console.log options
+
+    @querySelector('[id^="header"]').checked = true if options.header
+    @querySelector('[id^="eof"]').checked = true if options.eof
+    @querySelector('[id^="quoted"]').checked = true if options.quoted
+    @querySelector('[id^="skip-empty-lines"]').checked = true if options.skip_empty_lines
+
+    @querySelector('[id^="left-trim"]').checked = true if options.ltrim
+    @querySelector('[id^="right-trim"]').checked = true if options.rtrim
+    @querySelector('[id^="both-trim"]').checked = true if options.trim
+
+    @initializeDefaults(options)
 
   collectOptions: ->
     options =

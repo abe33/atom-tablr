@@ -11,9 +11,8 @@ TableElement = require '../lib/table-element'
 
 CHANGE_TIMEOUT = 400
 
-
 describe "CSVEditor", ->
-  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
+  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage] = []
 
   beforeEach ->
     [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
@@ -22,17 +21,22 @@ describe "CSVEditor", ->
     workspaceElement = atom.views.getView(atom.workspace)
     jasmineContent.appendChild(workspaceElement)
 
-    waitsForPromise -> atom.packages.activatePackage('table-edit')
+    waitsForPromise -> atom.packages.activatePackage('table-edit').then (pkg) ->
+      tableEditPackage = pkg.mainModule
 
   sleep = (ms) ->
     start = new Date
     -> new Date - start >= ms
 
-  openFixture = (fixtureName) ->
+  openFixture = (fixtureName, settings) ->
     csvFixture = path.join(__dirname, 'fixtures', fixtureName)
 
     projectPath = temp.mkdirSync('table-edit-project')
     csvDest = path.join(projectPath, fixtureName)
+
+    if settings?
+      tableEditPackage.storeOptionsForPath("/private#{csvDest}", settings)
+
     fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
 
     atom.project.setPaths([projectPath])
@@ -309,3 +313,33 @@ describe "CSVEditor", ->
         it 'marks the table editor as saved', ->
           expect(tableEditor.isModified()).toBeFalsy()
           expect(csvEditor.isModified()).toBeFalsy()
+
+    describe 'when there is options provided at the creation of the form', ->
+      beforeEach ->
+        openFixture 'custom-row-delimiter.csv', {
+          delimiter: ';'
+          rowDelimiter: '::'
+          quote: "'"
+          escape: "\\"
+          header: true
+          ltrim: true
+          comment: '//'
+          eof: true
+          quoted: true
+          skip_empty_lines: true
+        }
+
+      it 'initialize the forms with the corresponding values', ->
+        expect(csvEditorElement.querySelector('[name="header"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[name="eof"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[name="quoted"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[name="skip-empty-lines"]:checked')).toExist()
+
+        expect(csvEditorElement.querySelector('[id^="semi-colon"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="custom-row-delimiter"]:checked')).toExist()
+        expect(csvEditorElement.form.rowDelimiterTextEditor.getText()).toEqual('::')
+        expect(csvEditorElement.querySelector('[id^="custom-comment"]:checked')).toExist()
+        expect(csvEditorElement.form.commentTextEditor.getText()).toEqual('//')
+        expect(csvEditorElement.querySelector('[id^="single-quote-quote"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="backslash-escape"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="left-trim"]:checked')).toExist()
