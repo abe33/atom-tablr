@@ -57,9 +57,9 @@ class TableElement extends HTMLElement
   @pool 'gutterCell', 'gutterCells'
 
   createdCallback: ->
-    @cells = []
-    @headerCells = []
-    @gutterCells = []
+    @cells = {}
+    @headerCells = {}
+    @gutterCells = {}
 
     @subscriptions = new CompositeDisposable
 
@@ -926,6 +926,8 @@ class TableElement extends HTMLElement
        not @hasChanged
       return
 
+    maxCellCount = ((lastVisibleRow - firstVisibleRow) + @getRowOverdraw() * 2) * ((lastVisibleColumn - firstVisibleColumn) + @getColumnOverdraw() * 2)
+
     rowOverdraw = @getRowOverdraw()
     firstRow = Math.max 0, firstVisibleRow - rowOverdraw
     lastRow = Math.min @tableEditor.getScreenRowCount(), lastVisibleRow + rowOverdraw
@@ -956,6 +958,34 @@ class TableElement extends HTMLElement
 
       @appendGutterCell(row) for row in visibleRows
 
+    # Whole table redraw, when the table suddenly jump from one edge to the
+    # other and the old and new visible range doesn't intersect.
+    else if lastRow < @firstRenderedRow or firstRow >= @lastRenderedRow or lastColumn < @firstRenderedColumn or firstColumn >= @lastRenderedColumn
+
+      @releaseCell(cell) for key,cell of @cells
+      @releaseGutterCell(cell) for row,cell of @gutterCells
+      @releaseHeaderCell(cell) for column,cell of @headerCells
+
+      @cells = {}
+      @headerCells = {}
+      @gutterCells = {}
+
+      for column in visibleColumns
+        @appendHeaderCell(columns[column], column)
+        @appendCell(row, column) for row in visibleRows
+
+      @appendGutterCell(row) for row in visibleRows
+
+      # For the moment we don't want to update the intact range so we return
+      # early
+      @firstRenderedRow = firstRow
+      @lastRenderedRow = lastRow
+      @firstRenderedColumn = firstColumn
+      @lastRenderedColumn = lastColumn
+      @hasChanged = false
+      return
+
+    # Classical scroll routine
     else if firstRow isnt @firstRenderedRow or lastRow isnt @lastRenderedRow or firstColumn isnt @firstRenderedColumn or lastColumn isnt @lastRenderedColumn
       disposed = 0
       created = 0
@@ -998,11 +1028,10 @@ class TableElement extends HTMLElement
           @appendHeaderCell(columns[column], column)
           @appendCell(row, column) for row in visibleRows
 
-
     for row in [intactFirstRow...intactLastRow]
       @gutterCells[row]?.setModel({row})
       for column in [intactFirstColumn...intactLastColumn]
-        @cells[column][row]?.setModel(@getCellObjectAtPosition([row, column]))
+        @cells[row + '-' + column]?.setModel(@getCellObjectAtPosition([row, column]))
     for column in [intactFirstColumn...intactLastColumn]
       @headerCells[column]?.setModel({column: columns[column], index: column})
 
@@ -1059,13 +1088,11 @@ class TableElement extends HTMLElement
 
   getScreenCellAtPosition: (position) ->
     position = Point.fromObject(position)
-    @cells[position.column][position.row]
+    @cells[position.row + '-' + position.column]
 
   appendCell: (row, column) ->
-    @cells[column] ?= []
-    return @cells[column][row] if @cells[column][row]?
-
-    @cells[column][row] = @requestCell(@getCellObjectAtPosition([row, column]))
+    key = row + '-' + column
+    @cells[key] ? @cells[key] = @requestCell(@getCellObjectAtPosition([row, column]))
 
   getCellObjectAtPosition: (position) ->
     {row, column} = Point.fromObject(position)
@@ -1079,15 +1106,14 @@ class TableElement extends HTMLElement
     }
 
   disposeCell: (row, column) ->
-    cell = @cells[column]?[row]
+    key = row + '-' + column
+    cell = @cells[key]
     return unless cell?
     @releaseCell(cell)
-    @cells[column][row] = undefined
+    delete @cells[key]
 
   appendHeaderCell: (column, index) ->
-    return @headerCells[index] if @headerCells[index]?
-
-    @headerCells[index] = @requestHeaderCell({column, index})
+    @headerCells[index] ? @headerCells[index] = @requestHeaderCell({column, index})
 
   disposeHeaderCell: (column) ->
     return unless cell = @headerCells[column]
@@ -1095,9 +1121,7 @@ class TableElement extends HTMLElement
     delete @headerCells[column]
 
   appendGutterCell: (row) ->
-    return @gutterCells[row] if @gutterCells[row]?
-
-    @gutterCells[row] = @requestGutterCell({row})
+    @gutterCells[row] ? @gutterCells[row] = @requestGutterCell({row})
 
   disposeGutterCell: (row) ->
     return unless cell = @gutterCells[row]
