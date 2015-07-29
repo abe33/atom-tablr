@@ -446,7 +446,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelector('atom-table-cell:nth-last-child(2)')
+        cell = tableShadowRoot.querySelector('atom-table-cell[data-row="99"][data-column="1"]')
         mousedown(cell)
 
         expect(tableEditor.getLastCursor().getValue()).toEqual(9900)
