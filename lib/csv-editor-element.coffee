@@ -33,8 +33,14 @@ class CSVEditorElement extends HTMLElement
 
   collectOptions: -> @form.collectOptions()
 
+  destroy: ->
+    @subscriptions.dispose()
+    @model = null
+
   setModel: (@model) ->
     @form.setModel(@model.options)
+    @subscriptions.add @model.onDidDestroy => @destroy()
+
     @subscriptions.add @model.onDidOpen ({editor}) =>
       return unless editor instanceof TableEditor
 

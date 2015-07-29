@@ -12,7 +12,7 @@ TableElement = require '../lib/table-element'
 CHANGE_TIMEOUT = 400
 
 describe "CSVEditor", ->
-  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage] = []
+  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage, nextAnimationFrame] = []
 
   beforeEach ->
     [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
@@ -20,6 +20,16 @@ describe "CSVEditor", ->
     jasmineContent = document.body.querySelector('#jasmine-content')
     workspaceElement = atom.views.getView(atom.workspace)
     jasmineContent.appendChild(workspaceElement)
+
+    noAnimationFrame = -> throw new Error('No animation frame requested')
+    nextAnimationFrame = noAnimationFrame
+
+    requestAnimationFrameSafe = window.requestAnimationFrame
+    spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
+      lastFn = fn
+      nextAnimationFrame = ->
+        nextAnimationFrame = noAnimationFrame
+        fn()
 
     waitsForPromise -> atom.packages.activatePackage('table-edit').then (pkg) ->
       tableEditPackage = pkg.mainModule
@@ -328,6 +338,8 @@ describe "CSVEditor", ->
           quoted: true
           skip_empty_lines: true
         }
+        runs ->
+          nextAnimationFrame()
 
       it 'initialize the forms with the corresponding values', ->
         expect(csvEditorElement.querySelector('[name="header"]:checked')).toExist()

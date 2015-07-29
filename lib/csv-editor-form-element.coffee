@@ -53,6 +53,7 @@ class CSVEditorFormElement extends HTMLElement
       CSVEditorFormElement::__bindings__ ?= []
       CSVEditorFormElement::initializeBindings ?= ->
         @__bindings__.forEach (f) => f.call(this)
+        @__bindings__.length = 0
       CSVEditorFormElement::__bindings__.push ->
         @["#{outlet}TextEditor"] = @["#{outlet}TextEditorElement"].getModel()
         @subscriptions.add @["#{outlet}TextEditor"].onDidChange =>
@@ -65,14 +66,21 @@ class CSVEditorFormElement extends HTMLElement
       CSVEditorFormElement::__defaults__ ?= []
       CSVEditorFormElement::initializeDefaults ?= (options) ->
         @__defaults__.forEach (f) => f.call(this, options)
+        @__defaults__.length = 0
       CSVEditorFormElement::__defaults__.push (options) ->
         value = options[outlet]
         optionName = reversedOptions[value]
+
         if optionName? and radio = @querySelector("##{optionName}-#{name}-#{id}")
-          radio.setAttribute('checked', true)
+          console.log id, "value is a radio", optionName, value
+          radio.checked = true
         else if value?
+          console.log id, "value is custom", optionName, value
           @["#{outlet}TextEditor"].setText(value)
           @querySelector("#custom-#{name}-#{id}")?.checked = true
+        else if radio = @querySelector("##{selected}-#{name}-#{id}")
+          console.log id, "value is default", optionName, value
+          radio.checked = true
 
     @div class: 'settings-panel', =>
       @div class: 'setting-title', 'Choose between table and text editor:'
@@ -201,8 +209,6 @@ class CSVEditorFormElement extends HTMLElement
     @messagesContainer.innerHTML = ''
 
   setModel: (options={}) ->
-    console.log options
-
     @querySelector('[id^="header"]').checked = true if options.header
     @querySelector('[id^="eof"]').checked = true if options.eof
     @querySelector('[id^="quoted"]').checked = true if options.quoted
@@ -212,7 +218,7 @@ class CSVEditorFormElement extends HTMLElement
     @querySelector('[id^="right-trim"]').checked = true if options.rtrim
     @querySelector('[id^="both-trim"]').checked = true if options.trim
 
-    @initializeDefaults(options)
+    requestAnimationFrame => @initializeDefaults(options)
 
   collectOptions: ->
     options =
