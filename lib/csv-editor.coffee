@@ -61,6 +61,7 @@ class CSVEditor
         @emitter.emit 'did-change-modified', status
 
       @emitter.emit('did-open', {@editor, options: _.clone(options)})
+      @editor
 
   destroy: ->
     return if @destroyed
@@ -94,6 +95,35 @@ class CSVEditor
         tableEditor.unlockModifiedStatus()
 
         resolve(tableEditor)
+
+  previewCSV: (options) ->
+    new Promise (resolve, reject) =>
+      input = fs.createReadStream(@uriToOpen)
+      parser = csv.parse(options)
+      output = []
+
+      limit = 5
+      limit = 6 if options.header
+
+      stop = ->
+        input.unpipe(parser)
+        parser.end()
+        resolve(output[0...limit])
+
+      read = ->
+        output.push record while record = parser.read()
+        stop() if output.length > limit
+
+      end = ->
+        resolve(output)
+
+      error = (err) -> reject(err)
+
+      parser.on 'readable', read
+      parser.on 'end', end
+      parser.on 'error', error
+
+      input.pipe(parser)
 
   save: =>
     @saveAs(@getPath())

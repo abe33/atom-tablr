@@ -1,7 +1,8 @@
 {CompositeDisposable} = require 'atom'
 {SpacePenDSL, EventsDelegation} = require 'atom-utils'
 CSVEditor = require './csv-editor'
-CSVEditorFormElement = require './csv-editor-form-Element'
+CSVEditorFormElement = require './csv-editor-form-element'
+CSVPreviewElement = require './csv-preview-element'
 TableEditor = require './table-editor'
 
 nextId = 0
@@ -31,6 +32,8 @@ class CSVEditorElement extends HTMLElement
         @model.openTableEditor(@collectOptions()).catch (reason) =>
           @form.alert(reason.message)
 
+    @subscriptions.add @form.onDidChange (options) => @updatePreview(options)
+
   collectOptions: -> @form.collectOptions()
 
   destroy: ->
@@ -50,7 +53,20 @@ class CSVEditorElement extends HTMLElement
       @subscriptions.dispose()
       @subscriptions = new CompositeDisposable
 
+    @updatePreview(@model.options)
+
     @model.applyChoice()
+
+  updatePreview: (options) ->
+    return if options.remember
+
+    @form.preview.clean()
+    @model.previewCSV(options).then (preview) =>
+      @form.preview.render(preview, options)
+      @form.openTableEditorButton.removeAttribute('disabled')
+    .catch (reason) =>
+      @form.preview.error(reason)
+      @form.openTableEditorButton.setAttribute('disabled', 'true')
 
 module.exports = CSVEditorElement = document.registerElement 'atom-csv-editor', prototype: CSVEditorElement.prototype
 

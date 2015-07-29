@@ -6,6 +6,7 @@ DisplayTable = require './display-table'
 Cursor = require './cursor'
 Selection = require './selection'
 Range = require './range'
+columnName = require './column-name'
 
 module.exports =
 class TableEditor
@@ -100,15 +101,7 @@ class TableEditor
 
   getTable: -> @table
 
-  getColumnName: (index) ->
-    base = 'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z'.split(' ')
-
-    quotient = Math.floor(index / 26)
-
-    if quotient > 0
-      @getColumnName(quotient) & base[index % 26]
-    else
-      base[index % 26]
+  getColumnName: (index) -> columnName(index)
 
   createCursorAndSelection: (position, range) ->
     position = Point.fromObject(position)

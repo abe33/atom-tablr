@@ -1,4 +1,4 @@
-{CompositeDisposable} = require 'atom'
+{CompositeDisposable, Emitter} = require 'atom'
 {SpacePenDSL, EventsDelegation} = require 'atom-utils'
 
 nextId = 0
@@ -63,23 +63,23 @@ class CSVEditorFormElement extends HTMLElement
           else
             @querySelector("##{selected}-#{name}-#{id}")?.checked = true
 
+          @emitChangeEvent()
+
       CSVEditorFormElement::__defaults__ ?= []
       CSVEditorFormElement::initializeDefaults ?= (options) ->
         @__defaults__.forEach (f) => f.call(this, options)
         @__defaults__.length = 0
+        @initialized = true
       CSVEditorFormElement::__defaults__.push (options) ->
         value = options[outlet]
         optionName = reversedOptions[value]
 
         if optionName? and radio = @querySelector("##{optionName}-#{name}-#{id}")
-          console.log id, "value is a radio", optionName, value
           radio.checked = true
         else if value?
-          console.log id, "value is custom", optionName, value
           @["#{outlet}TextEditor"].setText(value)
           @querySelector("#custom-#{name}-#{id}")?.checked = true
         else if radio = @querySelector("##{selected}-#{name}-#{id}")
-          console.log id, "value is default", optionName, value
           radio.checked = true
 
     @div class: 'settings-panel', =>
@@ -184,8 +184,16 @@ class CSVEditorFormElement extends HTMLElement
             @label class: 'setting-title', for: "skip-empty-lines-#{id}", 'Skip Empty Lines'
             @input type: 'checkbox', name: 'skip-empty-lines', id: "skip-empty-lines-#{id}"
 
+      @p 'Preview of the parsed CSV (down to the fifth row):'
+      @tag 'atom-csv-preview', outlet: 'preview'
+
   createdCallback: ->
     @subscriptions = new CompositeDisposable
+    @emitter = new Emitter
+
+    @subscriptions.add @subscribeTo this, 'input',
+      change: => @emitChangeEvent()
+
     @initializeBindings()
 
   attachedCallback: ->
@@ -194,8 +202,15 @@ class CSVEditorFormElement extends HTMLElement
   detachedCallback: ->
     @attached = false
 
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
+
+  emitChangeEvent: ->
+    @emitter.emit 'did-change', @collectOptions() if @initialized
+
   destroy: ->
     @subscriptions.dispose()
+    @emitter.dispose()
 
   alert: (message) ->
     alert = document.createElement('div')
