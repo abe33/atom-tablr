@@ -187,7 +187,7 @@ describe "CSVEditor", ->
               expect(tableEditor.isModified()).toBeFalsy()
               expect(csvEditor.isModified()).toBeFalsy()
 
-    describe 'when the file cannot be parsed with the default', ->
+    xdescribe 'when the file cannot be parsed with the default', ->
       beforeEach ->
         openFixture('invalid.csv')
 
