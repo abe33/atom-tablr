@@ -1071,14 +1071,19 @@ describe 'tableElement', ->
     it 'moves the cursor on the remaining first row', ->
       tableElement.deleteCursorRow()
 
-      expect(tableEditor.getCursorPosition()).toEqual([0,0])
+      expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
 
     describe 'when the cursor is on the last row', ->
       it 'moves the cursor on row above', ->
+        spy = jasmine.createSpy('did-change-screen-rows')
+        tableEditor.onDidChangeScreenRows(spy)
+
         tableElement.moveToBottom()
         tableElement.deleteCursorRow()
 
-        expect(tableEditor.getCursorPosition()).toEqual([98,0])
+        waitsFor -> spy.callCount > 0
+        runs ->
+          expect(tableEditor.getCursorScreenPosition()).toEqual([98,0])
 
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->

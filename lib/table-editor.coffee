@@ -54,12 +54,22 @@ class TableEditor
 
     @addCursorAtScreenPosition(new Point(0,0))
 
-    rowsSubscription = @displayTable.onDidChangeScreenRows =>
+    @subscriptions.add @displayTable.onDidChangeScreenRows =>
       selection = @getLastSelection()
       selection.selectNone() if selection.isEmpty()
-      rowsSubscription.dispose()
 
-    @subscriptions.add rowsSubscription
+      {column, row} = @getCursorScreenPosition()
+      newColumn = column
+      newRow = row
+
+      console.log newColumn, newRow, column, row
+
+      newRow = @getLastRowIndex() if row > @getLastRowIndex()
+      newColumn = @getLastColumnIndex() if column > @getLastColumnIndex()
+
+      if newRow isnt row or newColumn isnt column
+        @setCursorAtScreenPosition([newRow, newColumn])
+
     @subscriptions.add @displayTable.onDidDestroy =>
       cursor.destroy() for cursor in @cursors
       @destroyed = true

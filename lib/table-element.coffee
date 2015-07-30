@@ -288,8 +288,6 @@ class TableElement extends HTMLElement
   deleteCursorRow: ->
     {column, row} = @tableEditor.getCursorPosition()
     @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(row))
-    if row > 0 and row >= @tableEditor.getLastRowIndex()
-      @tableEditor.setCursorAtScreenPosition([row - 1, column])
 
   getFirstVisibleRow: ->
     @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop)
