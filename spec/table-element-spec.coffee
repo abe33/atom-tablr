@@ -1057,11 +1057,28 @@ describe 'tableElement', ->
 
       expect(tableEditor.getScreenRow(tableEditor.getLastRowIndex())).toEqual([undefined, undefined, undefined])
 
+    it 'moves the cursor to the new row on the same column', ->
+      tableEditor.setCursorAtScreenPosition([1,1])
+      tableElement.insertRowAfter()
+      expect(tableEditor.getCursorPosition()).toEqual([2,1])
+
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
       tableElement.deleteCursorRow()
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
+
+    it 'moves the cursor on the remaining first row', ->
+      tableElement.deleteCursorRow()
+
+      expect(tableEditor.getCursorPosition()).toEqual([0,0])
+
+    describe 'when the cursor is on the last row', ->
+      it 'moves the cursor on row above', ->
+        tableElement.moveToBottom()
+        tableElement.deleteCursorRow()
+
+        expect(tableEditor.getCursorPosition()).toEqual([98,0])
 
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->

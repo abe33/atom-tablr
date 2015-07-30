@@ -271,14 +271,25 @@ class TableElement extends HTMLElement
   getRowResizeRuler: -> @rowRuler
 
   insertRowBefore: ->
-    @tableEditor.addRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))
+    {column, row} = @tableEditor.getCursorPosition()
+    newRowIndex = @tableEditor.screenRowToModelRow(@row)
+
+    @tableEditor.addRowAt(newRowIndex)
+
+    @tableEditor.setCursorAtScreenPosition([newRowIndex, column])
 
   insertRowAfter: ->
-    index = @tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row)
-    @tableEditor.addRowAt(index + 1)
+    {column, row} = @tableEditor.getCursorPosition()
+    newRowIndex = @tableEditor.screenRowToModelRow(row) + 1
+    @tableEditor.addRowAt(newRowIndex)
+
+    @tableEditor.setCursorAtScreenPosition([newRowIndex, column])
 
   deleteCursorRow: ->
-    @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))
+    {column, row} = @tableEditor.getCursorPosition()
+    @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(row))
+    if row > 0 and row >= @tableEditor.getLastRowIndex()
+      @tableEditor.setCursorAtScreenPosition([row - 1, column])
 
   getFirstVisibleRow: ->
     @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop)
