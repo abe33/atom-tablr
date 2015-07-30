@@ -274,7 +274,8 @@ class TableElement extends HTMLElement
     @tableEditor.addRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))
 
   insertRowAfter: ->
-    @tableEditor.addRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row + 1))
+    index = @tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row)
+    @tableEditor.addRowAt(index + 1)
 
   deleteCursorRow: ->
     @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(@tableEditor.getCursorPosition().row))

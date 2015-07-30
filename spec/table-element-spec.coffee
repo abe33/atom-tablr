@@ -1051,6 +1051,12 @@ describe 'tableElement', ->
 
       expect(tableEditor.getScreenRow(1)).toEqual([undefined, undefined, undefined])
 
+    it 'inserts a new row at the end of the table when on the last row', ->
+      tableElement.moveToBottom()
+      tableElement.insertRowAfter()
+
+      expect(tableEditor.getScreenRow(tableEditor.getLastRowIndex())).toEqual([undefined, undefined, undefined])
+
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
       tableElement.deleteCursorRow()
