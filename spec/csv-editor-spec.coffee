@@ -153,6 +153,10 @@ describe "CSVEditor", ->
           expect(tableEditor.getScreenColumnCount()).toEqual(3)
           expect(tableEditor.getScreenRowCount()).toEqual(3)
 
+        it 'places the focus on the table element', ->
+          tableElement = atom.views.getView(tableEditor)
+          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+
         it 'clears the table undo stack', ->
           expect(tableEditor.getTable().undoStack.length).toEqual(0)
 

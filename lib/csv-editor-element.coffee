@@ -48,7 +48,11 @@ class CSVEditorElement extends HTMLElement
       return unless editor instanceof TableEditor
 
       @innerHTML = ''
-      @appendChild(atom.views.getView(editor))
+
+      tableElement = atom.views.getView(editor)
+      @appendChild(tableElement)
+
+      tableElement.focus()
 
       @subscriptions.dispose()
       @subscriptions = new CompositeDisposable
