@@ -1155,7 +1155,10 @@ class TableElement extends HTMLElement
 #     ######  ##     ## ########
 
 atom.commands.add 'atom-table-editor',
-  'core:save': -> @tableEditor.save()
+  'core:save': (e) ->
+    @tableEditor.save()
+    e.stopImmediatePropagation()
+    e.preventDefault()
   'core:confirm': -> @startCellEdit()
   'core:undo': -> @tableEditor.undo()
   'core:redo': -> @tableEditor.redo()
