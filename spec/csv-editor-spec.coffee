@@ -2,6 +2,7 @@ fs = require 'fs'
 path = require 'path'
 temp = require 'temp'
 
+{TextEditor} = require 'atom'
 TableEdit = require '../lib/table-edit'
 TableEditor = require '../lib/table-editor'
 CSVEditor = require '../lib/csv-editor'
@@ -359,3 +360,21 @@ describe "CSVEditor", ->
         expect(csvEditorElement.querySelector('[id^="single-quote-quote"]:checked')).toExist()
         expect(csvEditorElement.querySelector('[id^="backslash-escape"]:checked')).toExist()
         expect(csvEditorElement.querySelector('[id^="left-trim"]:checked')).toExist()
+
+  describe 'when the package is disabled', ->
+    beforeEach ->
+      spyOn(tableEditPackage, 'deactivate').andCallThrough()
+
+      atom.packages.observeDisabledPackages()
+      atom.packages.disablePackage('table-edit')
+
+      waitsFor -> tableEditPackage.deactivate.callCount > 0
+
+    it 'disposes the csv opener', ->
+      editor = null
+      waitsForPromise -> atom.workspace.open('sample.csv').then (e) ->
+        editor = e
+
+      runs ->
+        expect(editor).toBeDefined()
+        expect(editor instanceof TextEditor).toBeTruthy()

@@ -1,4 +1,5 @@
 _ = require 'underscore-plus'
+{CompositeDisposable} = require 'atom'
 [TableEditor, TableElement, CSVEditor, CSVEditorElement, url] = []
 
 module.exports =
@@ -30,11 +31,13 @@ module.exports =
     TableElement ?= require './table-element'
     TableElement.registerViewProvider()
 
-    atom.commands.add 'atom-workspace',
+    @subscriptions = new CompositeDisposable
+
+    @subscriptions.add atom.commands.add 'atom-workspace',
       'table-edit:demo-large': => atom.workspace.open('table://large')
       'table-edit:demo-small': => atom.workspace.open('table://small')
 
-    atom.workspace.addOpener (uriToOpen) =>
+    @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless /\.csv$/.test uriToOpen
 
       unless CSVEditorElement?
@@ -58,7 +61,7 @@ module.exports =
 
       csvEditor
 
-    atom.workspace.addOpener (uriToOpen) =>
+    @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
 
       {protocol, host} = url.parse uriToOpen
@@ -67,6 +70,9 @@ module.exports =
       switch host
         when 'large' then @getLargeTable()
         when 'small' then @getSmallTable()
+
+  deactivate: ->
+    @subscriptions.dispose()
 
   getChoiceForPath: (path) ->
     @pathOptions?[path]?.choice
