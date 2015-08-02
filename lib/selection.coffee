@@ -27,7 +27,7 @@ class Selection
 
   destroy: ->
     return if @isDestroyed()
-    
+
     @binding.destroy()
 
   isDestroyed: -> @destroyed
@@ -55,6 +55,11 @@ class Selection
     for row in [@range.start.row...@range.end.row]
       for column in [@range.start.column...@range.end.column]
         @tableEditor.getValueAtScreenPosition([row, column])
+
+  fill: (text) ->
+    for row in [@range.start.row...@range.end.row]
+      for column in [@range.start.column...@range.end.column]
+        @tableEditor.setValueAtScreenPosition([row, column], text)
 
   copy: (maintainClipboard=false, fullLine=false) ->
     return if @isEmpty()

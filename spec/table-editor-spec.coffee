@@ -308,3 +308,35 @@ describe 'TableEditor', ->
         expect(selections[1].text).toEqual('gender\tfemale')
         expect(selections[1].values).toEqual([['gender','female']])
 
+    describe '::pasteClipboard', ->
+      describe 'when the clipboard only has a text', ->
+        beforeEach ->
+          atom.clipboard.write('foo')
+
+        describe 'when the selection spans only one cell', ->
+          it 'replaces the cell content with the clipboard text', ->
+            tableEditor.pasteClipboard()
+
+            expect(tableEditor.getCursorValue()).toEqual('foo')
+
+        describe 'when the selection spans many cells', ->
+          it 'sets the same value for each cells', ->
+            tableEditor.setSelectedRange([[0,0], [2,2]])
+
+            tableEditor.pasteClipboard()
+
+            expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+        describe 'when there is many selections', ->
+          it 'sets the same value for each cells', ->
+            tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+            tableEditor.pasteClipboard()
+
+            expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+            expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')

@@ -260,6 +260,14 @@ class TableEditor
 
     return
 
+  pasteClipboard: (options={}) ->
+    {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
+
+    if not metadata?
+      selection.fill(clipboardText) for selection in @selections
+
+
+
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
   ##    ##       ##     ## ##     ## ##       ##     ## ##     ## ##
