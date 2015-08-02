@@ -136,6 +136,28 @@ class TableEditor
       @cursorSubscriptions.get(selection).dispose()
       @cursorSubscriptions.delete(selection)
 
+  ##     ######   #######  ########  ##    ##
+  ##    ##    ## ##     ## ##     ##  ##  ##
+  ##    ##       ##     ## ##     ##   ####
+  ##    ##       ##     ## ########     ##
+  ##    ##       ##     ## ##           ##
+  ##    ##    ## ##     ## ##           ##
+  ##     ######   #######  ##           ##
+
+  copySelectedCells: ->
+    maintainClipboard = false
+    for selection in @selections
+      selection.copy(maintainClipboard, false)
+      maintainClipboard = true
+
+    return
+
+  pasteClipboard: (options={}) ->
+    {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
+
+    if not metadata?
+      selection.fill(clipboardText) for selection in @selections
+
   ##     ######  ######## ##       ########  ######  ########
   ##    ##    ## ##       ##       ##       ##    ##    ##
   ##    ##       ##       ##       ##       ##          ##
@@ -251,22 +273,6 @@ class TableEditor
       [range.start, 0]
       [range.end + 1, @getScreenColumnCount()]
     ])
-
-  copySelectedCells: ->
-    maintainClipboard = false
-    for selection in @selections
-      selection.copy(maintainClipboard, false)
-      maintainClipboard = true
-
-    return
-
-  pasteClipboard: (options={}) ->
-    {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
-
-    if not metadata?
-      selection.fill(clipboardText) for selection in @selections
-
-
 
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
