@@ -62,8 +62,6 @@ class TableEditor
       newColumn = column
       newRow = row
 
-      console.log newColumn, newRow, column, row
-
       newRow = @getLastRowIndex() if row > @getLastRowIndex()
       newColumn = @getLastColumnIndex() if column > @getLastColumnIndex()
 
