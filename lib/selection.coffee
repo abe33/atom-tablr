@@ -49,6 +49,13 @@ class Selection
 
   bounds: -> @range.bounds()
 
+  getValue: ->
+    return [] if @isEmpty()
+
+    for row in [@range.start.row...@range.end.row]
+      for column in [@range.start.column...@range.end.column]
+        @tableEditor.getValueAtScreenPosition([row, column])
+
   getFirstSelectedRow: -> @range.start.row
 
   getLastSelectedRow: -> @range.end.row - 1

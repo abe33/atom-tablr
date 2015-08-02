@@ -48,6 +48,8 @@ describe 'Selection', ->
         right: 1
       })
 
+    it 'has an empty value', ->
+      expect(selection.getValue()).toEqual([])
 
   describe 'with a size of one cell', ->
     beforeEach ->
@@ -72,6 +74,9 @@ describe 'Selection', ->
         right: 2
       })
 
+    it 'has a single value', ->
+      expect(selection.getValue()).toEqual([['female']])
+
   describe 'that spans many cells', ->
     beforeEach ->
       cursor = new Cursor({tableEditor, position: new Point(1,1)})
@@ -92,6 +97,11 @@ describe 'Selection', ->
         right: 2
       })
 
+    it 'has multiple values', ->
+      expect(selection.getValue()).toEqual([
+        ['female']
+        ['Jane Doe']
+      ])
 
   describe '::setRange', ->
     it 'sets the selection range', ->
