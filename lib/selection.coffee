@@ -56,6 +56,36 @@ class Selection
       for column in [@range.start.column...@range.end.column]
         @tableEditor.getValueAtScreenPosition([row, column])
 
+  copy: (maintainClipboard=false, fullLine=false) ->
+    return if @isEmpty()
+
+    values = @getValue()
+    selectionText = values.map((a) -> a.join('\t')).join('\n')
+
+    if maintainClipboard
+      {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
+      metadata ?= {}
+      unless metadata.selections?
+        metadata.selections = [{
+          text: clipboardText
+          values: metadata.values
+          fullLine: metadata.fullLine
+          indentBasis: 0
+        }]
+      metadata.selections.push({
+        values
+        text: selectionText
+        fullLine: fullLine
+        indentBasis: 0
+      })
+      atom.clipboard.write([clipboardText, selectionText].join("\n"), metadata)
+    else
+      atom.clipboard.write(selectionText, {
+        values
+        indentBasis: 0
+        fullLine: fullLine
+      })
+
   getFirstSelectedRow: -> @range.start.row
 
   getLastSelectedRow: -> @range.end.row - 1

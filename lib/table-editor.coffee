@@ -252,6 +252,14 @@ class TableEditor
       [range.end + 1, @getScreenColumnCount()]
     ])
 
+  copySelectedCells: ->
+    maintainClipboard = false
+    for selection in @selections
+      selection.copy(maintainClipboard, false)
+      maintainClipboard = true
+
+    return
+
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
   ##    ##       ##     ## ##     ## ##       ##     ## ##     ## ##

@@ -266,3 +266,45 @@ describe 'TableEditor', ->
           expect(tableEditor.getSelectedRanges()).toEqual([[[0,0], [2,2]]])
           expect(tableEditor.getSelections().length).toEqual(1)
           expect(tableEditor.getCursors().length).toEqual(1)
+
+    ##     ######   #######  ########  ##    ##
+    ##    ##    ## ##     ## ##     ##  ##  ##
+    ##    ##       ##     ## ##     ##   ####
+    ##    ##       ##     ## ########     ##
+    ##    ##       ##     ## ##           ##
+    ##    ##    ## ##     ## ##           ##
+    ##     ######   #######  ##           ##
+
+    describe '::copySelectedCells', ->
+      it "copies the selected cell value onto the clipboard", ->
+        tableEditor.copySelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age')
+        expect(atom.clipboard.readWithMetadata().text).toEqual('age')
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age']])
+
+      it 'copies the selected cell values onto the clipboard', ->
+        tableEditor.setSelectedRange([[0,0], [2,2]])
+
+        tableEditor.copySelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age',30], ['gender','female']])
+
+      it 'copies each selections as metadata', ->
+        tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+        tableEditor.copySelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
+
+        clipboard = atom.clipboard.readWithMetadata()
+        selections = clipboard.metadata.selections
+        expect(clipboard.text).toEqual('age\t30\ngender\tfemale')
+        expect(selections).toBeDefined()
+        expect(selections.length).toEqual(2)
+        expect(selections[0].text).toEqual('age\t30')
+        expect(selections[0].values).toEqual([['age',30]])
+        expect(selections[1].text).toEqual('gender\tfemale')
+        expect(selections[1].values).toEqual([['gender','female']])
+
