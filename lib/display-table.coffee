@@ -458,8 +458,8 @@ class DisplayTable
   getValueAtScreenPosition: (position) ->
     @getValueAtPosition(@modelPosition(position))
 
-  setValueAtScreenPosition: (position, value) ->
-    @setValueAtPosition(@modelPosition(position), value)
+  setValueAtScreenPosition: (position, value, transaction=true) ->
+    @setValueAtPosition(@modelPosition(position), value, transaction)
 
   getScreenPositionAtPixelPosition: (x,y) ->
     return unless x? and y?
