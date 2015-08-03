@@ -413,12 +413,3 @@ class Table
       @transaction
         undo: -> @setValueAtPosition(position, oldValue, false)
         redo: -> @setValueAtPosition(position, value, false)
-
-  positionOfCell: (cell) ->
-    unless cell?
-      throw new Error "Table::positionOfCell called without a cell"
-
-    row = @rows.indexOf(cell.row)
-    column = cell.row.cells.indexOf(cell)
-
-    {row, column}

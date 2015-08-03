@@ -561,24 +561,6 @@ describe 'Table', ->
       it 'is marked as modified', ->
         expect(table.isModified()).toBeTruthy()
 
-  # FIXME we can't be find the position of a primitive value if there's
-  # duplicates
-  xdescribe '::positionOfCell', ->
-    beforeEach ->
-      table.addColumn('name')
-      table.addColumn('age')
-
-      table.addRow(['John Doe', 30])
-      table.addRow(['Jane Doe', 30])
-
-    it 'returns the position of the cell', ->
-      cell = table.getValueAtPosition([1,1])
-
-      expect(table.positionOfCell(cell)).toEqual(row: 1, column: 1)
-
-    it 'throws an error without a cell', ->
-      expect(-> table.positionOfCell()).toThrow()
-
   #    ##     ## ##    ## ########   #######
   #    ##     ## ###   ## ##     ## ##     ##
   #    ##     ## ####  ## ##     ## ##     ##
