@@ -340,3 +340,115 @@ describe 'TableEditor', ->
             expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
             expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
             expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+      describe 'when the clipboard comes from a text buffer', ->
+        describe 'and has only one selection', ->
+          beforeEach ->
+            atom.clipboard.write('foo', {indentBasis: 0, fullLine: false})
+
+          describe 'when the selection spans only one cell', ->
+            it 'replaces the cell content with the clipboard text', ->
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getCursorValue()).toEqual('foo')
+
+          describe 'when the selection spans many cells', ->
+            it 'sets the same value for each cells', ->
+              tableEditor.setSelectedRange([[0,0], [2,2]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+          describe 'when there is many selections', ->
+            it 'sets the same value for each cells', ->
+              tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+          describe 'and has many selections', ->
+            describe 'when flattenBufferMultiSelectionOnPaste option is enabled', ->
+              beforeEach ->
+                atom.config.set 'table-edit.flattenBufferMultiSelectionOnPaste', true
+                atom.clipboard.write('foo\nbar', selections: [
+                  {indentBasis: 0, fullLine: false, text: 'foo'}
+                  {indentBasis: 0, fullLine: false, text: 'bar'}
+                ])
+
+              describe 'when the selection spans only one cell', ->
+                it 'replaces the cell content with the clipboard text', ->
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getCursorValue()).toEqual('foo\nbar')
+
+              describe 'when the selection spans many cells', ->
+                it 'sets the same value for each cells', ->
+                  tableEditor.setSelectedRange([[0,0], [2,2]])
+
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo\nbar')
+                  expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo\nbar')
+                  expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo\nbar')
+                  expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo\nbar')
+
+            describe 'when distributeBufferMultiSelectionOnPaste option is set to vertical', ->
+              beforeEach ->
+                atom.config.set 'table-edit.distributeBufferMultiSelectionOnPaste', 'vertically'
+                atom.clipboard.write('foo\nbar', selections: [
+                  {indentBasis: 0, fullLine: false, text: 'foo'}
+                  {indentBasis: 0, fullLine: false, text: 'bar'}
+                ])
+
+              describe 'when the selection spans only one cell', ->
+                it 'replaces the cell content with the clipboard text', ->
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
+
+              describe 'when the selection spans many cells', ->
+                it 'sets the same value for each cells', ->
+                  tableEditor.setSelectedRange([[0,0], [2,2]])
+
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
+                  expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')
+
+            describe 'when distributeBufferMultiSelectionOnPaste option is set to horizontal', ->
+              beforeEach ->
+                atom.config.set 'table-edit.distributeBufferMultiSelectionOnPaste', 'horizontally'
+                atom.clipboard.write('foo\nbar', selections: [
+                  {indentBasis: 0, fullLine: false, text: 'foo'}
+                  {indentBasis: 0, fullLine: false, text: 'bar'}
+                ])
+
+              describe 'when the selection spans only one cell', ->
+                it 'replaces the cell content with the clipboard text', ->
+
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
+
+              describe 'when the selection spans many cells', ->
+                it 'sets the same value for each cells', ->
+                  tableEditor.setSelectedRange([[0,0], [2,2]])
+
+                  tableEditor.pasteClipboard()
+
+                  expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
+                  expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+                  expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')

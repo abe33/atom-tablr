@@ -155,8 +155,23 @@ class TableEditor
   pasteClipboard: (options={}) ->
     {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
 
-    if not metadata?
+    if metadata?
+      if metadata.selections?
+        if atom.config.get('table-edit.flattenBufferMultiSelectionOnPaste')
+          selection.fill(clipboardText) for selection in @selections
+        else
+          switch atom.config.get('table-edit.distributeBufferMultiSelectionOnPaste')
+            when 'vertically'
+              values = metadata.selections.map (sel) -> [sel.text]
+            when 'horizontally'
+              values = [metadata.selections.map (sel) -> sel.text]
+
+          selection.fillValues(values) for selection in @selections
+      else
+        selection.fill(clipboardText) for selection in @selections
+    else
       selection.fill(clipboardText) for selection in @selections
+
 
   ##     ######  ######## ##       ########  ######  ########
   ##    ##    ## ##       ##       ##       ##    ##    ##

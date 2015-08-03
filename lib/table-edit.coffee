@@ -25,6 +25,15 @@ module.exports =
     columnOverdraw:
       type: 'integer'
       default: 2
+    flattenBufferMultiSelectionOnPaste:
+      type: 'boolean'
+      default: false
+      description: "If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection."
+    distributeBufferMultiSelectionOnPaste:
+      type: 'string'
+      default: 'vertically'
+      enum: ['horizontally', 'vertically']
+      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (verticall) or of the same row (horizontally)."
 
   activate: ({@pathOptions}) ->
     TableEditor ?= require './table-editor'
