@@ -1158,6 +1158,8 @@ atom.commands.add 'atom-table-editor',
     e.stopImmediatePropagation()
     e.preventDefault()
   'core:confirm': -> @startCellEdit()
+  'core:copy': -> @tableEditor.copySelectedCells()
+  'core:paste': -> @tableEditor.pasteClipboard()
   'core:undo': -> @tableEditor.undo()
   'core:redo': -> @tableEditor.redo()
   'core:move-left': -> @moveLeft()
