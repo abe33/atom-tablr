@@ -400,15 +400,17 @@ class DisplayTable
   removeRowsInScreenRange: (range, transaction=true) ->
     range = @table.rowRangeFrom(range)
 
-    rowHeights = (@rowHeights[index] for index in [range.start...range.end])
-    @table.removeRowsInRange(range, transaction)
+    rowIndices = (@screenRowToModelRow(i) for i in [range.start...range.end])
+    rowHeights = (@rowHeights[index] for index in rowIndices)
+
+    @table.removeRowsAtIndices(rowIndices, transaction)
 
     if transaction
       @table.ammendLastTransaction
         undo: (commit) =>
           commit.undo()
-          for i in [range.start...range.end]
-            @setRowHeightAt(i, rowHeights[i])
+          for index,i in rowIndices
+            @setRowHeightAt(index, rowHeights[i])
         redo: (commit) =>
           commit.redo()
 

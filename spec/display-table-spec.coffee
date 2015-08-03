@@ -383,12 +383,14 @@ describe 'DisplayTable', ->
 
         displayTable.addRowAt(1, ['blood type', 'ab-'])
         displayTable.sortBy('key')
+
         displayTable.onDidChangeScreenRows(spy)
 
         displayTable.removeRowsInScreenRange([1,3])
 
       it 'updates the screen rows', ->
         expect(displayTable.getScreenRows().length).toEqual(2)
+        expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
         expect(displayTable.getScreenRow(1)).toEqual(['name', 'Jane Doe'])
 
       it 'updates the rows offsets', ->
