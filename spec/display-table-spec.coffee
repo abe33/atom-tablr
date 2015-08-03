@@ -642,6 +642,36 @@ describe 'DisplayTable', ->
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
 
+    it 'rolls back many rows deletion with screen range', ->
+      displayTable.addColumn 'key'
+      displayTable.addColumn 'value'
+
+      displayTable.addRow ['name', 'Jane Doe'], height: 200
+      displayTable.addRow ['age', 30], height: 50
+      displayTable.addRow ['gender', 'female'], height: 100
+      displayTable.addRow ['blood type', 'ab-'], height: 50
+
+      displayTable.clearUndoStack()
+
+      displayTable.sortBy('key')
+
+      displayTable.removeRowsInScreenRange([1,3])
+
+      displayTable.undo()
+
+      expect(displayTable.getScreenRowCount()).toEqual(4)
+      expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
+      expect(displayTable.getScreenRow(1)).toEqual(['blood type', 'ab-'])
+      expect(displayTable.getScreenRow(2)).toEqual(['gender', 'female'])
+      expect(displayTable.getScreenRow(3)).toEqual(['name', 'Jane Doe'])
+      expect(displayTable.getScreenRowHeightAt(0)).toEqual(50)
+      expect(displayTable.getScreenRowHeightAt(1)).toEqual(50)
+      expect(displayTable.getScreenRowHeightAt(2)).toEqual(100)
+      expect(displayTable.getScreenRowHeightAt(3)).toEqual(200)
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+
+
     it 'rolls back a row deletion', ->
       displayTable.addColumn('key')
       displayTable.addRow(['foo'], height: 200)

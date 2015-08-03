@@ -346,19 +346,20 @@ class Table
         redo: -> @removeRowsInRange(range, false)
 
   removeRowsAtIndices: (indices, transaction=true) ->
+    indices = indices.slice().sort()
     removedRows = (@rows[index] for index in indices)
 
     @removeRow(row, true, false) for row in removedRows when row?
 
     if transaction
-      indices = indices.slice()
       @transaction
         undo: ->
           @addRowAt(index, removedRows[i], true, false) for index,i in indices
+          @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
         redo: ->
           @removeRowsAtIndices(indices, false)
 
-    @emitter.emit 'did-change-rows', {}
+    @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
 
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
