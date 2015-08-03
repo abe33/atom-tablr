@@ -197,6 +197,8 @@ class Table
           @rows.forEach (row,i) -> row[index] = values[i]
         redo: -> @removeColumnAt(index, false)
 
+    column
+
   changeColumnName: (column, newName, transaction=true, event=true) ->
     index = @columns.indexOf(column)
 
@@ -214,6 +216,8 @@ class Table
         redo: ->
           @columns[index] = newName
           @emitModifiedStatusChange()
+
+    return
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##
@@ -270,10 +274,10 @@ class Table
         newRange: {start: index, end: index+1}
       }
 
-    if not batch and transaction
-      @transaction
-        undo: -> @removeRowAt(index, false, false)
-        redo: -> @addRowAt(index, values, false, false)
+      if transaction
+        @transaction
+          undo: -> @removeRowAt(index, false, false)
+          redo: -> @addRowAt(index, values, false, false)
 
     row
 
@@ -319,19 +323,21 @@ class Table
         newRange: {start: index, end: index}
       }
 
-    if not batch and transaction
-      values = row.concat()
-      @transaction
-        undo: -> @addRowAt(index, values, false, false)
-        redo: -> @removeRowAt(index, false, false)
+      if transaction
+        values = row.slice()
+        @transaction
+          undo: -> @addRowAt(index, values, false, false)
+          redo: -> @removeRowAt(index, false, false)
+
+    row
 
   removeRowsInRange: (range, transaction=true) ->
     range = @rowRangeFrom(range)
 
     removedRows = @rows.splice(range.start, range.end - range.start)
+    rowsValues = removedRows.map((row) -> row.slice()) if transaction
 
     for row,i in removedRows
-      rowsValues = removedRows.slice() if transaction
       @emitter.emit 'did-remove-row', {row, index: range.start + i}
 
     @emitModifiedStatusChange()
@@ -345,21 +351,26 @@ class Table
         undo: -> @addRowsAt(range.start, rowsValues, false)
         redo: -> @removeRowsInRange(range, false)
 
+    removedRows
+
   removeRowsAtIndices: (indices, transaction=true) ->
     indices = indices.slice().sort()
     removedRows = (@rows[index] for index in indices)
+    rowsValues = removedRows.map((row) -> row.slice()) if transaction
 
     @removeRow(row, true, false) for row in removedRows when row?
 
     if transaction
       @transaction
         undo: ->
-          @addRowAt(index, removedRows[i], true, false) for index,i in indices
+          @addRowAt(index, rowsValues[i], true, false) for index,i in indices
           @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
         redo: ->
           @removeRowsAtIndices(indices, false)
 
     @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
+
+    removedRows
 
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
@@ -396,7 +407,7 @@ class Table
     position = Point.fromObject(position)
     @rows[position.row]?[position.column]
 
-  setValueAtPosition: (position, value, transaction=true) ->
+  setValueAtPosition: (position, value, batch=false, transaction=true) ->
     unless position?
       throw new Error "Table::setValueAtPosition called without a position"
     if position.row < 0 or position.row >= @getRowCount() or position.column < 0 or position.column >= @getColumnCount()
@@ -406,10 +417,41 @@ class Table
     oldValue = @rows[position.row]?[position.column]
     @rows[position.row]?[position.column] = value
 
+    unless batch
+      @emitModifiedStatusChange()
+      @emitter.emit 'did-change-cell-value', {
+        position
+        oldValue
+        newValue: value
+      }
+
+      if transaction
+        @transaction
+          undo: -> @setValueAtPosition(position, oldValue, batch, false)
+          redo: -> @setValueAtPosition(position, value, batch, false)
+
+    return
+
+  setValuesAtPositions: (positions, values, transaction=true) ->
+    oldValues = []
+
+    for position,i in positions
+      position = Point.fromObject(position)
+      oldValues.push @rows[position.row]?[position.column]
+      @rows[position.row]?[position.column] = values[i]
+
     @emitModifiedStatusChange()
-    @emitter.emit 'did-change-cell-value', {position, oldValue, newValue: value}
+    @emitter.emit 'did-change-cell-value', {
+      positions
+      oldValues
+      newValues: values
+    }
 
     if transaction
+      positions = positions.slice()
+      values = values.slice()
       @transaction
-        undo: -> @setValueAtPosition(position, oldValue, false)
-        redo: -> @setValueAtPosition(position, value, false)
+        undo: -> @setValuesAtPositions(positions, oldValues, false)
+        redo: -> @setValuesAtPositions(positions, values, false)
+
+    return
