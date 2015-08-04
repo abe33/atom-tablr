@@ -521,6 +521,73 @@ describe 'DisplayTable', ->
         expect(modelPosition).toEqual([2,1])
         expect(screenPosition).toEqual([1,1])
 
+    describe '::setValuesAtScreenPositions', ->
+      beforeEach ->
+        displayTable.sortBy('key')
+
+      it 'modifies the proper table cells', ->
+        displayTable.setValuesAtScreenPositions([[0,1], [1,1]], [20, 20])
+
+        expect(table.getRow(1)).toEqual(['age', 20])
+        expect(table.getRow(2)).toEqual(['gender', 20])
+
+        expect(displayTable.getScreenRow(0)).toEqual(['age', 20])
+        expect(displayTable.getScreenRow(1)).toEqual(['gender', 20])
+
+      it 'emits a did-change-cell-value event with screen positions', ->
+        spy = jasmine.createSpy('did-change-cell-value')
+
+        displayTable.onDidChangeCellValue(spy)
+
+        displayTable.setValuesAtScreenPositions([[0,1], [1,1]], [20, 20])
+
+        expect(spy).toHaveBeenCalled()
+        expect(spy.calls[0].args[0].screenPositions).toEqual([[0,1], [1,1]])
+        expect(spy.calls[0].args[0].positions).toEqual([[1,1],[2,1]])
+
+    describe '::setValuesInScreenRange', ->
+      describe 'when a sort is applied', ->
+        beforeEach ->
+          displayTable.sortBy('key')
+
+        it 'modifies the proper table cells', ->
+          displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+          expect(table.getRow(1)).toEqual(['age', 20])
+          expect(table.getRow(2)).toEqual(['gender', 20])
+
+          expect(displayTable.getScreenRow(0)).toEqual(['age', 20])
+          expect(displayTable.getScreenRow(1)).toEqual(['gender', 20])
+
+        it 'emits a did-change-cell-value', ->
+          spy = jasmine.createSpy('did-change-cell-value')
+
+          displayTable.onDidChangeCellValue(spy)
+
+          displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+          expect(spy).toHaveBeenCalled()
+
+      describe 'when no sort is applied', ->
+        it 'modifies the proper table cells', ->
+          displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+          expect(table.getRow(0)).toEqual(['name', 20])
+          expect(table.getRow(1)).toEqual(['age', 20])
+
+          expect(displayTable.getScreenRow(0)).toEqual(['name', 20])
+          expect(displayTable.getScreenRow(1)).toEqual(['age', 20])
+
+        it 'emits a did-change-cell-value', ->
+          spy = jasmine.createSpy('did-change-cell-value')
+
+          displayTable.onDidChangeCellValue(spy)
+
+          displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+          expect(spy).toHaveBeenCalled()
+
+
   ##    ##     ## ##    ## ########   #######
   ##    ##     ## ###   ## ##     ## ##     ##
   ##    ##     ## ####  ## ##     ## ##     ##
@@ -759,3 +826,67 @@ describe 'DisplayTable', ->
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
       expect(displayTable.getScreenRowCount()).toEqual(0)
+
+    it 'rolls back a change in rows data with a sort applied', ->
+      displayTable.addColumn 'key'
+      displayTable.addColumn 'value'
+
+      displayTable.addRow ['name', 'Jane Doe'], height: 200
+      displayTable.addRow ['age', 30], height: 50
+      displayTable.addRow ['gender', 'female'], height: 100
+      displayTable.addRow ['blood type', 'ab-'], height: 50
+
+      displayTable.sortBy('key')
+
+      displayTable.clearUndoStack()
+
+      displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+      displayTable.undo()
+
+      expect(table.getRow(1)).toEqual(['age', 30])
+      expect(table.getRow(3)).toEqual(['blood type', 'ab-'])
+      expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
+      expect(displayTable.getScreenRow(1)).toEqual(['blood type', 'ab-'])
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+
+      displayTable.redo()
+
+      expect(table.getRow(1)).toEqual(['age', 20])
+      expect(table.getRow(3)).toEqual(['blood type', 20])
+      expect(displayTable.getScreenRow(0)).toEqual(['age', 20])
+      expect(displayTable.getScreenRow(1)).toEqual(['blood type', 20])
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)
+
+    it 'rolls back a change in rows data with no sort applied', ->
+      displayTable.addColumn 'key'
+      displayTable.addColumn 'value'
+
+      displayTable.addRow ['name', 'Jane Doe'], height: 200
+      displayTable.addRow ['age', 30], height: 50
+      displayTable.addRow ['gender', 'female'], height: 100
+      displayTable.addRow ['blood type', 'ab-'], height: 50
+
+      displayTable.clearUndoStack()
+
+      displayTable.setValuesInScreenRange([[0,1], [2,2]], [[20], [20]])
+
+      displayTable.undo()
+
+      expect(table.getRow(0)).toEqual(['name', 'Jane Doe'])
+      expect(table.getRow(1)).toEqual(['age', 30])
+      expect(displayTable.getScreenRow(0)).toEqual(['name', 'Jane Doe'])
+      expect(displayTable.getScreenRow(1)).toEqual(['age', 30])
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+
+      displayTable.redo()
+
+      expect(table.getRow(0)).toEqual(['name', 20])
+      expect(table.getRow(1)).toEqual(['age', 20])
+      expect(displayTable.getScreenRow(0)).toEqual(['name', 20])
+      expect(displayTable.getScreenRow(1)).toEqual(['age', 20])
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)

@@ -86,11 +86,22 @@ class DisplayTable
       @updateScreenRows()
       @emitter.emit 'did-change-screen-rows', event
 
-    @subscriptions.add @table.onDidChangeCellValue ({position, oldValue, newValue}) =>
-      newEvent = {
-        position, oldValue, newValue
-        screenPosition: @screenPosition(position)
-      }
+    @subscriptions.add @table.onDidChangeCellValue (event) =>
+      if event.positions?
+        {positions, oldValues, newValues} = event
+        newEvent = {
+          positions, oldValues, newValues
+          screenPositions: positions.map (p) => @screenPosition(p)
+        }
+      else if event.position?
+        {position, oldValue, newValue} = event
+        newEvent = {
+          position, oldValue, newValue
+          screenPosition: @screenPosition(position)
+        }
+      else
+        newEvent = event
+
       @emitter.emit 'did-change-cell-value', newEvent
 
     @subscriptions.add @table.onDidDestroy (event) =>
@@ -472,6 +483,26 @@ class DisplayTable
   setValuesAtScreenPositions: (positions, values, transaction=true) ->
     positions = positions.map (position) => @modelPosition(position)
     @setValuesAtPositions(positions, values, transaction)
+
+  setValuesInScreenRange: (range, values, transaction=true) ->
+    range = Range.fromObject(range)
+
+    if @order?
+      valuesRows = values.length
+      valuesColumns = values[0].length
+      positions = []
+
+      flattenValues = values.reduce ((a,b) -> a.concat(b)), []
+
+      for row in [range.start.row...range.end.row]
+        for column in [range.start.column...range.end.column]
+          positions.push @modelPosition([row, column])
+
+      @setValuesAtPositions(positions, flattenValues, transaction)
+
+    else
+      @table.setValuesInRange(range, values, transaction)
+
 
   getScreenPositionAtPixelPosition: (x,y) ->
     return unless x? and y?
