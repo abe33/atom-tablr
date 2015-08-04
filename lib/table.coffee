@@ -2,6 +2,7 @@
 {Emitter, Disposable, CompositeDisposable} = require 'event-kit'
 Identifiable = require './mixins/identifiable'
 Transactions = require './mixins/transactions'
+Range = require './range'
 
 module.exports =
 class Table
@@ -453,5 +454,37 @@ class Table
       @transaction
         undo: -> @setValuesAtPositions(positions, oldValues, false)
         redo: -> @setValuesAtPositions(positions, values, false)
+
+    return
+
+  setValuesInRange: (range, values, transaction=true) ->
+    range = Range.fromObject(range)
+    oldValues = []
+
+    valuesRows = values.length
+    valuesColumns = values[0].length
+
+    for row in [range.start.row...range.end.row]
+      oldRowValues = []
+      oldValues.push oldRowValues
+      for column in [range.start.column...range.end.column]
+        valuesRow = (row - range.start.row) % valuesRows
+        valuesColumn = (column - range.start.column) % valuesColumns
+
+        oldRowValues.push @rows[row]?[column]
+        @rows[row]?[column] = values[valuesRow][valuesColumn]
+
+    @emitModifiedStatusChange()
+    @emitter.emit 'did-change-cell-value', {
+      range
+      oldValues
+      newValues: values
+    }
+
+    if transaction
+      values = values.map (a) -> a.slice()
+      @transaction
+        undo: -> @setValuesInRange(range, oldValues, false)
+        redo: -> @setValuesInRange(range, values, false)
 
     return

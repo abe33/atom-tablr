@@ -591,6 +591,36 @@ describe 'Table', ->
       it 'is marked as modified', ->
         expect(table.isModified()).toBeTruthy()
 
+  describe '::setValuesInRange', ->
+    beforeEach ->
+      table.addColumn('name')
+      table.addColumn('age')
+
+      table.addRow(['John Doe', 30])
+      table.addRow(['Jane Doe', 30])
+
+    it 'changes the value at the given position', ->
+      table.setValuesInRange([[0,1], [2,2]],[[40], [40]])
+
+      expect(table.getRow(0)).toEqual(['John Doe', 40])
+      expect(table.getRow(1)).toEqual(['Jane Doe', 40])
+
+    it 'emits a did-change-cell-value event', ->
+      spy = jasmine.createSpy('did-change-cell-value')
+      table.onDidChangeCellValue(spy)
+
+      table.setValuesInRange([[0,1], [2,2]],[[40], [40]])
+
+      expect(spy).toHaveBeenCalled()
+
+    describe 'when saved', ->
+      beforeEach ->
+        table.save()
+        table.setValuesInRange([[0,1], [2,2]],[[40], [40]])
+
+      it 'is marked as modified', ->
+        expect(table.isModified()).toBeTruthy()
+
   #    ##     ## ##    ## ########   #######
   #    ##     ## ###   ## ##     ## ##     ##
   #    ##     ## ####  ## ##     ## ##     ##
@@ -866,6 +896,31 @@ describe 'Table', ->
         expect(table.getRow(0)).toEqual(['hello', 'bar'])
         expect(table.getRow(1)).toEqual(['bar', 'world'])
 
+      it 'rolls back many changes in row data', ->
+        table.addRows [
+          ['foo', 'bar']
+          ['bar', 'baz']
+        ]
+
+        table.clearUndoStack()
+
+        table.setValuesInRange([[0,0], [1,2]], [['hello', 'world']])
+        expect(table.getRow(0)).toEqual(['hello', 'world'])
+
+        table.save()
+        table.undo()
+
+        expect(table.isModified()).toBeTruthy()
+        expect(table.undoStack.length).toEqual(0)
+        expect(table.redoStack.length).toEqual(1)
+        expect(table.getRow(0)).toEqual(['foo', 'bar'])
+
+        table.redo()
+
+        expect(table.isModified()).toBeFalsy()
+        expect(table.undoStack.length).toEqual(1)
+        expect(table.redoStack.length).toEqual(0)
+        expect(table.getRow(0)).toEqual(['hello', 'world'])
 
       describe '::clearUndoStack', ->
         it 'removes all the transactions in the undo stack', ->
