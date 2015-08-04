@@ -77,8 +77,8 @@ class Selection
 
     for row in [@range.start.row...@range.end.row]
       for column in [@range.start.column...@range.end.column]
-        clipboardRow = row % clipboardRows
-        clipboardColumn = column % clipboardColumns
+        clipboardRow = (row - @range.start.row) % clipboardRows
+        clipboardColumn = (column - @range.start.column) % clipboardColumns
         text = values[clipboardRow][clipboardColumn]
         @tableEditor.setValueAtScreenPosition([row, column], text)
 
