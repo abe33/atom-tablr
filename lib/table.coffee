@@ -339,7 +339,7 @@ class Table
     rowsValues = removedRows.map((row) -> row.slice()) if transaction
 
     for row,i in removedRows
-      @emitter.emit 'did-remove-row', {row, index: range.start + i}
+      @emitter.emit 'did-remove-row', {row, index: range.start}
 
     @emitModifiedStatusChange()
     @emitter.emit 'did-change-rows', {

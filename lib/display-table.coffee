@@ -80,7 +80,11 @@ class DisplayTable
       @rowHeights.splice(index, 0, undefined)
 
     @subscriptions.add @table.onDidRemoveRow ({index}) =>
+      console.log index
+      console.log @rowHeights.join(', ')
       @rowHeights.splice(index, 1)
+      console.log @rowHeights.join(', ')
+      console.log '---------------'
 
     @subscriptions.add @table.onDidChangeRows (event) =>
       @updateScreenRows()
@@ -400,16 +404,23 @@ class DisplayTable
   removeRowsInScreenRange: (range, transaction=true) ->
     range = @table.rowRangeFrom(range)
 
-    rowIndices = (@screenRowToModelRow(i) for i in [range.start...range.end])
-    rowHeights = (@rowHeights[index] for index in rowIndices)
+    if @order?
+      rowIndices = (@screenRowToModelRow(i) for i in [range.start...range.end])
+      rowHeights = (@rowHeights[index] for index in rowIndices)
 
-    @table.removeRowsAtIndices(rowIndices, transaction)
+      @table.removeRowsAtIndices(rowIndices, transaction)
+    else
+      rowIndices = [range.start...range.end]
+      rowHeights = (@rowHeights[index] for index in rowIndices)
+
+      @table.removeRowsInRange(range, transaction)
 
     if transaction
       @table.ammendLastTransaction
         undo: (commit) =>
           commit.undo()
           for index,i in rowIndices
+            console.log index, rowHeights[i]
             @setRowHeightAt(index, rowHeights[i])
         redo: (commit) =>
           commit.redo()
