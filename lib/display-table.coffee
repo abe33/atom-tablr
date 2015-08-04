@@ -9,7 +9,7 @@ class DisplayTable
   Delegator.includeInto(this)
 
   @delegatesMethods(
-    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'rowRangeFrom', 'destroy',
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'destroy',
     toProperty: 'table'
   )
 
@@ -501,8 +501,7 @@ class DisplayTable
       @setValuesAtPositions(positions, flattenValues, transaction)
 
     else
-      @table.setValuesInRange(range, values, transaction)
-
+      @setValuesInRange(range, values, transaction)
 
   getScreenPositionAtPixelPosition: (x,y) ->
     return unless x? and y?
