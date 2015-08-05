@@ -157,18 +157,27 @@ class TableEditor
 
     if metadata?
       if metadata.selections?
-        if atom.config.get('table-edit.flattenBufferMultiSelectionOnPaste')
-          selection.fill(clipboardText) for selection in @selections
+        if metadata.selections[0].values?
+          metaLength = metadata.selections.length
+          for selection,i in @selections
+            values = metadata.selections[i % metaLength].values
+            selection.fillValues(values)
         else
-          switch atom.config.get('table-edit.distributeBufferMultiSelectionOnPaste')
-            when 'vertically'
-              values = metadata.selections.map (sel) -> [sel.text]
-            when 'horizontally'
-              values = [metadata.selections.map (sel) -> sel.text]
+          if atom.config.get('table-edit.flattenBufferMultiSelectionOnPaste')
+            selection.fill(clipboardText) for selection in @selections
+          else
+            switch atom.config.get('table-edit.distributeBufferMultiSelectionOnPaste')
+              when 'vertically'
+                values = metadata.selections.map (sel) -> [sel.text]
+              when 'horizontally'
+                values = [metadata.selections.map (sel) -> sel.text]
 
-          selection.fillValues(values) for selection in @selections
+            selection.fillValues(values) for selection in @selections
       else
-        selection.fill(clipboardText) for selection in @selections
+        if metadata.values
+          selection.fillValues(metadata.values) for selection in @selections
+        else
+          selection.fill(clipboardText) for selection in @selections
     else
       selection.fill(clipboardText) for selection in @selections
 

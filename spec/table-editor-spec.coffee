@@ -452,3 +452,104 @@ describe 'TableEditor', ->
                   expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
                   expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
                   expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')
+
+      describe 'when the clipboard comes from a table', ->
+        describe 'and has only one selection', ->
+          beforeEach ->
+            atom.clipboard.write('foo\nbar', {
+              values: [['foo','bar']]
+              text: 'foo\tbar'
+              indentBasis: 0
+              fullLine: false
+            })
+
+          describe 'when the selection spans only one cell', ->
+            it 'expands the selection to match the clipboard content', ->
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
+              expect(tableEditor.getSelectedRange()).toEqual([[0,0],[1,2]])
+
+          describe 'when the selection spans many cells', ->
+            it 'sets the same value for each cells', ->
+              tableEditor.setSelectedRange([[0,0], [2,2]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')
+
+          describe 'when there is many selections', ->
+            it 'sets the same value for each cells', ->
+              tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')
+
+        describe 'and has many selections', ->
+          beforeEach ->
+            atom.clipboard.write('foo\nbar', {
+              selections: [
+                {
+                  values: [['foo', 'oof']]
+                  indentBasis: 0
+                  fullLine: false
+                  text: 'foo\toof'
+                }
+                {
+                  values: [['bar', 'rab']]
+                  indentBasis: 0
+                  fullLine: false
+                  text: 'bar\trab'
+                }
+              ]
+            })
+
+          describe 'when the selection spans only one cell', ->
+            it 'pastes only the first selection and expands the table selection', ->
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('oof')
+
+          describe 'when the selection spans many cells', ->
+            it 'pastes only the first selection', ->
+              tableEditor.setSelectedRange([[0,0], [2,2]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('oof')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('oof')
+
+          describe 'when there is many selections', ->
+            it 'paste each clipboard selection in the corresponding table selection', ->
+              tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('oof')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('rab')
+
+          describe 'when there is more selections in the table', ->
+            it 'loops over the clipboard selection when needed', ->
+              tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]], [[2,0],[3,2]]])
+
+              tableEditor.pasteClipboard()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('oof')
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('rab')
+              expect(tableEditor.getValueAtScreenPosition([2,0])).toEqual('foo')
+              expect(tableEditor.getValueAtScreenPosition([2,1])).toEqual('oof')
