@@ -567,6 +567,8 @@ describe 'TableEditor', ->
             it 'paste each clipboard selection in the corresponding table selection', ->
               tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
 
+              table.clearUndoStack()
+
               tableEditor.pasteClipboard()
 
               expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
@@ -574,9 +576,20 @@ describe 'TableEditor', ->
               expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
               expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('rab')
 
+              expect(table.undoStack.length).toEqual(1)
+
+              table.undo()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('age')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(30)
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('gender')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
+
           describe 'when there is more selections in the table', ->
             it 'loops over the clipboard selection when needed', ->
               tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]], [[2,0],[3,2]]])
+
+              table.clearUndoStack()
 
               tableEditor.pasteClipboard()
 
@@ -586,3 +599,14 @@ describe 'TableEditor', ->
               expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('rab')
               expect(tableEditor.getValueAtScreenPosition([2,0])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([2,1])).toEqual('oof')
+
+              expect(table.undoStack.length).toEqual(1)
+
+              table.undo()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('age')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(30)
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('gender')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
+              expect(tableEditor.getValueAtScreenPosition([2,0])).toEqual('name')
+              expect(tableEditor.getValueAtScreenPosition([2,1])).toEqual('Jane Doe')
