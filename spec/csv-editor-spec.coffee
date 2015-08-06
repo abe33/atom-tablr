@@ -220,7 +220,7 @@ describe "CSVEditor", ->
         expect(csvEditorElement.querySelector('atom-csv-preview .alert')).toExist()
 
       it 'disables the open table action', ->
-        expect(csvEditorElement.form.openTableEditorButton.disabled).toBeTruthy()
+        waitsFor -> csvEditorElement.form.openTableEditorButton.disabled
 
     describe 'changing the delimiter settings', ->
       beforeEach ->
