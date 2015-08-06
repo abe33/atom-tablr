@@ -81,6 +81,9 @@ class TableEditor
 
   getTitle: -> 'Table'
 
+  shouldPromptToSave: ({windowCloseRequested}={}) ->
+    @isModified()
+
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
 

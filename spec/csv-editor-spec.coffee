@@ -172,6 +172,20 @@ describe "CSVEditor", ->
             expect(tableEditorElement).toExist()
             expect(csvEditorElement.children.length).toEqual(1)
 
+        describe 'closing the tab with pending changes', ->
+          beforeEach ->
+            tableEditor.addRow ['Bill', 45, 'male']
+            tableEditor.addRow ['Bonnie', 42, 'female']
+
+            spyOn(atom, 'confirm').andReturn(0)
+
+            expect(csvEditor.isModified()).toBeTruthy()
+
+            atom.workspace.getActivePane().destroyItem(csvEditor)
+
+          it 'prompts the user to save', ->
+            expect(atom.confirm).toHaveBeenCalled()
+
         describe 'when the table is modified', ->
           beforeEach ->
             modifyAndSave ->

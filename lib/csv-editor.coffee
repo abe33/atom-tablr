@@ -28,9 +28,14 @@ class CSVEditor
 
   getPath: -> @uriToOpen
 
+  getURI: -> @uriToOpen
+
   isDestroyed: -> @destroyed
 
   isModified: -> @editor?.isModified() ? false
+
+  shouldPromptToSave: (options) ->
+    @editor?.shouldPromptToSave(options) ? false
 
   onDidOpen: (callback) ->
     @emitter.on 'did-open', callback
