@@ -15,7 +15,7 @@ class Transactions extends Mixin
       undo: =>
         commits[i].undo() for i in [commits.length-1..0]
       redo: =>
-        commir.redo() for commit in commits
+        commit.redo() for commit in commits
 
   endBatchTransaction: ->
     @appendCommit(@batchCommit)

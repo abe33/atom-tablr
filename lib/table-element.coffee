@@ -1163,6 +1163,7 @@ atom.commands.add 'atom-table-editor',
   'core:paste': -> @tableEditor.pasteClipboard()
   'core:undo': -> @tableEditor.undo()
   'core:redo': -> @tableEditor.redo()
+  'core:backspace': -> @tableEditor.delete()
   'core:move-left': -> @moveLeft()
   'core:move-right': -> @moveRight()
   'core:move-up': -> @moveUp()

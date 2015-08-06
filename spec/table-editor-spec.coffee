@@ -74,6 +74,23 @@ describe 'TableEditor', ->
       expect(tableEditor.getCursorValue()).toEqual('age')
       expect(tableEditor.getCursorValues()).toEqual(['age'])
 
+    describe '::delete', ->
+      it 'deletes the content of the selected cells', ->
+        initialValue = tableEditor.getCursorValue()
+        expect(initialValue).not.toBeUndefined()
+
+        tableEditor.delete()
+
+        expect(tableEditor.getCursorValue()).toBeUndefined()
+
+        tableEditor.undo()
+
+        expect(tableEditor.getCursorValue()).toEqual(initialValue)
+
+        tableEditor.redo()
+
+        expect(tableEditor.getCursorValue()).toBeUndefined()
+
     describe 'when destroyed', ->
       beforeEach ->
         tableEditor.destroy()
