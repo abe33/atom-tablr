@@ -192,7 +192,7 @@ describe "CSVEditor", ->
               expect(tableEditor.isModified()).toBeFalsy()
               expect(csvEditor.isModified()).toBeFalsy()
 
-    xdescribe 'when the file cannot be parsed with the default', ->
+    describe 'when the file cannot be parsed with the default', ->
       beforeEach ->
         openFixture('invalid.csv')
 
@@ -202,15 +202,11 @@ describe "CSVEditor", ->
 
         waitsFor -> csvEditorElement.querySelector('.alert')
 
-      it 'displays the error in the settings form', ->
-        expect(csvEditorElement.querySelector('.alert')).toExist()
+      it 'displays the error in the csv preview', ->
+        expect(csvEditorElement.querySelector('atom-csv-preview .alert')).toExist()
 
-      describe 'clicking again on the open button', ->
-        it 'clears the previously created alert', ->
-          tableEditorButton = csvEditorElement.form.openTableEditorButton
-          click(tableEditorButton)
-
-          expect(csvEditorElement.querySelector('.alert')).not.toExist()
+      it 'disables the open table action', ->
+        expect(csvEditorElement.form.openTableEditorButton.disabled).toBeTruthy()
 
     describe 'changing the delimiter settings', ->
       beforeEach ->
