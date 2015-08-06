@@ -1159,6 +1159,7 @@ atom.commands.add 'atom-table-editor',
     e.preventDefault()
   'core:confirm': -> @startCellEdit()
   'core:copy': -> @tableEditor.copySelectedCells()
+  'core:cut': -> @tableEditor.cutSelectedCells()
   'core:paste': -> @tableEditor.pasteClipboard()
   'core:undo': -> @tableEditor.undo()
   'core:redo': -> @tableEditor.redo()
