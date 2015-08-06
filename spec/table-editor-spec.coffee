@@ -19,6 +19,9 @@ describe 'TableEditor', ->
       expect(table).toBeDefined()
       expect(displayTable).toBeDefined()
 
+    it 'retains the table', ->
+      expect(table.isRetained()).toBeTruthy()
+
     it 'has a default empty selection', ->
       expect(tableEditor.getLastSelection()).toBeDefined()
       expect(tableEditor.getSelections()).toEqual([tableEditor.getLastSelection()])
@@ -57,6 +60,9 @@ describe 'TableEditor', ->
       expect(displayTable.table).toBe(table)
       expect(tableEditor.table).toBe(table)
 
+    it 'retains the table', ->
+      expect(table.isRetained()).toBeTruthy()
+
     it 'has a default empty selection', ->
       expect(tableEditor.getLastSelection()).toBeDefined()
       expect(tableEditor.getSelections()).toEqual([tableEditor.getLastSelection()])
@@ -70,7 +76,7 @@ describe 'TableEditor', ->
       expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
       expect(tableEditor.getCursorScreenPositions()).toEqual([[0,0]])
 
-    it 'returns undefined when asked for the value at cursor', ->
+    it 'returns the value at cursor', ->
       expect(tableEditor.getCursorValue()).toEqual('age')
       expect(tableEditor.getCursorValues()).toEqual(['age'])
 

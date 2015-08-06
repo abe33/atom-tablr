@@ -34,7 +34,6 @@ class TableEditor
     'onDidChangeCellValue',
     'sortBy', 'toggleSortDirection', 'resetSort',
     'undo', 'redo', 'clearUndoStack', 'clearRedoStack',
-    'destroy',
     toProperty: 'displayTable'
   )
   @delegatesMethods(
@@ -52,6 +51,8 @@ class TableEditor
     @cursors = []
     @selections = []
 
+    @table.retain()
+
     @addCursorAtScreenPosition(new Point(0,0))
 
     @subscriptions.add @displayTable.onDidChangeScreenRows =>
@@ -68,16 +69,24 @@ class TableEditor
       if newRow isnt row or newColumn isnt column
         @setCursorAtScreenPosition([newRow, newColumn])
 
-    @subscriptions.add @displayTable.onDidDestroy =>
-      cursor.destroy() for cursor in @cursors
-      @destroyed = true
-      @emitter.emit 'did-destroy', this
-      @emitter.dispose()
-      @emitter = null
-      @subscriptions.dispose()
-      @subscriptions = null
-      @displayTable = null
-      @table = null
+    @subscriptions.add @table.onDidDestroy => @wasDestroyed()
+
+  destroy: ->
+    {table} = this
+    @displayTable.destroy()
+    @wasDestroyed()
+    table.release()
+
+  wasDestroyed: ->
+    cursor.destroy() for cursor in @cursors
+    @destroyed = true
+    @emitter.emit 'did-destroy', this
+    @emitter.dispose()
+    @emitter = null
+    @subscriptions.dispose()
+    @subscriptions = null
+    @displayTable = null
+    @table = null
 
   getTitle: -> 'Table'
 

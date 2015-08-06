@@ -9,7 +9,7 @@ class DisplayTable
   Delegator.includeInto(this)
 
   @delegatesMethods(
-    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'destroy',
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom',
     toProperty: 'table'
   )
 
@@ -34,6 +34,23 @@ class DisplayTable
     @rowHeights = @table.getColumns().map (column) => @getRowHeight()
     @computeScreenColumnOffsets()
     @updateScreenRows()
+
+  destroy: ->
+    @unsubscribeFromScreenColumn(column) for column in @screenColumns
+    @rowOffsets = []
+    @rowHeights = []
+    @columnOffsets = []
+    @screenColumns = []
+    @screenRows = []
+    @screenToModelRowsMap = {}
+    @modelToScreenRowsMap = {}
+    @destroyed = true
+    @emitter.emit 'did-destroy', this
+    @emitter.dispose()
+    @emitter = null
+    @subscriptions.dispose()
+    @subscriptions = null
+    @table = null
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
@@ -104,22 +121,7 @@ class DisplayTable
 
       @emitter.emit 'did-change-cell-value', newEvent
 
-    @subscriptions.add @table.onDidDestroy (event) =>
-      @unsubscribeFromScreenColumn(column) for column in @screenColumns
-      @rowOffsets = []
-      @rowHeights = []
-      @columnOffsets = []
-      @screenColumns = []
-      @screenRows = []
-      @screenToModelRowsMap = {}
-      @modelToScreenRowsMap = {}
-      @destroyed = true
-      @emitter.emit 'did-destroy', this
-      @emitter.dispose()
-      @emitter = null
-      @subscriptions.dispose()
-      @subscriptions = null
-      @table = null
+    @subscriptions.add @table.onDidDestroy (event) => @destroy()
 
   subscribeToConfig: ->
     @observeConfig

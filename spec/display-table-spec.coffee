@@ -42,9 +42,6 @@ describe 'DisplayTable', ->
       beforeEach ->
         displayTable.destroy()
 
-      it 'destroys its table', ->
-        expect(table.isDestroyed()).toBeTruthy()
-
       it 'is destroyed', ->
         expect(displayTable.isDestroyed()).toBeTruthy()
 
@@ -53,6 +50,12 @@ describe 'DisplayTable', ->
         expect(displayTable.getScreenRowCount()).toEqual(0)
         expect(displayTable.rowOffsets).toEqual([])
         expect(displayTable.columnOffsets).toEqual([])
+
+    describe 'when its table is destroyed', ->
+      it 'is destroyed', ->
+        table.destroy()
+
+        expect(displayTable.isDestroyed()).toBeTruthy()
 
     ##      ######   #######  ##       ##     ## ##     ## ##    ##  ######
     ##     ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
