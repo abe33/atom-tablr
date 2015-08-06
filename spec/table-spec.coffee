@@ -40,6 +40,21 @@ describe 'Table', ->
     it 'throws an error when adding a column', ->
       expect(-> table.addColumn('foo')).toThrow()
 
+  describe '::retain', ->
+    it 'increments the reference count', ->
+      table.retain()
+
+      expect(table.refcount).toEqual(1)
+      expect(table.isRetained()).toBeTruthy()
+
+  ##     ######     ###    ##     ## ########
+  ##    ##    ##   ## ##   ##     ## ##
+  ##    ##        ##   ##  ##     ## ##
+  ##     ######  ##     ## ##     ## ######
+  ##          ## #########  ##   ##  ##
+  ##    ##    ## ##     ##   ## ##   ##
+  ##     ######  ##     ##    ###    ########
+
   describe '::save', ->
     describe 'when modified', ->
       beforeEach ->

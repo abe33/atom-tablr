@@ -16,6 +16,7 @@ class Table
     @columns = []
     @rows = []
     @emitter = new Emitter
+    @refcount = 0
 
   destroy: ->
     return if @destroyed
@@ -49,6 +50,12 @@ class Table
     @lastModified = modified
 
   isDestroyed: -> @destroyed
+
+  isRetained: -> @refcount > 0
+
+  retain: ->
+    @refcount++
+    this
 
   save: ->
     return unless @lastModified
