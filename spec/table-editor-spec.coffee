@@ -334,12 +334,23 @@ describe 'TableEditor', ->
           it 'sets the same value for each cells', ->
             tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
 
+            table.clearUndoStack()
+
             tableEditor.pasteClipboard()
 
             expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
             expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
             expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
             expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+            expect(table.undoStack.length).toEqual(1)
+
+            table.undo()
+
+            expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('age')
+            expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(30)
+            expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('gender')
+            expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
 
       describe 'when the clipboard comes from a text buffer', ->
         describe 'and has only one selection', ->
@@ -367,12 +378,23 @@ describe 'TableEditor', ->
             it 'sets the same value for each cells', ->
               tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
 
+              table.clearUndoStack()
+
               tableEditor.pasteClipboard()
 
               expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('foo')
+
+              expect(table.undoStack.length).toEqual(1)
+
+              table.undo()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('age')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(30)
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('gender')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
 
           describe 'and has many selections', ->
             describe 'when flattenBufferMultiSelectionOnPaste option is enabled', ->
@@ -486,12 +508,23 @@ describe 'TableEditor', ->
             it 'sets the same value for each cells', ->
               tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
 
+              table.clearUndoStack()
+
               tableEditor.pasteClipboard()
 
               expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual('bar')
               expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('foo')
               expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('bar')
+
+              expect(table.undoStack.length).toEqual(1)
+
+              table.undo()
+
+              expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('age')
+              expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(30)
+              expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('gender')
+              expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
 
         describe 'and has many selections', ->
           beforeEach ->

@@ -3,10 +3,34 @@ Mixin = require 'mixto'
 module.exports =
 class Transactions extends Mixin
 
+  batchTransaction: (block) =>
+    @startBatchTransaction()
+    block()
+    @endBatchTransaction()
+
+  startBatchTransaction: ->
+    commits = []
+    @batchCommit =
+      appendCommit: (commit) -> commits.push(commit)
+      undo: =>
+        commits[i].undo() for i in [commits.length-1..0]
+      redo: =>
+        commir.redo() for commit in commits
+
+  endBatchTransaction: ->
+    @appendCommit(@batchCommit)
+    @batchCommit = null
+
   transaction: (commit) ->
     commit.undo = commit.undo.bind(this)
     commit.redo = commit.redo.bind(this)
 
+    if @batchCommit?
+      @batchCommit.appendCommit(commit)
+    else
+      @appendCommit(commit)
+
+  appendCommit: (commit) ->
     @undoStack ?= []
     @undoStack.shift() if @undoStack.length + 1 > @constructor.MAX_HISTORY_SIZE
 
