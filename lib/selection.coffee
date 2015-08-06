@@ -61,9 +61,7 @@ class Selection
   columnsSpan: -> @range.end.column - @range.start.column
 
   fill: (text) ->
-    for row in [@range.start.row...@range.end.row]
-      for column in [@range.start.column...@range.end.column]
-        @tableEditor.setValueAtScreenPosition([row, column], text)
+    @tableEditor.setValuesInScreenRange(@range, [[text]])
 
   fillValues: (values) ->
     clipboardRows = values.length
@@ -75,12 +73,7 @@ class Selection
     if clipboardColumns > @columnsSpan()
       @range.end.column = @range.start.column + clipboardColumns
 
-    for row in [@range.start.row...@range.end.row]
-      for column in [@range.start.column...@range.end.column]
-        clipboardRow = (row - @range.start.row) % clipboardRows
-        clipboardColumn = (column - @range.start.column) % clipboardColumns
-        text = values[clipboardRow][clipboardColumn]
-        @tableEditor.setValueAtScreenPosition([row, column], text)
+    @tableEditor.setValuesInScreenRange(@range, values)
 
   copy: (maintainClipboard=false, fullLine=false) ->
     return if @isEmpty()

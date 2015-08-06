@@ -492,10 +492,15 @@ class DisplayTable
       valuesColumns = values[0].length
       positions = []
 
-      flattenValues = values.reduce ((a,b) -> a.concat(b)), []
+      flattenValues = []
 
       for row in [range.start.row...range.end.row]
         for column in [range.start.column...range.end.column]
+          valuesRow = (row - range.start.row) % valuesRows
+          valuesColumn = (column - range.start.column) % valuesColumns
+          value = values[valuesRow][valuesColumn]
+
+          flattenValues.push value
           positions.push @modelPosition([row, column])
 
       @setValuesAtPositions(positions, flattenValues, transaction)
