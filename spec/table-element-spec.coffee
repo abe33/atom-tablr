@@ -755,7 +755,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mousemove(handle, x, y - 20)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 20)
+          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 10)
 
           mouseup(handle, x, y - 20)
 
