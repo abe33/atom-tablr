@@ -136,6 +136,10 @@ class TableEditor
       @cursorSubscriptions.get(selection).dispose()
       @cursorSubscriptions.delete(selection)
 
+  delete: ->
+    @table.batchTransaction =>
+      selection.delete() for selection in @getSelections()
+
   ##     ######   #######  ########  ##    ##
   ##    ##    ## ##     ## ##     ##  ##  ##
   ##    ##       ##     ## ##     ##   ####
@@ -151,6 +155,10 @@ class TableEditor
       maintainClipboard = true
 
     return
+
+  cutSelectedCells: ->
+    @copySelectedCells()
+    @delete()
 
   pasteClipboard: (options={}) ->
     {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()

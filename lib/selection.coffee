@@ -60,6 +60,9 @@ class Selection
 
   columnsSpan: -> @range.end.column - @range.start.column
 
+  delete: ->
+    @tableEditor.setValuesInScreenRange(@range, [[undefined]])
+
   fill: (text) ->
     @tableEditor.setValuesInScreenRange(@range, [[text]])
 

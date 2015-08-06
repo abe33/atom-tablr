@@ -308,6 +308,67 @@ describe 'TableEditor', ->
         expect(selections[1].text).toEqual('gender\tfemale')
         expect(selections[1].values).toEqual([['gender','female']])
 
+    ##     ######  ##     ## ########
+    ##    ##    ## ##     ##    ##
+    ##    ##       ##     ##    ##
+    ##    ##       ##     ##    ##
+    ##    ##       ##     ##    ##
+    ##    ##    ## ##     ##    ##
+    ##     ######   #######     ##
+
+    describe '::cutSelectedCells', ->
+      it "cuts the selected cell value onto the clipboard", ->
+        tableEditor.cutSelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age')
+        expect(atom.clipboard.readWithMetadata().text).toEqual('age')
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age']])
+
+        expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
+
+      it 'cuts the selected cell values onto the clipboard', ->
+        tableEditor.setSelectedRange([[0,0], [2,2]])
+
+        tableEditor.cutSelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age',30], ['gender','female']])
+
+        expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual(undefined)
+
+      it 'cuts each selections as metadata', ->
+        tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+        tableEditor.cutSelectedCells()
+
+        expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
+
+        clipboard = atom.clipboard.readWithMetadata()
+        selections = clipboard.metadata.selections
+        expect(clipboard.text).toEqual('age\t30\ngender\tfemale')
+        expect(selections).toBeDefined()
+        expect(selections.length).toEqual(2)
+        expect(selections[0].text).toEqual('age\t30')
+        expect(selections[0].values).toEqual([['age',30]])
+        expect(selections[1].text).toEqual('gender\tfemale')
+        expect(selections[1].values).toEqual([['gender','female']])
+
+        expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual(undefined)
+        expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual(undefined)
+
+    ##    ########     ###     ######  ######## ########
+    ##    ##     ##   ## ##   ##    ##    ##    ##
+    ##    ##     ##  ##   ##  ##          ##    ##
+    ##    ########  ##     ##  ######     ##    ######
+    ##    ##        #########       ##    ##    ##
+    ##    ##        ##     ## ##    ##    ##    ##
+    ##    ##        ##     ##  ######     ##    ########
+
     describe '::pasteClipboard', ->
       describe 'when the clipboard only has a text', ->
         beforeEach ->
