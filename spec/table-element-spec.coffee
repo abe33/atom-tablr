@@ -89,6 +89,7 @@ describe 'tableElement', ->
     atom.config.set 'table-edit.rowOverdraw', 10
     atom.config.set 'table-edit.columnOverdraw', 2
     atom.config.set 'table-edit.minimumRowHeight', 10
+    atom.config.set 'table-edit.minimumColumnWidth', 40
 
     tableElement = atom.views.getView(tableEditor)
     tableShadowRoot = tableElement.shadowRoot
@@ -549,6 +550,50 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumn(0).width).toBeCloseTo(100)
         expect(tableEditor.getScreenColumn(1).width).toBeCloseTo(150)
         expect(tableEditor.getScreenColumn(2).width).toBeCloseTo(100)
+
+      it 'displays a ruler when the drag have begun', ->
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+
+        expect(isVisible(ruler)).toBeFalsy()
+
+        handle = tableShadowRoot.querySelectorAll('atom-table-header-cell .column-resize-handle')[2]
+        mousedown(handle)
+
+        expect(isVisible(ruler)).toBeTruthy()
+        expect(ruler.getBoundingClientRect().left).toEqual(handle.getBoundingClientRect().left + handle.offsetWidth - 1)
+
+      it 'moves the handle during the drag', ->
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        handle = tableShadowRoot.querySelectorAll('atom-table-header-cell .column-resize-handle')[2]
+        {x, y} = objectCenterCoordinates(handle)
+
+        mousedown(handle)
+        mousemove(handle, x + 50, y)
+
+        expect(ruler.getBoundingClientRect().left).toEqual(handle.getBoundingClientRect().left + 50)
+
+      it 'hides the ruler on drag end', ->
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        handle = tableShadowRoot.querySelectorAll('atom-table-header-cell .column-resize-handle')[2]
+        mousedown(handle)
+        mouseup(handle)
+
+        expect(isVisible(ruler)).toBeFalsy()
+
+      it 'stops the resize when the height is lower than the minimum column height', ->
+        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        handle = tableShadowRoot.querySelectorAll('atom-table-header-cell .column-resize-handle')[2]
+        {x, y} = objectCenterCoordinates(handle)
+
+        mousedown(handle)
+        mousemove(handle, x - 100, y)
+
+        expect(ruler.getBoundingClientRect().left).toEqual(handle.getBoundingClientRect().left - 58 + handle.offsetWidth)
+
+        mouseup(handle, x - 100, y)
+
+        expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('table-edit.minimumColumnWidth'))
+
 
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []

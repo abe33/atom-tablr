@@ -10,21 +10,27 @@ module.exports =
     pageMovesAmount:
       type: 'integer'
       default: 20
+
     rowHeight:
       type: 'integer'
       default: 24
-    columnWidth:
-      type: 'integer'
-      default: 120
-    minimumRowHeight:
-      type: 'integer'
-      default: 16
     rowOverdraw:
       type: 'integer'
       default: 3
+    minimumRowHeight:
+      type: 'integer'
+      default: 16
+
+    columnWidth:
+      type: 'integer'
+      default: 120
     columnOverdraw:
       type: 'integer'
       default: 2
+    minimumColumnWidth:
+      type: 'integer'
+      default: 40
+
     flattenBufferMultiSelectionOnPaste:
       type: 'boolean'
       default: false

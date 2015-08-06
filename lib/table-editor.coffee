@@ -27,7 +27,7 @@ class TableEditor
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
-    'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition',
+    'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth',
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'getColumns',
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn',
     'getScreenCellRect', 'getScreenCellPosition',

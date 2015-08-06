@@ -865,9 +865,18 @@ class TableElement extends HTMLElement
     ruler.style.left = @toUnit(pageX - @head.getBoundingClientRect().left)
     ruler.style.height = @toUnit(@offsetHeight)
 
-  columnResizeDrag: ({pageX}) ->
+  columnResizeDrag: ({pageX}, {position, dragOffset, handleWidth}) ->
     ruler = @getColumnResizeRuler()
-    ruler.style.left = @toUnit(pageX - @head.getBoundingClientRect().left)
+
+    headOffset = @head.getBoundingClientRect().left
+    headWrapperOffset = @getColumnsOffsetContainer().getBoundingClientRect().left
+    columnX = @tableEditor.getScreenColumnOffsetAt(position) - @getColumnsScrollContainer().scrollLeft
+    rulerLeft = Math.max(
+      headWrapperOffset - headOffset + columnX + @tableEditor.getMinimumScreenColumnWidth(),
+      pageX - headOffset + dragOffset - ruler.offsetWidth
+    )
+
+    ruler.style.left = @toUnit(rulerLeft)
 
   endColumnResizeDrag: ({pageX}, {startX, position}) ->
     return unless @dragging
@@ -876,7 +885,7 @@ class TableElement extends HTMLElement
 
     column = @tableEditor.getScreenColumn(position)
     width = @tableEditor.getScreenColumnWidthAt(position)
-    column.width = width + moveX
+    column.width = Math.max(@tableEditor.getMinimumScreenColumnWidth(), width + moveX)
 
     @getColumnResizeRuler().classList.remove('visible')
     @dragSubscription.dispose()
