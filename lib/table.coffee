@@ -26,28 +26,9 @@ class Table
     @rows = []
     @destroyed = true
 
+  hasMultipleEditors: -> @refcount > 0
+
   isModified: -> @cachedContents isnt @getCacheContent()
-
-  initializeAfterOpen: ->
-    @clearUndoStack()
-    @updateCachedContents()
-    @lastModified = false
-
-  lockModifiedStatus: ->
-    @modifiedLock = true
-
-  unlockModifiedStatus: ->
-    @modifiedLock = false
-    @emitModifiedStatusChange()
-
-  emitModifiedStatusChange: ->
-    return if @modifiedLock
-
-    modified = @isModified()
-    return if @lastModified is modified
-
-    @emitter.emit 'did-change-modified', modified
-    @lastModified = modified
 
   isDestroyed: -> @destroyed
 
@@ -55,6 +36,11 @@ class Table
 
   retain: ->
     @refcount++
+    this
+
+  release: ->
+    @refcount--
+    @destroy() unless @isRetained()
     this
 
   save: ->
@@ -89,6 +75,28 @@ class Table
 
   getCacheContent: ->
     res = [@columns].concat(@rows).join('\n')
+
+  initializeAfterOpen: ->
+    @clearUndoStack()
+    @updateCachedContents()
+    @lastModified = false
+
+  lockModifiedStatus: ->
+    @modifiedLock = true
+
+  unlockModifiedStatus: ->
+    @modifiedLock = false
+    @emitModifiedStatusChange()
+
+  emitModifiedStatusChange: ->
+    return if @modifiedLock
+
+    modified = @isModified()
+    return if @lastModified is modified
+
+    @emitter.emit 'did-change-modified', modified
+    @lastModified = modified
+
 
   #    ######## ##     ## ######## ##    ## ########  ######
   #    ##       ##     ## ##       ###   ##    ##    ##    ##

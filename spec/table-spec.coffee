@@ -42,10 +42,43 @@ describe 'Table', ->
 
   describe '::retain', ->
     it 'increments the reference count', ->
+      expect(table.refcount).toEqual(0)
+
       table.retain()
 
       expect(table.refcount).toEqual(1)
       expect(table.isRetained()).toBeTruthy()
+
+      table.retain()
+
+      expect(table.refcount).toEqual(2)
+
+  describe '::release', ->
+    it 'decrements the reference count', ->
+      table.retain()
+      table.retain()
+
+      table.release()
+
+      expect(table.refcount).toEqual(1)
+      expect(table.isRetained()).toBeTruthy()
+
+      table.release()
+
+      expect(table.refcount).toEqual(0)
+      expect(table.isRetained()).toBeFalsy()
+
+    it 'destroys the table when the refcount drop to 0', ->
+      spy = jasmine.createSpy('did-destroy')
+      table.onDidDestroy(spy)
+      table.retain()
+      table.retain()
+
+      table.release()
+      table.release()
+
+      expect(spy).toHaveBeenCalled()
+      expect(table.isDestroyed()).toBeTruthy()
 
   ##     ######     ###    ##     ## ########
   ##    ##    ##   ## ##   ##     ## ##
