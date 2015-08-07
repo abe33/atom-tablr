@@ -212,15 +212,17 @@ class TableElement extends HTMLElement
 
     @tableEditor = table
     @modelSubscriptions = subs = new CompositeDisposable()
-    subs.add @tableEditor.onDidAddColumn (e) => @requestUpdate()
-    subs.add @tableEditor.onDidRemoveColumn (e) => @requestUpdate()
-    subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
+    subs.add @tableEditor.onDidAddColumn (e) =>
+      @wholeTableIsDirty = true
+      @requestUpdate()
+    subs.add @tableEditor.onDidRemoveColumn (e) =>
+      @wholeTableIsDirty = true
+      @requestUpdate()
     subs.add @tableEditor.onDidChangeColumnOption ({option, column}) =>
       if option is 'width'
         @wholeTableIsDirty = true
       else
         @markDirtyRange(@tableEditor.getColumnRange(@tableEditor.getScreenColumnIndex(column)))
-
       @requestUpdate()
     subs.add @tableEditor.onDidChange =>
       @wholeTableIsDirty = true
