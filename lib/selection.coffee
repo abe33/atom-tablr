@@ -39,11 +39,12 @@ class Selection
   getRange: -> @range
 
   setRange: (range) ->
+    oldRange = @range
     @range = Range.fromObject(range)
     unless @range.containsPoint(@getCursor().getPosition())
       @getCursor().setPosition(@range.start, false)
 
-    @rangeChanged()
+    @rangeChanged(oldRange)
 
   isEmpty: -> @range.isEmpty()
 
@@ -127,6 +128,7 @@ class Selection
     @range = @cursor.getRange()
 
   expandUp: (delta=1) ->
+    oldRange = @range.copy()
     if @expandedDown()
       newRow = @range.end.row - delta
       if newRow <= @getFirstSelectedRow()
@@ -137,7 +139,10 @@ class Selection
     else
       @range.start.row = Math.max(0, @range.start.row - delta)
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandDown: (delta=1) ->
+    oldRange = @range.copy()
     rowCount = @tableEditor.getScreenRowCount()
     if @expandedUp()
       newRow = @range.start.row + delta
@@ -149,7 +154,10 @@ class Selection
     else
       @range.end.row = Math.min(@tableEditor.getScreenRowCount(), @range.end.row + delta)
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandLeft: (delta=1) ->
+    oldRange = @range.copy()
     if @expandedRight()
       newColumn = @range.end.column - delta
       if newColumn <= @getFirstSelectedColumn()
@@ -160,7 +168,10 @@ class Selection
     else
       @range.start.column = Math.max(0, @range.start.column - delta)
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandRight: (delta=1) ->
+    oldRange = @range.copy()
     columnCount = @tableEditor.getScreenColumnCount()
     if @expandedLeft()
       newColumn = @range.start.column + delta
@@ -172,7 +183,11 @@ class Selection
     else
       @range.end.column = Math.min(columnCount, @range.end.column + delta)
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandToTop: ->
+    oldRange = @range.copy()
+
     if @expandedDown()
       end = @range.start.row + 1
       @range.start.row = 0
@@ -180,7 +195,11 @@ class Selection
     else
       @range.start.row = 0
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandToBottom: ->
+    oldRange = @range.copy()
+
     if @expandedUp()
       start = @range.end.row - 1
       @range.start.row = start
@@ -188,7 +207,11 @@ class Selection
     else
       @range.end.row = @tableEditor.getScreenRowCount()
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandToLeft: ->
+    oldRange = @range.copy()
+
     if @expandedRight()
       end = @range.start.column + 1
       @range.start.column = 0
@@ -196,13 +219,19 @@ class Selection
     else
       @range.start.column = 0
 
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
+
   expandToRight: ->
+    oldRange = @range.copy()
+
     if @expandedLeft()
       start = @range.end.column - 1
       @range.start.column = start
       @range.end.column = @tableEditor.getScreenColumnCount()
     else
       @range.end.column = @tableEditor.getScreenColumnCount()
+
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
 
   expandedUp: ->
     @getCursor().getPosition().row is @getLastSelectedRow() and
@@ -223,11 +252,16 @@ class Selection
   spanMoreThanOneCell: -> @range.spanMoreThanOneCell()
 
   resetRangeOnCursor: ->
+    oldRange = @range
     @range = @cursor.getRange()
-    @rangeChanged()
+    @rangeChanged(oldRange) unless @range.isEqual(oldRange)
 
-  rangeChanged: ->
-    eventObject = selection: this
+  rangeChanged: (oldRange) ->
+    eventObject = {
+      selection: this
+      newRange: @range
+      oldRange
+    }
 
     @emitter.emit 'did-change-range', eventObject
     @tableEditor.emitter.emit 'did-change-selection-range', eventObject
