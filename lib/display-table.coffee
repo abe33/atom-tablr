@@ -116,6 +116,18 @@ class DisplayTable
           position, oldValue, newValue
           screenPosition: @screenPosition(position)
         }
+      else if event.range?
+        {range, oldValues, newValues} = event
+        if @order?
+          screenPositions = []
+          range.each (row, column) =>
+            screenPositions.push(@screenPosition([row, column]))
+          newEvent = { range, oldValues, newValues, screenPositions }
+        else
+          newEvent = {
+            range, oldValues, newValues
+            screenRange: range.copy()
+          }
       else
         newEvent = event
 
