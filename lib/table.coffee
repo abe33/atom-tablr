@@ -130,8 +130,8 @@ class Table
   onDidRemoveRow: (callback) ->
     @emitter.on 'did-remove-row', callback
 
-  onDidChangeRows: (callback) ->
-    @emitter.on 'did-change-rows', callback
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
 
   onDidChangeCellValue: (callback) ->
     @emitter.on 'did-change-cell-value', callback
@@ -285,7 +285,7 @@ class Table
 
     unless batch
       @emitModifiedStatusChange()
-      @emitter.emit 'did-change-rows', {
+      @emitter.emit 'did-change', {
         oldRange: {start: index, end: index}
         newRange: {start: index, end: index+1}
       }
@@ -306,7 +306,7 @@ class Table
     createdRows = rows.map (row,i) => @addRowAt(index+i, row, true)
 
     @emitModifiedStatusChange()
-    @emitter.emit 'did-change-rows', {
+    @emitter.emit 'did-change', {
       oldRange: {start: index, end: index}
       newRange: {start: index, end: index+rows.length}
     }
@@ -334,7 +334,7 @@ class Table
     @emitter.emit 'did-remove-row', {row, index}
     unless batch
       @emitModifiedStatusChange()
-      @emitter.emit 'did-change-rows', {
+      @emitter.emit 'did-change', {
         oldRange: {start: index, end: index+1}
         newRange: {start: index, end: index}
       }
@@ -357,7 +357,7 @@ class Table
       @emitter.emit 'did-remove-row', {row, index: range.start}
 
     @emitModifiedStatusChange()
-    @emitter.emit 'did-change-rows', {
+    @emitter.emit 'did-change', {
       oldRange: range
       newRange: {start: range.start, end: range.start}
     }
@@ -380,11 +380,11 @@ class Table
       @transaction
         undo: ->
           @addRowAt(index, rowsValues[i], true, false) for index,i in indices
-          @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
+          @emitter.emit 'did-change', {rowIndices: indices.slice()}
         redo: ->
           @removeRowsAtIndices(indices, false)
 
-    @emitter.emit 'did-change-rows', {rowIndices: indices.slice()}
+    @emitter.emit 'did-change', {rowIndices: indices.slice()}
 
     removedRows
 

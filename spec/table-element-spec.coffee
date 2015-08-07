@@ -1118,8 +1118,8 @@ describe 'tableElement', ->
 
     describe 'when the cursor is on the last row', ->
       it 'moves the cursor on row above', ->
-        spy = jasmine.createSpy('did-change-screen-rows')
-        tableEditor.onDidChangeScreenRows(spy)
+        spy = jasmine.createSpy('did-change')
+        tableEditor.onDidChange(spy)
 
         tableElement.moveToBottom()
         tableElement.deleteCursorRow()

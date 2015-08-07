@@ -216,7 +216,7 @@ class TableElement extends HTMLElement
     subs.add @tableEditor.onDidRemoveColumn (e) => @requestUpdate()
     subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
     subs.add @tableEditor.onDidChangeColumnOption => @requestUpdate()
-    subs.add @tableEditor.onDidChangeScreenRows => @requestUpdate()
+    subs.add @tableEditor.onDidChange => @requestUpdate()
     subs.add @tableEditor.onDidChangeRowHeight => @requestUpdate()
     subs.add @tableEditor.onDidChangeCellValue => @requestUpdate()
     subs.add @tableEditor.onDidAddCursor => @requestUpdate()

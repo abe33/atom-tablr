@@ -76,8 +76,8 @@ class DisplayTable
   onDidRemoveRow: (callback) ->
     @emitter.on 'did-remove-row', callback
 
-  onDidChangeScreenRows: (callback) ->
-    @emitter.on 'did-change-screen-rows', callback
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
 
   onDidChangeRowHeight: (callback) ->
     @emitter.on 'did-change-row-height', callback
@@ -99,9 +99,9 @@ class DisplayTable
     @subscriptions.add @table.onDidRemoveRow ({index}) =>
       @rowHeights.splice(index, 1)
 
-    @subscriptions.add @table.onDidChangeRows (event) =>
+    @subscriptions.add @table.onDidChange (event) =>
       @updateScreenRows()
-      @emitter.emit 'did-change-screen-rows', event
+      @emitter.emit 'did-change', event
 
     @subscriptions.add @table.onDidChangeCellValue (event) =>
       if event.positions?
@@ -558,7 +558,7 @@ class DisplayTable
 
   sortBy: (@order, @direction=1) ->
     @updateScreenRows()
-    @emitter.emit 'did-change-screen-rows', {
+    @emitter.emit 'did-change', {
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
@@ -566,7 +566,7 @@ class DisplayTable
   toggleSortDirection: ->
     @direction *= -1
     @updateScreenRows()
-    @emitter.emit 'did-change-screen-rows', {
+    @emitter.emit 'did-change', {
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
@@ -574,7 +574,7 @@ class DisplayTable
   resetSort: ->
     @order = null
     @updateScreenRows()
-    @emitter.emit 'did-change-screen-rows', {
+    @emitter.emit 'did-change', {
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }

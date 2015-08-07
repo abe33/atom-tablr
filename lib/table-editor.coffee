@@ -25,7 +25,7 @@ class TableEditor
     'getRow', 'getRows', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'addRows', 'addRowsAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange',
     'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
-    'onDidAddRow', 'onDidRemoveRow', 'onDidChangeScreenRows', 'onDidChangeRowHeight',
+    'onDidAddRow', 'onDidRemoveRow', 'onDidChange', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
     'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth',
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'getColumns',
@@ -55,7 +55,7 @@ class TableEditor
 
     @addCursorAtScreenPosition(new Point(0,0))
 
-    @subscriptions.add @displayTable.onDidChangeScreenRows =>
+    @subscriptions.add @displayTable.onDidChange =>
       selection = @getLastSelection()
       selection.selectNone() if selection.isEmpty()
 

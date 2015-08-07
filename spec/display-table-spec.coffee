@@ -229,10 +229,10 @@ describe 'DisplayTable', ->
           expect(spy.calls[0].args[0].screenIndex).toEqual(4)
           expect(spy.calls[0].args[0].index).toEqual(4)
 
-        it 'emits a did-change-screen-rows event with the screen row range', ->
-          spy = jasmine.createSpy('did-change-screen-rows')
+        it 'emits a did-change event with the screen row range', ->
+          spy = jasmine.createSpy('did-change')
 
-          displayTable.onDidChangeScreenRows(spy)
+          displayTable.onDidChange(spy)
 
           displayTable.addRow(['blood type', 'ab-'])
 
@@ -274,10 +274,10 @@ describe 'DisplayTable', ->
           expect(spy.calls[0].args[0].screenIndex).toEqual(1)
           expect(spy.calls[0].args[0].index).toEqual(1)
 
-        it 'emits a did-change-screen-rows event with the screen row ranges', ->
-          spy = jasmine.createSpy('did-change-screen-rows')
+        it 'emits a did-change event with the screen row ranges', ->
+          spy = jasmine.createSpy('did-change')
 
-          displayTable.onDidChangeScreenRows(spy)
+          displayTable.onDidChange(spy)
 
           displayTable.addRowAt(1, ['blood type', 'ab-'])
 
@@ -362,10 +362,10 @@ describe 'DisplayTable', ->
     describe 'removing many rows', ->
       spy = null
       beforeEach ->
-        spy = jasmine.createSpy('did-change-screen-rows')
+        spy = jasmine.createSpy('did-change')
 
         displayTable.addRowAt(1, ['blood type', 'ab-'])
-        displayTable.onDidChangeScreenRows(spy)
+        displayTable.onDidChange(spy)
 
         displayTable.removeRowsInRange([1,3])
 
@@ -382,7 +382,7 @@ describe 'DisplayTable', ->
     describe 'removing many rows in screen range', ->
       spy = null
       beforeEach ->
-        spy = jasmine.createSpy('did-change-screen-rows')
+        spy = jasmine.createSpy('did-change')
 
         displayTable.addRowAt(1, ['blood type', 'ab-'])
 
@@ -390,7 +390,7 @@ describe 'DisplayTable', ->
         beforeEach ->
           displayTable.sortBy('key')
 
-          displayTable.onDidChangeScreenRows(spy)
+          displayTable.onDidChange(spy)
 
           displayTable.removeRowsInScreenRange([1,3])
 
@@ -408,7 +408,7 @@ describe 'DisplayTable', ->
 
       describe 'when no sort is applied', ->
         beforeEach ->
-          displayTable.onDidChangeScreenRows(spy)
+          displayTable.onDidChange(spy)
 
           displayTable.removeRowsInScreenRange([1,3])
 

@@ -322,9 +322,9 @@ describe 'Table', ->
 
           expect(spy).toHaveBeenCalled()
 
-        it 'dispatches a did-change-rows event', ->
+        it 'dispatches a did-change event', ->
           spy = jasmine.createSpy 'changeRows'
-          table.onDidChangeRows spy
+          table.onDidChange spy
           table.addRow key: 'foo', value: 'bar'
 
           expect(spy).toHaveBeenCalled()
@@ -357,9 +357,9 @@ describe 'Table', ->
           it 'throws an error if the index is negative', ->
             expect(-> table.addRowAt -1, {}).toThrow()
 
-          it 'dispatches a did-change-rows event', ->
+          it 'dispatches a did-change event', ->
             spy = jasmine.createSpy 'changeRows'
-            table.onDidChangeRows spy
+            table.onDidChange spy
             table.addRowAt(1, key: 'hello', value: 'world')
 
             expect(spy).toHaveBeenCalled()
@@ -394,7 +394,7 @@ describe 'Table', ->
     describe 'adding many rows', ->
       beforeEach ->
         spy = jasmine.createSpy 'changeRows'
-        table.onDidChangeRows spy
+        table.onDidChange spy
         table.addRows [
           { key: 'foo', value: 'bar' }
           { key: 'oof', value: 'rab' }
@@ -406,7 +406,7 @@ describe 'Table', ->
       it 'is marked as modified', ->
         expect(table.isModified()).toBeTruthy()
 
-      it 'dispatch only one did-change-rows event', ->
+      it 'dispatch only one did-change event', ->
         expect(spy).toHaveBeenCalled()
         expect(spy.calls.length).toEqual(1)
         expect(spy.calls[0].args[0]).toEqual({
@@ -417,7 +417,7 @@ describe 'Table', ->
       describe 'at a given index', ->
         beforeEach ->
           spy = jasmine.createSpy 'changeRows'
-          table.onDidChangeRows spy
+          table.onDidChange spy
           table.addRowsAt 1, [
             { key: 'foo', value: 'bar' }
             { key: 'oof', value: 'rab' }
@@ -426,7 +426,7 @@ describe 'Table', ->
         it 'adds the rows in the table', ->
           expect(table.getRowCount()).toEqual(4)
 
-        it 'dispatch only one did-change-rows event', ->
+        it 'dispatch only one did-change event', ->
           expect(spy).toHaveBeenCalled()
           expect(spy.calls.length).toEqual(1)
           expect(spy.calls[0].args[0]).toEqual({
@@ -451,9 +451,9 @@ describe 'Table', ->
         table.removeRow(row)
         expect(spy).toHaveBeenCalled()
 
-      it 'dispatches a did-change-rows event', ->
+      it 'dispatches a did-change event', ->
         spy = jasmine.createSpy 'changeRows'
-        table.onDidChangeRows spy
+        table.onDidChange spy
         table.removeRow(row)
 
         expect(spy).toHaveBeenCalled()
@@ -490,14 +490,14 @@ describe 'Table', ->
 
         spy = jasmine.createSpy 'removeRows'
 
-        table.onDidChangeRows spy
+        table.onDidChange spy
 
       it 'removes the rows from the table', ->
         table.removeRowsInRange([0,2])
         expect(table.getRowCount()).toEqual(1)
         expect(table.getRow(0)).toEqual(['ofo', 'arb'])
 
-      it 'dispatches a single did-change-rows', ->
+      it 'dispatches a single did-change', ->
         table.removeRowsInRange([0,2])
         expect(spy).toHaveBeenCalled()
         expect(spy.calls.length).toEqual(1)
@@ -535,7 +535,7 @@ describe 'Table', ->
 
         spy = jasmine.createSpy 'removeRows'
 
-        table.onDidChangeRows spy
+        table.onDidChange spy
 
       it 'removes the rows at indices', ->
         table.removeRowsAtIndices([0,2])
