@@ -167,6 +167,8 @@ class DisplayTable
 
   getScreenColumn: (index) -> @screenColumns[index]
 
+  getScreenColumnIndex: (column) -> @screenColumns.indexOf(column)
+
   getLastColumnIndex: -> @screenColumns.length - 1
 
   getContentWidth: ->

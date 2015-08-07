@@ -26,7 +26,7 @@ class TableEditor
     'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChange', 'onDidChangeRowHeight',
-    'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex',
+    'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex', 'getScreenColumnIndex',
     'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth',
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'getColumns',
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn',
@@ -122,6 +122,25 @@ class TableEditor
   getTable: -> @table
 
   getColumnName: (index) -> columnName(index)
+
+  getRowRange: (row) ->
+    Range.fromObject([
+      [row, 0]
+      [row + 1, @getScreenColumnCount()]
+    ])
+
+  getRowsRange: (range) ->
+    range = @rowRangeFrom(range)
+    Range.fromObject([
+      [range.start, 0]
+      [range.end + 1, @getScreenColumnCount()]
+    ])
+
+  getColumnRange: (column) ->
+    Range.fromObject([
+      [0, column]
+      [@getScreenRowCount(), column + 1]
+    ])
 
   createCursorAndSelection: (position, range) ->
     position = Point.fromObject(position)
@@ -305,19 +324,6 @@ class TableEditor
         remainingSelections.push(selectionA)
 
     @selections = remainingSelections
-
-  getRowRange: (row) ->
-    Range.fromObject([
-      [row, 0]
-      [row + 1, @getScreenColumnCount()]
-    ])
-
-  getRowsRange: (range) ->
-    range = @rowRangeFrom(range)
-    Range.fromObject([
-      [range.start, 0]
-      [range.end + 1, @getScreenColumnCount()]
-    ])
 
   ##     ######  ##     ## ########   ######   #######  ########   ######
   ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##

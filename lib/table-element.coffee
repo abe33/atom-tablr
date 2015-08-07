@@ -215,11 +215,19 @@ class TableElement extends HTMLElement
     subs.add @tableEditor.onDidAddColumn (e) => @requestUpdate()
     subs.add @tableEditor.onDidRemoveColumn (e) => @requestUpdate()
     subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
-    subs.add @tableEditor.onDidChangeColumnOption => @requestUpdate()
+    subs.add @tableEditor.onDidChangeColumnOption ({option, column}) =>
+      if option is 'width'
+        @wholeTableIsDirty = true
+      else
+        @markDirtyRange(@tableEditor.getColumnRange(@tableEditor.getScreenColumnIndex(column)))
+
+      @requestUpdate()
     subs.add @tableEditor.onDidChange =>
       @wholeTableIsDirty = true
       @requestUpdate()
-    subs.add @tableEditor.onDidChangeRowHeight => @requestUpdate()
+    subs.add @tableEditor.onDidChangeRowHeight =>
+      @wholeTableIsDirty = true
+      @requestUpdate()
     subs.add @tableEditor.onDidAddCursor => @requestUpdate()
     subs.add @tableEditor.onDidRemoveCursor => @requestUpdate()
     subs.add @tableEditor.onDidChangeCursorPosition => @requestUpdate()
@@ -273,9 +281,6 @@ class TableElement extends HTMLElement
   isSelectedRow: (row) ->
     @tableEditor.getSelections().some (selection) ->
       selection.getRange().containsRow(row)
-
-  getRowRange: (row) ->
-    Range.fromObject([[row, 0], [row, @tableEditor.getLastColumnIndex()]])
 
   getRowsContainer: -> @tableRows
 
