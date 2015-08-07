@@ -216,15 +216,32 @@ class TableElement extends HTMLElement
     subs.add @tableEditor.onDidRemoveColumn (e) => @requestUpdate()
     subs.add @tableEditor.onDidRemoveColumn => @requestUpdate()
     subs.add @tableEditor.onDidChangeColumnOption => @requestUpdate()
-    subs.add @tableEditor.onDidChange => @requestUpdate()
+    subs.add @tableEditor.onDidChange =>
+      @wholeTableIsDirty = true
+      @requestUpdate()
     subs.add @tableEditor.onDidChangeRowHeight => @requestUpdate()
-    subs.add @tableEditor.onDidChangeCellValue => @requestUpdate()
     subs.add @tableEditor.onDidAddCursor => @requestUpdate()
     subs.add @tableEditor.onDidRemoveCursor => @requestUpdate()
     subs.add @tableEditor.onDidChangeCursorPosition => @requestUpdate()
-    subs.add @tableEditor.onDidAddSelection => @requestUpdate()
-    subs.add @tableEditor.onDidRemoveSelection => @requestUpdate()
-    subs.add @tableEditor.onDidChangeSelectionRange => @requestUpdate()
+    subs.add @tableEditor.onDidAddSelection ({selection}) =>
+      @markDirtyRange(selection.getRange())
+      @requestUpdate()
+    subs.add @tableEditor.onDidRemoveSelection ({selection}) =>
+      @markDirtyRange(selection.getRange())
+      @requestUpdate()
+    subs.add @tableEditor.onDidChangeSelectionRange ({oldRange, newRange}) =>
+      @markDirtyRange(oldRange)
+      @markDirtyRange(newRange)
+      @requestUpdate()
+    subs.add @tableEditor.onDidChangeCellValue (e) =>
+      if e.screenPosition?
+        @markDirtyCell(e.screenPosition)
+      else if e.screenPositions?
+        @markDirtyCells(e.screenPositions)
+      else if e.screenRange?
+        @markDirtyRange(e.screenRange)
+
+      @requestUpdate()
     subs.add @tableEditor.onDidDestroy =>
       @unsetModel()
       @subscriptions.dispose()
@@ -932,6 +949,17 @@ class TableElement extends HTMLElement
       @update()
       @updateRequested = false
 
+  markDirtyCell: (position) ->
+    @dirtyPositions ?= []
+    @dirtyPositions[position.row] ?= []
+    @dirtyPositions[position.row][position.column] = true
+
+  markDirtyCells: (positions) ->
+    @markDirtyCell(position) for position in positions
+
+  markDirtyRange: (range) ->
+    range.each (row, column) => @markDirtyCell({row, column})
+
   update: =>
     return unless @tableEditor?
     firstVisibleRow = @getFirstVisibleRow()
@@ -1048,18 +1076,25 @@ class TableElement extends HTMLElement
           @appendHeaderCell(columns[column], column)
           @appendCell(row, column) for row in visibleRows
 
-    for row in [intactFirstRow...intactLastRow]
-      @gutterCells[row]?.setModel({row})
+    if @dirtyPositions? or @wholeTableIsDirty
+      for row in [intactFirstRow...intactLastRow]
+        if @wholeTableIsDirty or @dirtyPositions[row]?
+          @gutterCells[row]?.setModel({row})
+
+        for column in [intactFirstColumn...intactLastColumn]
+          if @wholeTableIsDirty or @dirtyPositions[row]?[column]
+            @cells[row + '-' + column]?.setModel(@getCellObjectAtPosition([row, column]))
+
       for column in [intactFirstColumn...intactLastColumn]
-        @cells[row + '-' + column]?.setModel(@getCellObjectAtPosition([row, column]))
-    for column in [intactFirstColumn...intactLastColumn]
-      @headerCells[column]?.setModel({column: columns[column], index: column})
+        @headerCells[column]?.setModel({column: columns[column], index: column})
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
     @firstRenderedColumn = firstColumn
     @lastRenderedColumn = lastColumn
     @hasChanged = false
+    @dirtyPositions = null
+    @wholeTableIsDirty = false
 
   updateWidthAndHeight: ->
     @tableCells.style.cssText = """
