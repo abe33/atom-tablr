@@ -214,10 +214,8 @@ describe "CSVEditor", ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> csvEditorElement.querySelector('.alert')
-
       it 'displays the error in the csv preview', ->
-        expect(csvEditorElement.querySelector('atom-csv-preview .alert')).toExist()
+        waitsFor -> csvEditorElement.querySelector('atom-csv-preview .alert')
 
       it 'disables the open table action', ->
         waitsFor -> csvEditorElement.form.openTableEditorButton.disabled
