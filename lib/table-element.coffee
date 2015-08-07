@@ -958,6 +958,8 @@ class TableElement extends HTMLElement
     @dirtyPositions ?= []
     @dirtyPositions[position.row] ?= []
     @dirtyPositions[position.row][position.column] = true
+    @dirtyColumns ?= []
+    @dirtyColumns[position.column] = true
 
   markDirtyCells: (positions) ->
     @markDirtyCell(position) for position in positions
@@ -1091,7 +1093,11 @@ class TableElement extends HTMLElement
             @cells[row + '-' + column]?.setModel(@getCellObjectAtPosition([row, column]))
 
       for column in [intactFirstColumn...intactLastColumn]
-        @headerCells[column]?.setModel({column: columns[column], index: column})
+        if @wholeTableIsDirty or @dirtyColumns[column]
+          @headerCells[column]?.setModel({
+            column: columns[column],
+            index: column
+          })
 
     @firstRenderedRow = firstRow
     @lastRenderedRow = lastRow
@@ -1099,6 +1105,7 @@ class TableElement extends HTMLElement
     @lastRenderedColumn = lastColumn
     @hasChanged = false
     @dirtyPositions = null
+    @dirtyColumns = null
     @wholeTableIsDirty = false
 
   updateWidthAndHeight: ->
