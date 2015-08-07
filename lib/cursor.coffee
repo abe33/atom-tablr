@@ -34,8 +34,9 @@ class Cursor
   getValue: -> @tableEditor.getValueAtScreenPosition(@getPosition())
 
   setPosition: (position, resetSelection=true) ->
+    oldPosition = @position
     @position = Point.fromObject(position)
-    @cursorMoved(resetSelection)
+    @cursorMoved(oldPosition, resetSelection)
 
   getRange: ->
     new Range(@position, {
@@ -44,20 +45,23 @@ class Cursor
     })
 
   moveUp: (delta=1) ->
+    oldPosition = @position.copy()
     newRow = @position.row - delta
     newRow = @tableEditor.getScreenRowCount() - 1 if newRow < 0
 
     @position.row = newRow
-    @cursorMoved()
+    @cursorMoved(oldPosition)
 
   moveDown: (delta=1) ->
+    oldPosition = @position.copy()
     newRow = @position.row + delta
     newRow = 0 if newRow >= @tableEditor.getScreenRowCount()
 
     @position.row = newRow
-    @cursorMoved()
+    @cursorMoved(oldPosition)
 
   moveLeft: (delta=1) ->
+    oldPosition = @position.copy()
     newColumn = @position.column - delta
 
     if newColumn < 0
@@ -68,9 +72,10 @@ class Cursor
       @position.row = newRow
 
     @position.column = newColumn
-    @cursorMoved()
+    @cursorMoved(oldPosition)
 
   moveRight: (delta=1) ->
+    oldPosition = @position.copy()
     newColumn = @position.column + delta
     if newColumn >= @tableEditor.getScreenColumnCount()
       newColumn = 0
@@ -80,7 +85,7 @@ class Cursor
       @position.row = newRow
 
     @position.column = newColumn
-    @cursorMoved()
+    @cursorMoved(oldPosition)
 
   moveToTop: ->
     @moveUp(@position.row)
@@ -95,27 +100,35 @@ class Cursor
     @moveRight(@tableEditor.getScreenColumnCount() - @position.column - 1)
 
   pageUp: ->
+    oldPosition = @position.copy()
     newRow = @position.row - atom.config.get('table-edit.pageMovesAmount')
     @position.row = Math.max 0, newRow
-    @cursorMoved()
+    @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageDown: ->
+    oldPosition = @position.copy()
     newRow = @position.row + atom.config.get('table-edit.pageMovesAmount')
     @position.row = Math.min @tableEditor.getLastRowIndex(), newRow
-    @cursorMoved()
+    @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageLeft: ->
+    oldPosition = @position.copy()
     newColumn = @position.column - atom.config.get('table-edit.pageMovesAmount')
     @position.column = Math.max 0, newColumn
-    @cursorMoved()
+    @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageRight: ->
+    oldPosition = @position.copy()
     newColumn = @position.column + atom.config.get('table-edit.pageMovesAmount')
     @position.column = Math.min @tableEditor.getLastColumnIndex(), newColumn
-    @cursorMoved()
+    @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
-  cursorMoved: (resetSelection=true) ->
+  cursorMoved: (oldPosition, resetSelection=true) ->
     @selection.resetRangeOnCursor() if resetSelection
-    eventObject = cursor: this
+    eventObject = {
+      cursor: this
+      newPosition: @position
+      oldPosition
+    }
     @emitter.emit 'did-change-position', eventObject
     @tableEditor.emitter.emit 'did-change-cursor-position', eventObject
