@@ -1005,6 +1005,16 @@ class TableElement extends HTMLElement
     @updateScroll()
     @updateSelection()
 
+    endUpdate = =>
+      @firstRenderedRow = firstRow
+      @lastRenderedRow = lastRow
+      @firstRenderedColumn = firstColumn
+      @lastRenderedColumn = lastColumn
+      @hasChanged = false
+      @dirtyPositions = null
+      @dirtyColumns = null
+      @wholeTableIsDirty = false
+
     # We never rendered anything
     unless @firstRenderedRow?
       for column in visibleColumns
@@ -1012,6 +1022,8 @@ class TableElement extends HTMLElement
         @appendCell(row, column) for row in visibleRows
 
       @appendGutterCell(row) for row in visibleRows
+
+      return endUpdate()
 
     # Whole table redraw, when the table suddenly jump from one edge to the
     # other and the old and new visible range doesn't intersect.
@@ -1031,14 +1043,7 @@ class TableElement extends HTMLElement
 
       @appendGutterCell(row) for row in visibleRows
 
-      # For the moment we don't want to update the intact range so we return
-      # early
-      @firstRenderedRow = firstRow
-      @lastRenderedRow = lastRow
-      @firstRenderedColumn = firstColumn
-      @lastRenderedColumn = lastColumn
-      @hasChanged = false
-      return
+      return endUpdate()
 
     # Classical scroll routine
     else if firstRow isnt @firstRenderedRow or lastRow isnt @lastRenderedRow or firstColumn isnt @firstRenderedColumn or lastColumn isnt @lastRenderedColumn
@@ -1099,14 +1104,7 @@ class TableElement extends HTMLElement
             index: column
           })
 
-    @firstRenderedRow = firstRow
-    @lastRenderedRow = lastRow
-    @firstRenderedColumn = firstColumn
-    @lastRenderedColumn = lastColumn
-    @hasChanged = false
-    @dirtyPositions = null
-    @dirtyColumns = null
-    @wholeTableIsDirty = false
+    endUpdate()
 
   updateWidthAndHeight: ->
     @tableCells.style.cssText = """
