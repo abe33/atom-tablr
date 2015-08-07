@@ -36,7 +36,7 @@ class Cursor
   setPosition: (position, resetSelection=true) ->
     oldPosition = @position
     @position = Point.fromObject(position)
-    @cursorMoved(oldPosition, resetSelection)
+    @cursorMoved(oldPosition, resetSelection) unless @position.isEqual(oldPosition)
 
   getRange: ->
     new Range(@position, {
