@@ -96,6 +96,13 @@ class Range
       Math.max(pointA.column, pointB.column)
     )
 
+  each: (block) ->
+    for row in [@start.row...@end.row]
+      for column in [@start.column...@end.column]
+        block(row, column)
+
+    return
+
   # Public: Returns a new range with the same start and end positions.
   copy: ->
     new @constructor(@start.copy(), @end.copy())
