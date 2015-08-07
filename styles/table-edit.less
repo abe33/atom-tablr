@@ -156,6 +156,7 @@ atom-table-editor {
 
       &.selected {
         background: @background-color-highlight;
+        border-color: @base-background-color;
       }
 
       &.order {
@@ -285,6 +286,11 @@ atom-table-editor {
 
       &.selected {
         background: @background-color-highlight;
+        border-color: @base-background-color;
+      }
+
+      &.active-row {
+        color: @text-color-selected;
       }
 
       .row-resize-handle {
@@ -412,18 +418,18 @@ atom-table-editor {
     //     ######     ##    ##     ##    ##    ########  ######
 
     .active-row {
-      background: fadeout(@background-color-success, 95%);
+      background: fadeout(@background-color-success, 75%);
     }
 
     .order {
-      background: fadeout(@background-color-info, 95%);
+      background: fadeout(@background-color-info, 75%);
     }
 
     .active-column {
-      background: fadeout(@background-color-error, 95%);
+      background: fadeout(@background-color-error, 75%);
 
       &.order {
-        background: screen(fadeout(@background-color-error, 90%), fadeout(@background-color-info, 90%));
+        background: screen(fadeout(@background-color-error, 70%), fadeout(@background-color-info, 70%));
       }
     }
 
