@@ -31,6 +31,7 @@ class TableHeaderCellElement extends HTMLElement
   getHeaderCellClasses: (column, index) ->
     classes = []
     classes.push 'active-column' if @tableElement.isCursorColumn(index)
+    classes.push 'selected' if @tableElement.isSelectedColumn(index)
 
     if @tableEditor.order is column.name
       classes.push 'order'

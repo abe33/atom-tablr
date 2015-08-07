@@ -862,10 +862,8 @@ describe 'tableElement', ->
 
   it 'renders the cursor using a class', ->
     expect(tableShadowRoot.querySelectorAll('atom-table-header-cell.active-column').length).toEqual(1)
-    expect(tableShadowRoot.querySelectorAll('atom-table-cell.active-row').length).toEqual(2)
+    expect(tableShadowRoot.querySelectorAll('atom-table-gutter-cell.active-row').length).toEqual(1)
     expect(tableShadowRoot.querySelectorAll('atom-table-cell.active').length).toEqual(1)
-    expect(tableShadowRoot.querySelectorAll('atom-table-cell.active-column').length)
-    .toBeGreaterThan(1)
 
   describe '::moveRight', ->
     it 'requests an update', ->

@@ -31,17 +31,8 @@ class TableCellElement extends HTMLElement
 
   getCellClasses: (cell, column, row) ->
     classes = ['table-edit-cell']
-    if @tableElement.isCursorCell([row, column])
-      classes.push 'active'
-    else if @tableElement.isCursorColumn(column)
-      classes.push 'active-column'
-    else if @tableElement.isCursorRow(row)
-      classes.push 'active-row'
-
+    classes.push 'active' if @tableElement.isCursorCell([row, column])
     classes.push 'selected' if @tableElement.isSelectedCell([row, column])
-
-    classes.push 'order' if @tableElement.order is cell.column.name
-
     classes
 
 module.exports = TableCellElement = document.registerElement 'atom-table-cell', prototype: TableCellElement.prototype

@@ -391,7 +391,7 @@ class TableElement extends HTMLElement
 
   isSelectedColumn: (column) ->
     @tableEditor.getSelections().some (selection) ->
-      selection.getRowRange().containsColumn(column)
+      selection.getRange().containsColumn(column)
 
   getScreenColumnIndexAtPixelPosition: (x) ->
     x -= @getColumnsOffsetContainer().getBoundingClientRect().left
