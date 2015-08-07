@@ -782,7 +782,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mousemove(handle, x, y + 50)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight + 50)
+          expect(ruler.getBoundingClientRect().top).toEqual(y + 50 - ruler.offsetHeight)
 
         it 'hides the ruler on drag end', ->
           ruler = tableShadowRoot.querySelector('.row-resize-ruler')
@@ -800,7 +800,7 @@ describe 'tableElement', ->
           mousedown(handle)
           mousemove(handle, x, y - 20)
 
-          expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight - 10)
+          expect(ruler.getBoundingClientRect().top).toEqual(y - 10 + handle.offsetHeight / 2)
 
           mouseup(handle, x, y - 20)
 

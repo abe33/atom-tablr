@@ -826,7 +826,7 @@ class TableElement extends HTMLElement
     if @dragging
       ruler = @getRowResizeRuler()
       rowY = @tableEditor.getScreenRowOffsetAt(row) - @getRowsScrollContainer().scrollTop
-      rulerTop = Math.max(rowY + @tableEditor.getMinimumRowHeight(), pageY - @body.getBoundingClientRect().top + dragOffset + handleHeight - ruler.offsetHeight)
+      rulerTop = Math.max(rowY + @tableEditor.getMinimumRowHeight(), pageY - @body.getBoundingClientRect().top + dragOffset)
       ruler.style.top = @toUnit(rulerTop)
 
   endRowResizeDrag: ({pageY}, {row, handleHeight, dragOffset}) ->
