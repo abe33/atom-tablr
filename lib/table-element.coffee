@@ -684,12 +684,12 @@ class TableElement extends HTMLElement
 
   expandSelectionToEndOfLine: ->
     @tableEditor.expandToRight()
-    @makeRowVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
+    @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
     @requestUpdate()
 
   expandSelectionToBeginningOfLine: ->
     @tableEditor.expandToLeft()
-    @makeRowVisible(@tableEditor.getLastSelection().getRange().start.column)
+    @makeColumnVisible(@tableEditor.getLastSelection().getRange().start.column)
     @requestUpdate()
 
   expandSelectionToEndOfTable: ->
