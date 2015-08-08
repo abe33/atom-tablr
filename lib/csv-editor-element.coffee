@@ -79,3 +79,9 @@ CSVEditorElement.registerViewProvider = ->
     element = new CSVEditorElement
     element.setModel(model)
     element
+
+atom.commands.add 'atom-csv-editor',
+  'core:save-as': (e) ->
+    unless @model.editor?
+      e.stopImmediatePropagation()
+      e.preventDefault()
