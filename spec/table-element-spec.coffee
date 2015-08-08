@@ -90,6 +90,7 @@ describe 'tableElement', ->
     atom.config.set 'table-edit.columnOverdraw', 2
     atom.config.set 'table-edit.minimumRowHeight', 10
     atom.config.set 'table-edit.minimumColumnWidth', 40
+    atom.config.set 'table-edit.scrollSpeedDuringDrag', 20
 
     tableElement = atom.views.getView(tableEditor)
     tableShadowRoot = tableElement.shadowRoot
@@ -1345,6 +1346,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
         expect(tableShadowRoot.querySelectorAll('atom-table-gutter-cell.selected').length).toEqual(2)
+
     describe 'when the selection spans only one cell', ->
       it 'does not render the selection box', ->
         expect(tableShadowRoot.querySelector('.selection-box').style.display).toEqual('none')
@@ -1638,6 +1640,33 @@ describe 'tableElement', ->
         mousemove(endCell)
 
         expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
+
+    it 'scrolls the view when the selection reach the last column', ->
+      tableElement.setColumnsWidths([500, 500, 500])
+      nextAnimationFrame()
+
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="1"]')
+
+      mousedown(startCell)
+      mousemove(endCell)
+
+      expect(tableElement.getRowsContainer().scrollLeft).toBeGreaterThan(0)
+
+    it 'scrolls the view when the selection reach the first column', ->
+      tableElement.setColumnsWidths([500, 500, 500])
+      nextAnimationFrame()
+
+      tableElement.setScrollLeft(550)
+      nextAnimationFrame()
+
+      startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="11"][data-column="1"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="11"][data-column="0"]')
+
+      mousedown(startCell)
+      mousemove(endCell)
+
+      expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(550)
 
     describe 'when the columns widths have been changed', ->
       beforeEach ->

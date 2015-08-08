@@ -734,6 +734,12 @@ class TableElement extends HTMLElement
   #    ##     ## ##   ##   ##     ##
   #    ########   ####  ## ########
 
+  startDragScrollInterval: (method, e, o) ->
+    @dragScrollInterval = setInterval (=> method.call(this, e, o)), 50
+
+  clearDragScrollInterval: ->
+    clearInterval(@dragScrollInterval)
+
   startDrag: (e) ->
     return if @dragging
 
@@ -745,6 +751,7 @@ class TableElement extends HTMLElement
 
   drag: (e) ->
     if @dragging
+      @clearDragScrollInterval()
       {pageX, pageY} = e
       {row, column} = @cellPositionAtScreenPosition pageX, pageY
       cursorPosition = @tableEditor.getLastCursor().getPosition()
@@ -776,13 +783,16 @@ class TableElement extends HTMLElement
 
       selection.setRange(newRange)
 
-      @scrollDuringDrag(row)
+      @scrollDuringDrag(row, column)
       @requestUpdate()
+
+      @startDragScrollInterval(@drag, e)
 
   endDrag: (e) ->
     return unless @dragging
 
     @drag(e)
+    @clearDragScrollInterval()
     @dragging = false
     @dragSubscription.dispose()
 
@@ -801,8 +811,11 @@ class TableElement extends HTMLElement
       'mouseup': stopPropagationAndDefault (e) =>
         @endGutterDrag(e, startRow: row)
 
-  gutterDrag: ({pageY}, {startRow}) ->
+  gutterDrag: (e, o) ->
+    {pageY} = e
+    {startRow} = o
     if @dragging
+      @clearDragScrollInterval()
       row = @getScreenRowIndexAtPixelPosition(pageY)
 
       if row > startRow
@@ -814,12 +827,14 @@ class TableElement extends HTMLElement
 
       @scrollDuringDrag(row)
       @requestUpdate()
+      @startDragScrollInterval(@gutterDrag, e, o)
 
   endGutterDrag: (e,o) ->
     return unless @dragging
 
     @dragSubscription.dispose()
     @gutterDrag(e,o)
+    @clearDragScrollInterval()
     @dragging = false
 
   startRowResizeDrag: (e) ->
@@ -915,11 +930,19 @@ class TableElement extends HTMLElement
     @dragSubscription.dispose()
     @dragging = false
 
-  scrollDuringDrag: (row) ->
+  scrollDuringDrag: (row, column) ->
+    container = @getRowsScrollContainer()
+
     if row >= @getLastVisibleRow() - 1
-      @makeRowVisible(row + 1)
+      container.scrollTop += atom.config.get('table-edit.scrollSpeedDuringDrag')
     else if row <= @getFirstVisibleRow() + 1
-      @makeRowVisible(row - 1)
+      container.scrollTop -= atom.config.get('table-edit.scrollSpeedDuringDrag')
+
+    if column?
+      if column >= @getLastVisibleColumn() - 1
+        container.scrollLeft += atom.config.get('table-edit.scrollSpeedDuringDrag')
+      else if column <= @getFirstVisibleColumn() + 1
+        container.scrollLeft -= atom.config.get('table-edit.scrollSpeedDuringDrag')
 
   initializeDragEvents: (object, events) ->
     @dragSubscription = new CompositeDisposable

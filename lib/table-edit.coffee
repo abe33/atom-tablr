@@ -10,6 +10,9 @@ module.exports =
     pageMovesAmount:
       type: 'integer'
       default: 20
+    scrollSpeedDuringDrag:
+      type: 'integer'
+      default: 20
 
     rowHeight:
       type: 'integer'
