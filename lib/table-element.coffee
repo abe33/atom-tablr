@@ -1159,8 +1159,8 @@ class TableElement extends HTMLElement
     if @scrollPastEnd
       columnWidth = @tableEditor.getScreenColumnWidth()
       rowHeight = @tableEditor.getRowHeight()
-      width = Math.max(columnWidth, width + @tableRows.offsetWidth - columnWidth)
-      height = Math.max(rowHeight * 3, height + @tableRows.offsetHeight - rowHeight * 3)
+      width += Math.max(columnWidth, @tableRows.offsetWidth - columnWidth)
+      height += Math.max(rowHeight * 3, @tableRows.offsetHeight - rowHeight * 3)
 
     @tableCells.style.cssText = """
     height: #{height}px;
