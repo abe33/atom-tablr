@@ -123,6 +123,8 @@ class TableEditor
 
   getColumnName: (index) -> columnName(index)
 
+  getUntitledColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
+
   getTableRange: ->
     Range.fromObject([
       [0,0]
@@ -195,6 +197,15 @@ class TableEditor
   deleteRowAtCursor: ->
     {column, row} = @getCursorPosition()
     @removeScreenRowAt(@screenRowToModelRow(row))
+
+  insertColumnBefore: ->
+    @addColumnAt(@getCursorPosition().column, @getUntitledColumnName())
+
+  insertColumnAfter: ->
+    @addColumnAt(@getCursorPosition().column + 1, @getUntitledColumnName())
+
+  deleteColumnAtCursor: ->
+    @removeColumnAt(@getCursorPosition().column)
 
   ##     ######   #######  ########  ##    ##
   ##    ##    ## ##     ## ##     ##  ##  ##

@@ -383,16 +383,11 @@ class TableElement extends HTMLElement
 
   getColumnResizeRuler: -> @columnRuler
 
-  getNewColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
+  insertColumnBefore: -> @tableEditor.insertColumnBefore() unless @readOnly
 
-  insertColumnBefore: ->
-    @tableEditor.addColumnAt(@tableEditor.getCursorPosition().column, @getNewColumnName())
+  insertColumnAfter: -> @tableEditor.insertColumnAfter() unless @readOnly
 
-  insertColumnAfter: ->
-    @tableEditor.addColumnAt(@tableEditor.getCursorPosition().column + 1, @getNewColumnName())
-
-  deleteCursorColumn: ->
-    @tableEditor.removeColumnAt(@tableEditor.getCursorPosition().column)
+  deleteColumnAtCursor: -> @tableEditor.deleteColumnAtCursor() unless @readOnly
 
   getFirstVisibleColumn: ->
     @tableEditor.getScreenColumnIndexAtPixelPosition(@getColumnsScrollContainer().scrollLeft)
@@ -1313,7 +1308,7 @@ atom.commands.add 'atom-table-editor',
   'table-edit:delete-row': -> @deleteRowAtCursor()
   'table-edit:insert-column-before': -> @insertColumnBefore()
   'table-edit:insert-column-after': -> @insertColumnAfter()
-  'table-edit:delete-column': -> @deleteCursorColumn()
+  'table-edit:delete-column': -> @deleteColumnAtCursor()
 
 #    ######## ##       ######## ##     ## ######## ##    ## ########
 #    ##       ##       ##       ###   ### ##       ###   ##    ##

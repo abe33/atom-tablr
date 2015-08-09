@@ -1172,7 +1172,7 @@ describe 'tableElement', ->
           expect(tableEditor.getCursorScreenPosition()).toEqual([98,0])
 
     describe 'when the read-only attribute is set', ->
-      it 'does delete the active row', ->
+      it 'does not delete the active row', ->
         tableElement.setAttribute('read-only', true)
         tableElement.deleteRowAtCursor()
 
@@ -1192,6 +1192,13 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumn(0).name).toEqual('untitled_1')
         expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_0')
 
+    describe 'when the read-only attribute is set', ->
+      it 'does not insert the column', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.insertColumnBefore()
+
+        expect(tableEditor.getScreenColumnCount()).toEqual(3)
+
   describe 'table-edit:insert-column-after', ->
     it 'inserts a new column after the active column', ->
       tableElement.insertColumnAfter()
@@ -1206,11 +1213,25 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_1')
         expect(tableEditor.getScreenColumn(2).name).toEqual('untitled_0')
 
+    describe 'when the read-only attribute is set', ->
+      it 'does not insert the column', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.insertColumnAfter()
+
+        expect(tableEditor.getScreenColumnCount()).toEqual(3)
+
   describe 'table-edit:delete-column', ->
     it 'deletes the current active column', ->
-      tableElement.deleteCursorColumn()
+      tableElement.deleteColumnAtCursor()
 
       expect(tableEditor.getScreenRow(0)).toEqual([0, 'yes'])
+
+    describe 'when the read-only attribute is set', ->
+      it 'does not delete the column', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.deleteColumnAtCursor()
+
+        expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
