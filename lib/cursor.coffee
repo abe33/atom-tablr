@@ -46,46 +46,86 @@ class Cursor
 
   moveUp: (delta=1) ->
     oldPosition = @position.copy()
+    @moveUpInRange(delta)
+    @cursorMoved(oldPosition)
+
+  moveUpInSelection: (delta=1) ->
+    return @moveUp() unless @selection.spanMoreThanOneCell()
+
+    oldPosition = @position.copy()
+    @moveUpInRange(delta, @selection.getRange())
+    @cursorMoved(oldPosition, false)
+
+  moveUpInRange: (delta=1, range=@tableEditor.getTableRange()) ->
     newRow = @position.row - delta
-    newRow = @tableEditor.getScreenRowCount() - 1 if newRow < 0
+    newRow = range.end.row - 1 if newRow < range.start.row
 
     @position.row = newRow
-    @cursorMoved(oldPosition)
 
   moveDown: (delta=1) ->
     oldPosition = @position.copy()
+    @moveDownInRange(delta)
+    @cursorMoved(oldPosition)
+
+  moveDownInSelection: (delta=1) ->
+    return @moveDown() unless @selection.spanMoreThanOneCell()
+
+    oldPosition = @position.copy()
+    @moveDownInRange(delta, @selection.getRange())
+    @cursorMoved(oldPosition, false)
+
+  moveDownInRange: (delta=1, range=@tableEditor.getTableRange()) ->
     newRow = @position.row + delta
-    newRow = 0 if newRow >= @tableEditor.getScreenRowCount()
+    newRow = range.start.row if newRow >= range.end.row
 
     @position.row = newRow
-    @cursorMoved(oldPosition)
 
   moveLeft: (delta=1) ->
     oldPosition = @position.copy()
+    @moveLeftInRange(delta)
+    @cursorMoved(oldPosition)
+
+  moveLeftInSelection: (delta=1) ->
+    return @moveLeft() unless @selection.spanMoreThanOneCell()
+
+    oldPosition = @position.copy()
+    @moveLeftInRange(delta, @selection.getRange())
+    @cursorMoved(oldPosition, false)
+
+  moveLeftInRange: (delta=1, range=@tableEditor.getTableRange()) ->
     newColumn = @position.column - delta
 
-    if newColumn < 0
-      newColumn = @tableEditor.getScreenColumnCount() - 1
+    if newColumn < range.start.column
+      newColumn = range.end.column - 1
       newRow = @position.row - 1
-      newRow = @tableEditor.getScreenRowCount() - 1 if newRow < 0
+      newRow = range.end.row - 1 if newRow < range.start.row
 
       @position.row = newRow
 
     @position.column = newColumn
-    @cursorMoved(oldPosition)
 
   moveRight: (delta=1) ->
     oldPosition = @position.copy()
+    @moveRightInRange(delta)
+    @cursorMoved(oldPosition)
+
+  moveRightInSelection: (delta=1) ->
+    return @moveRight() unless @selection.spanMoreThanOneCell()
+
+    oldPosition = @position.copy()
+    @moveRightInRange(delta, @selection.getRange())
+    @cursorMoved(oldPosition, false)
+
+  moveRightInRange: (delta=1, range=@tableEditor.getTableRange()) ->
     newColumn = @position.column + delta
-    if newColumn >= @tableEditor.getScreenColumnCount()
-      newColumn = 0
+    if newColumn >= range.end.column
+      newColumn = range.start.column
       newRow = @position.row + 1
-      newRow = 0 if newRow >= @tableEditor.getScreenRowCount()
+      newRow = range.start.row if newRow >= range.end.row
 
       @position.row = newRow
 
     @position.column = newColumn
-    @cursorMoved(oldPosition)
 
   moveToTop: ->
     @moveUp(@position.row)
@@ -124,6 +164,8 @@ class Cursor
     @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   cursorMoved: (oldPosition, resetSelection=true) ->
+    return if @position.isEqual(oldPosition)
+
     @selection.resetRangeOnCursor() if resetSelection
     eventObject = {
       cursor: this

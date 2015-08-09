@@ -9,8 +9,8 @@
 # https://atom.io/docs/latest/advanced/keymaps
 
 'atom-table-editor':
-  'tab': 'core:move-right'
-  'shift-tab': 'core:move-left'
+  'tab': 'table-edit:move-right-in-selection'
+  'shift-tab': 'table-edit:move-left-in-selection'
   'cmd-left': 'table-edit:move-to-beginning-of-line'
   'cmd-right': 'table-edit:move-to-end-of-line'
   'cmd-shift-right': 'table-edit:select-to-end-of-line'

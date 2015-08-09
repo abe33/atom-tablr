@@ -125,6 +125,148 @@ describe 'Cursor', ->
 
       expect(cursor.position).toEqual([1,2])
 
+  describe 'selection moves', ->
+    beforeEach ->
+      table = new Table
+
+      for n in [0..60]
+        table.addColumn "column_#{n}"
+
+      for r in [0..60]
+        row = []
+        row.push("cell_#{r}_#{c}") for c in [0..60]
+
+        table.addRow(row)
+
+      tableEditor = new TableEditor({table})
+      {displayTable} = tableEditor
+
+      cursor = new Cursor({tableEditor, position: new Point(30,30)})
+      selection = new Selection({
+        cursor, tableEditor,
+        range: new Range([28,28],[32,32])
+      })
+
+    describe '::moveLeftInSelection', ->
+      it 'moves the cursor to the left', ->
+        cursor.moveLeftInSelection()
+
+        expect(cursor.position).toEqual([30,29])
+
+      it 'does not reset the selection range', ->
+        cursor.moveLeftInSelection()
+
+        expect(selection.range).toEqual([[28,28], [32,32]])
+
+      describe 'when the selection spans only the cursor cell', ->
+        beforeEach ->
+          selection.resetRangeOnCursor()
+
+        it 'ignores the selection bounds', ->
+          cursor.moveLeftInSelection()
+
+          expect(cursor.position).toEqual([30,29])
+
+      describe 'when it goes outside the selection bounds', ->
+        it 'moves to the end of the previous selection row', ->
+          cursor.moveLeftInSelection()
+          cursor.moveLeftInSelection()
+          cursor.moveLeftInSelection()
+
+          expect(cursor.position).toEqual([29,31])
+
+        it 'moves to the end of the last selection row when it goes past the first row', ->
+          cursor.moveLeftInSelection() for n in [0..10]
+
+          expect(cursor.position).toEqual([31,31])
+
+    describe '::moveRightInSelection', ->
+      it 'moves the cursor to the right', ->
+        cursor.moveRightInSelection()
+
+        expect(cursor.position).toEqual([30,31])
+
+      it 'does not reset the selection range', ->
+        cursor.moveRightInSelection()
+
+        expect(selection.range).toEqual([[28,28], [32,32]])
+
+      describe 'when the selection spans only the cursor cell', ->
+        beforeEach ->
+          selection.resetRangeOnCursor()
+
+        it 'ignores the selection bounds', ->
+          cursor.moveRightInSelection()
+
+          expect(cursor.position).toEqual([30,31])
+
+      describe 'when it goes outside the selection bounds', ->
+        it 'moves to the end of the previous selection row', ->
+          cursor.moveRightInSelection()
+          cursor.moveRightInSelection()
+
+          expect(cursor.position).toEqual([31,28])
+
+        it 'moves to the end of the last selection row when it goes past the first row', ->
+          cursor.moveRightInSelection() for n in [0..5]
+
+          expect(cursor.position).toEqual([28,28])
+
+    describe '::moveUpInSelection', ->
+      it 'moves the cursor to the top', ->
+        cursor.moveUpInSelection()
+
+        expect(cursor.position).toEqual([29,30])
+
+      it 'does not reset the selection range', ->
+        cursor.moveUpInSelection()
+
+        expect(selection.range).toEqual([[28,28], [32,32]])
+
+      describe 'when the selection spans only the cursor cell', ->
+        beforeEach ->
+          selection.resetRangeOnCursor()
+
+        it 'ignores the selection bounds', ->
+          cursor.moveUpInSelection()
+
+          expect(cursor.position).toEqual([29,30])
+
+      describe 'when it goes outside the selection bounds', ->
+        it 'moves to the end of the selection column row', ->
+          cursor.moveUpInSelection()
+          cursor.moveUpInSelection()
+          cursor.moveUpInSelection()
+
+          expect(cursor.position).toEqual([31,30])
+
+    describe '::moveDownInSelection', ->
+      it 'moves the cursor to the top', ->
+        cursor.moveDownInSelection()
+
+        expect(cursor.position).toEqual([31,30])
+
+      it 'does not reset the selection range', ->
+        cursor.moveDownInSelection()
+
+        expect(selection.range).toEqual([[28,28], [32,32]])
+
+      describe 'when the selection spans only the cursor cell', ->
+        beforeEach ->
+          selection.resetRangeOnCursor()
+
+        it 'ignores the selection bounds', ->
+          cursor.moveDownInSelection()
+
+          expect(cursor.position).toEqual([31,30])
+
+      describe 'when it goes outside the selection bounds', ->
+        it 'moves to the end of the selection column row', ->
+          cursor.moveDownInSelection()
+          cursor.moveDownInSelection()
+
+          expect(cursor.position).toEqual([28,30])
+
   describe 'page moves', ->
     beforeEach ->
       table = new Table

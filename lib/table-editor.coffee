@@ -123,6 +123,12 @@ class TableEditor
 
   getColumnName: (index) -> columnName(index)
 
+  getTableRange: ->
+    Range.fromObject([
+      [0,0]
+      [@getScreenRowCount(),@getScreenColumnCount()]
+    ])
+
   getRowRange: (row) ->
     Range.fromObject([
       [row, 0]
@@ -394,26 +400,50 @@ class TableEditor
         positions[position] = true
     return
 
-  moveUp: (delta=1) -> @moveCursors (cursor) -> cursor.moveUp(delta)
+  moveUp: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveUp(delta)
 
-  moveDown: (delta=1) -> @moveCursors (cursor) -> cursor.moveDown(delta)
+  moveDown: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveDown(delta)
 
-  moveLeft: (delta=1) -> @moveCursors (cursor) -> cursor.moveLeft(delta)
+  moveLeft: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveLeft(delta)
 
-  moveRight: (delta=1) -> @moveCursors (cursor) -> cursor.moveRight(delta)
+  moveRight: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveRight(delta)
 
-  moveToTop: -> @moveCursors (cursor) -> cursor.moveToTop()
+  moveUpInSelection: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveUpInSelection(delta)
 
-  moveToBottom: -> @moveCursors (cursor) -> cursor.moveToBottom()
+  moveDownInSelection: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveDownInSelection(delta)
 
-  moveToLeft: -> @moveCursors (cursor) -> cursor.moveToLeft()
+  moveLeftInSelection: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveLeftInSelection(delta)
 
-  moveToRight: -> @moveCursors (cursor) -> cursor.moveToRight()
+  moveRightInSelection: (delta=1) ->
+    @moveCursors (cursor) -> cursor.moveRightInSelection(delta)
 
-  pageUp: -> @moveCursors (cursor) -> cursor.pageUp()
+  moveToTop: ->
+    @moveCursors (cursor) -> cursor.moveToTop()
 
-  pageDown: -> @moveCursors (cursor) -> cursor.pageDown()
+  moveToBottom: ->
+    @moveCursors (cursor) -> cursor.moveToBottom()
 
-  pageLeft: -> @moveCursors (cursor) -> cursor.pageLeft()
+  moveToLeft: ->
+    @moveCursors (cursor) -> cursor.moveToLeft()
 
-  pageRight: -> @moveCursors (cursor) -> cursor.pageRight()
+  moveToRight: ->
+    @moveCursors (cursor) -> cursor.moveToRight()
+
+  pageUp: ->
+    @moveCursors (cursor) -> cursor.pageUp()
+
+  pageDown: ->
+    @moveCursors (cursor) -> cursor.pageDown()
+
+  pageLeft: ->
+    @moveCursors (cursor) -> cursor.pageLeft()
+
+  pageRight: ->
+    @moveCursors (cursor) -> cursor.pageRight()

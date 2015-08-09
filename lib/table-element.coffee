@@ -232,7 +232,10 @@ class TableElement extends HTMLElement
       @requestUpdate()
     subs.add @tableEditor.onDidAddCursor => @requestUpdate()
     subs.add @tableEditor.onDidRemoveCursor => @requestUpdate()
-    subs.add @tableEditor.onDidChangeCursorPosition => @requestUpdate()
+    subs.add @tableEditor.onDidChangeCursorPosition ({newPosition, oldPosition}) =>
+      @markDirtyCell(oldPosition)
+      @markDirtyCell(newPosition)
+      @requestUpdate()
     subs.add @tableEditor.onDidAddSelection ({selection}) =>
       @markDirtyRange(selection.getRange())
       @requestUpdate()
@@ -513,6 +516,22 @@ class TableElement extends HTMLElement
 
   moveDown: ->
     @tableEditor.moveDown()
+    @afterCursorMove()
+
+  moveLeftInSelection: ->
+    @tableEditor.moveLeftInSelection()
+    @afterCursorMove()
+
+  moveRightInSelection: ->
+    @tableEditor.moveRightInSelection()
+    @afterCursorMove()
+
+  moveUpInSelection: ->
+    @tableEditor.moveUpInSelection()
+    @afterCursorMove()
+
+  moveDownInSelection: ->
+    @tableEditor.moveDownInSelection()
     @afterCursorMove()
 
   moveToTop: ->
@@ -1260,6 +1279,10 @@ atom.commands.add 'atom-table-editor',
   'core:select-left': -> @expandSelectionLeft()
   'core:select-up': -> @expandSelectionUp()
   'core:select-down': -> @expandSelectionDown()
+  'table-edit:move-left-in-selection': -> @moveLeftInSelection()
+  'table-edit:move-right-in-selection': -> @moveRightInSelection()
+  'table-edit:move-up-in-selection': -> @moveUpInSelection()
+  'table-edit:move-down-in-selection': -> @moveDownInSelection()
   'table-edit:select-to-end-of-line': -> @expandSelectionToEndOfLine()
   'table-edit:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
   'table-edit:select-to-end-of-table': -> @expandSelectionToEndOfTable()
