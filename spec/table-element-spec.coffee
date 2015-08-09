@@ -181,6 +181,15 @@ describe 'tableElement', ->
       it 'returns 8', ->
         expect(tableElement.getLastVisibleRow()).toEqual(8)
 
+  describe 'when the scrollPastEnd setting is enabled', ->
+    beforeEach ->
+      atom.config.set('table-edit.scrollPastEnd', true)
+      nextAnimationFrame()
+
+    it 'increases the dimensions of the cells container', ->
+      expect(tableElement.tableCells.offsetHeight).toBeCloseTo(2000 + tableElement.tableRows.offsetHeight - 60)
+      expect(tableElement.tableCells.offsetWidth).toBeCloseTo(300 + tableElement.tableRows.offsetWidth - 100)
+
   describe 'once rendered', ->
     beforeEach ->
       cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="0"]')

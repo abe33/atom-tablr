@@ -138,6 +138,8 @@ class TableElement extends HTMLElement
         @requestUpdate() if @attached
       'table-edit.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
+      'table-edit.scrollPastEnd': (@scrollPastEnd) =>
+        @requestUpdate() if @attached
 
   observeConfig: (configs) ->
     for config, callback of configs
@@ -1151,15 +1153,24 @@ class TableElement extends HTMLElement
     endUpdate()
 
   updateWidthAndHeight: ->
+    width = @tableEditor.getContentWidth()
+    height = @tableEditor.getContentHeight()
+
+    if @scrollPastEnd
+      columnWidth = @tableEditor.getScreenColumnWidth()
+      rowHeight = @tableEditor.getRowHeight()
+      width = Math.max(columnWidth, width + @tableRows.offsetWidth - columnWidth)
+      height = Math.max(rowHeight * 3, height + @tableRows.offsetHeight - rowHeight * 3)
+
     @tableCells.style.cssText = """
-    height: #{@tableEditor.getContentHeight()}px;
-    width: #{@tableEditor.getContentWidth()}px;
+    height: #{height}px;
+    width: #{width}px;
     """
     @tableGutter.style.cssText = """
-    height: #{@tableEditor.getContentHeight()}px;
+    height: #{height}px;
     """
     @tableHeaderCells.style.cssText = """
-    width: #{@tableEditor.getContentWidth()}px;
+    width: #{width}px;
     """
 
     @tableGutterFiller.textContent = @tableHeaderFiller.textContent = @tableEditor.getScreenRowCount()

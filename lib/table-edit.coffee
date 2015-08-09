@@ -13,6 +13,9 @@ module.exports =
     scrollSpeedDuringDrag:
       type: 'integer'
       default: 20
+    scrollPastEnd:
+      type: 'boolean'
+      default: false
 
     rowHeight:
       type: 'integer'
