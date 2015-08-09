@@ -1271,11 +1271,13 @@ class TableElement extends HTMLElement
 #    ##    ## ##     ## ##     ##
 #     ######  ##     ## ########
 
+preventAndStop = (f) -> (e) ->
+  f.call(this, e)
+  e.stopImmediatePropagation()
+  e.preventDefault()
+
 atom.commands.add 'atom-table-editor',
-  'core:save': (e) ->
-    @tableEditor.save()
-    e.stopImmediatePropagation()
-    e.preventDefault()
+  'core:save': preventAndStop (e) -> @tableEditor.save()
   'core:confirm': -> @startCellEdit()
   'core:copy': -> @tableEditor.copySelectedCells()
   'core:cut': -> @tableEditor.cutSelectedCells()
