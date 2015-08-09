@@ -13,7 +13,7 @@ describe 'Cursor', ->
     atom.config.set 'table-edit.minimuColumnWidth', 10
     atom.config.set 'table-edit.rowHeight', 20
     atom.config.set 'table-edit.minimumRowHeight', 10
-    atom.config.set 'table-edit.pageMovesAmount', 3
+    atom.config.set 'table-edit.pageMovesAmount', 20
 
     table = new Table
 
@@ -125,14 +125,69 @@ describe 'Cursor', ->
 
       expect(cursor.position).toEqual([1,2])
 
-  xdescribe '::pageUp', ->
-    it 'moves the cursor by the amount of page moves', ->
+  describe 'page moves', ->
+    beforeEach ->
+      table = new Table
 
-  xdescribe '::pageDown', ->
-    it 'moves the cursor by the amount of page moves', ->
+      for n in [0..60]
+        table.addColumn "column_#{n}"
 
-  xdescribe '::pageLeft', ->
-    it 'moves the cursor by the amount of page moves', ->
+      for r in [0..60]
+        row = []
+        row.push("cell_#{r}_#{c}") for c in [0..60]
 
-  xdescribe '::pageRight', ->
-    it 'moves the cursor by the amount of page moves', ->
+        table.addRow(row)
+
+      tableEditor = new TableEditor({table})
+      {displayTable} = tableEditor
+
+      cursor = new Cursor({tableEditor, position: new Point(30,30)})
+      selection = new Selection({cursor, tableEditor})
+
+    describe '::pageUp', ->
+      it 'moves the cursor by the amount of page moves', ->
+        cursor.pageUp()
+
+        expect(cursor.position).toEqual([10,30])
+
+      it 'stops at the first line when going beyond top', ->
+        cursor.pageUp()
+        cursor.pageUp()
+
+        expect(cursor.position).toEqual([0,30])
+
+    describe '::pageDown', ->
+      it 'moves the cursor by the amount of page moves', ->
+        cursor.pageDown()
+
+        expect(cursor.position).toEqual([50,30])
+
+      it 'stops at the last line when going beyond bottom', ->
+        cursor.pageDown()
+        cursor.pageDown()
+
+        expect(cursor.position).toEqual([60,30])
+
+    describe '::pageLeft', ->
+      it 'moves the cursor by the amount of page moves', ->
+        cursor.pageLeft()
+
+        expect(cursor.position).toEqual([30,10])
+
+      it 'stops at the first column when going beyond left', ->
+        cursor.pageLeft()
+        cursor.pageLeft()
+
+        expect(cursor.position).toEqual([30,0])
+
+    describe '::pageRight', ->
+      it 'moves the cursor by the amount of page moves', ->
+        cursor.pageRight()
+
+        expect(cursor.position).toEqual([30,50])
+
+      it 'stops at the last column when going beyond right', ->
+        cursor.pageRight()
+        cursor.pageRight()
+
+        expect(cursor.position).toEqual([30,60])
