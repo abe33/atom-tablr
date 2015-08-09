@@ -304,24 +304,11 @@ class TableElement extends HTMLElement
 
   getRowResizeRuler: -> @rowRuler
 
-  insertRowBefore: ->
-    {column, row} = @tableEditor.getCursorPosition()
-    newRowIndex = @tableEditor.screenRowToModelRow(@row)
+  insertRowBefore: -> @tableEditor.insertRowBefore() unless @readOnly
 
-    @tableEditor.addRowAt(newRowIndex)
+  insertRowAfter: -> @tableEditor.insertRowAfter() unless @readOnly
 
-    @tableEditor.setCursorAtScreenPosition([newRowIndex, column])
-
-  insertRowAfter: ->
-    {column, row} = @tableEditor.getCursorPosition()
-    newRowIndex = @tableEditor.screenRowToModelRow(row) + 1
-    @tableEditor.addRowAt(newRowIndex)
-
-    @tableEditor.setCursorAtScreenPosition([newRowIndex, column])
-
-  deleteCursorRow: ->
-    {column, row} = @tableEditor.getCursorPosition()
-    @tableEditor.removeScreenRowAt(@tableEditor.screenRowToModelRow(row))
+  deleteRowAtCursor: -> @tableEditor.deleteRowAtCursor() unless @readOnly
 
   getFirstVisibleRow: ->
     @tableEditor.getScreenRowIndexAtPixelPosition(@getRowsScrollContainer().scrollTop)
@@ -504,6 +491,16 @@ class TableElement extends HTMLElement
   #    ##       ##     ## ##  ####    ##    ##   ##   ##     ## ##
   #    ##    ## ##     ## ##   ###    ##    ##    ##  ##     ## ##
   #     ######   #######  ##    ##    ##    ##     ##  #######  ########
+
+  save: -> @tableEditor.save()
+
+  copySelectedCells: -> @tableEditor.copySelectedCells()
+
+  cutSelectedCells: -> @tableEditor.cutSelectedCells()
+
+  pasteClipboard: -> @tableEditor.pasteClipboard()
+
+  delete: -> tableEditor.delete()
 
   focus: -> @hiddenInput.focus() unless @hasFocus()
 
@@ -1279,14 +1276,14 @@ preventAndStop = (f) -> (e) ->
   e.preventDefault()
 
 atom.commands.add 'atom-table-editor',
-  'core:save': preventAndStop (e) -> @tableEditor.save()
+  'core:save': preventAndStop (e) -> @save()
   'core:confirm': -> @startCellEdit()
-  'core:copy': -> @tableEditor.copySelectedCells()
-  'core:cut': -> @tableEditor.cutSelectedCells()
-  'core:paste': -> @tableEditor.pasteClipboard()
+  'core:copy': -> @copySelectedCells()
+  'core:cut': -> @cutSelectedCells()
+  'core:paste': -> @pasteClipboard()
   'core:undo': -> @tableEditor.undo()
   'core:redo': -> @tableEditor.redo()
-  'core:backspace': -> @tableEditor.delete()
+  'core:backspace': -> @delete()
   'core:move-left': -> @moveLeft()
   'core:move-right': -> @moveRight()
   'core:move-up': -> @moveUp()
@@ -1313,7 +1310,7 @@ atom.commands.add 'atom-table-editor',
   'table-edit:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
   'table-edit:insert-row-before': -> @insertRowBefore()
   'table-edit:insert-row-after': -> @insertRowAfter()
-  'table-edit:delete-row': -> @deleteCursorRow()
+  'table-edit:delete-row': -> @deleteRowAtCursor()
   'table-edit:insert-column-before': -> @insertColumnBefore()
   'table-edit:insert-column-after': -> @insertColumnAfter()
   'table-edit:delete-column': -> @deleteCursorColumn()

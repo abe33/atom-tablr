@@ -173,9 +173,28 @@ class TableEditor
       @cursorSubscriptions.get(selection).dispose()
       @cursorSubscriptions.delete(selection)
 
+  insertRowBefore: ->
+    {column, row} = @getCursorPosition()
+    newRowIndex = @screenRowToModelRow(@row)
+
+    @addRowAt(newRowIndex)
+
+    @setCursorAtScreenPosition([newRowIndex, column])
+
+  insertRowAfter: ->
+    {column, row} = @getCursorPosition()
+    newRowIndex = @screenRowToModelRow(row) + 1
+    @addRowAt(newRowIndex)
+
+    @setCursorAtScreenPosition([newRowIndex, column])
+
   delete: ->
     @table.batchTransaction =>
       selection.delete() for selection in @getSelections()
+
+  deleteRowAtCursor: ->
+    {column, row} = @getCursorPosition()
+    @removeScreenRowAt(@screenRowToModelRow(row))
 
   ##     ######   #######  ########  ##    ##
   ##    ##    ## ##     ## ##     ##  ##  ##

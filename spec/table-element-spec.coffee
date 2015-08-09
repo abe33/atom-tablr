@@ -1117,6 +1117,13 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenRowHeightAt(0)).toEqual(tableEditor.getRowHeight())
 
+    describe 'when the read-only attribute is set', ->
+      it 'does insert a new row before the active row', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.insertRowBefore()
+
+        expect(tableEditor.getScreenRow(0)).not.toEqual([undefined, undefined, undefined])
+
   describe 'table-edit:insert-row-after', ->
     it 'inserts a new row after the active row', ->
       tableElement.insertRowAfter()
@@ -1134,14 +1141,21 @@ describe 'tableElement', ->
       tableElement.insertRowAfter()
       expect(tableEditor.getCursorPosition()).toEqual([2,1])
 
+    describe 'when the read-only attribute is set', ->
+      it 'does insert a new row after the active row', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.insertRowAfter()
+
+        expect(tableEditor.getScreenRowCount()).toEqual(100)
+
   describe 'table-edit:delete-row', ->
     it 'deletes the current active row', ->
-      tableElement.deleteCursorRow()
+      tableElement.deleteRowAtCursor()
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
 
     it 'moves the cursor on the remaining first row', ->
-      tableElement.deleteCursorRow()
+      tableElement.deleteRowAtCursor()
 
       expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
 
@@ -1151,11 +1165,18 @@ describe 'tableElement', ->
         tableEditor.onDidChange(spy)
 
         tableElement.moveToBottom()
-        tableElement.deleteCursorRow()
+        tableElement.deleteRowAtCursor()
 
         waitsFor -> spy.callCount > 0
         runs ->
           expect(tableEditor.getCursorScreenPosition()).toEqual([98,0])
+
+    describe 'when the read-only attribute is set', ->
+      it 'does delete the active row', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.deleteRowAtCursor()
+
+        expect(tableEditor.getScreenRowCount()).toEqual(100)
 
   describe 'table-edit:insert-column-before', ->
     it 'inserts a new column before the active column', ->
