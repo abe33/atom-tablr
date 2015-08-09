@@ -61,6 +61,8 @@ class TableElement extends HTMLElement
     @headerCells = {}
     @gutterCells = {}
 
+    @readOnly = @hasAttribute('read-only')
+
     @subscriptions = new CompositeDisposable
 
     @subscribeToContent()
@@ -70,12 +72,15 @@ class TableElement extends HTMLElement
     @initHeaderCellsPool(TableHeaderCellElement, @tableHeaderCells)
     @initGutterCellsPool(TableGutterCellElement, @tableGutter)
 
+  attributeChangedCallback: (attrName, oldVal, newVal) ->
+    switch attrName
+      when 'read-only' then @readOnly = newVal?
+
   subscribeToContent: ->
     @subscriptions.add @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
-          @startCellEdit()
-          @editor.setText(e.data)
+          @startCellEdit(e.data)
 
     @subscriptions.add @subscribeTo this,
       'mousedown': stopPropagationAndDefault (e) => @focus()
@@ -583,7 +588,9 @@ class TableElement extends HTMLElement
 
   isEditing: -> @editing
 
-  startCellEdit: =>
+  startCellEdit: (initialData) ->
+    return if @readOnly
+
     @createTextEditor() unless @editor?
 
     @subscribeToCellTextEditor(@editor)
@@ -610,6 +617,8 @@ class TableElement extends HTMLElement
 
     @editor.getBuffer().history.clearUndoStack()
     @editor.getBuffer().history.clearRedoStack()
+
+    @editor.setText(initialData) if initialData?
 
   confirmCellEdit: ->
     @stopEdit()

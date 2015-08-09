@@ -1185,7 +1185,6 @@ describe 'tableElement', ->
   #    ##       ##     ##  ##     ##
   #    ######## ########  ####    ##
 
-
   describe 'pressing a key when the table view has focus', ->
     beforeEach ->
       textInput(tableElement.hiddenInput, 'x')
@@ -1322,6 +1321,36 @@ describe 'tableElement', ->
 
       it 'closes the editor', ->
         expect(tableElement.isEditing()).toBeFalsy()
+
+  describe 'when the element has the read-only attribute', ->
+    beforeEach ->
+      tableElement.setAttribute('read-only', true)
+
+    describe 'pressing a key when the table view has focus', ->
+      beforeEach ->
+        textInput(tableElement.hiddenInput, 'x')
+
+      it 'does not start the edit mode', ->
+        expect(tableElement.isEditing()).toBeFalsy()
+        expect(tableElement.querySelector('atom-text-editor')).not.toExist()
+
+    describe 'double clicking on a cell', ->
+      beforeEach ->
+        cell = tableShadowRoot.querySelector('atom-table-cell:last-child')
+        dblclick(cell)
+
+      it 'does not start the edit mode', ->
+        expect(tableElement.isEditing()).toBeFalsy()
+        expect(tableElement.querySelector('atom-text-editor')).not.toExist()
+
+    describe 'core:confirm', ->
+      beforeEach ->
+        atom.commands.dispatch(tableElement, 'core:confirm')
+
+      it 'does not start the edit mode', ->
+        expect(tableElement.isEditing()).toBeFalsy()
+        expect(tableElement.querySelector('atom-text-editor')).not.toExist()
+
 
   #     ######  ######## ##       ########  ######  ########
   #    ##    ## ##       ##       ##       ##    ##    ##
