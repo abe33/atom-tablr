@@ -630,6 +630,8 @@ class TableElement extends HTMLElement
       @tableEditor.setValueAtScreenPosition(position, newValue)
 
   startColumnEdit: ({target, pageX, pageY}) =>
+    return if @readOnly
+
     @createTextEditor() unless @editor?
 
     @subscribeToColumnTextEditor(@editor)

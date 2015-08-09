@@ -609,7 +609,6 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('table-edit.minimumColumnWidth'))
 
-
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
@@ -680,6 +679,21 @@ describe 'tableElement', ->
           expect(tableElement.isEditing()).toBeFalsy()
           expect(tableElement.moveLeft).toHaveBeenCalled()
           expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
+
+    describe 'when the element has the read-only attribute', ->
+      beforeEach ->
+        tableElement.setAttribute('read-only', true)
+
+      describe 'clicking on a header cell edit action button', ->
+        beforeEach ->
+          cell = header.querySelector('atom-table-header-cell')
+          action = cell.querySelector('.column-edit-action')
+
+          click(action)
+
+        it 'starts the edition of the column name', ->
+          expect(tableElement.isEditing()).toBeFalsy()
+          expect(tableElement.querySelector('atom-text-editor')).not.toExist()
 
   #     ######   ##     ## ######## ######## ######## ########
   #    ##    ##  ##     ##    ##       ##    ##       ##     ##
