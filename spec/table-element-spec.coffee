@@ -24,6 +24,11 @@ stylesheet = "
     padding: 0;
   }
 
+  atom-table-editor::shadow atom-table-gutter-cell {
+    border: none;
+    padding: 0;
+  }
+
   atom-table-editor::shadow .selection-box-handle {
     width: 1px;
     height: 1px;
