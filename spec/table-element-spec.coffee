@@ -1233,6 +1233,39 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
+  describe 'core:paste', ->
+    beforeEach ->
+      atom.clipboard.write('foo')
+
+    it 'deletes the current active column', ->
+      tableElement.pasteClipboard()
+
+      expect(tableEditor.getScreenRow(0)).toEqual(['foo', 0, 'yes'])
+
+    describe 'when the read-only attribute is set', ->
+      it 'does not delete the column', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.pasteClipboard()
+
+        expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
+
+  describe 'core:cut', ->
+    beforeEach ->
+      atom.clipboard.write('foo')
+
+    it 'deletes the current active column', ->
+      tableElement.cutSelectedCells()
+
+      expect(tableEditor.getScreenRow(0)).toEqual([undefined, 0, 'yes'])
+
+    describe 'when the read-only attribute is set', ->
+      it 'does not delete the column', ->
+        tableElement.setAttribute('read-only', true)
+        tableElement.cutSelectedCells()
+
+        expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
+        expect(atom.clipboard.read()).toEqual('row0')
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

@@ -491,9 +491,13 @@ class TableElement extends HTMLElement
 
   copySelectedCells: -> @tableEditor.copySelectedCells()
 
-  cutSelectedCells: -> @tableEditor.cutSelectedCells()
+  cutSelectedCells: ->
+    if @readOnly
+      @tableEditor.copySelectedCells()
+    else
+      @tableEditor.cutSelectedCells()
 
-  pasteClipboard: -> @tableEditor.pasteClipboard()
+  pasteClipboard: -> @tableEditor.pasteClipboard() unless @readOnly
 
   delete: -> tableEditor.delete()
 
