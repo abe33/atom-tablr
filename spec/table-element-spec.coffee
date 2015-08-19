@@ -1774,11 +1774,13 @@ describe 'tableElement', ->
         expect(tableElement.getRowsContainer().scrollTop).toBeLessThan(300)
 
     it 'scrolls the view when the selection reach the last column', ->
-      tableElement.setColumnsWidths([500, 500, 500])
+      tableEditor.addColumn('rab')
+      tableEditor.addColumn('bar')
+      tableElement.setColumnsWidths([500, 500, 500, 500, 500])
       nextAnimationFrame()
 
       startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="1"]')
+      endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="2"]')
 
       mousedown(startCell)
       mousemove(endCell)
