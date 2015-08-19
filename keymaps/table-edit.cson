@@ -7,24 +7,43 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
-
 'atom-table-editor':
   'tab': 'table-edit:move-right-in-selection'
   'shift-tab': 'table-edit:move-left-in-selection'
+
+'.platform-darwin atom-table-editor':
   'cmd-left': 'table-edit:move-to-beginning-of-line'
   'cmd-right': 'table-edit:move-to-end-of-line'
   'cmd-shift-right': 'table-edit:select-to-end-of-line'
   'cmd-shift-left': 'table-edit:select-to-beginning-of-line'
   'cmd-shift-up': 'table-edit:select-to-beginning-of-table'
   'cmd-shift-down': 'table-edit:select-to-end-of-table'
-  'cmd-alt-up': 'table-edit:insert-row-before'
-  'cmd-alt-down': 'table-edit:insert-row-after'
-  'cmd-alt-backspace': 'table-edit:delete-row'
-  'cmd-alt-ctrl-left': 'table-edit:insert-column-before'
-  'cmd-alt-ctrl-right': 'table-edit:insert-column-after'
-  'cmd-alt-ctrl-backspace': 'table-edit:delete-column'
+  'cmd-alt-n up': 'table-edit:insert-row-before'
+  'cmd-alt-n down': 'table-edit:insert-row-after'
+  'cmd-alt-n left': 'table-edit:insert-column-before'
+  'cmd-alt-n right': 'table-edit:insert-column-after'
+  'cmd-alt-backspace left': 'table-edit:delete-row'
+  'cmd-alt-backspace right': 'table-edit:delete-row'
+  'cmd-alt-backspace up': 'table-edit:delete-column'
+  'cmd-alt-backspace down': 'table-edit:delete-column'
 
-'atom-table-editor atom-text-editor:not([mini])':
+'.platform-win32, .platform-linux':
+  'ctrl-left': 'table-edit:move-to-beginning-of-line'
+  'ctrl-right': 'table-edit:move-to-end-of-line'
+  'ctrl-shift-right': 'table-edit:select-to-end-of-line'
+  'ctrl-shift-left': 'table-edit:select-to-beginning-of-line'
+  'ctrl-shift-up': 'table-edit:select-to-beginning-of-table'
+  'ctrl-shift-down': 'table-edit:select-to-end-of-table'
+  'ctrl-alt-n up': 'table-edit:insert-row-before'
+  'ctrl-alt-n down': 'table-edit:insert-row-after'
+  'ctrl-alt-n left': 'table-edit:insert-column-before'
+  'ctrl-alt-n right': 'table-edit:insert-column-after'
+  'ctrl-alt-backspace left': 'table-edit:delete-row'
+  'ctrl-alt-backspace right': 'table-edit:delete-row'
+  'ctrl-alt-backspace up': 'table-edit:delete-column'
+  'ctrl-alt-backspace down': 'table-edit:delete-column'
+
+'atom-table-editor atom-text-editor':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
   'tab': 'table-edit:move-right'
