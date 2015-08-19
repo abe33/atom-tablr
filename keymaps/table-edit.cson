@@ -46,6 +46,6 @@
 'atom-table-editor atom-text-editor:not([mini])':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
-  'tab': 'table-edit:move-right'
-  'shift-tab': 'table-edit:move-left'
+  'tab': 'table-edit:move-right-in-selection'
+  'shift-tab': 'table-edit:move-left-in-selection'
   'ctrl-tab': 'editor:indent'
