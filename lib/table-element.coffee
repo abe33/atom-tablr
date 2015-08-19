@@ -499,7 +499,7 @@ class TableElement extends HTMLElement
 
   pasteClipboard: -> @tableEditor.pasteClipboard() unless @readOnly
 
-  delete: -> tableEditor.delete()
+  delete: -> @tableEditor.delete()
 
   focus: -> @hiddenInput.focus() unless @hasFocus()
 
