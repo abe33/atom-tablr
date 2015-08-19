@@ -968,13 +968,21 @@ class TableElement extends HTMLElement
   scrollDuringDrag: (row, column) ->
     container = @getRowsScrollContainer()
 
-    if row >= @getLastVisibleRow() - 1
+    scrollTop = container.scrollTop
+    rowOffset = @tableEditor.getScreenRowOffsetAt(row)
+    rowHeight = @tableEditor.getScreenRowHeightAt(row)
+
+    if row >= @getLastVisibleRow() - 1 and rowOffset + rowHeight >= scrollTop + @height - @height / 5
       container.scrollTop += atom.config.get('table-edit.scrollSpeedDuringDrag')
     else if row <= @getFirstVisibleRow() + 1
       container.scrollTop -= atom.config.get('table-edit.scrollSpeedDuringDrag')
 
     if column?
-      if column >= @getLastVisibleColumn() - 1
+      scrollLeft = container.scrollLeft
+      columnOffset = @tableEditor.getScreenColumnOffsetAt(row)
+      columnWidth = @tableEditor.getScreenColumnWidthAt(row)
+
+      if column >= @getLastVisibleColumn() - 1  and columnOffset + columnWidth >= scrollLeft + @width - @width / 5
         container.scrollLeft += atom.config.get('table-edit.scrollSpeedDuringDrag')
       else if column <= @getFirstVisibleColumn() + 1
         container.scrollLeft -= atom.config.get('table-edit.scrollSpeedDuringDrag')
