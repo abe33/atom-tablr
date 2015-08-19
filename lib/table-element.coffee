@@ -687,6 +687,13 @@ class TableElement extends HTMLElement
         e.stopImmediatePropagation()
         return false
 
+    @textEditorSubscriptions.add @subscribeTo @editorElement,
+      'click': (e) =>
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        e.preventDefault()
+        @editorElement.focus()
+
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
