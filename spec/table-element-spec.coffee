@@ -1096,9 +1096,12 @@ describe 'tableElement', ->
 
   describe 'table-edit:insert-row-before', ->
     it 'inserts a new row before the active row', ->
+      tableElement.moveDown()
+      tableElement.moveDown()
+      tableElement.moveDown()
       tableElement.insertRowBefore()
 
-      expect(tableEditor.getScreenRow(0)).toEqual([undefined, undefined, undefined])
+      expect(tableEditor.getScreenRow(3)).toEqual([undefined, undefined, undefined])
 
     it 'refreshes the rows offsets', ->
       tableEditor.setScreenRowHeightAt(0, 60)

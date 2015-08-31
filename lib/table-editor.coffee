@@ -177,7 +177,7 @@ class TableEditor
 
   insertRowBefore: ->
     {column, row} = @getCursorPosition()
-    newRowIndex = @screenRowToModelRow(@row)
+    newRowIndex = @screenRowToModelRow(row)
 
     @addRowAt(newRowIndex)
 
