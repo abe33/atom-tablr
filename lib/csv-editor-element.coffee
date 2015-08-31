@@ -40,6 +40,8 @@ class CSVEditorElement extends HTMLElement
     @subscriptions.dispose()
     @model = null
 
+  focus: -> @tableElement?.focus()
+
   setModel: (@model) ->
     @form.setModel(@model.options)
     @subscriptions.add @model.onDidDestroy => @destroy()
@@ -49,10 +51,10 @@ class CSVEditorElement extends HTMLElement
 
       @innerHTML = ''
 
-      tableElement = atom.views.getView(editor)
-      @appendChild(tableElement)
+      @tableElement = atom.views.getView(editor)
+      @appendChild(@tableElement)
 
-      tableElement.focus()
+      @tableElement.focus()
 
       @subscriptions.dispose()
       @subscriptions = new CompositeDisposable

@@ -164,6 +164,14 @@ describe "CSVEditor", ->
         it 'leaves the table in a unmodified state', ->
           expect(tableEditor.isModified()).toBeFalsy()
 
+        it 'gives the focus to the table editor when it receive it', ->
+          tableElement = atom.views.getView(tableEditor)
+          spyOn(tableElement, 'focus')
+
+          csvEditorElement.focus()
+
+          expect(tableElement.focus).toHaveBeenCalled()
+
         it 'clears the csv editor content and replace it with a table element', ->
           waitsFor ->
             tableEditorElement = csvEditorElement.querySelector('atom-table-editor')
