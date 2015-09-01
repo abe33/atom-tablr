@@ -1,6 +1,10 @@
 @import "ui-variables";
 @import "buttons";
 
+@double-padding: @component-padding * 2;
+@half-padding: @component-padding / 2;
+@two-third-padding: (@component-padding / 3) * 2;
+
 .flex-container {
   position: relative;
   width: 100%;
@@ -502,7 +506,6 @@ atom-csv-editor {
   atom-csv-preview {
     width: 100%;
     display: block;
-    padding: 0 20px 20px;
     height: 140px;
 
     .table-wrapper {
@@ -515,7 +518,7 @@ atom-csv-editor {
 
     .alert {
       display: inline-block;
-      margin-top: 20px;
+      margin-top: @double-padding;
     }
 
     table {
@@ -524,9 +527,9 @@ atom-csv-editor {
 
       th, td {
         text-align: left;
-        padding: 6px 10px;
+        padding: 0.6em @component-padding;
         font-size: 1.2em;
-        padding: 2px 6px;
+        padding: 0.3em 0.6em;
         border-right: 1px solid @background-color-highlight;
         border-bottom: 1px solid @background-color-highlight;
 
@@ -538,11 +541,16 @@ atom-csv-editor {
       tr:last-child td {
         border-bottom: none;
       }
+
+      th {
+        font-weight: normal;
+        color: @text-color-highlight;
+      }
     }
   }
 
   .alert {
-    margin-top: 20px;
+    margin-top: @double-padding;
   }
 
   .settings-view {
@@ -551,9 +559,13 @@ atom-csv-editor {
     right: 0;
     top: 0;
     bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 @double-padding;
 
     .settings-panel > .setting-title {
       font-size: 1.4em;
+      margin-top: @component-padding * 2;
 
       &:first-child {
         font-size: 2em;
@@ -561,7 +573,7 @@ atom-csv-editor {
     }
 
     .settings-panel > .controls label {
-      margin: 10px 0;
+      margin: @component-padding 0;
     }
 
     label * {
@@ -598,7 +610,7 @@ atom-csv-editor {
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 20px 0;
+      padding: @double-padding 0;
     }
 
     .btn-group {
@@ -611,9 +623,6 @@ atom-csv-editor {
       }
     }
 
-    .btn + .control-group {
-      margin-top: 18px;
-    }
     .control-group {
       display: flex;
       align-items: center;
@@ -626,21 +635,25 @@ atom-csv-editor {
     }
     .control-group > .setting-title {
       flex: 1 1 0;
+      margin: 0;
     }
 
     .split-panel {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
+      margin-left: -@component-padding;
+      margin-right: -@component-padding;
 
       .panel {
-        padding: 20px;
+        padding: @double-padding @component-padding;
         flex: 1 1 0;
         min-width: 250px;
       }
 
       .controls > label:not(.btn) {
         padding: 0;
-        padding-right: 20px;
+        padding-right: @double-padding;
         margin: 0;
       }
     }
@@ -651,7 +664,7 @@ atom-csv-editor {
         align-items: stretch;
 
         .setting-title {
-          height: 24px;
+          line-height: 2em;
           flex: 1 0;
         }
       }
@@ -666,18 +679,18 @@ atom-csv-editor {
         .controls:first-child {
           flex-direction: row;
           display: flex;
-          margin-bottom: 10px;
+          margin-bottom: @two-third-padding;
           align-items: center;
 
           atom-text-editor {
-            width: 70px;
-            height: 24px;
+            width: 6em;
+            height: 2em;
           }
         }
       }
       &.with-radios {
         .setting-title {
-          margin-bottom: 10px;
+          margin-bottom: @two-third-padding;
         }
       }
     }

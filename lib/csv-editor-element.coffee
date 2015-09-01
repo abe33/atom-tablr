@@ -21,6 +21,7 @@ class CSVEditorElement extends HTMLElement
   createdCallback: ->
     @setAttribute 'tabindex', -1
     @subscriptions = new CompositeDisposable
+    @classList.add 'pane-item'
 
     @subscriptions.add @subscribeTo @form.openTextEditorButton,
       click: =>
