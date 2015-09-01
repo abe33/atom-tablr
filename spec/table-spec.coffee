@@ -195,8 +195,13 @@ describe 'Table', ->
     it 'is marked as modified', ->
       expect(table.isModified()).toBeTruthy()
 
-    it 'raises an exception when adding a column whose name already exist in table', ->
-      expect(-> table.addColumn('key')).toThrow()
+    describe 'when adding a column whose name already exist in table', ->
+      it 'does not raise an exception', ->
+        expect(-> table.addColumn('key')).not.toThrow()
+
+    describe 'when adding a column whose name is undefined', ->
+      it 'does not raise an exception', ->
+        expect(-> table.addColumn('key')).not.toThrow()
 
     describe 'when there is already rows in the table', ->
       beforeEach ->

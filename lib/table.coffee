@@ -165,10 +165,6 @@ class Table
   addColumnAt: (index, column, transaction=true, event=true) ->
     throw new Error "Can't add column to a destroyed table" if @isDestroyed()
     throw new Error "Can't add column #{column} at index #{index}" if index < 0
-    throw new Error "Can't add column without a name" unless column?
-
-    if column in @columns
-      throw new Error "Can't add column #{column} as one already exist"
 
     @extendExistingRows(column, index)
 
