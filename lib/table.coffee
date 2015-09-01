@@ -454,7 +454,7 @@ class Table
     for position,i in positions
       position = Point.fromObject(position)
       oldValues.push @rows[position.row]?[position.column]
-      @rows[position.row]?[position.column] = values[i]
+      @rows[position.row]?[position.column] = values[i % values.length]
 
     @emitModifiedStatusChange()
     @emitter.emit 'did-change-cell-value', {

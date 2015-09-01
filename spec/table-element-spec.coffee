@@ -1416,6 +1416,35 @@ describe 'tableElement', ->
       it 'closes the editor', ->
         expect(tableElement.isEditing()).toBeFalsy()
 
+  describe 'when there is many cursor', ->
+    [editor, editorElement] = []
+
+    beforeEach ->
+      tableEditor.setSelectedRanges([
+        [[0,0],[1,1]]
+        [[1,0],[2,1]]
+      ])
+      tableElement.startCellEdit()
+      editorElement = tableElement.querySelector('atom-text-editor')
+      editor = editorElement.model
+
+    describe 'core:confirm', ->
+      describe 'when the content of the editor has changed', ->
+        beforeEach ->
+          editor.setText('foobar')
+          atom.commands.dispatch(editorElement, 'core:confirm')
+
+        it 'closes the editor', ->
+          expect(tableShadowRoot.querySelectorAll('atom-text-editor').length).toEqual(0)
+
+        it 'gives the focus back to the table view', ->
+          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+
+        it 'changes the cells value', ->
+          expect(tableEditor.getCursors().length).toEqual(2)
+          for cursor in tableEditor.getCursors()
+            expect(cursor.getValue()).toEqual('foobar')
+
   describe 'when the element has the read-only attribute', ->
     beforeEach ->
       tableElement.setAttribute('read-only', true)

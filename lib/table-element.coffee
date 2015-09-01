@@ -628,12 +628,11 @@ class TableElement extends HTMLElement
 
   confirmCellEdit: ->
     @stopEdit()
-    cursor = @tableEditor.getLastCursor()
-    position = cursor.getPosition()
+    positions = @tableEditor.getCursors().map (c) -> c.getPosition()
 
     newValue = @editor.getText()
-    unless newValue is cursor.getValue()
-      @tableEditor.setValueAtScreenPosition(position, newValue)
+    unless newValue is @tableEditor.getLastCursor().getValue()
+      @tableEditor.setValuesAtScreenPositions(positions, [newValue])
 
   startColumnEdit: ({target, pageX, pageY}) =>
     return if @readOnly
