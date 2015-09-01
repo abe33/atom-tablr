@@ -1551,6 +1551,13 @@ describe 'tableElement', ->
           expect(selectionBox.offsetWidth).toBeCloseTo(firstCell.offsetWidth + lastCell.offsetWidth, -1)
           expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, -1)
 
+      describe 'core:cancel', ->
+        it 'does nothing', ->
+          originalRange = tableEditor.getLastSelection().getRange()
+          tableElement.resetSelections()
+
+          expect(tableEditor.getLastSelection().getRange()).toEqual(originalRange)
+
     describe 'when there is many selections', ->
       beforeEach ->
         tableEditor.setSelectedRanges([
@@ -1567,6 +1574,13 @@ describe 'tableElement', ->
 
         it 'removes the selection element', ->
           expect(tableShadowRoot.querySelectorAll('atom-table-editor-selection').length).toEqual(1)
+
+      describe 'core:cancel', ->
+        it 'resets all the selections to the last cursor range', ->
+          tableElement.resetSelections()
+
+          expect(tableEditor.getSelections().length).toEqual(1)
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,3]])
 
     describe 'core:select-right', ->
       it 'expands the selection by one cell on the right', ->

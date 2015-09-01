@@ -736,6 +736,9 @@ class TableElement extends HTMLElement
 
     @tableCells.appendChild(selectionElement)
 
+  resetSelections: ->
+    @tableEditor.setSelectedRange(@tableEditor.getLastSelection().getRange())
+
   expandSelectionRight: ->
     @tableEditor.expandRight()
     @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
@@ -1279,6 +1282,7 @@ preventAndStop = (f) -> (e) ->
 atom.commands.add 'atom-table-editor',
   'core:save': preventAndStop (e) -> @save()
   'core:confirm': -> @startCellEdit()
+  'core:cancel': -> @resetSelections()
   'core:copy': -> @copySelectedCells()
   'core:cut': -> @cutSelectedCells()
   'core:paste': -> @pasteClipboard()
