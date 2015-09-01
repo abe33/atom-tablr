@@ -82,9 +82,10 @@ class CSVEditor
 
   openCSV: ->
     new Promise (resolve, reject) =>
-      if CSVEditor.tableEditorForPath[@uriToOpen]?
+      if (previousEditor = CSVEditor.tableEditorForPath[@uriToOpen])? and previousEditor.table?
         {table, displayTable} = CSVEditor.tableEditorForPath[@uriToOpen]
         tableEditor = new TableEditor({table, displayTable})
+
         resolve(tableEditor)
       else
         fileContent = fs.readFileSync(@uriToOpen)

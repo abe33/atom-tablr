@@ -229,6 +229,31 @@ describe "CSVEditor", ->
               csvEditor.destroy()
               expect(table.isDestroyed()).toBeTruthy()
 
+            describe 'when a new table editor is opened', ->
+              beforeEach ->
+                secondCSVEditor.destroy()
+                csvEditor.destroy()
+
+                tableEditor = null
+                csvEditor = null
+
+                waitsForPromise ->
+                  atom.workspace.open(path.join(projectPath, 'sample.csv')).then (t) ->
+                    csvEditor = t
+                    csvEditorElement = atom.views.getView(csvEditor)
+
+                    csvEditor.onDidOpen ({editor}) ->
+                      tableEditor = editor
+
+                    tableEditorButton = csvEditorElement.form.openTableEditorButton
+                    click(tableEditorButton)
+
+                waitsFor -> tableEditor?
+
+              it 'returns a living editor', ->
+                expect(tableEditor.table.getColumnCount()).toEqual(3)
+                expect(tableEditor.table.getRowCount()).toEqual(3)
+
         describe 'closing the tab with pending changes', ->
           beforeEach ->
             tableEditor.addRow ['Bill', 45, 'male']
