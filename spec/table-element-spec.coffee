@@ -3,6 +3,7 @@ path = require 'path'
 Table = require '../lib/table'
 TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
+TableSelectionElement = require '../lib/table-selection-element'
 Column = require '../lib/display-column'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
@@ -61,6 +62,7 @@ describe 'tableElement', ->
 
   beforeEach ->
     TableElement.registerViewProvider()
+    TableSelectionElement.registerViewProvider()
 
     jasmineContent = document.body.querySelector('#jasmine-content')
 
@@ -1484,8 +1486,7 @@ describe 'tableElement', ->
 
     describe 'when the selection spans only one cell', ->
       it 'does not render the selection box', ->
-        expect(tableShadowRoot.querySelector('.selection-box').style.display).toEqual('none')
-        expect(tableShadowRoot.querySelector('.selection-box-handle').style.display).toEqual('none')
+        expect(tableShadowRoot.querySelector('atom-table-editor-selection').style.display).toEqual('none')
 
     describe 'when the selection spans many cells', ->
       [selectionBox, selectionBoxHandle] = []
@@ -1493,7 +1494,7 @@ describe 'tableElement', ->
       beforeEach ->
         tableEditor.setSelectedRange([[2,0],[4,3]])
         nextAnimationFrame()
-        selectionBox = tableShadowRoot.querySelector('.selection-box')
+        selectionBox = tableShadowRoot.querySelector('atom-table-editor-selection')
         selectionBoxHandle = tableShadowRoot.querySelector('.selection-box-handle')
 
       it 'renders the selection box', ->
@@ -1513,20 +1514,11 @@ describe 'tableElement', ->
         expect(selectionBox.offsetWidth).toEqual(300)
         expect(selectionBox.offsetHeight).toEqual(firstCell.offsetHeight + lastCell.offsetHeight)
 
-      it 'positions the selection box handle at the bottom right corner', ->
-        cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
-        lastCell = tableElement.getScreenCellAtPosition([3,2])
-        lastCellOffset = lastCell.getBoundingClientRect()
-        selectionBoxHandleOffset = selectionBoxHandle.getBoundingClientRect()
-
-        expect(selectionBoxHandleOffset.top).toBeCloseTo(lastCellOffset.bottom, -1)
-        expect(selectionBoxHandleOffset.left).toBeCloseTo(lastCellOffset.right, -1)
-
       it 'positions the selection box over the cells', ->
         tableEditor.setSelectedRange([[2,1],[4,3]])
         nextAnimationFrame()
 
-        selectionBox = tableShadowRoot.querySelector('.selection-box')
+        selectionBox = tableShadowRoot.querySelector('atom-table-editor-selection')
         cells = tableShadowRoot.querySelectorAll('atom-table-cell.selected')
         firstCell = tableElement.getScreenCellAtPosition([2,1])
         lastCell = tableElement.getScreenCellAtPosition([3,2])

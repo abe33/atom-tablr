@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
-[TableEditor, TableElement, CSVEditor, CSVEditorElement, url] = []
+[TableEditor, TableElement, TableSelectionElement, CSVEditor, CSVEditorElement, url] = []
 
 module.exports =
   config:
@@ -50,7 +50,9 @@ module.exports =
   activate: ({@pathOptions}) ->
     TableEditor ?= require './table-editor'
     TableElement ?= require './table-element'
+    TableSelectionElement ?= require './table-selection-element'
     TableElement.registerViewProvider()
+    TableSelectionElement.registerViewProvider()
 
     @subscriptions = new CompositeDisposable
 

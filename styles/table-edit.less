@@ -319,33 +319,36 @@ atom-table-editor {
     //   ##    ##  ##     ## ##       ##       ##    ##  ##    ##
     //   ##     ##  #######  ######## ######## ##     ##  ######
 
-    .selection-box {
+    atom-table-editor-selection {
+      display: block;
       position: absolute;
       pointer-events: none;
       border: 1px solid fadeout(@background-color-info, 50%);
       z-index: 2;
-    }
 
-    .selection-box-handle {
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      z-index: 2;
-      margin-top: -3px;
-      margin-left: -3px;
-      background: @background-color-info;
-
-      &:before {
-        content: '';
+      .selection-box-handle {
         position: absolute;
-        display: block;
-        top: -4px;
-        bottom: -4px;
-        left: -4px;
-        right: -4px;
-        cursor: nwse-resize;
+        width: 5px;
+        height: 5px;
+        z-index: 2;
+        background: @background-color-info;
+        right: -3px;
+        pointer-events: auto;
+        bottom: -3px;
+
+        &:before {
+          content: '';
+          position: absolute;
+          display: block;
+          top: -4px;
+          bottom: -4px;
+          left: -4px;
+          right: -4px;
+          cursor: nwse-resize;
+        }
       }
     }
+
     .ruler {
       position: absolute;
       display: none;

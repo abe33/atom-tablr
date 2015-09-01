@@ -39,10 +39,7 @@ class TableElement extends HTMLElement
     @div class: 'table-edit-body', outlet: 'body', =>
       @div class: 'table-edit-content', =>
         @div class: 'table-edit-rows', outlet: 'tableRows', =>
-          @div class: 'table-edit-rows-wrapper', outlet: 'tableCells', =>
-            @div class: 'selection-box', outlet: 'tableSelectionBox'
-            @div class: 'selection-box-handle', outlet: 'tableSelectionBoxHandle'
-
+          @div class: 'table-edit-rows-wrapper', outlet: 'tableCells'
         @div class: 'table-edit-gutter', =>
           @div class: 'table-edit-gutter-wrapper', outlet: 'tableGutter', =>
             @div class: 'table-edit-gutter-filler', outlet: 'tableGutterFiller'
@@ -271,6 +268,8 @@ class TableElement extends HTMLElement
       @clearGutterCells()
       @clearHeaderCells()
       @remove()
+
+    @addSelection(selection) for selection in @tableEditor.getSelections()
 
     @requestUpdate()
 
@@ -721,6 +720,11 @@ class TableElement extends HTMLElement
   #    ##    ## ##       ##       ##       ##    ##    ##
   #     ######  ######## ######## ########  ######     ##
 
+  addSelection: (selection) ->
+    selectionElement = atom.views.getView(selection)
+
+    @tableCells.appendChild(selectionElement)
+
   expandSelectionRight: ->
     @tableEditor.expandRight()
     @makeColumnVisible(@tableEditor.getLastSelection().getRange().end.column - 1)
@@ -1071,7 +1075,6 @@ class TableElement extends HTMLElement
 
     @updateWidthAndHeight()
     @updateScroll()
-    @updateSelection()
 
     endUpdate = =>
       @firstRenderedRow = firstRow
@@ -1200,33 +1203,6 @@ class TableElement extends HTMLElement
   updateScroll: ->
     @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
     @getGutter().scrollTop = @getRowsContainer().scrollTop
-
-  updateSelection: ->
-    if @tableEditor.getLastSelection().spanMoreThanOneCell()
-      {top, left, right, bottom} = @selectionScrollRect()
-      height = bottom - top
-      width = right - left
-      @tableSelectionBox.style.cssText = """
-      top: #{top}px;
-      left: #{left}px;
-      height: #{height}px;
-      width: #{width}px;
-      """
-      @tableSelectionBoxHandle.style.cssText = """
-      top: #{top + height}px;
-      left: #{left + width}px;
-      """
-    else
-      @tableSelectionBox.style.cssText = "display: none"
-      @tableSelectionBoxHandle.style.cssText = "display: none"
-
-  selectionScrollRect: ->
-    range = @tableEditor.getLastSelection().getRange()
-
-    left: @tableEditor.getScreenColumnOffsetAt(range.start.column)
-    top: @tableEditor.getScreenRowOffsetAt(range.start.row)
-    right: @tableEditor.getScreenColumnOffsetAt(range.end.column - 1) + @tableEditor.getScreenColumnWidthAt(range.end.column - 1)
-    bottom: @tableEditor.getScreenRowOffsetAt(range.end.row - 1) + @tableEditor.getScreenRowHeightAt(range.end.row - 1)
 
   getScreenCellAtPosition: (position) ->
     position = Point.fromObject(position)
