@@ -7,6 +7,8 @@ TableEditor = require './table-editor'
 
 module.exports =
 class CSVEditor
+  @tableEditorForPath: {}
+
   constructor: (@uriToOpen, @options={}, @choice) ->
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
@@ -71,35 +73,41 @@ class CSVEditor
   destroy: ->
     return if @destroyed
 
+    @editor?.destroy()
     @destroyed = true
     @emitter.emit('did-destroy', this)
     @emitter.dispose()
 
   openCSV: ->
     new Promise (resolve, reject) =>
-      fileContent = fs.readFileSync(@uriToOpen)
-      options = _.clone(@options)
-
-      csv.parse String(fileContent), options, (err, data) =>
-        return reject(err) if err?
-
-        tableEditor = new TableEditor
-        return resolve(tableEditor) if data.length is 0
-        tableEditor.lockModifiedStatus()
-
-        if @options.header
-          for column in data.shift()
-            tableEditor.addColumn(column, {}, false)
-        else
-          for i in [0...data[0].length]
-            tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
-
-        tableEditor.addRows(data)
-        tableEditor.setSaveHandler(@save)
-        tableEditor.initializeAfterOpen()
-        tableEditor.unlockModifiedStatus()
-
+      if CSVEditor.tableEditorForPath[@uriToOpen]?
+        tableEditor = new TableEditor(table: CSVEditor.tableEditorForPath[@uriToOpen].getTable())
         resolve(tableEditor)
+      else
+        fileContent = fs.readFileSync(@uriToOpen)
+        options = _.clone(@options)
+
+        csv.parse String(fileContent), options, (err, data) =>
+          return reject(err) if err?
+
+          tableEditor = new TableEditor
+          return resolve(tableEditor) if data.length is 0
+          tableEditor.lockModifiedStatus()
+
+          if @options.header
+            for column in data.shift()
+              tableEditor.addColumn(column, {}, false)
+          else
+            for i in [0...data[0].length]
+              tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
+
+          tableEditor.addRows(data)
+          tableEditor.setSaveHandler(@save)
+          tableEditor.initializeAfterOpen()
+          tableEditor.unlockModifiedStatus()
+
+          CSVEditor.tableEditorForPath[@uriToOpen] = tableEditor
+          resolve(tableEditor)
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>

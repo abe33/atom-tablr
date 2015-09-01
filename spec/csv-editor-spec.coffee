@@ -129,7 +129,7 @@ describe "CSVEditor", ->
           csvEditor.destroy()
 
         waitsForPromise ->
-          atom.workspace.open(path.join(projectPath, 'sample.json')).then (t) ->
+          atom.workspace.open(path.join(projectPath, 'sample.csv')).then (t) ->
             csvEditor = t
             csvEditorElement = atom.views.getView(csvEditor)
 
@@ -179,6 +179,34 @@ describe "CSVEditor", ->
           runs ->
             expect(tableEditorElement).toExist()
             expect(csvEditorElement.children.length).toEqual(1)
+
+        describe 'when panes are split', ->
+          [secondCSVEditor, secondCSVEditorElement] = []
+          beforeEach ->
+            newPane = atom.workspace.getActivePane().splitRight()
+            expect(newPane).toBe(atom.workspace.getActivePane())
+
+            waitsForPromise ->
+              atom.workspace.open(path.join(projectPath, 'sample.csv')).then (t) ->
+                secondCSVEditor = t
+                secondCSVEditorElement = atom.views.getView(secondCSVEditor)
+
+                tableEditorButton = secondCSVEditorElement.form.openTableEditorButton
+                click(tableEditorButton)
+
+          it 'reuses the same table for two different table editors', ->
+            expect(csvEditor.editor.table).toBe(secondCSVEditor.editor.table)
+            expect(csvEditor).not.toBe(secondCSVEditor)
+            expect(csvEditorElement).not.toBe(secondCSVEditorElement)
+
+          describe 'when all the editors have been closed', ->
+            it 'releases the table', ->
+              {table} = secondCSVEditor.editor
+              secondCSVEditor.destroy()
+              expect(table.isDestroyed()).toBeFalsy()
+
+              csvEditor.destroy()
+              expect(table.isDestroyed()).toBeTruthy()
 
         describe 'closing the tab with pending changes', ->
           beforeEach ->
