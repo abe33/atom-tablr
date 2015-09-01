@@ -1,3 +1,4 @@
+_ = require 'underscore-plus'
 
 mouseEvent = (type, properties={}) ->
   defaults = {
@@ -35,13 +36,19 @@ module.exports = {objectCenterCoordinates, mouseEvent, inputEvent}
 
 ['mousedown', 'mousemove', 'mouseup', 'click', 'dblclick'].forEach (key) ->
   module.exports[key] = (obj, x, y, cx, cy) ->
+    if typeof x is 'object'
+      options = x
+      x = undefined
+    else
+      options = {}
+
     {x,y} = objectCenterCoordinates(obj) unless x? and y?
 
     unless cx? and cy?
       cx = x
       cy = y
 
-    obj.dispatchEvent(mouseEvent key, {pageX: x, pageY: y, clientX: cx, clientY: cy})
+    obj.dispatchEvent(mouseEvent key, _.extend(options, {pageX: x, pageY: y, clientX: cx, clientY: cy}))
 
 module.exports.mousewheel = (obj, deltaX=0, deltaY=0) ->
   obj.dispatchEvent(mouseEvent 'mousewheel', {deltaX, deltaY})

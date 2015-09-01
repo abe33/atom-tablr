@@ -111,8 +111,18 @@ class TableElement extends HTMLElement
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
 
+        {metaKey, ctrlKey, shiftKey, pageX, pageY} = e
+
         if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
-          @tableEditor.setCursorAtScreenPosition position
+          if metaKey or (ctrlKey and process.platform isnt 'darwin')
+            @tableEditor.addCursorAtScreenPosition(position)
+          else if shiftKey
+            @tableEditor.getLastSelection().setRange([
+              @tableEditor.getLastCursor().getPosition()
+              [position.row + 1, position.column + 1]
+            ])
+          else
+            @tableEditor.setCursorAtScreenPosition position
 
         @startDrag(e)
         @focus()

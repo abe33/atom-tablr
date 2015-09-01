@@ -1764,6 +1764,25 @@ describe 'tableElement', ->
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,3]])
 
+      describe 'when the meta key is pressed', ->
+        it 'creates a new selection with the cells from the mouse movements', ->
+          startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+          endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="2"]')
+
+          mousedown(startCell, metaKey: true)
+          mousemove(endCell, metaKey: true)
+
+          expect(tableEditor.getSelections().length).toEqual(2)
+
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,3]])
+
+      describe 'when the shift key is pressed', ->
+        it 'creates a new selection with the cells from the mouse movements', ->
+          startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
+          mousedown(startCell, shiftKey: true)
+
+          expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[4,1]])
+
       it 'scrolls the view when the selection reach the last row', ->
         startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
         endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="9"][data-column="2"]')
