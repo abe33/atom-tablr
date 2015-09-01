@@ -1551,6 +1551,23 @@ describe 'tableElement', ->
           expect(selectionBox.offsetWidth).toBeCloseTo(firstCell.offsetWidth + lastCell.offsetWidth, -1)
           expect(selectionBox.offsetHeight).toBeCloseTo(firstCell.offsetHeight + lastCell.offsetHeight, -1)
 
+    describe 'when there is many selections', ->
+      beforeEach ->
+        tableEditor.setSelectedRanges([
+          [[0,0],[1,3]]
+          [[1,0],[2,3]]
+        ])
+
+      it 'adds a new selection element in the table', ->
+        expect(tableShadowRoot.querySelectorAll('atom-table-editor-selection').length).toEqual(2)
+
+      describe 'and one selection is destroyed', ->
+        beforeEach ->
+          tableEditor.setSelectedRanges([[[0,0],[1,3]]])
+
+        it 'removes the selection element', ->
+          expect(tableShadowRoot.querySelectorAll('atom-table-editor-selection').length).toEqual(1)
+
     describe 'core:select-right', ->
       it 'expands the selection by one cell on the right', ->
         tableElement.expandSelectionRight()

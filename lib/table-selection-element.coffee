@@ -24,6 +24,8 @@ class TableSelectionElement extends HTMLElement
     return if @destroyed
 
     @parentNode?.removeChild(this)
+    @subscriptions.dispose()
+    @selection = @tableEditor = null
     @destroyed = true
 
   update: ->

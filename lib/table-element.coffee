@@ -241,6 +241,7 @@ class TableElement extends HTMLElement
       @markDirtyCell(newPosition)
       @requestUpdate()
     subs.add @tableEditor.onDidAddSelection ({selection}) =>
+      @addSelection(selection)
       @markDirtyRange(selection.getRange())
       @requestUpdate()
     subs.add @tableEditor.onDidRemoveSelection ({selection}) =>
