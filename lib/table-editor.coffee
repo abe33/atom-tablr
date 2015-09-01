@@ -6,7 +6,6 @@ DisplayTable = require './display-table'
 Cursor = require './cursor'
 Selection = require './selection'
 Range = require './range'
-columnName = require './column-name'
 
 module.exports =
 class TableEditor
@@ -121,10 +120,6 @@ class TableEditor
 
   getTable: -> @table
 
-  getColumnName: (index) -> columnName(index)
-
-  getUntitledColumnName: -> @newColumnId ?= 0; "untitled_#{@newColumnId++}"
-
   getTableRange: ->
     Range.fromObject([
       [0,0]
@@ -199,10 +194,10 @@ class TableEditor
     @removeScreenRowAt(@screenRowToModelRow(row))
 
   insertColumnBefore: ->
-    @addColumnAt(@getCursorPosition().column, @getUntitledColumnName())
+    @addColumnAt(@getCursorPosition().column)
 
   insertColumnAfter: ->
-    @addColumnAt(@getCursorPosition().column + 1, @getUntitledColumnName())
+    @addColumnAt(@getCursorPosition().column + 1)
 
   deleteColumnAtCursor: ->
     @removeColumnAt(@getCursorPosition().column)

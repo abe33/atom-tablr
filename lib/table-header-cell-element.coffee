@@ -1,4 +1,5 @@
 {SpacePenDSL} = require 'atom-utils'
+columnName = require './column-name'
 
 module.exports =
 class TableHeaderCellElement extends HTMLElement
@@ -12,7 +13,7 @@ class TableHeaderCellElement extends HTMLElement
   setModel: ({column, index}) ->
     @released = false
     classes = @getHeaderCellClasses(column, index)
-    @label.textContent = column.name
+    @label.textContent = column.name ? columnName(index)
     @className = classes.join(' ')
     @dataset.column = index
     @style.cssText = "

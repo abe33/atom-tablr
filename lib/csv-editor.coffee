@@ -102,7 +102,7 @@ class CSVEditor
               tableEditor.addColumn(column, {}, false)
           else
             for i in [0...data[0].length]
-              tableEditor.addColumn(tableEditor.getColumnName(i), {}, false)
+              tableEditor.addColumn(undefined, {}, false)
 
           tableEditor.addRows(data)
           tableEditor.setSaveHandler(@save)

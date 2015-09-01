@@ -1190,12 +1190,15 @@ describe 'tableElement', ->
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, 'row0', 0, 'yes'])
 
     describe 'called several times', ->
-      it 'creates incremental names for columns', ->
+      it 'uses incremental placeholders for column names', ->
         tableElement.insertColumnBefore()
         tableElement.insertColumnBefore()
 
-        expect(tableEditor.getScreenColumn(0).name).toEqual('untitled_1')
-        expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_0')
+        nextAnimationFrame()
+
+        expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="0"] span').textContent).toEqual('A')
+        expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="1"] span').textContent).toEqual('B')
+
 
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
@@ -1211,12 +1214,14 @@ describe 'tableElement', ->
       expect(tableEditor.getScreenRow(0)).toEqual(['row0', undefined, 0, 'yes'])
 
     describe 'called several times', ->
-      it 'creates incremental names for columns', ->
+      it 'uses incremental placeholders for column names', ->
         tableElement.insertColumnAfter()
         tableElement.insertColumnAfter()
 
-        expect(tableEditor.getScreenColumn(1).name).toEqual('untitled_1')
-        expect(tableEditor.getScreenColumn(2).name).toEqual('untitled_0')
+        nextAnimationFrame()
+
+        expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="1"] span').textContent).toEqual('B')
+        expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="2"] span').textContent).toEqual('C')
 
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
