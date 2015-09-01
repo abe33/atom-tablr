@@ -34,7 +34,7 @@ class TableHeaderCellElement extends HTMLElement
     classes.push 'active-column' if @tableElement.isCursorColumn(index)
     classes.push 'selected' if @tableElement.isSelectedColumn(index)
 
-    if @tableEditor.order is column.name
+    if @tableEditor.order is index
       classes.push 'order'
 
       if @tableEditor.direction is 1

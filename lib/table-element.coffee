@@ -86,14 +86,13 @@ class TableElement extends HTMLElement
     @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
         columnIndex = @getScreenColumnIndexAtPixelPosition(e.pageX, e.pageY)
-        if column = @tableEditor.getScreenColumn(columnIndex)
-          if column.name is @tableEditor.order
-            if @tableEditor.direction is -1
-              @tableEditor.resetSort()
-            else
-              @tableEditor.toggleSortDirection()
+        if columnIndex is @tableEditor.order
+          if @tableEditor.direction is -1
+            @tableEditor.resetSort()
           else
-            @tableEditor.sortBy(column.name)
+            @tableEditor.toggleSortDirection()
+        else
+          @tableEditor.sortBy(columnIndex)
 
     @subscriptions.add @subscribeTo @getRowsContainer(),
       'scroll': (e) => @requestUpdate()

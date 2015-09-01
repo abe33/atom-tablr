@@ -465,7 +465,7 @@ class DisplayTable
       if typeof @order is 'function'
         @screenRows.sort(@order)
       else
-        orderFunction = @compareRows(@table.getColumnIndex(@order), @direction)
+        orderFunction = @compareRows(@order, @direction)
         @screenRows.sort(orderFunction)
 
     @screenToModelRowsMap = (rows.indexOf(row) for row in @screenRows)
@@ -570,7 +570,12 @@ class DisplayTable
   ##    ##    ## ##     ## ##    ##     ##
   ##     ######   #######  ##     ##    ##
 
-  sortBy: (@order, @direction=1) ->
+  sortBy: (order, @direction=1) ->
+    if typeof order is 'string'
+      @order = @table.getColumnIndex(order)
+    else
+      @order = order
+
     @updateScreenRows()
     @emitter.emit 'did-change', {
       oldScreenRange: {start: 0, end: @getRowCount()}

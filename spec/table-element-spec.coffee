@@ -521,7 +521,7 @@ describe 'tableElement', ->
         mousedown(column)
 
       it 'changes the sort order to use the clicked column', ->
-        expect(tableEditor.order).toEqual('foo')
+        expect(tableEditor.order).toEqual(2)
         expect(tableEditor.direction).toEqual(1)
 
       describe 'a second time', ->
@@ -529,7 +529,7 @@ describe 'tableElement', ->
           mousedown(column)
 
         it 'toggles the sort direction', ->
-          expect(tableEditor.order).toEqual('foo')
+          expect(tableEditor.order).toEqual(2)
           expect(tableEditor.direction).toEqual(-1)
 
       describe 'a third time', ->
@@ -549,7 +549,7 @@ describe 'tableElement', ->
           mousedown(column)
 
         it 'changes the sort order to use the clicked column', ->
-          expect(tableEditor.order).toEqual('value')
+          expect(tableEditor.order).toEqual(1)
           expect(tableEditor.direction).toEqual(1)
 
     describe 'dragging a resize handle', ->
