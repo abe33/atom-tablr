@@ -42,9 +42,9 @@ class TableEditor
   )
 
   constructor: (options={}) ->
-    {@table} = options
+    {@table, @displayTable} = options
     @table = new Table unless @table?
-    @displayTable = new DisplayTable({@table})
+    @displayTable = new DisplayTable({@table}) unless @displayTable?
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @cursorSubscriptions = new WeakMap
@@ -73,7 +73,7 @@ class TableEditor
 
   destroy: ->
     {table} = this
-    @displayTable.destroy()
+    @displayTable = null
     @wasDestroyed()
     table.release()
 

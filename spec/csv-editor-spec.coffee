@@ -216,6 +216,7 @@ describe "CSVEditor", ->
 
           it 'reuses the same table for two different table editors', ->
             expect(csvEditor.editor.table).toBe(secondCSVEditor.editor.table)
+            expect(csvEditor.editor.displayTable).toBe(secondCSVEditor.editor.displayTable)
             expect(csvEditor).not.toBe(secondCSVEditor)
             expect(csvEditorElement).not.toBe(secondCSVEditorElement)
 
