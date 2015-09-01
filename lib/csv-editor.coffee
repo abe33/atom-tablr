@@ -36,6 +36,8 @@ class CSVEditor
 
   isModified: -> @editor?.isModified() ? false
 
+  copy: -> new CSVEditor(@uriToOpen, _.clone(@options), @choice)
+
   shouldPromptToSave: (options) ->
     @editor?.shouldPromptToSave(options) ? false
 

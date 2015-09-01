@@ -23,12 +23,14 @@ class CSVEditorElement extends HTMLElement
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add @subscribeTo @form.openTextEditorButton,
-      click: => @model.openTextEditor(@collectOptions())
+      click: =>
+        @model.choice = 'TextEditor'
+        @model.openTextEditor(@collectOptions())
 
     @subscriptions.add @subscribeTo @form.openTableEditorButton,
       click: =>
         @form.cleanMessages()
-
+        @model.choice = 'TableEditor'
         @model.openTableEditor(@collectOptions()).catch (reason) =>
           @form.alert(reason.message)
 

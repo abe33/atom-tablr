@@ -84,6 +84,14 @@ describe "CSVEditor", ->
       runs ->
         expect(csvEditor instanceof CSVEditor).toBeTruthy()
 
+    describe '::copy', ->
+      it 'returns a CSVEditor in a pending state', ->
+        openFixture('sample.csv')
+        runs ->
+          copy = csvEditor.copy()
+
+          expect(copy.getPath()).toEqual(csvEditor.getPath())
+
     describe 'when the user choose to open a text editor', ->
       beforeEach ->
         openFixture('sample.csv')
@@ -106,6 +114,12 @@ describe "CSVEditor", ->
 
       it 'destroys the csv editor pane item', ->
         expect(atom.workspace.getActivePane().getItems().length).toEqual(1)
+
+      describe '::copy', ->
+        it 'returns a CSVEditor in a pending state', ->
+          copy = csvEditor.copy()
+
+          expect(copy.choice).toEqual('TextEditor')
 
     describe 'when the remember choice setting is enabled', ->
       beforeEach ->
@@ -179,6 +193,12 @@ describe "CSVEditor", ->
           runs ->
             expect(tableEditorElement).toExist()
             expect(csvEditorElement.children.length).toEqual(1)
+
+        describe '::copy', ->
+          it 'returns a CSVEditor in a pending state', ->
+            copy = csvEditor.copy()
+
+            expect(copy.choice).toEqual('TableEditor')
 
         describe 'when panes are split', ->
           [secondCSVEditor, secondCSVEditorElement] = []
