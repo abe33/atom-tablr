@@ -614,73 +614,103 @@ describe 'tableElement', ->
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
-      beforeEach ->
-        cell = header.querySelector('atom-table-header-cell')
-        action = cell.querySelector('.column-edit-action')
-        cellOffset = cell.getBoundingClientRect()
-
-        click(action)
-
-        editorElement = tableElement.querySelector('atom-text-editor')
-        editor = editorElement.model
-
-      it 'starts the edition of the column name', ->
-        editorOffset = editorElement.getBoundingClientRect()
-
-        expect(editorElement).toExist(1)
-        expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
-        expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
-        expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
-        expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
-
-      it 'gives the focus to the editor', ->
-        expect(editorElement.matches('.is-focused')).toBeTruthy()
-
-      it 'fills the editor with the cell value', ->
-        expect(editor.getText()).toEqual('key')
-
-      it 'cleans the buffer history', ->
-        expect(editor.getBuffer().history.undoStack.length).toEqual(0)
-        expect(editor.getBuffer().history.redoStack.length).toEqual(0)
-
-      describe 'core:cancel', ->
-        it 'closes the editor', ->
-          atom.commands.dispatch(editorElement, 'core:cancel')
-          expect(tableElement.isEditing()).toBeFalsy()
-
-      describe 'core:confirm', ->
+      describe 'that does not have a name', ->
         beforeEach ->
-          editor.setText('foobar')
-          atom.commands.dispatch(editorElement, 'core:confirm')
+          tableEditor.insertColumnBefore()
+          nextAnimationFrame()
 
-        it 'closes the editor', ->
-          expect(isVisible(editorElement)).toBeFalsy()
+          cell = header.querySelector('atom-table-header-cell')
+          action = cell.querySelector('.column-edit-action')
+          cellOffset = cell.getBoundingClientRect()
 
-        it 'gives the focus back to the table view', ->
-          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+          click(action)
 
-        it 'changes the cell value', ->
-          expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
+          editorElement = tableElement.querySelector('atom-text-editor')
+          editor = editorElement.model
 
-      describe 'table-edit:move-right', ->
-        it 'confirms the current edit and moves the active cursor to the right', ->
-          spyOn(tableElement, 'moveRight')
-          editor.setText('Foo Bar')
-          atom.commands.dispatch(editorElement, 'table-edit:move-right')
+        it 'opens the editor with the dynamic name as content', ->
+          expect(editor.getText()).toEqual('A')
 
-          expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.moveRight).toHaveBeenCalled()
-          expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
+        describe 'core:confirm', ->
+          describe 'when the editor is still on the dynamic name', ->
+            it 'does not change the cell value', ->
+              atom.commands.dispatch(editorElement, 'core:confirm')
+              expect(tableEditor.getScreenColumn(0).name).toEqual(undefined)
 
-      describe 'table-edit:move-left', ->
-        it 'confirms the current edit and moves the active cursor to the left', ->
-          spyOn(tableElement, 'moveLeft')
-          editor.setText('Foo Bar')
-          atom.commands.dispatch(editorElement, 'table-edit:move-left')
+          describe 'when the editor is empty', ->
+            it 'does not change the cell value', ->
+              editor.setText('')
+              atom.commands.dispatch(editorElement, 'core:confirm')
+              expect(tableEditor.getScreenColumn(0).name).toEqual(undefined)
 
-          expect(tableElement.isEditing()).toBeFalsy()
-          expect(tableElement.moveLeft).toHaveBeenCalled()
-          expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
+      describe 'that have a name', ->
+        beforeEach ->
+          cell = header.querySelector('atom-table-header-cell')
+          action = cell.querySelector('.column-edit-action')
+          cellOffset = cell.getBoundingClientRect()
+
+          click(action)
+
+          editorElement = tableElement.querySelector('atom-text-editor')
+          editor = editorElement.model
+
+        it 'starts the edition of the column name', ->
+          editorOffset = editorElement.getBoundingClientRect()
+
+          expect(editorElement).toExist(1)
+          expect(editorOffset.top).toBeCloseTo(cellOffset.top, -2)
+          expect(editorOffset.left).toBeCloseTo(cellOffset.left, -2)
+          expect(editorElement.offsetWidth).toBeCloseTo(cell.offsetWidth, -2)
+          expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
+
+        it 'gives the focus to the editor', ->
+          expect(editorElement.matches('.is-focused')).toBeTruthy()
+
+        it 'fills the editor with the cell value', ->
+          expect(editor.getText()).toEqual('key')
+
+        it 'cleans the buffer history', ->
+          expect(editor.getBuffer().history.undoStack.length).toEqual(0)
+          expect(editor.getBuffer().history.redoStack.length).toEqual(0)
+
+        describe 'core:cancel', ->
+          it 'closes the editor', ->
+            atom.commands.dispatch(editorElement, 'core:cancel')
+            expect(tableElement.isEditing()).toBeFalsy()
+
+        describe 'core:confirm', ->
+          beforeEach ->
+            editor.setText('foobar')
+            atom.commands.dispatch(editorElement, 'core:confirm')
+
+          it 'closes the editor', ->
+            expect(isVisible(editorElement)).toBeFalsy()
+
+          it 'gives the focus back to the table view', ->
+            expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+
+          it 'changes the cell value', ->
+            expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
+
+        describe 'table-edit:move-right', ->
+          it 'confirms the current edit and moves the active cursor to the right', ->
+            spyOn(tableElement, 'moveRight')
+            editor.setText('Foo Bar')
+            atom.commands.dispatch(editorElement, 'table-edit:move-right')
+
+            expect(tableElement.isEditing()).toBeFalsy()
+            expect(tableElement.moveRight).toHaveBeenCalled()
+            expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
+
+        describe 'table-edit:move-left', ->
+          it 'confirms the current edit and moves the active cursor to the left', ->
+            spyOn(tableElement, 'moveLeft')
+            editor.setText('Foo Bar')
+            atom.commands.dispatch(editorElement, 'table-edit:move-left')
+
+            expect(tableElement.isEditing()).toBeFalsy()
+            expect(tableElement.moveLeft).toHaveBeenCalled()
+            expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
 
     describe 'when the element has the read-only attribute', ->
       beforeEach ->

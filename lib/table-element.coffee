@@ -645,6 +645,7 @@ class TableElement extends HTMLElement
 
     columnIndex = @getScreenColumnIndexAtPixelPosition(pageX, pageY)
     if @columnUnderEdit = @tableEditor.getScreenColumn(columnIndex)
+      @columnUnderEditIndex = columnIndex
       columnRect = target.parentNode.getBoundingClientRect()
 
       @editorElement.style.top = @toUnit(columnRect.top)
@@ -654,7 +655,7 @@ class TableElement extends HTMLElement
       @editorElement.style.display = 'block'
 
       @editorElement.focus()
-      @editor.setText(@columnUnderEdit.name)
+      @editor.setText(@columnUnderEdit.name ? columnName(columnIndex))
 
       @editor.getBuffer().history.clearUndoStack()
       @editor.getBuffer().history.clearRedoStack()
@@ -662,8 +663,14 @@ class TableElement extends HTMLElement
   confirmColumnEdit: ->
     @stopEdit()
     newValue = @editor.getText()
-    @columnUnderEdit.name = newValue unless newValue is @columnUnderEdit.name
+
+    if newValue is '' or newValue is columnName(@columnUnderEditIndex)
+      @columnUnderEdit.name = undefined
+    else if newValue isnt @columnUnderEdit.name
+      @columnUnderEdit.name = newValue
+
     delete @columnUnderEdit
+    delete @columnUnderEditIndex
 
   stopEdit: ->
     @editing = false
