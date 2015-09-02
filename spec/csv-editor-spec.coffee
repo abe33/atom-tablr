@@ -46,7 +46,7 @@ describe "CSVEditor", ->
     csvDest = path.join(projectPath, fixtureName)
 
     if settings?
-      tableEditPackage.storeOptionsForPath("/private#{csvDest}", settings)
+      tableEditPackage.csvConfig.set("/private#{csvDest}", 'options',  settings)
 
     fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
 

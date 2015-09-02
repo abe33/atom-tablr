@@ -9,7 +9,7 @@ module.exports =
 class CSVEditor
   @tableEditorForPath: {}
 
-  constructor: (@uriToOpen, @options={}, @choice) ->
+  constructor: (@uriToOpen, @options={}, @choice, @csvConfig) ->
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
 
@@ -60,6 +60,7 @@ class CSVEditor
     atom.project.open(@uriToOpen).then (editor) =>
       pane = atom.workspace.paneForItem(this)
       @emitter.emit('did-open', {editor, options: _.clone(@options)})
+      @saveConfig('TextEditor')
       @destroy()
 
       pane.activateItem(editor)
@@ -70,6 +71,7 @@ class CSVEditor
         @emitter.emit 'did-change-modified', status
 
       @emitter.emit('did-open', {@editor, options: _.clone(options)})
+      @saveConfig('TableEditor')
       @editor
 
   destroy: ->
@@ -79,6 +81,26 @@ class CSVEditor
     @destroyed = true
     @emitter.emit('did-destroy', this)
     @emitter.dispose()
+
+  save: =>
+    @saveAs(@getPath())
+
+  saveAs: (path) ->
+    new Promise (resolve, reject) =>
+      options = _.clone(@options)
+      options.columns = @editor.getColumns() if options.header
+
+      csv.stringify @editor.getTable().getRows(), options, (err, data) =>
+        return reject(err) if err?
+
+        fs.writeFile path, data, (err) =>
+          return reject(err) if err?
+          resolve()
+
+  saveConfig: (choice) ->
+    @csvConfig.set(@uriToOpen, 'options', @options)
+    if @options.remember and choice?
+      @csvConfig.set(@uriToOpen, 'choice', choice)
 
   openCSV: ->
     new Promise (resolve, reject) =>
@@ -141,18 +163,3 @@ class CSVEditor
       parser.on 'error', error
 
       input.pipe(parser)
-
-  save: =>
-    @saveAs(@getPath())
-
-  saveAs: (path) ->
-    new Promise (resolve, reject) =>
-      options = _.clone(@options)
-      options.columns = @editor.getColumns() if options.header
-
-      csv.stringify @editor.getTable().getRows(), options, (err, data) =>
-        return reject(err) if err?
-
-        fs.writeFile path, data, (err) =>
-          return reject(err) if err?
-          resolve()

@@ -1,6 +1,6 @@
 _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
-[TableEditor, TableElement, TableSelectionElement, CSVEditor, CSVEditorElement, url] = []
+[TableEditor, TableElement, TableSelectionElement, CSVEditor, CSVEditorElement, CSVConfig, url] = []
 
 module.exports =
   config:
@@ -45,14 +45,18 @@ module.exports =
       type: 'string'
       default: 'vertically'
       enum: ['horizontally', 'vertically']
-      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (verticall) or of the same row (horizontally)."
+      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (vertically) or of the same row (horizontally)."
 
-  activate: ({@pathOptions}) ->
+  activate: ({csvConfig}) ->
+    CSVConfig ?= require './csv-config'
     TableEditor ?= require './table-editor'
     TableElement ?= require './table-element'
     TableSelectionElement ?= require './table-selection-element'
+
     TableElement.registerViewProvider()
     TableSelectionElement.registerViewProvider()
+
+    @csvConfig = new CSVConfig(csvConfig)
 
     @subscriptions = new CompositeDisposable
 
@@ -68,21 +72,12 @@ module.exports =
         CSVEditorElement = require './csv-editor-element'
         CSVEditorElement.registerViewProvider()
 
-      choice = @getChoiceForPath(uriToOpen)
-      options = _.clone @getOptionsForPath(uriToOpen)
+      choice = @csvConfig.get(uriToOpen, 'choice')
+      options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})
 
       return atom.project.open(uriToOpen) if choice is 'TextEditor'
 
-      csvEditor = new CSVEditor(uriToOpen, options, choice)
-
-      disposable = csvEditor.onDidOpen ({editor, options}) =>
-        disposable.dispose()
-
-        @storeOptionsForPath(uriToOpen, options)
-        if options.remember
-          @storeChoiceForPath(uriToOpen, editor.constructor.name)
-
-      csvEditor
+      new CSVEditor(uriToOpen, options, choice, @csvConfig)
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'
@@ -96,22 +91,6 @@ module.exports =
 
   deactivate: ->
     @subscriptions.dispose()
-
-  getChoiceForPath: (path) ->
-    @pathOptions?[path]?.choice
-
-  storeChoiceForPath: (path, choice) ->
-    @pathOptions ?= {}
-    @pathOptions[path] ?= {}
-    @pathOptions[path].choice = choice
-
-  getOptionsForPath: (path) ->
-    @pathOptions?[path]?.options
-
-  storeOptionsForPath: (path, options) ->
-    @pathOptions ?= {}
-    @pathOptions[path] ?= {}
-    @pathOptions[path].options = options
 
   getSmallTable: ->
     table = new TableEditor
@@ -168,4 +147,4 @@ module.exports =
     return table
 
   serialize: ->
-    {@pathOptions}
+    csvConfig: @csvConfig.serialize()
