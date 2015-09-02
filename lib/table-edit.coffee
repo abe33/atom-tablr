@@ -143,7 +143,7 @@ module.exports =
     table.addColumn 'key', width: 150, align: 'right'
     table.addColumn 'value', width: 150, align: 'center'
     for i in [0..100]
-      table.addColumn 'column_' + i, width: 150, align: 'left'
+      table.addColumn undefined, width: 150, align: 'left'
 
     rows = []
     for i in [0...1000]

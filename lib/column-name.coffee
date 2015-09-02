@@ -6,6 +6,6 @@ columnName = (index) ->
   quotient = Math.floor(index / 26)
 
   if quotient > 0
-    columnName(quotient) & base[index % 26]
+    columnName(quotient - 1) + base[index % 26]
   else
     base[index % 26]
