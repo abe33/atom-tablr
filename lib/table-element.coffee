@@ -4,6 +4,7 @@ Delegator = require 'delegato'
 {EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 
+columnName = require './column-name'
 Table = require './table'
 TableEditor = require './table-editor'
 TableCellElement = require './table-cell-element'
@@ -613,7 +614,7 @@ class TableElement extends HTMLElement
     @editorElement.style.height = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
 
-    @editorElement.dataset.column = @tableEditor.getScreenColumn(position.column).name
+    @editorElement.dataset.column = @tableEditor.getScreenColumn(position.column).name ? columnName(position.column)
     @editorElement.dataset.row = position.row + 1
 
     @editorElement.focus()
