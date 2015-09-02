@@ -1095,6 +1095,7 @@ class TableElement extends HTMLElement
 
     @updateWidthAndHeight()
     @updateScroll()
+    @updateSelections() if @wholeTableIsDirty
 
     endUpdate = =>
       @firstRenderedRow = firstRow
@@ -1223,6 +1224,10 @@ class TableElement extends HTMLElement
   updateScroll: ->
     @getColumnsContainer().scrollLeft = @getColumnsScrollContainer().scrollLeft
     @getGutter().scrollTop = @getRowsContainer().scrollTop
+
+  updateSelections: ->
+    @tableEditor.getSelections().forEach (selection) ->
+      atom.views.getView(selection).update()
 
   getScreenCellAtPosition: (position) ->
     position = Point.fromObject(position)
