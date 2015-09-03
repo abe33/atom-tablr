@@ -90,20 +90,7 @@ class CSVEditor
       options = _.clone(@options)
       options.columns = @editor.getColumns() if options.header
 
-      config =
-        columns: @editor.getScreenColumns().map (column) =>
-          conf = {}
-          if column.width? and column.width isnt @editor.getScreenColumnWidth()
-            conf.width = column.width
-
-          if column.align? and column.align isnt 'left'
-            conf.align = column.align
-
-          conf
-
-        rowHeights: @editor.displayTable.rowHeights.slice()
-
-      @csvConfig.set(@uriToOpen, 'layout', config)
+      @saveLayout()
 
       csv.stringify @editor.getTable().getRows(), options, (err, data) =>
         return reject(err) if err?
@@ -116,6 +103,22 @@ class CSVEditor
     @csvConfig.set(@uriToOpen, 'options', @options)
     if @options.remember and choice?
       @csvConfig.set(@uriToOpen, 'choice', choice)
+
+  saveLayout: ->
+    config =
+      columns: @editor.getScreenColumns().map (column) =>
+        conf = {}
+        if column.width? and column.width isnt @editor.getScreenColumnWidth()
+          conf.width = column.width
+
+        if column.align? and column.align isnt 'left'
+          conf.align = column.align
+
+        conf
+
+      rowHeights: @editor.displayTable.rowHeights.slice()
+
+    @csvConfig.set(@uriToOpen, 'layout', config)
 
   openCSV: ->
     new Promise (resolve, reject) =>
