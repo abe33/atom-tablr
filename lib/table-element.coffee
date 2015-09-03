@@ -692,24 +692,25 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
       'table-edit:move-right-in-selection': (e) =>
+        e.stopPropagation()
         @confirmCellEdit()
-        @moveRight()
+        @moveRightInSelection()
       'table-edit:move-left-in-selection': (e) =>
+        e.stopPropagation()
         @confirmCellEdit()
-        @moveLeft()
+        @moveLeftInSelection()
       'core:cancel': (e) =>
         @stopEdit()
-        e.stopImmediatePropagation()
+        e.stopPropagation()
         return false
       'core:confirm': (e) =>
         @confirmCellEdit()
-        e.stopImmediatePropagation()
+        e.stopPropagation()
         return false
 
     @textEditorSubscriptions.add @subscribeTo @editorElement,
       'click': (e) =>
         e.stopPropagation()
-        e.stopImmediatePropagation()
         e.preventDefault()
         @editorElement.focus()
 
@@ -718,18 +719,20 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
       'table-edit:move-right-in-selection': (e) =>
+        e.stopPropagation()
         @confirmColumnEdit()
-        @moveRight()
+        @moveRightInSelection()
       'table-edit:move-left-in-selection': (e) =>
+        e.stopPropagation()
         @confirmColumnEdit()
-        @moveLeft()
+        @moveLeftInSelection()
       'core:cancel': (e) =>
+        e.stopPropagation()
         @stopEdit()
-        e.stopImmediatePropagation()
         return false
       'core:confirm': (e) =>
+        e.stopPropagation()
         @confirmColumnEdit()
-        e.stopImmediatePropagation()
         return false
 
   #     ######  ######## ##       ########  ######  ########
@@ -1290,7 +1293,7 @@ class TableElement extends HTMLElement
 
 preventAndStop = (f) -> (e) ->
   f.call(this, e)
-  e.stopImmediatePropagation()
+  e.stopPropagation()
   e.preventDefault()
 
 stopEventPropagation = (commandListeners) ->
