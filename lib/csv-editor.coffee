@@ -77,7 +77,10 @@ class CSVEditor
   destroy: ->
     return if @destroyed
 
-    @editor?.destroy()
+    if @editor?
+      @saveLayout()
+      @editor.destroy()
+
     @destroyed = true
     @emitter.emit('did-destroy', this)
     @emitter.dispose()
