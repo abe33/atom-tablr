@@ -79,6 +79,9 @@ class DisplayTable
   onDidChange: (callback) ->
     @emitter.on 'did-change', callback
 
+  onDidChangeLayout: (callback) ->
+    @emitter.on 'did-change-layout', callback
+
   onDidChangeRowHeight: (callback) ->
     @emitter.on 'did-change-row-height', callback
 
@@ -189,13 +192,18 @@ class DisplayTable
   getScreenColumnWidthAt: (index) ->
     @screenColumns[index]?.width ? @getScreenColumnWidth()
 
-  getScreenColumnAlignAt: (index) ->
-    @screenColumns[index]?.align
-
   setScreenColumnWidthAt: (index, width) ->
     minWidth = @getMinimumScreenColumnWidth()
     width = minWidth if width < minWidth
     @screenColumns[index]?.width = width
+    @emitter.emit 'did-change-layout', this
+
+  getScreenColumnAlignAt: (index) ->
+    @screenColumns[index]?.align
+
+  setScreenColumnAlignAt: (index, align) ->
+    @screenColumns[index]?.align = align
+    @emitter.emit 'did-change-layout', this
 
   getScreenColumnOffsetAt: (column) -> @screenColumnOffsets[column]
 
@@ -329,6 +337,7 @@ class DisplayTable
 
   setRowHeights: (@rowHeights=[]) ->
     @computeRowOffsets()
+    @emitter.emit 'did-change-layout', this
 
   getRowHeightAt: (index) ->
     @rowHeights[index] ? @getRowHeight()
@@ -339,6 +348,7 @@ class DisplayTable
     @rowHeights[index] = height
     @computeRowOffsets()
     @emitter.emit 'did-change-row-height', {height, row: index}
+    @emitter.emit 'did-change-layout', this
 
   getRowOffsetAt: (index) -> @getScreenRowOffsetAt(@modelRowToScreenRow(index))
 
