@@ -89,6 +89,20 @@ module.exports =
         when 'large' then @getLargeTable()
         when 'small' then @getSmallTable()
 
+    @subscriptions.add atom.contextMenu.add
+      'atom-table-editor': [{
+        label: 'Table'
+        submenu: [
+          {label: 'Align left', command: 'table-edit:align-left'}
+          {label: 'Align center', command: 'table-edit:align-center'}
+          {label: 'Align right', command: 'table-edit:align-right'}
+        ]
+        created: (event) ->
+          {pageX, pageY, target} = event
+          target.targetColumnForAlignment = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+          setTimeout (-> delete target.targetColumnForAlignment), 10
+      }]
+
   deactivate: ->
     @subscriptions.dispose()
 

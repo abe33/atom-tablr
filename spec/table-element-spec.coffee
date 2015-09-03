@@ -1306,6 +1306,54 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
         expect(atom.clipboard.read()).toEqual('row0')
 
+  describe 'table-edit:align-left', ->
+    describe 'when there is no target column', ->
+      it 'change the alignment of the active column', ->
+        tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align = 'right'
+
+        tableElement.alignLeft()
+
+        expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('left')
+
+    describe 'when there is a target column', ->
+      it 'change the alignment of the target column', ->
+        tableElement.targetColumnForAlignment = 2
+        tableEditor.getScreenColumn(2).align = 'right'
+
+        tableElement.alignLeft()
+
+        expect(tableEditor.getScreenColumn(2).align).toEqual('left')
+
+  describe 'table-edit:align-center', ->
+    describe 'when there is no target column', ->
+      it 'change the alignment of the active column', ->
+        tableElement.alignCenter()
+
+        expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('center')
+
+    describe 'when there is a target column', ->
+      it 'change the alignment of the target column', ->
+        tableElement.targetColumnForAlignment = 2
+
+        tableElement.alignCenter()
+
+        expect(tableEditor.getScreenColumn(2).align).toEqual('center')
+
+  describe 'table-edit:align-right', ->
+    describe 'when there is no target column', ->
+      it 'change the alignment of the active column', ->
+        tableElement.alignRight()
+
+        expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('right')
+
+    describe 'when there is a target column', ->
+      it 'change the alignment of the target column', ->
+        tableElement.targetColumnForAlignment = 2
+
+        tableElement.alignRight()
+
+        expect(tableEditor.getScreenColumn(2).align).toEqual('right')
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

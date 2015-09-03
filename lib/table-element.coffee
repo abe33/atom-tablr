@@ -86,6 +86,8 @@ class TableElement extends HTMLElement
 
     @subscriptions.add @subscribeTo @head,
       'mousedown': stopPropagationAndDefault (e) =>
+        return if e.button isnt 0
+
         columnIndex = @getScreenColumnIndexAtPixelPosition(e.pageX, e.pageY)
         if columnIndex is @tableEditor.order
           if @tableEditor.direction is -1
@@ -110,6 +112,8 @@ class TableElement extends HTMLElement
       'dblclick': (e) => @startCellEdit()
       'mousedown': stopPropagationAndDefault (e) =>
         @stopEdit() if @isEditing()
+
+        return if e.button isnt 0
 
         {metaKey, ctrlKey, shiftKey, pageX, pageY} = e
 
@@ -583,6 +587,24 @@ class TableElement extends HTMLElement
     @makeCellVisible(@tableEditor.getLastCursor().getPosition())
 
   getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
+
+  alignLeft: ->
+    if @targetColumnForAlignment?
+      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'left'
+    else
+      @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'left'
+
+  alignCenter: ->
+    if @targetColumnForAlignment?
+      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'center'
+    else
+      @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'center'
+
+  alignRight: ->
+    if @targetColumnForAlignment?
+      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'right'
+    else
+      @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'right'
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
@@ -1356,6 +1378,9 @@ atom.commands.add 'atom-table-editor',
   'table-edit:insert-column-before': -> @insertColumnBefore()
   'table-edit:insert-column-after': -> @insertColumnAfter()
   'table-edit:delete-column': -> @deleteColumnAtCursor()
+  'table-edit:align-left': -> @alignLeft()
+  'table-edit:align-center': -> @alignCenter()
+  'table-edit:align-right': -> @alignRight()
 
 atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
   'core:move-up': -> @moveUp()
