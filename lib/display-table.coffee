@@ -326,7 +326,9 @@ class DisplayTable
 
   setRowHeight: (@rowHeight) ->
     @computeRowOffsets()
-    @requestUpdate()
+
+  setRowHeights: (@rowHeights=[]) ->
+    @computeRowOffsets()
 
   getRowHeightAt: (index) ->
     @rowHeights[index] ? @getRowHeight()

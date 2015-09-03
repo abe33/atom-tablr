@@ -127,6 +127,7 @@ class CSVEditor
       else
         fileContent = fs.readFileSync(@uriToOpen)
         options = _.clone(@options)
+        layout = @csvConfig.get(@uriToOpen, 'layout')
 
         csv.parse String(fileContent), options, (err, data) =>
           return reject(err) if err?
@@ -136,13 +137,14 @@ class CSVEditor
           tableEditor.lockModifiedStatus()
 
           if @options.header
-            for column in data.shift()
-              tableEditor.addColumn(column, {}, false)
+            for column,i in data.shift()
+              tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
           else
             for i in [0...data[0].length]
-              tableEditor.addColumn(undefined, {}, false)
+              tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
 
           tableEditor.addRows(data)
+          tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
           tableEditor.setSaveHandler(@save)
           tableEditor.initializeAfterOpen()
           tableEditor.unlockModifiedStatus()

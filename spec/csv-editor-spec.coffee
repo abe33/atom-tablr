@@ -442,6 +442,41 @@ describe "CSVEditor", ->
           expect(tableEditor.isModified()).toBeFalsy()
           expect(csvEditor.isModified()).toBeFalsy()
 
+    describe 'when there is a previous layout saved for the file', ->
+      beforeEach ->
+        openFixture('sample.csv')
+        runs ->
+          nextAnimationFrame()
+          tableEditPackage.csvConfig.set csvEditor.getPath(), 'layout', {
+            columns: [
+              {width: 200, align: 'right'}
+              {width: 300}
+              {align: 'center'}
+            ]
+            rowHeights: [
+              undefined
+              100
+              200
+            ]
+          }
+
+          csvEditor.onDidOpen ({editor}) -> tableEditor = editor
+
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
+          click(tableEditorButton)
+
+        waitsFor -> tableEditor?
+
+      it 'uses this layout to setup the display table', ->
+        expect(tableEditor.getScreenRowHeightAt(1)).toEqual(100)
+        expect(tableEditor.getScreenRowHeightAt(2)).toEqual(200)
+
+        expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(200)
+        expect(tableEditor.getScreenColumnWidthAt(1)).toEqual(300)
+
+        expect(tableEditor.getScreenColumn(0).align).toEqual('right')
+        expect(tableEditor.getScreenColumn(2).align).toEqual('center')
+
     describe 'when there is options provided at the creation of the form', ->
       beforeEach ->
         openFixture 'custom-row-delimiter.csv', {
