@@ -274,8 +274,15 @@ describe "CSVEditor", ->
               tableEditor.addRow ['Bill', 45, 'male']
               tableEditor.addRow ['Bonnie', 42, 'female']
 
+              tableEditor.getScreenColumn(0).width = 200
+              tableEditor.getScreenColumn(0).align = 'right'
+              tableEditor.getScreenColumn(1).width = 300
+              tableEditor.getScreenColumn(2).align = 'center'
+              tableEditor.setScreenRowHeightAt(1, 100)
+              tableEditor.setScreenRowHeightAt(3, 200)
+
           describe 'when saved', ->
-            it 'save the new csv content on disk', ->
+            it 'saves the new csv content on disk', ->
               expect(savedContent).toEqual("""
               name,age,gender
               Jane,32,female
@@ -287,6 +294,22 @@ describe "CSVEditor", ->
             it 'marks the table editor as saved', ->
               expect(tableEditor.isModified()).toBeFalsy()
               expect(csvEditor.isModified()).toBeFalsy()
+
+            it 'saves the layout and display settings', ->
+              expect(tableEditPackage.csvConfig.get(csvEditor.getPath(), 'layout')).toEqual({
+                columns: [
+                  {width: 200, align: 'right'}
+                  {width: 300}
+                  {align: 'center'}
+                ]
+                rowHeights: [
+                  undefined
+                  100
+                  undefined
+                  200
+                  undefined
+                ]
+              })
 
     describe 'when the file cannot be parsed with the default', ->
       beforeEach ->

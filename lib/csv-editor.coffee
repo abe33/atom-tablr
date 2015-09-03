@@ -90,6 +90,21 @@ class CSVEditor
       options = _.clone(@options)
       options.columns = @editor.getColumns() if options.header
 
+      config =
+        columns: @editor.getScreenColumns().map (column) =>
+          conf = {}
+          if column.width? and column.width isnt @editor.getScreenColumnWidth()
+            conf.width = column.width
+
+          if column.align? and column.align isnt 'left'
+            conf.align = column.align
+
+          conf
+
+        rowHeights: @editor.displayTable.rowHeights.slice()
+
+      @csvConfig.set(@uriToOpen, 'layout', config)
+
       csv.stringify @editor.getTable().getRows(), options, (err, data) =>
         return reject(err) if err?
 
