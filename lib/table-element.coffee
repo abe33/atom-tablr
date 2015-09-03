@@ -610,8 +610,8 @@ class TableElement extends HTMLElement
 
     @editorElement.style.top = @toUnit(activeCellRect.top + bounds.top)
     @editorElement.style.left = @toUnit(activeCellRect.left + bounds.left)
-    @editorElement.style.width = @toUnit(activeCellRect.width)
-    @editorElement.style.height = @toUnit(activeCellRect.height)
+    @editorElement.style.minWidth = @toUnit(activeCellRect.width)
+    @editorElement.style.minHeight = @toUnit(activeCellRect.height)
     @editorElement.style.display = 'block'
 
     @editorElement.dataset.column = @tableEditor.getScreenColumn(position.column).name ? columnName(position.column)
@@ -650,9 +650,12 @@ class TableElement extends HTMLElement
 
       @editorElement.style.top = @toUnit(columnRect.top)
       @editorElement.style.left =  @toUnit(columnRect.left)
-      @editorElement.style.width = @toUnit(columnRect.width)
-      @editorElement.style.height = @toUnit(columnRect.height)
+      @editorElement.style.minWidth = @toUnit(columnRect.width)
+      @editorElement.style.minHeight = @toUnit(columnRect.height)
       @editorElement.style.display = 'block'
+
+      @editorElement.removeAttribute('data-row')
+      @editorElement.removeAttribute('data-column')
 
       @editorElement.focus()
       @editor.setText(@columnUnderEdit.name ? columnName(columnIndex))
@@ -680,13 +683,13 @@ class TableElement extends HTMLElement
     @focus()
 
   createTextEditor: ->
-    @editor = new TextEditor({})
+    @editor = new TextEditor({mini: true})
     @editorElement = atom.views.getView(@editor)
     @appendChild(@editorElement)
 
   subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
       'table-edit:move-right-in-selection': (e) =>
         @confirmCellEdit()
@@ -712,7 +715,7 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
+    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
       'table-edit:move-right-in-selection': (e) =>
         @confirmColumnEdit()
@@ -1290,6 +1293,26 @@ preventAndStop = (f) -> (e) ->
   e.stopImmediatePropagation()
   e.preventDefault()
 
+stopEventPropagation = (commandListeners) ->
+  newCommandListeners = {}
+  for commandName, commandListener of commandListeners
+    do (commandListener) ->
+      newCommandListeners[commandName] = (event) ->
+        event.stopPropagation()
+        commandListener.call(@getModel(), event)
+  newCommandListeners
+
+stopEventPropagationAndGroupUndo = (commandListeners) ->
+  newCommandListeners = {}
+  for commandName, commandListener of commandListeners
+    do (commandListener) ->
+      newCommandListeners[commandName] = (event) ->
+        event.stopPropagation()
+        model = @getModel()
+        model.transact atom.config.get('editor.undoGroupingInterval'), ->
+          commandListener.call(model, event)
+  newCommandListeners
+
 atom.commands.add 'atom-table-editor',
   'core:save': preventAndStop (e) -> @save()
   'core:confirm': -> @startCellEdit()
@@ -1330,6 +1353,59 @@ atom.commands.add 'atom-table-editor',
   'table-edit:insert-column-before': -> @insertColumnBefore()
   'table-edit:insert-column-after': -> @insertColumnAfter()
   'table-edit:delete-column': -> @deleteColumnAtCursor()
+
+atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
+  'core:move-up': -> @moveUp()
+  'core:move-down': -> @moveDown()
+  'core:move-to-top': -> @moveToTop()
+  'core:move-to-bottom': -> @moveToBottom()
+  'core:page-up': -> @pageUp()
+  'core:page-down': -> @pageDown()
+  'core:select-to-top': -> @selectToTop()
+  'core:select-to-bottom': -> @selectToBottom()
+  'core:select-page-up': -> @selectPageUp()
+  'core:select-page-down': -> @selectPageDown()
+  'editor:add-selection-below': -> @addSelectionBelow()
+  'editor:add-selection-above': -> @addSelectionAbove()
+  'editor:split-selections-into-lines': -> @splitSelectionsIntoLines()
+  'editor:toggle-soft-tabs': -> @toggleSoftTabs()
+  'editor:toggle-soft-wrap': -> @toggleSoftWrapped()
+  'editor:fold-all': -> @foldAll()
+  'editor:unfold-all': -> @unfoldAll()
+  'editor:fold-current-row': -> @foldCurrentRow()
+  'editor:unfold-current-row': -> @unfoldCurrentRow()
+  'editor:fold-selection': -> @foldSelectedLines()
+  'editor:fold-at-indent-level-1': -> @foldAllAtIndentLevel(0)
+  'editor:fold-at-indent-level-2': -> @foldAllAtIndentLevel(1)
+  'editor:fold-at-indent-level-3': -> @foldAllAtIndentLevel(2)
+  'editor:fold-at-indent-level-4': -> @foldAllAtIndentLevel(3)
+  'editor:fold-at-indent-level-5': -> @foldAllAtIndentLevel(4)
+  'editor:fold-at-indent-level-6': -> @foldAllAtIndentLevel(5)
+  'editor:fold-at-indent-level-7': -> @foldAllAtIndentLevel(6)
+  'editor:fold-at-indent-level-8': -> @foldAllAtIndentLevel(7)
+  'editor:fold-at-indent-level-9': -> @foldAllAtIndentLevel(8)
+  'editor:log-cursor-scope': -> @logCursorScope()
+  'editor:copy-path': -> @copyPathToClipboard()
+  'editor:toggle-indent-guide': -> atom.config.set('editor.showIndentGuide', not atom.config.get('editor.showIndentGuide'))
+  'editor:toggle-line-numbers': -> atom.config.set('editor.showLineNumbers', not atom.config.get('editor.showLineNumbers'))
+  'editor:scroll-to-cursor': -> @scrollToCursorPosition()
+)
+
+atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagationAndGroupUndo(
+  'editor:indent': -> @indent()
+  'editor:auto-indent': -> @autoIndentSelectedRows()
+  'editor:indent-selected-rows': -> @indentSelectedRows()
+  'editor:outdent-selected-rows': -> @outdentSelectedRows()
+  'editor:newline': -> @insertNewline()
+  'editor:newline-below': -> @insertNewlineBelow()
+  'editor:newline-above': -> @insertNewlineAbove()
+  'editor:toggle-line-comments': -> @toggleLineCommentsInSelection()
+  'editor:checkout-head-revision': -> @checkoutHeadRevision()
+  'editor:move-line-up': -> @moveLineUp()
+  'editor:move-line-down': -> @moveLineDown()
+  'editor:duplicate-lines': -> @duplicateLines()
+  'editor:join-lines': -> @joinLines()
+)
 
 #    ######## ##       ######## ##     ## ######## ##    ## ########
 #    ##       ##       ##       ###   ### ##       ###   ##    ##

@@ -43,9 +43,10 @@
   'ctrl-alt-backspace up': 'table-edit:delete-column'
   'ctrl-alt-backspace down': 'table-edit:delete-column'
 
-'atom-table-editor atom-text-editor:not([mini])':
+'atom-table-editor atom-text-editor[mini]':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
+  'cmd-enter': 'editor:newline'
   'tab': 'table-edit:move-right-in-selection'
   'shift-tab': 'table-edit:move-left-in-selection'
   'ctrl-tab': 'editor:indent'

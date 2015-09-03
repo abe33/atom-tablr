@@ -65,12 +65,23 @@ atom-table-editor {
   color: @text-color;
   -webkit-user-select: none;
 
-  atom-text-editor {
+  atom-text-editor[mini].is-focused {
+    border: 1px solid @background-color-info;
+    box-shadow: none;
+
+    &[data-row]::before {
+      background: @background-color-info;
+    }
+  }
+  atom-text-editor[mini] {
     position: fixed;
     margin: 0;
-    border: 1px solid @background-color-info;
+    border: 1px solid @background-color-selected;
     box-shadow: 0 5px 10px 3px rgba(0,0,0,0.2);
     z-index: 1;
+    overflow: visible;
+    opacity: 1;
+    border-radius: 0;
 
     &::shadow .gutter {
       display: none;
@@ -83,9 +94,10 @@ atom-table-editor {
       left: -1px;
       transform: translate(0, -100%);
       font-size: 0.7em;
-      background: @background-color-info;
+      background: @background-color-selected;
       color: @base-background-color;
-      padding: 2px 6px;
+      line-height: 1em;
+      padding: 6px 6px;
     }
   }
 
