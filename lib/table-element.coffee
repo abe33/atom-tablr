@@ -688,10 +688,10 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions = new CompositeDisposable
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
 
-      'table-edit:move-right': (e) =>
+      'table-edit:move-right-in-selection': (e) =>
         @confirmCellEdit()
         @moveRight()
-      'table-edit:move-left': (e) =>
+      'table-edit:move-left-in-selection': (e) =>
         @confirmCellEdit()
         @moveLeft()
       'core:cancel': (e) =>
@@ -714,10 +714,10 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions = new CompositeDisposable
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor:not([mini])',
 
-      'table-edit:move-right': (e) =>
+      'table-edit:move-right-in-selection': (e) =>
         @confirmColumnEdit()
         @moveRight()
-      'table-edit:move-left': (e) =>
+      'table-edit:move-left-in-selection': (e) =>
         @confirmColumnEdit()
         @moveLeft()
       'core:cancel': (e) =>

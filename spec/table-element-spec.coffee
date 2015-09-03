@@ -692,21 +692,21 @@ describe 'tableElement', ->
           it 'changes the cell value', ->
             expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
 
-        describe 'table-edit:move-right', ->
+        describe 'table-edit:move-right-in-selection', ->
           it 'confirms the current edit and moves the active cursor to the right', ->
             spyOn(tableElement, 'moveRight')
             editor.setText('Foo Bar')
-            atom.commands.dispatch(editorElement, 'table-edit:move-right')
+            atom.commands.dispatch(editorElement, 'table-edit:move-right-in-selection')
 
             expect(tableElement.isEditing()).toBeFalsy()
             expect(tableElement.moveRight).toHaveBeenCalled()
             expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
 
-        describe 'table-edit:move-left', ->
+        describe 'table-edit:move-left-in-selection', ->
           it 'confirms the current edit and moves the active cursor to the left', ->
             spyOn(tableElement, 'moveLeft')
             editor.setText('Foo Bar')
-            atom.commands.dispatch(editorElement, 'table-edit:move-left')
+            atom.commands.dispatch(editorElement, 'table-edit:move-left-in-selection')
 
             expect(tableElement.isEditing()).toBeFalsy()
             expect(tableElement.moveLeft).toHaveBeenCalled()
@@ -1391,23 +1391,23 @@ describe 'tableElement', ->
         atom.commands.dispatch(editorElement, 'core:cancel')
         expect(tableElement.isEditing()).toBeFalsy()
 
-    describe 'table-edit:move-right', ->
+    describe 'table-edit:move-right-in-selection', ->
       it 'confirms the current edit and moves the active cursor to the right', ->
         previousActiveCell = tableEditor.getLastCursor()
         spyOn(tableElement, 'moveRight')
         editor.setText('Foo Bar')
-        atom.commands.dispatch(editorElement, 'table-edit:move-right')
+        atom.commands.dispatch(editorElement, 'table-edit:move-right-in-selection')
 
         expect(tableElement.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
         expect(tableElement.moveRight).toHaveBeenCalled()
 
-    describe 'table-edit:move-left', ->
+    describe 'table-edit:move-left-in-selection', ->
       it 'confirms the current edit and moves the active cursor to the left', ->
         previousActiveCell = tableEditor.getLastCursor()
         spyOn(tableElement, 'moveLeft')
         editor.setText('Foo Bar')
-        atom.commands.dispatch(editorElement, 'table-edit:move-left')
+        atom.commands.dispatch(editorElement, 'table-edit:move-left-in-selection')
 
         expect(tableElement.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
