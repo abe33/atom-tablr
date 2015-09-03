@@ -1875,6 +1875,14 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[100,1]])
 
+    ##    ########  ##    ## ########
+    ##    ##     ## ###   ## ##     ##
+    ##    ##     ## ####  ## ##     ##
+    ##    ##     ## ## ## ## ##     ##
+    ##    ##     ## ##  #### ##     ##
+    ##    ##     ## ##   ### ##     ##
+    ##    ########  ##    ## ########
+
     describe 'dragging the mouse pressed over cell', ->
       it 'creates a selection with the cells from the mouse movements', ->
         startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
@@ -1990,6 +1998,30 @@ describe 'tableElement', ->
 
         it 'expands the selection to the right', ->
           expect(tableEditor.getLastSelection().getRange()).toEqual([[2,0],[3,3]])
+
+    describe 'when there is multiple selections', ->
+      beforeEach ->
+        tableEditor.setSelectedRanges([
+          [[0,0],[1,2]]
+          [[2,0],[3,2]]
+        ])
+        nextAnimationFrame()
+
+      describe 'dragging the first selection box handle', ->
+        [handle, handleOffset] = []
+
+        beforeEach ->
+          handle = tableShadowRoot.querySelector('.selection-box-handle')
+          mousedown(handle)
+
+        describe 'to the right', ->
+          beforeEach ->
+            handleOffset = handle.getBoundingClientRect()
+            mousemove(handle, handleOffset.left, handleOffset.top+16)
+
+          it 'expands the selection to the right', ->
+            expect(tableEditor.getSelections()[0].getRange()).toEqual([[0,0],[2,2]])
+            expect(tableEditor.getSelections()[1].getRange()).toEqual([[2,0],[3,2]])
 
   #     ######   #######  ########  ######## #### ##    ##  ######
   #    ##    ## ##     ## ##     ##    ##     ##  ###   ## ##    ##

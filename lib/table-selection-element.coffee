@@ -12,6 +12,8 @@ class TableSelectionElement extends HTMLElement
   createdCallback: ->
     @subscriptions = new CompositeDisposable
 
+  getModel: -> @selection
+
   setModel: (@selection) ->
     {@tableEditor} = @selection
 

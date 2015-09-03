@@ -821,8 +821,8 @@ class TableElement extends HTMLElement
   #    ##     ## ##   ##   ##     ##
   #    ########   ####  ## ########
 
-  startDragScrollInterval: (method, e, o) ->
-    @dragScrollInterval = setInterval (=> method.call(this, e, o)), 50
+  startDragScrollInterval: (method, args...) ->
+    @dragScrollInterval = setInterval (=> method.apply(this, args)), 50
 
   clearDragScrollInterval: ->
     clearInterval(@dragScrollInterval)
@@ -832,17 +832,25 @@ class TableElement extends HTMLElement
 
     @dragging = true
 
-    @initializeDragEvents @body,
-      'mousemove': stopPropagationAndDefault (e) => @drag(e)
-      'mouseup': stopPropagationAndDefault (e) => @endDrag(e)
+    if e.target.matches('.selection-box-handle')
+      selection = e.target.parentNode.getModel()
 
-  drag: (e) ->
+    @initializeDragEvents @body,
+      'mousemove': stopPropagationAndDefault (e) => @drag(e, selection)
+      'mouseup': stopPropagationAndDefault (e) => @endDrag(e, selection)
+
+  drag: (e, selection) ->
+    @clearDragScrollInterval()
+
     if @dragging
-      @clearDragScrollInterval()
+      if selection?
+        cursorPosition = selection.getCursor().getPosition()
+      else
+        selection = @tableEditor.getLastSelection()
+        cursorPosition = selection.getCursor().getPosition()
+
       {pageX, pageY} = e
       {row, column} = @cellPositionAtScreenPosition pageX, pageY
-      cursorPosition = @tableEditor.getLastCursor().getPosition()
-      selection = @tableEditor.getLastSelection()
       newRange = new Range
 
       row = Math.max(0, row)
@@ -873,12 +881,12 @@ class TableElement extends HTMLElement
       @scrollDuringDrag(row, column)
       @requestUpdate()
 
-      @startDragScrollInterval(@drag, e)
+      @startDragScrollInterval(@drag, e, selection)
 
-  endDrag: (e) ->
+  endDrag: (e, selection) ->
     return unless @dragging
 
-    @drag(e)
+    @drag(e, selection)
     @clearDragScrollInterval()
     @dragging = false
     @dragSubscription.dispose()
