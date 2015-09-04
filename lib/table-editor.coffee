@@ -77,7 +77,7 @@ class TableEditor
     table.release()
 
   wasDestroyed: ->
-    cursor.destroy() for cursor in @cursors
+    cursor?.destroy() for cursor in @cursors
     @destroyed = true
     @emitter.emit 'did-destroy', this
     @emitter.dispose()
