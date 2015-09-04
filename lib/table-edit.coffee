@@ -7,9 +7,12 @@ module.exports =
     undefinedDisplay:
       type: 'string'
       default: ''
-    pageMovesAmount:
+    pageMoveRowAmount:
       type: 'integer'
       default: 20
+    pageMoveColumnAmount:
+      type: 'integer'
+      default: 5
     scrollSpeedDuringDrag:
       type: 'integer'
       default: 20

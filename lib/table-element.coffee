@@ -148,7 +148,7 @@ class TableElement extends HTMLElement
     @observeConfig
       'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
         @requestUpdate() if @attached
-      'table-edit.pageMovesAmount': (@configPageMovesAmount) =>
+      'table-edit.pageMoveRowAmount': (@configPageMoveRowAmount) =>
         @requestUpdate() if @attached
       'table-edit.rowOverdraw': (@configRowOverdraw) =>
         @requestUpdate() if @attached
@@ -585,8 +585,6 @@ class TableElement extends HTMLElement
 
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getLastCursor().getPosition())
-
-  getPageMovesAmount: -> @pageMovesAmount ? @configPageMovesAmount
 
   alignLeft: ->
     if @targetColumnForAlignment?

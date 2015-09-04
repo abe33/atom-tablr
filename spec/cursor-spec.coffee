@@ -13,7 +13,8 @@ describe 'Cursor', ->
     atom.config.set 'table-edit.minimuColumnWidth', 10
     atom.config.set 'table-edit.rowHeight', 20
     atom.config.set 'table-edit.minimumRowHeight', 10
-    atom.config.set 'table-edit.pageMovesAmount', 20
+    atom.config.set 'table-edit.pageMoveRowAmount', 20
+    atom.config.set 'table-edit.pageMoveColumnAmount', 20
 
     table = new Table
 

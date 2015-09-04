@@ -1064,7 +1064,7 @@ describe 'tableElement', ->
 
   describe 'core:page-down', ->
     beforeEach ->
-      atom.config.set 'table-edit.pageMovesAmount', 20
+      atom.config.set 'table-edit.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows below', ->
       tableElement.pageDown()
@@ -1080,7 +1080,7 @@ describe 'tableElement', ->
 
     describe 'with a custom amount on the instance', ->
       it 'moves the cursor 30 rows below', ->
-        atom.config.set 'table-edit.pageMovesAmount', 30
+        atom.config.set 'table-edit.pageMoveRowAmount', 30
 
         tableElement.pageDown()
 
@@ -1088,7 +1088,7 @@ describe 'tableElement', ->
 
   describe 'core:page-up', ->
     beforeEach ->
-      atom.config.set 'table-edit.pageMovesAmount', 20
+      atom.config.set 'table-edit.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows up', ->
       tableEditor.setCursorAtScreenPosition([20, 0])
@@ -1104,10 +1104,32 @@ describe 'tableElement', ->
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
-  describe 'core:move-to-top', ->
+  describe '::pageLeft', ->
     beforeEach ->
-      atom.config.set 'table-edit.pageMovesAmount', 20
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      atom.config.set 'table-edit.pageMoveColumnAmount', 4
 
+    it 'moves the cursor 4 cells left', ->
+      tableEditor.setCursorAtScreenPosition([0, 5])
+
+      tableElement.pageLeft()
+
+      expect(tableEditor.getCursorPosition().column).toEqual(1)
+
+    it 'stops to the first cell without looping', ->
+      tableEditor.setCursorAtScreenPosition([0, 2])
+
+      tableElement.pageLeft()
+
+      expect(tableEditor.getCursorPosition().column).toEqual(0)
+
+  describe 'core:move-to-top', ->
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
@@ -1116,9 +1138,6 @@ describe 'tableElement', ->
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
   describe 'core:move-to-bottom', ->
-    beforeEach ->
-      atom.config.set 'table-edit.pageMovesAmount', 20
-
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
@@ -1571,7 +1590,7 @@ describe 'tableElement', ->
 
     describe 'selection', ->
       it 'follows the cursor when it moves', ->
-        atom.config.set 'table-edit.pageMovesAmount', 10
+        atom.config.set 'table-edit.pageMoveRowAmount', 10
         tableElement.pageDown()
         tableElement.moveRight()
 

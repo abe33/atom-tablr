@@ -10,6 +10,8 @@
 'atom-table-editor':
   'tab': 'table-edit:move-right-in-selection'
   'shift-tab': 'table-edit:move-left-in-selection'
+  'home': 'core:move-to-top'
+  'end': 'core:move-to-bottom'
 
 '.platform-darwin atom-table-editor':
   'cmd-left': 'table-edit:move-to-beginning-of-line'
