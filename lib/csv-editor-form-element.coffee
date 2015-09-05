@@ -134,7 +134,7 @@ class CSVEditorFormElement extends HTMLElement
 
         @div class: 'panel', =>
           radiosWithTextEditor {
-            label: 'Field Delimiter'
+            label: 'Column Delimiter'
             name: 'delimiter'
             outlet: 'delimiter'
             selected: 'comma'
