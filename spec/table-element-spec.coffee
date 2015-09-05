@@ -18,6 +18,11 @@ stylesheet = "
 
   atom-table-editor::shadow .table-edit-header {
     height: 27px;
+    border: 1px solid black;
+  }
+
+  atom-table-editor::shadow .table-edit-body {
+    border: 1px solid black;
   }
 
   atom-table-editor::shadow atom-table-cell {
