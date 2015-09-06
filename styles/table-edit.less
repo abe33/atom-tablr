@@ -19,7 +19,6 @@
 .cell {
   overflow: hidden;
   float: left;
-  text-overflow: ellipsis;
   height: 100%;
   padding: 2px 6px;
   border-right: 1px solid @background-color-highlight;
@@ -173,6 +172,11 @@ atom-table-editor {
       cursor: s-resize;
       padding-right: 24px;
       height: 100%;
+      text-overflow: ellipsis;
+
+      span {
+        white-space: nowrap;
+      }
 
       &.selected {
         background: @background-color-highlight;
