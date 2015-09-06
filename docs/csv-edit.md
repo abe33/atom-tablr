@@ -29,11 +29,10 @@ Setting|Description
 `Quoted`|When checked, each field will be wrapped with the quote character on save.
 `Skip Empty Lines`|When checked, the empty lines in the file will be ignored and no rows will be created for them.
 
-As you probably noticed, many fields in the settings form have a `custom` option and an additional text input. This allow you to define your own values when they're not available in the predefined options. Starting to type in the text input will automatically set the option on `custom`, and removing all its content will make the option come back to its default.
+As you probably noticed, many fields in the settings form have a `custom` option and an additional text input. This allow you to define your own values when they're not available in the predefined options. Starting to type in the text input will automatically set the option on `custom`, and removing all its content will make the setting come back to its default.
 
 ### Table Editor
 
-When choosing to open the `.csv` file using the `Table Editor` mode, you'll end up with the following interface:
+![CSV Opener](https://github.com/abe33/atom-table-edit/blob/master/resources/table-editor.png?raw=true "In this screenshot the Header option was checked.")
 
-![CSV Opener](https://github.com/abe33/atom-table-edit/blob/master/resources/table-editor.png?raw=true)
-<br/><small>In the example above, the Header option was checked.</small>
+Working with a table editor is done pretty much as you could expect. You can select one or many cells, edit them, copy/paste them and so on.
