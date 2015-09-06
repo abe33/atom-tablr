@@ -892,31 +892,39 @@ class TableElement extends HTMLElement
   startGutterDrag: (e) ->
     return if @dragging
 
-    row = @getScreenRowIndexAtPixelPosition(e.pageY)
+    {metaKey, ctrlKey, shiftKey, pageX, pageY} = e
+
+    row = @getScreenRowIndexAtPixelPosition(pageY)
     return unless row?
 
     @dragging = true
-    @tableEditor.setSelectedRow(row)
+
+    if metaKey or (ctrlKey and process.platform isnt 'darwin')
+      @tableEditor.addSelectionAtScreenRange(@tableEditor.getRowRange(row))
+    else
+      @tableEditor.setSelectedRow(row)
+
+    selection = @tableEditor.getLastSelection()
 
     @initializeDragEvents @body,
       'mousemove': stopPropagationAndDefault (e) =>
-        @gutterDrag(e, startRow: row)
+        @gutterDrag(e, {startRow: row, selection})
       'mouseup': stopPropagationAndDefault (e) =>
-        @endGutterDrag(e, startRow: row)
+        @endGutterDrag(e, {startRow: row, selection})
 
   gutterDrag: (e, o) ->
     {pageY} = e
-    {startRow} = o
+    {startRow, selection} = o
     if @dragging
       @clearDragScrollInterval()
       row = @getScreenRowIndexAtPixelPosition(pageY)
 
       if row > startRow
-        @tableEditor.setSelectedRowRange([startRow, row])
+        selection.setRange(@tableEditor.getRowsRange([startRow, row]))
       else if row < startRow
-        @tableEditor.setSelectedRowRange([row, startRow])
+        selection.setRange(@tableEditor.getRowsRange([row, startRow]))
       else
-        @tableEditor.setSelectedRow(row)
+        selection.setRange(@tableEditor.getRowRange(row))
 
       @scrollDuringDrag(row)
       @requestUpdate()

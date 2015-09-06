@@ -796,6 +796,21 @@ describe 'tableElement', ->
             it 'scrolls the view', ->
               expect(tableElement.getRowsContainer().scrollTop).toBeGreaterThan(0)
 
+          describe 'then starting a new one with the cmd key pressed', ->
+            beforeEach ->
+              cell = gutter.querySelectorAll('atom-table-gutter-cell')[4]
+              mouseup(cell)
+
+
+              cellStart = tableElement.gutterCells[6]
+              cellEnd = tableElement.gutterCells[8]
+              mousedown(cellStart, metaKey: true)
+              mousemove(cellEnd, metaKey: true)
+              nextAnimationFrame()
+
+            it 'adds a new selection', ->
+              expect(tableEditor.getSelections().length).toEqual(2)
+
           describe 'then dragging the mouse up', ->
             beforeEach ->
               cell = gutter.querySelectorAll('atom-table-gutter-cell')[0]
