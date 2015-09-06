@@ -436,6 +436,26 @@ atom-table-editor {
       .cell;
       border-bottom: 1px solid @background-color-highlight;
       background: @input-background-color;
+
+      &.ellipsis::after {
+        content: '\f09a';
+        font-family: 'Octicons Regular';
+        color: @text-color;
+        // text-shadow: 0 0 8px @app-background-color, 0 0 8px @app-background-color, 0 0 8px @app-background-color;
+        display: inline-block;
+        background: @app-background-color;
+        font-size: 1.6em;
+        line-height: 0.4em;
+        position: absolute;
+        padding: 0.1em;
+        border-radius: 0.2em;
+        right: 0.05em;
+        bottom: 0.05em;
+      }
+
+      &.active.ellipsis::after {
+        color: @background-color-info;
+      }
     }
 
     //     ######  ########    ###    ######## ########  ######

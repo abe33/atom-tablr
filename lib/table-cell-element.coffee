@@ -19,6 +19,8 @@ class TableCellElement extends HTMLElement
       top: #{@tableEditor.getScreenRowOffsetAt(row)}px;
       text-align: #{@tableEditor.getScreenColumnAlignAt(column)};
     """
+    requestAnimationFrame =>
+      @classList.toggle('ellipsis', @scrollHeight > @clientHeight or @scrollWidth > @clientWidth)
 
   isReleased: -> @released
 
