@@ -484,15 +484,9 @@ class DisplayTable
     @modelToScreenRowsMap = (@screenRows.indexOf(row) for row in rows)
     @computeRowOffsets()
 
-  compareRows: (order, direction) -> (a,b) ->
-    a = a[order]
-    b = b[order]
-    if a > b
-      direction
-    else if a < b
-      -direction
-    else
-      0
+  compareRows: (order, direction=1) ->
+    collator = new Intl.Collator("en-US", numeric: true)
+    return (a,b) -> collator.compare(a[order],b[order]) * direction
 
   ##     ######  ######## ##       ##        ######
   ##    ##    ## ##       ##       ##       ##    ##
