@@ -4,10 +4,6 @@ class TableCellElement extends HTMLElement
   setModel: (@model) ->
     @released = false
     {cell, column, row} = @model
-    if cell.column.cellRender?
-      @innerHTML = cell.column.cellRender(cell, [row, column])
-    else
-      @textContent = cell.value ? @tableElement.getUndefinedDisplay()
 
     @className = @getCellClasses(cell, column, row).join(' ')
     @dataset.row = row
@@ -19,6 +15,15 @@ class TableCellElement extends HTMLElement
       top: #{@tableEditor.getScreenRowOffsetAt(row)}px;
       text-align: #{@tableEditor.getScreenColumnAlignAt(column)};
     """
+    if cell.column.cellRender?
+      @innerHTML = cell.column.cellRender(cell, [row, column])
+    else
+      @textContent = cell.value ? @tableElement.getUndefinedDisplay()
+
+    @lastRow = row
+    @lastColumn = column
+    @lastValue = cell.value
+
     requestAnimationFrame =>
       @classList.toggle('ellipsis', @scrollHeight > @clientHeight or @scrollWidth > @clientWidth)
 
@@ -35,6 +40,10 @@ class TableCellElement extends HTMLElement
     classes = ['table-edit-cell']
     classes.push 'active' if @tableElement.isCursorCell([row, column])
     classes.push 'selected' if @tableElement.isSelectedCell([row, column])
+    classes.push 'ellipsis' if @classList.contains('ellipsis') and @isSameCell(cell, column, row)
     classes
+
+  isSameCell: (cell, column, row) ->
+    cell.value is @lastValue and column is @lastColumn and row is @lastRow
 
 module.exports = TableCellElement = document.registerElement 'atom-table-cell', prototype: TableCellElement.prototype
