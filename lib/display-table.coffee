@@ -140,14 +140,14 @@ class DisplayTable
 
   subscribeToConfig: ->
     @observeConfig
-      'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
-      'table-edit.rowHeight': (@configRowHeight) =>
+      'tablr.undefinedDisplay': (@configUndefinedDisplay) =>
+      'tablr.rowHeight': (@configRowHeight) =>
         @computeRowOffsets() if @rowHeights?
-      'table-edit.minimumRowHeight': (@configMinimumRowHeight) =>
+      'tablr.minimumRowHeight': (@configMinimumRowHeight) =>
         @computeRowOffsets() if @rowHeights?
-      'table-edit.columnWidth': (@configScreenColumnWidth) =>
+      'tablr.columnWidth': (@configScreenColumnWidth) =>
         @computeScreenColumnOffsets() if @screenColumns?
-      'table-edit.minimumColumnWidth': (@configMinimumScreenColumnWidth) =>
+      'tablr.minimumColumnWidth': (@configMinimumScreenColumnWidth) =>
         @computeScreenColumnOffsets() if @screenColumns?
 
   observeConfig: (configs) ->

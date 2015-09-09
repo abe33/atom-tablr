@@ -5,10 +5,10 @@ describe 'TableEditor', ->
   [table, displayTable, tableEditor] = []
 
   beforeEach ->
-    atom.config.set 'table-edit.columnWidth', 100
-    atom.config.set 'table-edit.minimuColumnWidth', 10
-    atom.config.set 'table-edit.rowHeight', 20
-    atom.config.set 'table-edit.minimumRowHeight', 10
+    atom.config.set 'tablr.columnWidth', 100
+    atom.config.set 'tablr.minimuColumnWidth', 10
+    atom.config.set 'tablr.rowHeight', 20
+    atom.config.set 'tablr.minimumRowHeight', 10
 
   describe 'when initialized without a table', ->
     beforeEach ->
@@ -483,7 +483,7 @@ describe 'TableEditor', ->
           describe 'and has many selections', ->
             describe 'when flattenBufferMultiSelectionOnPaste option is enabled', ->
               beforeEach ->
-                atom.config.set 'table-edit.flattenBufferMultiSelectionOnPaste', true
+                atom.config.set 'tablr.flattenBufferMultiSelectionOnPaste', true
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}
@@ -508,7 +508,7 @@ describe 'TableEditor', ->
 
             describe 'when distributeBufferMultiSelectionOnPaste option is set to vertical', ->
               beforeEach ->
-                atom.config.set 'table-edit.distributeBufferMultiSelectionOnPaste', 'vertically'
+                atom.config.set 'tablr.distributeBufferMultiSelectionOnPaste', 'vertically'
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}
@@ -534,7 +534,7 @@ describe 'TableEditor', ->
 
             describe 'when distributeBufferMultiSelectionOnPaste option is set to horizontal', ->
               beforeEach ->
-                atom.config.set 'table-edit.distributeBufferMultiSelectionOnPaste', 'horizontally'
+                atom.config.set 'tablr.distributeBufferMultiSelectionOnPaste', 'horizontally'
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}

@@ -1,3 +1,6 @@
+<img src='https://cdn.rawgit.com/abe33/atom-tablr/master/resources/logo.svg' width='146' height='50'>
+
+
 ## General
 
 Command|Action
@@ -18,18 +21,18 @@ Command|Action
 `core:move-right`|<p>OSX/Win/Linux: <kbd>right</kbd></p>Move the cursors one cell to the right. If a selection spans several cells it sees its range reset to the new cursor position.<br/>If the current cell is a cell on the last column, the cursor will move on the first cell of the next row.<br/>If the cell is the last cell of the last row, the cursor moves to the first table cell.
 `core:move-up`|<p>OSX/Win/Linux: <kbd>up</kbd></p>Move the cursors one cell to the top. If a selection spans several cells it sees its range reset to the new cursor position.<br/>When the cursor is on the first row of the table it moves to the same column on the last row.
 `core:move-down`|<p>OSX/Win/Linux: <kbd>down</kbd></p>Move the cursors one cell to the bottom. If a selection spans several cells it sees its range reset to the new cursor position.<br/>When the cursor is on the last row of the table it moves to the same column on the first row.
-`table-edit:move-left-in-selection`|<p>OSX/Win/Linux: <kbd>tab</kbd></p>Move the cursors one cell to the left inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-left`.
-`table-edit:move-right-in-selection`|<p>OSX/Win/Linux: <kbd>shift-tab</kbd></p>Move the cursors one cell to the right inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-right`.
-`table-edit:move-up-in-selection`|Move the cursors one cell to the top inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-up`.
-`table-edit:move-down-in-selection`|Move the cursors one cell to the bottom inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-down`.
-`table-edit:move-to-beginning-of-line`|<p>OSX: <kbd>cmd-left</kbd><br/>Win/Linux: <kbd>ctrl-left</kbd></p>Move the cursors to the first cell of the current row.
-`table-edit:move-to-end-of-line`|<p>OSX: <kbd>cmd-right</kbd><br/>Win/Linux: <kbd>ctrl-right</kbd></p>Move the cursors to the last cell of the current row.
+`tablr:move-left-in-selection`|<p>OSX/Win/Linux: <kbd>tab</kbd></p>Move the cursors one cell to the left inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-left`.
+`tablr:move-right-in-selection`|<p>OSX/Win/Linux: <kbd>shift-tab</kbd></p>Move the cursors one cell to the right inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-right`.
+`tablr:move-up-in-selection`|Move the cursors one cell to the top inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-up`.
+`tablr:move-down-in-selection`|Move the cursors one cell to the bottom inside its current selection. This is effective only if the selection spans many cells, otherwise this command behaves as `core:move-down`.
+`tablr:move-to-beginning-of-line`|<p>OSX: <kbd>cmd-left</kbd><br/>Win/Linux: <kbd>ctrl-left</kbd></p>Move the cursors to the first cell of the current row.
+`tablr:move-to-end-of-line`|<p>OSX: <kbd>cmd-right</kbd><br/>Win/Linux: <kbd>ctrl-right</kbd></p>Move the cursors to the last cell of the current row.
 `core:move-to-top`|<p>OSX: <kbd>cmd-up</kbd> <kbd>home</kbd><br/>Win/Linux: <kbd>ctrl-up</kbd> <kbd>home</kbd></p>Move the cursors to the first row of the table.
 `core:move-to-bottom`|<p>OSX: <kbd>cmd-down</kbd> <kbd>end</kbd><br/>Win/Linux: <kbd>ctrl-down</kbd> <kbd>end</kbd></p>Move the cursor to the last row of the table.
-`table-edit:page-left`|Move the cursors left by the amount of rows specified in the `table-edit.pageMoveColumnAmount` setting. <br/>The cursor will stop at the first column when going past the bounds.
-`table-edit:page-right`|Move the cursors right by the amount of rows specified in the `table-edit.pageMoveColumnAmount` setting. <br/>The cursor will stop at the last column when going past the bounds.
-`core:page-up`|<p>OSX/Win/Linux: <kbd>pageup</kbd></p>Move the cursors up by the amount of rows specified in the `table-edit.pageMoveRowAmount` setting. <br/>The cursor will stop at the first row when going past the bounds.
-`core:page-down`|<p>OSX/Win/Linux: <kbd>pagedown</kbd></p>Move the cursors down by the amount of rows specified in the `table-edit.pageMoveRowAmount` setting. <br/>The cursor will stop at the last row when going past the bounds.
+`tablr:page-left`|Move the cursors left by the amount of rows specified in the `tablr.pageMoveColumnAmount` setting. <br/>The cursor will stop at the first column when going past the bounds.
+`tablr:page-right`|Move the cursors right by the amount of rows specified in the `tablr.pageMoveColumnAmount` setting. <br/>The cursor will stop at the last column when going past the bounds.
+`core:page-up`|<p>OSX/Win/Linux: <kbd>pageup</kbd></p>Move the cursors up by the amount of rows specified in the `tablr.pageMoveRowAmount` setting. <br/>The cursor will stop at the first row when going past the bounds.
+`core:page-down`|<p>OSX/Win/Linux: <kbd>pagedown</kbd></p>Move the cursors down by the amount of rows specified in the `tablr.pageMoveRowAmount` setting. <br/>The cursor will stop at the last row when going past the bounds.
 
 ## Selections
 
@@ -40,10 +43,10 @@ Command|Action
 `core:select-right`|<p>OSX/Win/Linux: <kbd>shift-right</kbd></p>Expand the selections by one cell to the right when the selection is expanded on the right of the cursor or shrink the selection by one cell when it's expanded on the left.
 `core:select-up`|<p>OSX/Win/Linux: <kbd>shift-up</kbd></p>Expand the selections by one cell to the top when the selection is expanded on the top of the cursor or shrink the selection by one cell when it's expanded on the bottom.
 `core:select-down`|<p>OSX/Win/Linux: <kbd>shift-down</kbd></p>Expand the selections by one cell to the bottom when the selection is expanded on the bottom of the cursor or shrink the selection by one cell when it's expanded on the top.
-`table-edit:select-to-beginning-of-line`|<p>OSX: <kbd>cmd-shift-left</kbd><br/>Win/Linux: <kbd>ctrl-shift-left</kbd></p>Expand the selections to the first cell of each rows.
-`table-edit:select-to-end-of-line`|<p>OSX: <kbd>cmd-shift-right</kbd><br/>Win/Linux: <kbd>ctrl-shift-right</kbd></p>Expand the selections to the last cell of each rows.
-`table-edit:select-to-beginning-of-table`|<p>OSX: <kbd>cmd-shift-up</kbd><br/>Win/Linux: <kbd>ctrl-shift-up</kbd></p>Expand the selection to the first row of the table.
-`table-edit:select-to-end-of-table`|<p>OSX: <kbd>cmd-shift-down</kbd><br/>Win/Linux: <kbd>ctrl-shift-down</kbd></p>Expand the selection to the last row of the table.
+`tablr:select-to-beginning-of-line`|<p>OSX: <kbd>cmd-shift-left</kbd><br/>Win/Linux: <kbd>ctrl-shift-left</kbd></p>Expand the selections to the first cell of each rows.
+`tablr:select-to-end-of-line`|<p>OSX: <kbd>cmd-shift-right</kbd><br/>Win/Linux: <kbd>ctrl-shift-right</kbd></p>Expand the selections to the last cell of each rows.
+`tablr:select-to-beginning-of-table`|<p>OSX: <kbd>cmd-shift-up</kbd><br/>Win/Linux: <kbd>ctrl-shift-up</kbd></p>Expand the selection to the first row of the table.
+`tablr:select-to-end-of-table`|<p>OSX: <kbd>cmd-shift-down</kbd><br/>Win/Linux: <kbd>ctrl-shift-down</kbd></p>Expand the selection to the last row of the table.
 
 ## Edit
 
@@ -53,15 +56,15 @@ Command|Action
 ---|---
 `core:confirm`|<p>OSX/Win/Linux: <kbd>enter</kbd></p>Start an edit session for every cursors.
 `core:backspace`|<p>OSX/Win/Linux: <kbd>backspace</kbd></p>Delete the value of the currently selected cells.
-`table-edit:insert-row-before`|<p>OSX: <kbd>cmd-shift-n up</kbd><br/>Win/Linux: <kbd>ctrl-shift-n up</kbd></p>Insert a new empty row before the last cursor's row.
-`table-edit:insert-row-after`|<p>OSX: <kbd>cmd-shift-n down</kbd><br/>Win/Linux: <kbd>ctrl-shift-n down</kbd></p>Insert a new empty row after the last cursor's row.
-`table-edit:insert-column-before`|<p>OSX: <kbd>cmd-shift-n left</kbd><br/>Win/Linux: <kbd>ctrl-shift-n left</kbd></p>Insert a new empty column before the last cursor's column.
-`table-edit:insert-column-after`|<p>OSX: <kbd>cmd-shift-n right</kbd><br/>Win/Linux: <kbd>ctrl-shift-n right</kbd></p>Insert a new empty column after the last cursor's column.
-`table-edit:delete-row`|<p>OSX: <kbd>cmd-shift-backspace left</kbd> <kbd>cmd-shift-backspace right</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace left</kbd> <kbd>ctrl-shift-backspace right</kbd></p>Delete the row at the last cursor's position.
-`table-edit:delete-column`|<p>OSX: <kbd>cmd-shift-backspace up</kbd> <kbd>cmd-shift-backspace down</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace up</kbd> <kbd>ctrl-shift-backspace down</kbd></p>Delete the column at the last cursor's position.
-`table-edit:align-left`|Change the alignment of the column at the last cursor's position to `left`.
-`table-edit:align-center`|Change the alignment of the column at the last cursor's position to `center`.
-`table-edit:align-right`|Change the alignment of the column at the last cursor's position to `right`.
+`tablr:insert-row-before`|<p>OSX: <kbd>cmd-shift-n up</kbd><br/>Win/Linux: <kbd>ctrl-shift-n up</kbd></p>Insert a new empty row before the last cursor's row.
+`tablr:insert-row-after`|<p>OSX: <kbd>cmd-shift-n down</kbd><br/>Win/Linux: <kbd>ctrl-shift-n down</kbd></p>Insert a new empty row after the last cursor's row.
+`tablr:insert-column-before`|<p>OSX: <kbd>cmd-shift-n left</kbd><br/>Win/Linux: <kbd>ctrl-shift-n left</kbd></p>Insert a new empty column before the last cursor's column.
+`tablr:insert-column-after`|<p>OSX: <kbd>cmd-shift-n right</kbd><br/>Win/Linux: <kbd>ctrl-shift-n right</kbd></p>Insert a new empty column after the last cursor's column.
+`tablr:delete-row`|<p>OSX: <kbd>cmd-shift-backspace left</kbd> <kbd>cmd-shift-backspace right</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace left</kbd> <kbd>ctrl-shift-backspace right</kbd></p>Delete the row at the last cursor's position.
+`tablr:delete-column`|<p>OSX: <kbd>cmd-shift-backspace up</kbd> <kbd>cmd-shift-backspace down</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace up</kbd> <kbd>ctrl-shift-backspace down</kbd></p>Delete the column at the last cursor's position.
+`tablr:align-left`|Change the alignment of the column at the last cursor's position to `left`.
+`tablr:align-center`|Change the alignment of the column at the last cursor's position to `center`.
+`tablr:align-right`|Change the alignment of the column at the last cursor's position to `right`.
 
 ## Cell Edit
 
@@ -71,7 +74,7 @@ Command|Action
 ---|---
 `core:confirm`|<p>OSX/Win/Linux: <kbd>enter</kbd></p>Confirm the edit and changes the value of all cells at cursor positions.
 `core:cancel`|<p>OSX/Win/Linux: <kbd>escape</kbd></p>Abort the edit and leaves all the cells at cursor positions unchanged.
-`table-edit:move-right-in-selection`|<p>OSX/Win/Linux: <kbd>tab</kbd></p>Confirm the edit and move cursors one cell to the left in their respective selections.
-`table-edit:move-left-in-selection`|<p>OSX/Win/Linux: <kbd>shift-tab</kbd></p>Confirm the edit and move cursors one cell to the right in their respective selections.
+`tablr:move-right-in-selection`|<p>OSX/Win/Linux: <kbd>tab</kbd></p>Confirm the edit and move cursors one cell to the left in their respective selections.
+`tablr:move-left-in-selection`|<p>OSX/Win/Linux: <kbd>shift-tab</kbd></p>Confirm the edit and move cursors one cell to the right in their respective selections.
 `editor:newline`|<p>OSX: <kbd>cmd-enter</kbd> <kbd>ctrl-enter</kbd><br/>Win/Linux: <kbd>ctrl-enter</kbd></p> As the <kbd>enter</kbd> key is used to confirm the edit, alternative keybindings are necessary to insert new lines in a cell.
 `editor:indent`|<p>OSX/Win/Linux: <kbd>ctrl-tab</kbd></p>As the <kbd>tab</kbd> key is already used to confirm the edit and move the cursors an alternative keybinding is necessary to insert a tabulation in a cell.

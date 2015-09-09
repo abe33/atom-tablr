@@ -36,7 +36,7 @@ class TableCellElement extends HTMLElement
     @released = true
 
   getCellClasses: (cell, column, row) ->
-    classes = ['table-edit-cell']
+    classes = ['tablr-cell']
     classes.push 'active' if @tableElement.isCursorCell([row, column])
     classes.push 'selected' if @tableElement.isSelectedCell([row, column])
     classes.push 'ellipsis' if @classList.contains('ellipsis') and @isSameCell(cell, column, row)

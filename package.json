@@ -1,9 +1,9 @@
 {
-  "name": "table-edit",
-  "main": "./lib/table-edit",
+  "name": "tablr",
+  "main": "./lib/tablr",
   "version": "0.0.0",
   "description": "Edit tabular data through an UI",
-  "repository": "https://github.com/abe33/atom-table-edit",
+  "repository": "https://github.com/abe33/atom-tablr",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0"

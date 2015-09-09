@@ -9,12 +9,12 @@ describe 'Cursor', ->
   [table, displayTable, tableEditor, selection, cursor] = []
 
   beforeEach ->
-    atom.config.set 'table-edit.columnWidth', 100
-    atom.config.set 'table-edit.minimuColumnWidth', 10
-    atom.config.set 'table-edit.rowHeight', 20
-    atom.config.set 'table-edit.minimumRowHeight', 10
-    atom.config.set 'table-edit.pageMoveRowAmount', 20
-    atom.config.set 'table-edit.pageMoveColumnAmount', 20
+    atom.config.set 'tablr.columnWidth', 100
+    atom.config.set 'tablr.minimuColumnWidth', 10
+    atom.config.set 'tablr.rowHeight', 20
+    atom.config.set 'tablr.minimumRowHeight', 10
+    atom.config.set 'tablr.pageMoveRowAmount', 20
+    atom.config.set 'tablr.pageMoveColumnAmount', 20
 
     table = new Table
 

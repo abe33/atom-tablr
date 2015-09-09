@@ -8,7 +8,7 @@ TableSelectionElement = require '../lib/table-selection-element'
 Column = require '../lib/display-column'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
 
-stylesheetPath = path.resolve __dirname, '..', 'styles', 'table-edit.less'
+stylesheetPath = path.resolve __dirname, '..', 'styles', 'tablr.less'
 stylesheet = "
   #{atom.themes.loadStylesheet(stylesheetPath)}
 
@@ -17,12 +17,12 @@ stylesheet = "
     width: 400px;
   }
 
-  atom-table-editor::shadow .table-edit-header {
+  atom-table-editor::shadow .tablr-header {
     height: 27px;
     border: 1px solid black;
   }
 
-  atom-table-editor::shadow .table-edit-body {
+  atom-table-editor::shadow .tablr-body {
     border: 1px solid black;
   }
 
@@ -103,13 +103,13 @@ describe 'tableElement', ->
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
-    atom.config.set 'table-edit.rowHeight', 20
-    atom.config.set 'table-edit.columnWidth', 100
-    atom.config.set 'table-edit.rowOverdraw', 10
-    atom.config.set 'table-edit.columnOverdraw', 2
-    atom.config.set 'table-edit.minimumRowHeight', 10
-    atom.config.set 'table-edit.minimumColumnWidth', 40
-    atom.config.set 'table-edit.scrollSpeedDuringDrag', 20
+    atom.config.set 'tablr.rowHeight', 20
+    atom.config.set 'tablr.columnWidth', 100
+    atom.config.set 'tablr.rowOverdraw', 10
+    atom.config.set 'tablr.columnOverdraw', 2
+    atom.config.set 'tablr.minimumRowHeight', 10
+    atom.config.set 'tablr.minimumColumnWidth', 40
+    atom.config.set 'tablr.scrollSpeedDuringDrag', 20
 
     tableElement = atom.views.getView(tableEditor)
     tableShadowRoot = tableElement.shadowRoot
@@ -183,7 +183,7 @@ describe 'tableElement', ->
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
   it 'has a body', ->
-    expect(tableShadowRoot.querySelector('.table-edit-body')).toExist()
+    expect(tableShadowRoot.querySelector('.tablr-body')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
@@ -202,7 +202,7 @@ describe 'tableElement', ->
 
   describe 'when the scrollPastEnd setting is enabled', ->
     beforeEach ->
-      atom.config.set('table-edit.scrollPastEnd', true)
+      atom.config.set('tablr.scrollPastEnd', true)
       nextAnimationFrame()
 
     it 'increases the dimensions of the cells container', ->
@@ -217,7 +217,7 @@ describe 'tableElement', ->
       expect(cells.length).toEqual(3)
 
     it 'renders undefined cells based on a config', ->
-      atom.config.set('table-edit.undefinedDisplay', 'foo')
+      atom.config.set('tablr.undefinedDisplay', 'foo')
 
       tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
@@ -225,7 +225,7 @@ describe 'tableElement', ->
 
     it 'renders undefined cells based on the view property', ->
       tableElement.undefinedDisplay = 'bar'
-      atom.config.set('table-edit.undefinedDisplay', 'foo')
+      atom.config.set('tablr.undefinedDisplay', 'foo')
 
       tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
@@ -240,7 +240,7 @@ describe 'tableElement', ->
         expect(tableElement.getScreenCellAtPosition([0,0]).classList.contains('ellipsis')).toBeTruthy()
 
     it 'sets the proper width and height on the table rows container', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
+      bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
       expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth - tableElement.tableGutter.offsetWidth, -2)
@@ -253,7 +253,7 @@ describe 'tableElement', ->
       it 'repaints the table', ->
         tableElement.pollDOM()
         nextAnimationFrame()
-        expect(tableShadowRoot.querySelectorAll('.table-edit-rows')).not.toEqual(18)
+        expect(tableShadowRoot.querySelectorAll('.tablr-rows')).not.toEqual(18)
     describe 'the columns widths', ->
       beforeEach ->
         cells = tableShadowRoot.querySelectorAll('atom-table-cell[data-row="0"]')
@@ -274,7 +274,7 @@ describe 'tableElement', ->
           expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         it 'sets the proper width and height on the table rows container', ->
-          bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
+          bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
 
           expect(bodyContent.offsetHeight).toEqual(2000)
           expect(bodyContent.offsetWidth).toEqual(600)
@@ -408,7 +408,7 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
+      bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
@@ -453,7 +453,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
-        bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
+        bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
 
         expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
@@ -498,7 +498,7 @@ describe 'tableElement', ->
   #    ##     ## ######## ##     ## ########  ######## ##     ##
 
   it 'has a header', ->
-    expect(tableShadowRoot.querySelector('.table-edit-header')).toExist()
+    expect(tableShadowRoot.querySelector('.tablr-header')).toExist()
 
   describe 'header', ->
     header = null
@@ -531,7 +531,7 @@ describe 'tableElement', ->
       expect(cells[2].offsetWidth).toBeCloseTo(rowCells[rowCells.length-1].offsetWidth, -2)
 
     it 'contains a filler div to figurate the gutter width', ->
-      expect(header.querySelector('.table-edit-header-filler')).toExist()
+      expect(header.querySelector('.tablr-header-filler')).toExist()
 
     describe 'clicking on a header cell', ->
       [column] = []
@@ -629,7 +629,7 @@ describe 'tableElement', ->
 
         mouseup(handle, x - 100, y)
 
-        expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('table-edit.minimumColumnWidth'))
+        expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('tablr.minimumColumnWidth'))
 
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
@@ -712,21 +712,21 @@ describe 'tableElement', ->
           it 'changes the cell value', ->
             expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
 
-        describe 'table-edit:move-right-in-selection', ->
+        describe 'tablr:move-right-in-selection', ->
           it 'confirms the current edit and moves the active cursor to the right', ->
             spyOn(tableElement, 'moveRightInSelection')
             editor.setText('Foo Bar')
-            atom.commands.dispatch(editorElement, 'table-edit:move-right-in-selection')
+            atom.commands.dispatch(editorElement, 'tablr:move-right-in-selection')
 
             expect(tableElement.isEditing()).toBeFalsy()
             expect(tableElement.moveRightInSelection).toHaveBeenCalled()
             expect(tableEditor.getScreenColumn(0).name).toEqual('Foo Bar')
 
-        describe 'table-edit:move-left-in-selection', ->
+        describe 'tablr:move-left-in-selection', ->
           it 'confirms the current edit and moves the active cursor to the left', ->
             spyOn(tableElement, 'moveLeftInSelection')
             editor.setText('Foo Bar')
-            atom.commands.dispatch(editorElement, 'table-edit:move-left-in-selection')
+            atom.commands.dispatch(editorElement, 'tablr:move-left-in-selection')
 
             expect(tableElement.isEditing()).toBeFalsy()
             expect(tableElement.moveLeftInSelection).toHaveBeenCalled()
@@ -768,11 +768,11 @@ describe 'tableElement', ->
       [content, gutter] = []
 
       beforeEach ->
-        content = tableShadowRoot.querySelector('.table-edit-content')
-        gutter = tableShadowRoot.querySelector('.table-edit-gutter')
+        content = tableShadowRoot.querySelector('.tablr-content')
+        gutter = tableShadowRoot.querySelector('.tablr-gutter')
 
       it 'contains a filler div to set the gutter width', ->
-        expect(gutter.querySelector('.table-edit-gutter-filler')).toExist()
+        expect(gutter.querySelector('.tablr-gutter-filler')).toExist()
 
       it 'matches the count of rows in the body', ->
         expect(gutter.querySelectorAll('atom-table-gutter-cell').length)
@@ -1099,7 +1099,7 @@ describe 'tableElement', ->
 
   describe 'core:page-down', ->
     beforeEach ->
-      atom.config.set 'table-edit.pageMoveRowAmount', 20
+      atom.config.set 'tablr.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows below', ->
       tableElement.pageDown()
@@ -1115,7 +1115,7 @@ describe 'tableElement', ->
 
     describe 'with a custom amount on the instance', ->
       it 'moves the cursor 30 rows below', ->
-        atom.config.set 'table-edit.pageMoveRowAmount', 30
+        atom.config.set 'tablr.pageMoveRowAmount', 30
 
         tableElement.pageDown()
 
@@ -1123,7 +1123,7 @@ describe 'tableElement', ->
 
   describe 'core:page-up', ->
     beforeEach ->
-      atom.config.set 'table-edit.pageMoveRowAmount', 20
+      atom.config.set 'tablr.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows up', ->
       tableEditor.setCursorAtScreenPosition([20, 0])
@@ -1148,7 +1148,7 @@ describe 'tableElement', ->
       tableEditor.addColumn()
       tableEditor.addColumn()
       tableEditor.addColumn()
-      atom.config.set 'table-edit.pageMoveColumnAmount', 4
+      atom.config.set 'tablr.pageMoveColumnAmount', 4
 
     it 'moves the cursor 4 cells left', ->
       tableEditor.setCursorAtScreenPosition([0, 5])
@@ -1180,7 +1180,7 @@ describe 'tableElement', ->
 
       expect(tableEditor.getCursorPosition().row).toEqual(99)
 
-  describe 'table-edit:insert-row-before', ->
+  describe 'tablr:insert-row-before', ->
     it 'inserts a new row before the active row', ->
       tableElement.moveDown()
       tableElement.moveDown()
@@ -1213,7 +1213,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenRow(0)).not.toEqual([undefined, undefined, undefined])
 
-  describe 'table-edit:insert-row-after', ->
+  describe 'tablr:insert-row-after', ->
     it 'inserts a new row after the active row', ->
       tableElement.insertRowAfter()
 
@@ -1237,7 +1237,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenRowCount()).toEqual(100)
 
-  describe 'table-edit:delete-row', ->
+  describe 'tablr:delete-row', ->
     it 'deletes the current active row', ->
       tableElement.deleteRowAtCursor()
 
@@ -1267,7 +1267,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenRowCount()).toEqual(100)
 
-  describe 'table-edit:insert-column-before', ->
+  describe 'tablr:insert-column-before', ->
     it 'inserts a new column before the active column', ->
       tableElement.insertColumnBefore()
 
@@ -1291,7 +1291,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
-  describe 'table-edit:insert-column-after', ->
+  describe 'tablr:insert-column-after', ->
     it 'inserts a new column after the active column', ->
       tableElement.insertColumnAfter()
 
@@ -1314,7 +1314,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
-  describe 'table-edit:delete-column', ->
+  describe 'tablr:delete-column', ->
     it 'deletes the current active column', ->
       tableElement.deleteColumnAtCursor()
 
@@ -1360,7 +1360,7 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
         expect(atom.clipboard.read()).toEqual('row0')
 
-  describe 'table-edit:align-left', ->
+  describe 'tablr:align-left', ->
     describe 'when there is no target column', ->
       it 'change the alignment of the active column', ->
         tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align = 'right'
@@ -1378,7 +1378,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('left')
 
-  describe 'table-edit:align-center', ->
+  describe 'tablr:align-center', ->
     describe 'when there is no target column', ->
       it 'change the alignment of the active column', ->
         tableElement.alignCenter()
@@ -1393,7 +1393,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('center')
 
-  describe 'table-edit:align-right', ->
+  describe 'tablr:align-right', ->
     describe 'when there is no target column', ->
       it 'change the alignment of the active column', ->
         tableElement.alignRight()
@@ -1493,23 +1493,23 @@ describe 'tableElement', ->
         atom.commands.dispatch(editorElement, 'core:cancel')
         expect(tableElement.isEditing()).toBeFalsy()
 
-    describe 'table-edit:move-right-in-selection', ->
+    describe 'tablr:move-right-in-selection', ->
       it 'confirms the current edit and moves the active cursor to the right', ->
         previousActiveCell = tableEditor.getLastCursor()
         spyOn(tableElement, 'moveRightInSelection')
         editor.setText('Foo Bar')
-        atom.commands.dispatch(editorElement, 'table-edit:move-right-in-selection')
+        atom.commands.dispatch(editorElement, 'tablr:move-right-in-selection')
 
         expect(tableElement.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
         expect(tableElement.moveRightInSelection).toHaveBeenCalled()
 
-    describe 'table-edit:move-left-in-selection', ->
+    describe 'tablr:move-left-in-selection', ->
       it 'confirms the current edit and moves the active cursor to the left', ->
         previousActiveCell = tableEditor.getLastCursor()
         spyOn(tableElement, 'moveLeftInSelection')
         editor.setText('Foo Bar')
-        atom.commands.dispatch(editorElement, 'table-edit:move-left-in-selection')
+        atom.commands.dispatch(editorElement, 'tablr:move-left-in-selection')
 
         expect(tableElement.isEditing()).toBeFalsy()
         expect(previousActiveCell.getValue()).toEqual('Foo Bar')
@@ -1625,7 +1625,7 @@ describe 'tableElement', ->
 
     describe 'selection', ->
       it 'follows the cursor when it moves', ->
-        atom.config.set 'table-edit.pageMoveRowAmount', 10
+        atom.config.set 'tablr.pageMoveRowAmount', 10
         tableElement.pageDown()
         tableElement.moveRight()
 
@@ -1853,13 +1853,13 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,1]])
 
-    describe 'table-edit:select-to-end-of-line', ->
+    describe 'tablr:select-to-end-of-line', ->
       it 'expands the selection to the end of the current row', ->
         tableElement.expandSelectionToEndOfLine()
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-      describe 'then triggering table-edit:select-to-beginning-of-line', ->
+      describe 'then triggering tablr:select-to-beginning-of-line', ->
         it 'expands the selection to the beginning of the current row', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
@@ -1868,7 +1868,7 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
 
-    describe 'table-edit:select-to-beginning-of-line', ->
+    describe 'tablr:select-to-beginning-of-line', ->
       it 'expands the selection to the beginning of the current row', ->
         tableEditor.setCursorAtScreenPosition([0,2])
 
@@ -1876,7 +1876,7 @@ describe 'tableElement', ->
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
-      describe 'table-edit:select-to-end-of-line', ->
+      describe 'tablr:select-to-end-of-line', ->
         it 'expands the selection to the end of the current row', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
@@ -1885,7 +1885,7 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 
-    describe 'table-edit:select-to-end-of-table', ->
+    describe 'tablr:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
         tableElement.expandSelectionToEndOfTable()
 
@@ -1896,7 +1896,7 @@ describe 'tableElement', ->
 
         expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
-      describe 'then triggering table-edit:select-to-beginning-of-table', ->
+      describe 'then triggering tablr:select-to-beginning-of-table', ->
         it 'expands the selection to the beginning of the table', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
@@ -1905,7 +1905,7 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[2,1]])
 
-    describe 'table-edit:select-to-beginning-of-table', ->
+    describe 'tablr:select-to-beginning-of-table', ->
       it 'expands the selection to the beginning of the table', ->
         tableEditor.setCursorAtScreenPosition([2,0])
 
@@ -1920,7 +1920,7 @@ describe 'tableElement', ->
 
         expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
 
-      describe 'table-edit:select-to-end-of-table', ->
+      describe 'tablr:select-to-end-of-table', ->
         it 'expands the selection to the end of the table', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
@@ -2100,7 +2100,7 @@ describe 'tableElement', ->
         expect(tableEditor.getLastCursor().getValue()).toEqual(tableEditor.getValueAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
-        expect(tableShadowRoot.querySelector('.table-edit-rows-wrapper').offsetHeight).toEqual(2000)
+        expect(tableShadowRoot.querySelector('.tablr-rows-wrapper').offsetHeight).toEqual(2000)
 
       it 'decorates the table header cell with a class', ->
         expect(tableShadowRoot.querySelectorAll('atom-table-header-cell.order.descending').length).toEqual(1)

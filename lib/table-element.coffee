@@ -30,20 +30,20 @@ class TableElement extends HTMLElement
   @useShadowRoot()
 
   @content: ->
-    @div class: 'table-edit-header', outlet: 'head', =>
-      @div class: 'table-edit-header-content', =>
-        @div class: 'table-edit-header-filler', outlet: 'tableHeaderFiller'
-        @div class: 'table-edit-header-row', outlet: 'tableHeaderRow', =>
-          @div class: 'table-edit-header-wrapper', outlet: 'tableHeaderCells'
+    @div class: 'tablr-header', outlet: 'head', =>
+      @div class: 'tablr-header-content', =>
+        @div class: 'tablr-header-filler', outlet: 'tableHeaderFiller'
+        @div class: 'tablr-header-row', outlet: 'tableHeaderRow', =>
+          @div class: 'tablr-header-wrapper', outlet: 'tableHeaderCells'
         @div class: 'column-resize-ruler', outlet: 'columnRuler'
 
-    @div class: 'table-edit-body', outlet: 'body', =>
-      @div class: 'table-edit-content', =>
-        @div class: 'table-edit-rows', outlet: 'tableRows', =>
-          @div class: 'table-edit-rows-wrapper', outlet: 'tableCells'
-        @div class: 'table-edit-gutter', =>
-          @div class: 'table-edit-gutter-wrapper', outlet: 'tableGutter', =>
-            @div class: 'table-edit-gutter-filler', outlet: 'tableGutterFiller'
+    @div class: 'tablr-body', outlet: 'body', =>
+      @div class: 'tablr-content', =>
+        @div class: 'tablr-rows', outlet: 'tableRows', =>
+          @div class: 'tablr-rows-wrapper', outlet: 'tableCells'
+        @div class: 'tablr-gutter', =>
+          @div class: 'tablr-gutter-wrapper', outlet: 'tableGutter', =>
+            @div class: 'tablr-gutter-filler', outlet: 'tableGutterFiller'
 
         @div class: 'row-resize-ruler', outlet: 'rowRuler'
 
@@ -132,11 +132,11 @@ class TableElement extends HTMLElement
         @focus()
       'click': stopPropagationAndDefault()
 
-    @subscriptions.add @subscribeTo @body, '.table-edit-gutter',
+    @subscriptions.add @subscribeTo @body, '.tablr-gutter',
       'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
       'click': stopPropagationAndDefault()
 
-    @subscriptions.add @subscribeTo @body, '.table-edit-gutter .row-resize-handle',
+    @subscriptions.add @subscribeTo @body, '.tablr-gutter .row-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startRowResizeDrag(e)
       'click': stopPropagationAndDefault()
 
@@ -146,15 +146,15 @@ class TableElement extends HTMLElement
 
   subscribeToConfig: ->
     @observeConfig
-      'table-edit.undefinedDisplay': (@configUndefinedDisplay) =>
+      'tablr.undefinedDisplay': (@configUndefinedDisplay) =>
         @requestUpdate() if @attached
-      'table-edit.pageMoveRowAmount': (@configPageMoveRowAmount) =>
+      'tablr.pageMoveRowAmount': (@configPageMoveRowAmount) =>
         @requestUpdate() if @attached
-      'table-edit.rowOverdraw': (@configRowOverdraw) =>
+      'tablr.rowOverdraw': (@configRowOverdraw) =>
         @requestUpdate() if @attached
-      'table-edit.columnOverdraw': (@configColumnOverdraw) =>
+      'tablr.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
-      'table-edit.scrollPastEnd': (@scrollPastEnd) =>
+      'tablr.scrollPastEnd': (@scrollPastEnd) =>
         @requestUpdate() if @attached
 
   observeConfig: (configs) ->
@@ -203,7 +203,7 @@ class TableElement extends HTMLElement
     @height = @clientHeight
     @width = @clientWidth
 
-  getGutter: -> @shadowRoot.querySelector('.table-edit-gutter')
+  getGutter: -> @shadowRoot.querySelector('.tablr-gutter')
 
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
@@ -711,11 +711,11 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions = new CompositeDisposable
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
-      'table-edit:move-right-in-selection': (e) =>
+      'tablr:move-right-in-selection': (e) =>
         e.stopPropagation()
         @confirmCellEdit()
         @moveRightInSelection()
-      'table-edit:move-left-in-selection': (e) =>
+      'tablr:move-left-in-selection': (e) =>
         e.stopPropagation()
         @confirmCellEdit()
         @moveLeftInSelection()
@@ -738,11 +738,11 @@ class TableElement extends HTMLElement
     @textEditorSubscriptions = new CompositeDisposable
     @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
 
-      'table-edit:move-right-in-selection': (e) =>
+      'tablr:move-right-in-selection': (e) =>
         e.stopPropagation()
         @confirmColumnEdit()
         @moveRightInSelection()
-      'table-edit:move-left-in-selection': (e) =>
+      'tablr:move-left-in-selection': (e) =>
         e.stopPropagation()
         @confirmColumnEdit()
         @moveLeftInSelection()
@@ -1039,9 +1039,9 @@ class TableElement extends HTMLElement
     rowHeight = @tableEditor.getScreenRowHeightAt(row)
 
     if row >= @getLastVisibleRow() - 1 and rowOffset + rowHeight >= scrollTop + @height - @height / 5
-      container.scrollTop += atom.config.get('table-edit.scrollSpeedDuringDrag')
+      container.scrollTop += atom.config.get('tablr.scrollSpeedDuringDrag')
     else if row <= @getFirstVisibleRow() + 1
-      container.scrollTop -= atom.config.get('table-edit.scrollSpeedDuringDrag')
+      container.scrollTop -= atom.config.get('tablr.scrollSpeedDuringDrag')
 
     if column?
       scrollLeft = container.scrollLeft
@@ -1049,9 +1049,9 @@ class TableElement extends HTMLElement
       columnWidth = @tableEditor.getScreenColumnWidthAt(row)
 
       if column >= @getLastVisibleColumn() - 1  and columnOffset + columnWidth >= scrollLeft + @width - @width / 5
-        container.scrollLeft += atom.config.get('table-edit.scrollSpeedDuringDrag')
+        container.scrollLeft += atom.config.get('tablr.scrollSpeedDuringDrag')
       else if column <= @getFirstVisibleColumn() + 1
-        container.scrollLeft -= atom.config.get('table-edit.scrollSpeedDuringDrag')
+        container.scrollLeft -= atom.config.get('tablr.scrollSpeedDuringDrag')
 
   initializeDragEvents: (object, events) ->
     @dragSubscription = new CompositeDisposable
@@ -1368,33 +1368,33 @@ atom.commands.add 'atom-table-editor',
   'core:move-down': -> @moveDown()
   'core:move-to-top': -> @moveToTop()
   'core:move-to-bottom': -> @moveToBottom()
-  'table-edit:move-to-end-of-line': -> @moveToRight()
-  'table-edit:move-to-beginning-of-line': -> @moveToLeft()
+  'tablr:move-to-end-of-line': -> @moveToRight()
+  'tablr:move-to-beginning-of-line': -> @moveToLeft()
   'core:page-up': -> @pageUp()
   'core:page-down': -> @pageDown()
-  'table-edit:page-left': -> @pageLeft()
-  'table-edit:page-right': -> @pageRight()
+  'tablr:page-left': -> @pageLeft()
+  'tablr:page-right': -> @pageRight()
   'core:select-right': -> @expandSelectionRight()
   'core:select-left': -> @expandSelectionLeft()
   'core:select-up': -> @expandSelectionUp()
   'core:select-down': -> @expandSelectionDown()
-  'table-edit:move-left-in-selection': -> @moveLeftInSelection()
-  'table-edit:move-right-in-selection': -> @moveRightInSelection()
-  'table-edit:move-up-in-selection': -> @moveUpInSelection()
-  'table-edit:move-down-in-selection': -> @moveDownInSelection()
-  'table-edit:select-to-end-of-line': -> @expandSelectionToEndOfLine()
-  'table-edit:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
-  'table-edit:select-to-end-of-table': -> @expandSelectionToEndOfTable()
-  'table-edit:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
-  'table-edit:insert-row-before': -> @insertRowBefore()
-  'table-edit:insert-row-after': -> @insertRowAfter()
-  'table-edit:delete-row': -> @deleteRowAtCursor()
-  'table-edit:insert-column-before': -> @insertColumnBefore()
-  'table-edit:insert-column-after': -> @insertColumnAfter()
-  'table-edit:delete-column': -> @deleteColumnAtCursor()
-  'table-edit:align-left': -> @alignLeft()
-  'table-edit:align-center': -> @alignCenter()
-  'table-edit:align-right': -> @alignRight()
+  'tablr:move-left-in-selection': -> @moveLeftInSelection()
+  'tablr:move-right-in-selection': -> @moveRightInSelection()
+  'tablr:move-up-in-selection': -> @moveUpInSelection()
+  'tablr:move-down-in-selection': -> @moveDownInSelection()
+  'tablr:select-to-end-of-line': -> @expandSelectionToEndOfLine()
+  'tablr:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
+  'tablr:select-to-end-of-table': -> @expandSelectionToEndOfTable()
+  'tablr:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
+  'tablr:insert-row-before': -> @insertRowBefore()
+  'tablr:insert-row-after': -> @insertRowAfter()
+  'tablr:delete-row': -> @deleteRowAtCursor()
+  'tablr:insert-column-before': -> @insertColumnBefore()
+  'tablr:insert-column-after': -> @insertColumnAfter()
+  'tablr:delete-column': -> @deleteColumnAtCursor()
+  'tablr:align-left': -> @alignLeft()
+  'tablr:align-center': -> @alignCenter()
+  'tablr:align-right': -> @alignRight()
 
 atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
   'core:move-up': -> @moveUp()

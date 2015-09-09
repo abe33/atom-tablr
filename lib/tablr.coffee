@@ -64,8 +64,8 @@ module.exports =
     @subscriptions = new CompositeDisposable
 
     @subscriptions.add atom.commands.add 'atom-workspace',
-      'table-edit:demo-large': => atom.workspace.open('table://large')
-      'table-edit:demo-small': => atom.workspace.open('table://small')
+      'tablr:demo-large': => atom.workspace.open('tablr://large')
+      'tablr:demo-small': => atom.workspace.open('tablr://small')
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless /\.csv$/.test uriToOpen
@@ -86,7 +86,7 @@ module.exports =
       url ||= require 'url'
 
       {protocol, host} = url.parse uriToOpen
-      return unless protocol is 'table:'
+      return unless protocol is 'tablr:'
 
       switch host
         when 'large' then @getLargeTable()
@@ -96,9 +96,9 @@ module.exports =
       'atom-table-editor': [{
         label: 'Table'
         submenu: [
-          {label: 'Align left', command: 'table-edit:align-left'}
-          {label: 'Align center', command: 'table-edit:align-center'}
-          {label: 'Align right', command: 'table-edit:align-right'}
+          {label: 'Align left', command: 'tablr:align-left'}
+          {label: 'Align center', command: 'tablr:align-center'}
+          {label: 'Align right', command: 'tablr:align-right'}
         ]
         created: (event) ->
           {pageX, pageY, target} = event

@@ -3,7 +3,7 @@ path = require 'path'
 temp = require 'temp'
 
 {TextEditor} = require 'atom'
-TableEdit = require '../lib/table-edit'
+TableEdit = require '../lib/tablr'
 TableEditor = require '../lib/table-editor'
 CSVEditor = require '../lib/csv-editor'
 TableElement = require '../lib/table-element'
@@ -32,7 +32,7 @@ describe "CSVEditor", ->
         nextAnimationFrame = noAnimationFrame
         fn()
 
-    waitsForPromise -> atom.packages.activatePackage('table-edit').then (pkg) ->
+    waitsForPromise -> atom.packages.activatePackage('tablr').then (pkg) ->
       tableEditPackage = pkg.mainModule
 
   sleep = (ms) ->
@@ -42,7 +42,7 @@ describe "CSVEditor", ->
   openFixture = (fixtureName, settings) ->
     csvFixture = path.join(__dirname, 'fixtures', fixtureName)
 
-    projectPath = temp.mkdirSync('table-edit-project')
+    projectPath = temp.mkdirSync('tablr-project')
     csvDest = path.join(projectPath, fixtureName)
 
     if settings?
@@ -213,6 +213,9 @@ describe "CSVEditor", ->
 
                 tableEditorButton = secondCSVEditorElement.form.openTableEditorButton
                 click(tableEditorButton)
+
+            waitsFor ->
+              secondCSVEditor.editor
 
           it 'reuses the same table for two different table editors', ->
             expect(csvEditor.editor.table).toBe(secondCSVEditor.editor.table)
@@ -514,7 +517,7 @@ describe "CSVEditor", ->
       spyOn(tableEditPackage, 'deactivate').andCallThrough()
 
       atom.packages.observeDisabledPackages()
-      atom.packages.disablePackage('table-edit')
+      atom.packages.disablePackage('tablr')
 
       waitsFor -> tableEditPackage.deactivate.callCount > 0
 
