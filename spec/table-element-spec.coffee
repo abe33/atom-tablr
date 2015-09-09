@@ -3,6 +3,7 @@ path = require 'path'
 Table = require '../lib/table'
 TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
+TableCellElement = require '../lib/table-cell-element'
 TableSelectionElement = require '../lib/table-selection-element'
 Column = require '../lib/display-column'
 {mousedown, mousemove, mouseup, scroll, click, dblclick, textInput, objectCenterCoordinates} = require './helpers/events'
@@ -58,6 +59,12 @@ isVisible = (node) ->
   node.offsetWidth isnt 0 and
   node.offsetHeight? and
   node.offsetHeight isnt 0
+
+# The real implementation use a requestAnimationFrame to ensure that there is
+# no forced layout update of the DOM when evaluating the size of the cell's
+# content. However, in tests, this lead to nasty side effects as we mock the
+# requestAnimationFrame method.
+TableCellElement::requestEllipsisCheck = -> @checkEllipsis()
 
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
@@ -223,6 +230,14 @@ describe 'tableElement', ->
       tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
       expect(tableElement.getScreenCellAtPosition([0,0]).textContent).toEqual('bar')
+
+    describe 'when the cell content is bigger than the available space', ->
+      beforeEach ->
+        tableEditor.setValueAtPosition([0,0], "some really long text")
+        nextAnimationFrame()
+
+      it 'adds an ellipsis class to the cell', ->
+        expect(tableElement.getScreenCellAtPosition([0,0]).classList.contains('ellipsis')).toBeTruthy()
 
     it 'sets the proper width and height on the table rows container', ->
       bodyContent = tableShadowRoot.querySelector('.table-edit-rows-wrapper')
