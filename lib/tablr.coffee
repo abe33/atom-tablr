@@ -48,7 +48,7 @@ module.exports =
       type: 'string'
       default: 'vertically'
       enum: ['horizontally', 'vertically']
-      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (vertically) or of the same row (horizontally)."
+      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`)."
 
   activate: ({csvConfig}) ->
     CSVConfig ?= require './csv-config'
