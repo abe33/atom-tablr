@@ -178,6 +178,90 @@ describe 'TableEditor', ->
 
         expect(spy).toHaveBeenCalled()
 
+    describe '::addCursorBelowLastSelection', ->
+      beforeEach ->
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+
+        tableEditor.setSelectedRange([
+          [3,2]
+          [5,4]
+        ])
+
+      it 'creates a new cursor', ->
+        tableEditor.addCursorBelowLastSelection()
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([5,2])
+
+    describe '::addCursorAboveLastSelection', ->
+      beforeEach ->
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+
+        tableEditor.setSelectedRange([
+          [3,2]
+          [5,4]
+        ])
+
+      it 'creates a new cursor', ->
+        tableEditor.addCursorAboveLastSelection()
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([2,2])
+
+    describe '::addCursorLeftToLastSelection', ->
+      beforeEach ->
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+
+        tableEditor.setSelectedRange([
+          [3,2]
+          [5,4]
+        ])
+
+      it 'creates a new cursor', ->
+        tableEditor.addCursorLeftToLastSelection()
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([3,1])
+
+    describe '::addCursorRightToLastSelection', ->
+      beforeEach ->
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addColumn()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+        tableEditor.addRow()
+
+        tableEditor.setSelectedRange([
+          [3,2]
+          [5,4]
+        ])
+
+      it 'creates a new cursor', ->
+        tableEditor.addCursorRightToLastSelection()
+
+        expect(tableEditor.getCursors().length).toEqual(2)
+        expect(tableEditor.getCursorScreenPosition()).toEqual([3,4])
+
     describe '::setCursorAtScreenPosition', ->
       it 'sets the cursor position', ->
         tableEditor.setCursorAtScreenPosition([1,1])

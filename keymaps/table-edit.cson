@@ -28,6 +28,8 @@
   'cmd-alt-backspace right': 'tablr:delete-row'
   'cmd-alt-backspace up': 'tablr:delete-column'
   'cmd-alt-backspace down': 'tablr:delete-column'
+  'ctrl-shift-up': 'tablr:add-selection-above'
+  'ctrl-shift-down': 'tablr:add-selection-below'
 
 '.platform-win32, .platform-linux':
   'ctrl-left': 'tablr:move-to-beginning-of-line'
@@ -36,6 +38,8 @@
   'ctrl-shift-left': 'tablr:select-to-beginning-of-line'
   'ctrl-shift-up': 'tablr:select-to-beginning-of-table'
   'ctrl-shift-down': 'tablr:select-to-end-of-table'
+  'ctrl-alt-up': 'tablr:add-selection-above'
+  'ctrl-alt-down': 'tablr:add-selection-below'
   'ctrl-alt-n up': 'tablr:insert-row-before'
   'ctrl-alt-n down': 'tablr:insert-row-after'
   'ctrl-alt-n left': 'tablr:insert-column-before'

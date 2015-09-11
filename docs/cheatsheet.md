@@ -33,6 +33,10 @@ Command|Action
 `tablr:page-right`|Move the cursors right by the amount of rows specified in the `tablr.pageMoveColumnAmount` setting. <br/>The cursor will stop at the last column when going past the bounds.
 `core:page-up`|<p>OSX/Win/Linux: <kbd>pageup</kbd></p>Move the cursors up by the amount of rows specified in the `tablr.pageMoveRowAmount` setting. <br/>The cursor will stop at the first row when going past the bounds.
 `core:page-down`|<p>OSX/Win/Linux: <kbd>pagedown</kbd></p>Move the cursors down by the amount of rows specified in the `tablr.pageMoveRowAmount` setting. <br/>The cursor will stop at the last row when going past the bounds.
+`tablr:add-selection-left`|Add a new cursor on the left of the last selection bounds and on the same row as the selection's cursor.
+`tablr:add-selection-right`|Add a new cursor on the right of the last selection bounds and on the same row as the selection's cursor.
+`tablr:add-selection-above`|<p>OSX: <kbd>ctrl-shift-up</kbd><br/>Win/Linux: <kbd>ctrl-alt-up</kbd></p>Add a new cursor above the last selection bounds and on the same column as the selection's cursor.
+`tablr:add-selection-below`|<p>OSX: <kbd>ctrl-shift-down</kbd><br/>Win/Linux: <kbd>ctrl-alt-down</kbd></p>Add a new cursor below the last selection bounds and on the same column as the selection's cursor.
 
 ## Selections
 

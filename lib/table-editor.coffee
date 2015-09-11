@@ -400,6 +400,38 @@ class TableEditor
 
     @createCursorAndSelection(position)
 
+  addCursorBelowLastSelection: ->
+    range = @getSelectedRange()
+    position = @getCursorPosition()
+    @addCursorAtScreenPosition([
+      range.end.row
+      position.column
+    ])
+
+  addCursorAboveLastSelection: ->
+    range = @getSelectedRange()
+    position = @getCursorPosition()
+    @addCursorAtScreenPosition([
+      range.start.row - 1
+      position.column
+    ])
+
+  addCursorLeftToLastSelection: ->
+    range = @getSelectedRange()
+    position = @getCursorPosition()
+    @addCursorAtScreenPosition([
+      position.row
+      range.start.column - 1
+    ])
+
+  addCursorRightToLastSelection: ->
+    range = @getSelectedRange()
+    position = @getCursorPosition()
+    @addCursorAtScreenPosition([
+      position.row
+      range.end.column
+    ])
+
   setCursorAtPosition: (position) ->
     position = @screenPosition(position)
     @moveCursors (cursor) -> cursor.setPosition(position)

@@ -583,6 +583,22 @@ class TableElement extends HTMLElement
     @tableEditor.pageRight()
     @afterCursorMove()
 
+  addCursorBelowLastSelection: ->
+    @tableEditor.addCursorBelowLastSelection()
+    @afterCursorMove()
+
+  addCursorAboveLastSelection: ->
+    @tableEditor.addCursorAboveLastSelection()
+    @afterCursorMove()
+
+  addCursorLeftToLastSelection: ->
+    @tableEditor.addCursorLeftToLastSelection()
+    @afterCursorMove()
+
+  addCursorRightToLastSelection: ->
+    @tableEditor.addCursorRightToLastSelection()
+    @afterCursorMove()
+
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getLastCursor().getPosition())
 
@@ -1395,6 +1411,10 @@ atom.commands.add 'atom-table-editor',
   'tablr:align-left': -> @alignLeft()
   'tablr:align-center': -> @alignCenter()
   'tablr:align-right': -> @alignRight()
+  'tablr:add-selection-below': -> @addCursorBelowLastSelection()
+  'tablr:add-selection-above': -> @addCursorAboveLastSelection()
+  'tablr:add-selection-left': -> @addCursorLeftToLastSelection()
+  'tablr:add-selection-right': -> @addCursorRightToLastSelection()
 
 atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
   'core:move-up': -> @moveUp()
