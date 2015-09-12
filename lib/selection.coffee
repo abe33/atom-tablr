@@ -57,6 +57,16 @@ class Selection
       for column in [@range.start.column...@range.end.column]
         @tableEditor.getValueAtScreenPosition([row, column])
 
+  getFlattenValue: ->
+    return [] if @isEmpty()
+
+    res = []
+    for row in [@range.start.row...@range.end.row]
+      for column in [@range.start.column...@range.end.column]
+        res.push @tableEditor.getValueAtScreenPosition([row, column])
+
+    res
+
   rowsSpan: -> @range.end.row - @range.start.row
 
   columnsSpan: -> @range.end.column - @range.start.column
@@ -96,18 +106,42 @@ class Selection
       }]
 
       metadata.values.push(values)
-      metadata.selections.push({
-        text: selectionText
-        fullLine: fullLine
-        indentBasis: 0
-      })
+
+      if atom.config.get 'tablr.treatEachCellAsASelectionWhenPastingToABuffer'
+        @getFlattenValue().forEach (value) ->
+          metadata.selections.push({
+            text: value
+            fullLine: fullLine
+            indentBasis: 0
+          })
+      else
+        metadata.selections.push({
+          text: selectionText
+          fullLine: fullLine
+          indentBasis: 0
+        })
+
       atom.clipboard.write([clipboardText, selectionText].join("\n"), metadata)
     else
-      atom.clipboard.write(selectionText, {
-        values: [values]
-        indentBasis: 0
-        fullLine: fullLine
-      })
+      if atom.config.get 'tablr.treatEachCellAsASelectionWhenPastingToABuffer'
+        atom.clipboard.write(selectionText, {
+          values: [values]
+          indentBasis: 0
+          fullLine: fullLine
+          selections: @getFlattenValue().map (value) ->
+            {
+              text: value
+              fullLine: fullLine
+              indentBasis: 0
+            }
+        })
+
+      else
+        atom.clipboard.write(selectionText, {
+          values: [values]
+          indentBasis: 0
+          fullLine: fullLine
+        })
 
   getFirstSelectedRow: -> @range.start.row
 

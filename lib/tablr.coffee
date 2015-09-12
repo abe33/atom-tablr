@@ -43,12 +43,16 @@ module.exports =
     flattenBufferMultiSelectionOnPaste:
       type: 'boolean'
       default: false
-      description: "If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection."
+      description: 'If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection.'
     distributeBufferMultiSelectionOnPaste:
       type: 'string'
       default: 'vertically'
       enum: ['horizontally', 'vertically']
-      description: "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`)."
+      description: 'If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`).'
+    treatEachCellAsASelectionWhenPastingToABuffer:
+      type: 'boolean'
+      default: true
+      description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
 
   activate: ({csvConfig}) ->
     CSVConfig ?= require './csv-config'

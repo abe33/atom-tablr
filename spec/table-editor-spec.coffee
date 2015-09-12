@@ -418,6 +418,32 @@ describe 'TableEditor', ->
         expect(selections[0].text).toEqual('age\t30')
         expect(selections[1].text).toEqual('gender\tfemale')
 
+      describe 'when the treatEachCellAsASelectionWhenPastingToATextBuffer setting is enabled', ->
+        beforeEach ->
+          atom.config.set 'tablr.treatEachCellAsASelectionWhenPastingToABuffer', true
+
+        it 'copies each cells as a buffer selection', ->
+          tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
+
+          tableEditor.copySelectedCells()
+
+          expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
+
+          clipboard = atom.clipboard.readWithMetadata()
+          metadata = clipboard.metadata
+          selections = metadata.selections
+          expect(clipboard.text).toEqual('age\t30\ngender\tfemale')
+          expect(metadata.values).toEqual([
+            [['age',30]]
+            [['gender','female']]
+          ])
+          expect(selections).toBeDefined()
+          expect(selections.length).toEqual(4)
+          expect(selections[0].text).toEqual('age')
+          expect(selections[1].text).toEqual(30)
+          expect(selections[2].text).toEqual('gender')
+          expect(selections[3].text).toEqual('female')
+
     ##     ######  ##     ## ########
     ##    ##    ## ##     ##    ##
     ##    ##       ##     ##    ##
