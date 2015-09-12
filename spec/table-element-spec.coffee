@@ -1985,6 +1985,15 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[4,1]])
 
+        describe 'and the mouse position is before the cursor position', ->
+          it 'creates the proper selection', ->
+            tableEditor.setCursorAtScreenPosition([4,2])
+
+            startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="1"][data-column="0"]')
+            mousedown(startCell, shiftKey: true)
+
+            expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[5,3]])
+
       it 'scrolls the view when the selection reach the last row', ->
         startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="6"][data-column="0"]')
         endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="9"][data-column="2"]')

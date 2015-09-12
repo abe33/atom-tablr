@@ -121,9 +121,16 @@ class TableElement extends HTMLElement
           if metaKey or (ctrlKey and process.platform isnt 'darwin')
             @tableEditor.addCursorAtScreenPosition(position)
           else if shiftKey
+            cursor = @tableEditor.getLastCursor().getPosition()
+
+            startRow = Math.min(cursor.row, position.row)
+            endRow = Math.max(cursor.row, position.row)
+            startColumn = Math.min(cursor.column, position.column)
+            endColumn = Math.max(cursor.column, position.column)
+
             @tableEditor.getLastSelection().setRange([
-              @tableEditor.getLastCursor().getPosition()
-              [position.row + 1, position.column + 1]
+              [startRow, startColumn]
+              [endRow + 1, endColumn + 1]
             ])
           else
             @tableEditor.setCursorAtScreenPosition position
