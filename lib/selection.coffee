@@ -88,15 +88,15 @@ class Selection
     if maintainClipboard
       {text: clipboardText, metadata} = atom.clipboard.readWithMetadata()
       metadata ?= {}
-      unless metadata.selections?
-        metadata.selections = [{
-          text: clipboardText
-          values: metadata.values
-          fullLine: metadata.fullLine
-          indentBasis: 0
-        }]
+      metadata.values ?= []
+      metadata.selections ?= [{
+        text: clipboardText
+        fullLine: metadata.fullLine
+        indentBasis: 0
+      }]
+
+      metadata.values.push(values)
       metadata.selections.push({
-        values
         text: selectionText
         fullLine: fullLine
         indentBasis: 0
@@ -104,7 +104,7 @@ class Selection
       atom.clipboard.write([clipboardText, selectionText].join("\n"), metadata)
     else
       atom.clipboard.write(selectionText, {
-        values
+        values: [values]
         indentBasis: 0
         fullLine: fullLine
       })

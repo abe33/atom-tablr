@@ -388,7 +388,7 @@ describe 'TableEditor', ->
 
         expect(atom.clipboard.read()).toEqual('age')
         expect(atom.clipboard.readWithMetadata().text).toEqual('age')
-        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age']])
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [[['age']]])
 
       it 'copies the selected cell values onto the clipboard', ->
         tableEditor.setSelectedRange([[0,0], [2,2]])
@@ -396,7 +396,7 @@ describe 'TableEditor', ->
         tableEditor.copySelectedCells()
 
         expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
-        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age',30], ['gender','female']])
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [[['age',30], ['gender','female']]])
 
       it 'copies each selections as metadata', ->
         tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
@@ -406,14 +406,17 @@ describe 'TableEditor', ->
         expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
 
         clipboard = atom.clipboard.readWithMetadata()
-        selections = clipboard.metadata.selections
+        metadata = clipboard.metadata
+        selections = metadata.selections
         expect(clipboard.text).toEqual('age\t30\ngender\tfemale')
+        expect(metadata.values).toEqual([
+          [['age',30]]
+          [['gender','female']]
+        ])
         expect(selections).toBeDefined()
         expect(selections.length).toEqual(2)
         expect(selections[0].text).toEqual('age\t30')
-        expect(selections[0].values).toEqual([['age',30]])
         expect(selections[1].text).toEqual('gender\tfemale')
-        expect(selections[1].values).toEqual([['gender','female']])
 
     ##     ######  ##     ## ########
     ##    ##    ## ##     ##    ##
@@ -429,7 +432,7 @@ describe 'TableEditor', ->
 
         expect(atom.clipboard.read()).toEqual('age')
         expect(atom.clipboard.readWithMetadata().text).toEqual('age')
-        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age']])
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [[['age']]])
 
         expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
 
@@ -439,7 +442,7 @@ describe 'TableEditor', ->
         tableEditor.cutSelectedCells()
 
         expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
-        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [['age',30], ['gender','female']])
+        expect(atom.clipboard.readWithMetadata().metadata).toEqual(fullLine: false, indentBasis: 0, values: [[['age',30], ['gender','female']]])
 
         expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
         expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(undefined)
@@ -454,14 +457,17 @@ describe 'TableEditor', ->
         expect(atom.clipboard.read()).toEqual('age\t30\ngender\tfemale')
 
         clipboard = atom.clipboard.readWithMetadata()
-        selections = clipboard.metadata.selections
+        metadata = clipboard.metadata
+        selections = metadata.selections
         expect(clipboard.text).toEqual('age\t30\ngender\tfemale')
+        expect(metadata.values).toEqual([
+          [['age',30]]
+          [['gender','female']]
+        ])
         expect(selections).toBeDefined()
         expect(selections.length).toEqual(2)
         expect(selections[0].text).toEqual('age\t30')
-        expect(selections[0].values).toEqual([['age',30]])
         expect(selections[1].text).toEqual('gender\tfemale')
-        expect(selections[1].values).toEqual([['gender','female']])
 
         expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual(undefined)
         expect(tableEditor.getValueAtScreenPosition([0,1])).toEqual(undefined)
@@ -647,7 +653,7 @@ describe 'TableEditor', ->
         describe 'and has only one selection', ->
           beforeEach ->
             atom.clipboard.write('foo\nbar', {
-              values: [['foo','bar']]
+              values: [[['foo','bar']]]
               text: 'foo\tbar'
               indentBasis: 0
               fullLine: false
@@ -697,15 +703,17 @@ describe 'TableEditor', ->
         describe 'and has many selections', ->
           beforeEach ->
             atom.clipboard.write('foo\nbar', {
+              values: [
+                [['foo', 'oof']]
+                [['bar', 'rab']]
+              ]
               selections: [
                 {
-                  values: [['foo', 'oof']]
                   indentBasis: 0
                   fullLine: false
                   text: 'foo\toof'
                 }
                 {
-                  values: [['bar', 'rab']]
                   indentBasis: 0
                   fullLine: false
                   text: 'bar\trab'
