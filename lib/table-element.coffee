@@ -902,6 +902,7 @@ class TableElement extends HTMLElement
 
     @drag(e, selection)
     @clearDragScrollInterval()
+    @tableEditor.mergeSelections()
     @dragging = false
     @dragSubscription.dispose()
 

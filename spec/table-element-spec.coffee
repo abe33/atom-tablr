@@ -1964,6 +1964,20 @@ describe 'tableElement', ->
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[3,0],[7,3]])
 
+        describe 'to create a selection within another one', ->
+          it 'merges the two selections in one', ->
+            tableEditor.setSelectedRange([[1,0],[5,3]])
+            startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="2"][data-column="0"]')
+            endCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="2"]')
+
+            mousedown(startCell, metaKey: true)
+            mousemove(endCell, metaKey: true)
+            mouseup(endCell, metaKey: true)
+
+            expect(tableEditor.getSelections().length).toEqual(1)
+
+            expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[5,3]])
+
       describe 'when the shift key is pressed', ->
         it 'creates a new selection with the cells from the mouse movements', ->
           startCell = tableShadowRoot.querySelector('atom-table-cell[data-row="3"][data-column="0"]')
