@@ -35,6 +35,31 @@ As you probably noticed, many fields in the settings form have a `custom` option
 
 ### Table Editor
 
-![CSV Opener](https://github.com/abe33/atom-tablr/blob/master/resources/table-editor.png?raw=true "In this screenshot the Header option was checked.")
+![TableEditor](https://github.com/abe33/atom-tablr/blob/master/resources/table-editor.png?raw=true "In this screenshot the Header option was checked.")
 
 Working with a table editor is done pretty much as you could expect. You can select one or many cells, edit them, copy/paste them and so on.
+
+#### Multiple Selections
+
+One big difference with other widespread spreadsheet editors is the use of multiple selections.
+
+![Multiple selections](https://github.com/abe33/atom-tablr/blob/master/resources/multiple-selections.png?raw=true)
+
+Tablr implements multiple selections using the same controls than those of a text editor. However, tables multiple selections behavior is different than in a text editor. Here are the main differences:
+
+- Selections can intersect with other selections. In a text editor a range spans from the start character to the end one by including every lines between them and can be merged whenever two selections intersect. In a table, a range is a surface that group cells together and are merged only when one selection contains another one.<br/>![Intersecting selections](https://github.com/abe33/atom-tablr/blob/master/resources/iintersecting-selections.png?raw=true)
+- When copying multiple selections from a table, each cell can be considered as a selection on its own. Various settings exist to allow you to alter this behavior to match your taste.
+- When editing a selection you only edit the cell at the cursor position and not the whole selection. In the case of multiple selections, an edit will change the value of each cursor cells. Commands exist to move the cursors within their own selection.
+
+#### Copy & Paste
+
+Copy, cut and paste works within a table editor as well as from and to a text editor.
+When copying from or pasting to a table, Tablr uses three data formats to support every source and targets:
+
+From|To|Description
+--|--|--
+Table Editor|Table Editor|Each selection is stored as a two dimensions array, keeping information about the structure of the selection. On paste, each target selection will receive the content from the corresponding clipboard selection. If there is more targets than sources it will cycle through the sources when reaching the end. If there is more sources than targets, the extra sources will be ignored. When a target selection is smaller than the source, it gets expanded to match the source selection. When it's the source that is smaller, the copy will cycle in the source selection through each axis to fill the target selection.
+Table Editor|Text Editor|Each selection is stored using the same format the text editor use for multiple selections. When a selection has many cells it will either use the format used when pasting to another context (using `\t` and `\n`) or it will create a selection for each cell when the `Treat Each Cell As A Selection When Pasting To A Buffer` setting is enabled.
+Text Editor|Table Editor|
+Table Editor|Other|Each selection will be serialized using a `\t` character to separate the columns and a `\n` character to separate each rows and selections.
+Other|Table Editor|Each selected cell will be filled with the content of the clipboard.
