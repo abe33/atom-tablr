@@ -47,7 +47,7 @@ One big difference with other widespread spreadsheet editors is the use of multi
 
 Tablr implements multiple selections using the same controls than those of a text editor. However, tables multiple selections behavior is different than in a text editor. Here are the main differences:
 
-- Selections can intersect with other selections. In a text editor a range spans from the start character to the end one by including every lines between them and can be merged whenever two selections intersect. In a table, a range is a surface that group cells together and are merged only when one selection contains another one.<br/>![Intersecting selections](https://github.com/abe33/atom-tablr/blob/master/resources/iintersecting-selections.png?raw=true)
+- Selections can intersect with other selections. In a text editor a range spans from the start character to the end one by including every lines between them and can be merged whenever two selections intersect. In a table, a range is a surface that group cells together and are merged only when one selection contains another one.<br/>![Intersecting selections](https://github.com/abe33/atom-tablr/blob/master/resources/intersecting-selections.png?raw=true)
 - When copying multiple selections from a table, each cell can be considered as a selection on its own. Various settings exist to allow you to alter this behavior to match your taste.
 - When editing a selection you only edit the cell at the cursor position and not the whole selection. In the case of multiple selections, an edit will change the value of each cursor cells. Commands exist to move the cursors within their own selection.
 
