@@ -1,6 +1,17 @@
 _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
-[TableEditor, TableElement, TableSelectionElement, CSVEditor, CSVEditorElement, CSVConfig, url] = []
+[url] = []
+
+TableEditor = require './table-editor'
+TableElement = require './table-element'
+TableSelectionElement = require './table-selection-element'
+CSVConfig = require './csv-config'
+CSVEditor = require './csv-editor'
+CSVEditorElement = require './csv-editor-element'
+
+CSVEditorElement.registerViewProvider()
+TableElement.registerViewProvider()
+TableSelectionElement.registerViewProvider()
 
 module.exports =
   config:
@@ -55,14 +66,6 @@ module.exports =
       description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
 
   activate: ({csvConfig}) ->
-    CSVConfig ?= require './csv-config'
-    TableEditor ?= require './table-editor'
-    TableElement ?= require './table-element'
-    TableSelectionElement ?= require './table-selection-element'
-
-    TableElement.registerViewProvider()
-    TableSelectionElement.registerViewProvider()
-
     @csvConfig = new CSVConfig(csvConfig)
 
     @subscriptions = new CompositeDisposable
@@ -73,11 +76,6 @@ module.exports =
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless /\.csv$/.test uriToOpen
-
-      unless CSVEditorElement?
-        CSVEditor ?= require './csv-editor'
-        CSVEditorElement = require './csv-editor-element'
-        CSVEditorElement.registerViewProvider()
 
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})

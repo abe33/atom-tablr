@@ -4,13 +4,21 @@ csv = require 'csv'
 path = require 'path'
 {CompositeDisposable, Emitter} = require 'atom'
 TableEditor = require './table-editor'
-Tablr = require './tablr'
+Tablr = null
 
 module.exports =
 class CSVEditor
+  atom.deserializers.add(this)
+
+  @deserialize: (state) ->
+    csvEditor = new CSVEditor(state)
+    csvEditor.applyChoice()
+    csvEditor
+
   @tableEditorForPath: {}
 
-  constructor: ({@uriToOpen, @options, @choice}={}) ->
+  constructor: ({@uriToOpen, @options, @choice, @layout}={}) ->
+    Tablr ?= require './tablr'
     @options ?= {}
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
@@ -104,13 +112,13 @@ class CSVEditor
           return reject(err) if err?
           resolve()
 
-  saveConfig: (choice) ->
+  saveConfig: (@choice) ->
     Tablr.csvConfig.set(@uriToOpen, 'options', @options)
-    if @options.remember and choice?
-      Tablr.csvConfig.set(@uriToOpen, 'choice', choice)
+    if @options.remember and @choice?
+      Tablr.csvConfig.set(@uriToOpen, 'choice', @choice)
 
   saveLayout: ->
-    config =
+    @layout =
       columns: @editor.getScreenColumns().map (column) =>
         conf = {}
         if column.width? and column.width isnt @editor.getScreenColumnWidth()
@@ -123,7 +131,7 @@ class CSVEditor
 
       rowHeights: @editor.displayTable.rowHeights.slice()
 
-    Tablr.csvConfig.set(@uriToOpen, 'layout', config)
+    Tablr.csvConfig.set(@uriToOpen, 'layout', @layout)
 
   openCSV: ->
     new Promise (resolve, reject) =>
@@ -135,7 +143,7 @@ class CSVEditor
       else
         fileContent = fs.readFileSync(@uriToOpen)
         options = _.clone(@options)
-        layout = Tablr.csvConfig.get(@uriToOpen, 'layout')
+        layout = @layout ? Tablr.csvConfig?.get(@uriToOpen, 'layout')
 
         csv.parse String(fileContent), options, (err, data) =>
           return reject(err) if err?
@@ -188,3 +196,13 @@ class CSVEditor
       parser.on 'error', error
 
       input.pipe(parser)
+
+  serialize: ->
+    out = {
+      deserializer: 'CSVEditor'
+      @uriToOpen
+      @options
+      @choice
+    }
+    out.layout = @layout if @layout?
+    out

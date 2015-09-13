@@ -529,3 +529,122 @@ describe "CSVEditor", ->
       runs ->
         expect(editor).toBeDefined()
         expect(editor instanceof TextEditor).toBeTruthy()
+
+  ##    ########  ########  ######  ########  #######  ########  ########
+  ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
+  ##    ##     ## ##       ##          ##    ##     ## ##     ## ##
+  ##    ########  ######    ######     ##    ##     ## ########  ######
+  ##    ##   ##   ##             ##    ##    ##     ## ##   ##   ##
+  ##    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
+  ##    ##     ## ########  ######     ##     #######  ##     ## ########
+
+  describe '::serialize', ->
+    it 'serializes the csv editor', ->
+      openFixture('sample.csv')
+      runs ->
+        expect(csvEditor.serialize()).toEqual({
+          deserializer: 'CSVEditor'
+          uriToOpen: "/private#{csvDest}"
+          options: csvEditor.options
+          choice: undefined
+        })
+
+    describe 'when the editor has a choice', ->
+      it 'serializes the user choice', ->
+        openFixture('sample.csv')
+        waitsForPromise -> csvEditor.openTableEditor()
+        runs ->
+          expect(csvEditor.serialize()).toEqual({
+            deserializer: 'CSVEditor'
+            uriToOpen: "/private#{csvDest}"
+            options: csvEditor.options
+            choice: 'TableEditor'
+          })
+
+    describe 'when the table editor has a layout', ->
+      it 'serializes the layout', ->
+        openFixture('sample.csv')
+        waitsForPromise -> csvEditor.openTableEditor()
+        runs ->
+          {editor: tableEditor} = csvEditor
+
+          tableEditor.getScreenColumn(0).width = 200
+          tableEditor.getScreenColumn(0).align = 'right'
+          tableEditor.getScreenColumn(1).width = 300
+          tableEditor.getScreenColumn(2).align = 'center'
+          tableEditor.setScreenRowHeightAt(1, 100)
+          tableEditor.setScreenRowHeightAt(2, 200)
+          csvEditor.saveLayout()
+
+          expect(csvEditor.serialize()).toEqual({
+            deserializer: 'CSVEditor'
+            uriToOpen: "/private#{csvDest}"
+            options: csvEditor.options
+            choice: 'TableEditor'
+            layout:
+              columns: [
+                {width: 200, align: 'right'}
+                {width: 300}
+                {align: 'center'}
+              ]
+              rowHeights: [
+                undefined
+                100
+                200
+              ]
+          })
+
+  describe '.deserialize', ->
+    it 'restores a CSVEditor using the provided state', ->
+      csvEditor = atom.deserializers.deserialize({
+        deserializer: 'CSVEditor'
+        uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+        options: {}
+        choice: undefined
+      })
+
+      expect(csvEditor).toBeDefined()
+
+    describe 'with a state corresponding to a table choice', ->
+      it 'applies the choice on creation', ->
+        spyOn(CSVEditor.prototype, 'applyChoice')
+        csvEditor = atom.deserializers.deserialize({
+          deserializer: 'CSVEditor'
+          uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+          options: {}
+          choice: 'TableEditor'
+        })
+
+        expect(csvEditor).toBeDefined()
+        expect(CSVEditor::applyChoice).toHaveBeenCalled()
+
+      describe 'that has a layout defined', ->
+        it 'applies the restored layout', ->
+          csvEditor = atom.deserializers.deserialize({
+            deserializer: 'CSVEditor'
+            uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+            options: {}
+            choice: 'TableEditor'
+            layout:
+              columns: [
+                {width: 200, align: 'right'}
+                {width: 300}
+                {align: 'center'}
+              ]
+              rowHeights: [
+                undefined
+                100
+                200
+              ]
+          })
+
+          waitsFor -> tableEditor = csvEditor.editor
+          runs ->
+            expect(tableEditor.getScreenRowHeightAt(1)).toEqual(100)
+            expect(tableEditor.getScreenRowHeightAt(2)).toEqual(200)
+
+            expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(200)
+            expect(tableEditor.getScreenColumnWidthAt(1)).toEqual(300)
+
+            expect(tableEditor.getScreenColumn(0).align).toEqual('right')
+            expect(tableEditor.getScreenColumn(2).align).toEqual('center')
