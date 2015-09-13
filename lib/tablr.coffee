@@ -84,7 +84,7 @@ module.exports =
 
       return atom.project.open(uriToOpen) if choice is 'TextEditor'
 
-      new CSVEditor(uriToOpen, options, choice, @csvConfig)
+      new CSVEditor({uriToOpen, options, choice})
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       url ||= require 'url'

@@ -4,12 +4,14 @@ csv = require 'csv'
 path = require 'path'
 {CompositeDisposable, Emitter} = require 'atom'
 TableEditor = require './table-editor'
+Tablr = require './tablr'
 
 module.exports =
 class CSVEditor
   @tableEditorForPath: {}
 
-  constructor: (@uriToOpen, @options={}, @choice, @csvConfig) ->
+  constructor: ({@uriToOpen, @options, @choice}={}) ->
+    @options ?= {}
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
 
@@ -36,7 +38,7 @@ class CSVEditor
 
   isModified: -> @editor?.isModified() ? false
 
-  copy: -> new CSVEditor(@uriToOpen, _.clone(@options), @choice)
+  copy: -> new CSVEditor({@uriToOpen, options: _.clone(@options), @choice})
 
   shouldPromptToSave: (options) ->
     @editor?.shouldPromptToSave(options) ? false
@@ -103,9 +105,9 @@ class CSVEditor
           resolve()
 
   saveConfig: (choice) ->
-    @csvConfig.set(@uriToOpen, 'options', @options)
+    Tablr.csvConfig.set(@uriToOpen, 'options', @options)
     if @options.remember and choice?
-      @csvConfig.set(@uriToOpen, 'choice', choice)
+      Tablr.csvConfig.set(@uriToOpen, 'choice', choice)
 
   saveLayout: ->
     config =
@@ -121,7 +123,7 @@ class CSVEditor
 
       rowHeights: @editor.displayTable.rowHeights.slice()
 
-    @csvConfig.set(@uriToOpen, 'layout', config)
+    Tablr.csvConfig.set(@uriToOpen, 'layout', config)
 
   openCSV: ->
     new Promise (resolve, reject) =>
@@ -133,7 +135,7 @@ class CSVEditor
       else
         fileContent = fs.readFileSync(@uriToOpen)
         options = _.clone(@options)
-        layout = @csvConfig.get(@uriToOpen, 'layout')
+        layout = Tablr.csvConfig.get(@uriToOpen, 'layout')
 
         csv.parse String(fileContent), options, (err, data) =>
           return reject(err) if err?
