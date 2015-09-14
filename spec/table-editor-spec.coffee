@@ -597,6 +597,21 @@ describe 'TableEditor', ->
               expect(tableEditor.getValueAtScreenPosition([1,1])).toEqual('female')
 
           describe 'and has many selections', ->
+            describe 'that span one cell', ->
+              it 'pastes each selection in the corresponding cells', ->
+                atom.clipboard.write('foo\nbar', selections: [
+                  {indentBasis: 0, fullLine: false, text: 'foo'}
+                  {indentBasis: 0, fullLine: false, text: 'bar'}
+                ])
+                tableEditor.setSelectedRanges([[[0,0],[1,1]], [[1,0],[2,1]]])
+
+                table.clearUndoStack()
+
+                tableEditor.pasteClipboard()
+
+                expect(tableEditor.getValueAtScreenPosition([0,0])).toEqual('foo')
+                expect(tableEditor.getValueAtScreenPosition([1,0])).toEqual('bar')
+
             describe 'when flattenBufferMultiSelectionOnPaste option is enabled', ->
               beforeEach ->
                 atom.config.set 'tablr.flattenBufferMultiSelectionOnPaste', true

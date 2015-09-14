@@ -235,6 +235,9 @@ class TableEditor
         else if metadata.selections?
           if atom.config.get('tablr.flattenBufferMultiSelectionOnPaste')
             selection.fill(clipboardText) for selection in selections
+          else if selections.every((selection) -> not selection.spanMoreThanOneCell()) and selections.length is metadata.selections.length
+            for selection,i in selections
+              selection.fill(metadata.selections[i % metadata.selections.length].text)
           else
             switch atom.config.get('tablr.distributeBufferMultiSelectionOnPaste')
               when 'vertically'
