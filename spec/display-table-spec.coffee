@@ -57,6 +57,31 @@ describe 'DisplayTable', ->
 
         expect(displayTable.isDestroyed()).toBeTruthy()
 
+    ##    ########  ########  ######  ########  #######  ########  ########
+    ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
+    ##    ##     ## ##       ##          ##    ##     ## ##     ## ##
+    ##    ########  ######    ######     ##    ##     ## ########  ######
+    ##    ##   ##   ##             ##    ##    ##     ## ##   ##   ##
+    ##    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
+    ##    ##     ## ########  ######     ##     #######  ##     ## ########
+
+    describe '::serialize', ->
+      it 'serializes the display table', ->
+        expect(displayTable.serialize()).toEqual({
+          table: displayTable.table.serialize()
+          rowHeights: displayTable.rowHeights
+        })
+
+      it 'serializes the table order when defined', ->
+        displayTable.sortBy('key', -1)
+
+        expect(displayTable.serialize()).toEqual({
+          table: displayTable.table.serialize()
+          rowHeights: displayTable.rowHeights
+          order: 0
+          direction: -1
+        })
+
     ##      ######   #######  ##       ##     ## ##     ## ##    ##  ######
     ##     ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
     ##     ##       ##     ## ##       ##     ## #### #### ####  ## ##

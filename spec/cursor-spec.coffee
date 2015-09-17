@@ -334,3 +334,15 @@ describe 'Cursor', ->
         cursor.pageRight()
 
         expect(cursor.position).toEqual([30,60])
+
+    ##    ########  ########  ######  ########  #######  ########  ########
+    ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
+    ##    ##     ## ##       ##          ##    ##     ## ##     ## ##
+    ##    ########  ######    ######     ##    ##     ## ########  ######
+    ##    ##   ##   ##             ##    ##    ##     ## ##   ##   ##
+    ##    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
+    ##    ##     ## ########  ######     ##     #######  ##     ## ########
+
+    describe '::serialize', ->
+      it 'serializes the cursor', ->
+        expect(cursor.serialize()).toEqual(cursor.position.serialize())

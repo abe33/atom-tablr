@@ -285,3 +285,15 @@ describe 'Selection', ->
         selection.selectNone()
 
         expect(selection.getRange()).toEqual([[1,1],[2,2]])
+
+    ##    ########  ########  ######  ########  #######  ########  ########
+    ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
+    ##    ##     ## ##       ##          ##    ##     ## ##     ## ##
+    ##    ########  ######    ######     ##    ##     ## ########  ######
+    ##    ##   ##   ##             ##    ##    ##     ## ##   ##   ##
+    ##    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
+    ##    ##     ## ########  ######     ##     #######  ##     ## ########
+
+    describe '::serialize', ->
+      it 'serializes the selection', ->
+        expect(selection.serialize()).toEqual(selection.range.serialize())

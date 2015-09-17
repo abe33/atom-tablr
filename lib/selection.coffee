@@ -299,3 +299,5 @@ class Selection
 
     @emitter.emit 'did-change-range', eventObject
     @tableEditor.emitter.emit 'did-change-selection-range', eventObject
+
+  serialize: -> @range.serialize()

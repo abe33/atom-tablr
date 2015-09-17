@@ -112,6 +112,22 @@ describe 'TableEditor', ->
         expect(tableEditor.getCursors().length).toEqual(0)
         expect(tableEditor.getSelections().length).toEqual(0)
 
+    ##    ########  ########  ######  ########  #######  ########  ########
+    ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
+    ##    ##     ## ##       ##          ##    ##     ## ##     ## ##
+    ##    ########  ######    ######     ##    ##     ## ########  ######
+    ##    ##   ##   ##             ##    ##    ##     ## ##   ##   ##
+    ##    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
+    ##    ##     ## ########  ######     ##     #######  ##     ## ########
+
+    describe '::serialize', ->
+      it 'serializes the table editor', ->
+        expect(tableEditor.serialize()).toEqual({
+          displayTable: tableEditor.displayTable.serialize()
+          cursors: tableEditor.getCursors().map (cursor) -> cursor.serialize()
+          selections: tableEditor.getSelections().map (sel) -> sel.serialize()
+        })
+
     ##     ######  ##     ## ########   ######   #######  ########   ######
     ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##
     ##    ##       ##     ## ##     ## ##       ##     ## ##     ## ##

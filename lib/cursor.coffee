@@ -174,3 +174,5 @@ class Cursor
     }
     @emitter.emit 'did-change-position', eventObject
     @tableEditor.emitter.emit 'did-change-cursor-position', eventObject
+
+  serialize: -> @position.serialize()

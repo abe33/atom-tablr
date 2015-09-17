@@ -202,6 +202,13 @@ class TableEditor
   deleteColumnAtCursor: ->
     @removeColumnAt(@getCursorPosition().column)
 
+  serialize: ->
+    {
+      displayTable: @displayTable.serialize()
+      cursors: @getCursors().map (cursor) -> cursor.serialize()
+      selections: @getSelections().map (sel) -> sel.serialize()
+    }
+
   ##     ######   #######  ########  ##    ##
   ##    ##    ## ##     ## ##     ##  ##  ##
   ##    ##       ##     ## ##     ##   ####

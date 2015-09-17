@@ -156,6 +156,16 @@ class DisplayTable
 
   isDestroyed: -> @destroyed
 
+  serialize: ->
+    out = {
+      @rowHeights
+      table: @table.serialize()
+    }
+
+    out = _.extend(out, {@order, @direction}) if @order?
+
+    out
+
   ##     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   ##    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   ##    ##       ##     ## ##       ##     ## #### #### ####  ## ##

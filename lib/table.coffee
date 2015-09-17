@@ -68,6 +68,8 @@ class Table
       @emitter.emit 'did-save', this
       @emitModifiedStatusChange()
 
+  serialize: -> {@columns, @rows, @id}
+
   setSaveHandler: (@saveHandler) ->
 
   updateCachedContents: ->

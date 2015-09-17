@@ -182,7 +182,46 @@ describe 'Table', ->
   #    ##    ##  ##       ##    ##    ##    ##     ## ##    ##  ##
   #    ##     ## ########  ######     ##     #######  ##     ## ########
 
-  describe '::serialze', ->
+  describe '::serialize', ->
+    it 'serializes the empty table', ->
+      expect(table.serialize()).toEqual({
+        columns: []
+        rows: []
+        id: table.id
+      })
+
+    it 'serializes the table with its empty rows and columns', ->
+      table.addColumn()
+      table.addColumn()
+
+      table.addRow()
+      table.addRow()
+
+      expect(table.serialize()).toEqual({
+        columns: [undefined, undefined]
+        rows: [
+          [undefined, undefined]
+          [undefined, undefined]
+        ]
+        id: table.id
+      })
+
+    it 'serializes the table with its values', ->
+      table.addColumn('foo')
+      table.addColumn('bar')
+
+      table.addRow([1,2])
+      table.addRow([3,4])
+
+      expect(table.serialize()).toEqual({
+        columns: ['foo', 'bar']
+        rows: [
+          [1,2]
+          [3,4]
+        ]
+        id: table.id
+      })
+
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
