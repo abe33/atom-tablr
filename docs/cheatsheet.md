@@ -1,5 +1,4 @@
-<img src='https://cdn.rawgit.com/abe33/atom-tablr/master/resources/logo.svg' width='146' height='50'>
-
+<img src='atom://tablr/resources/heading.svg' width='858' height='50'>
 
 ## General
 

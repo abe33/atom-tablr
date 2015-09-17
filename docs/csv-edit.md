@@ -1,10 +1,10 @@
-<img src='https://cdn.rawgit.com/abe33/atom-tablr/master/resources/logo.svg' width='146' height='50'>
+<img src='atom://tablr/resources/heading.svg' width='858' height='50'>
 
 ## Edit A CSV File
 
 This package provides a specific opener for `CSV` files that will allow you to choose between editing the file as text or with the table editor.
 
-![CSV Opener](https://github.com/abe33/atom-tablr/blob/master/resources/csv-opener.png?raw=true)
+![CSV Opener](atom://tablr/resources/csv-opener.png)
 
 As you can see in the screenshot above, there's a bunch of settings available before opening a file with the table editor. This is necessary as `CSV` isn't a [strictly defined format](https://en.wikipedia.org/wiki/Comma-separated_values) and delimiter and other options can't be guessed from the plain-text version. These settings aren't necessary when using the text editor mode but you can still set them, they'll be save for later use.
 
@@ -35,7 +35,7 @@ As you probably noticed, many fields in the settings form have a `custom` option
 
 ### Table Editor
 
-![TableEditor](https://github.com/abe33/atom-tablr/blob/master/resources/table-editor.png?raw=true "In this screenshot the Header option was checked.")
+![TableEditor](atom://tablr/resources/table-editor.png "In this screenshot the Header option was checked.")
 
 Working with a table editor is done pretty much as you could expect. You can select one or many cells, edit them, copy/paste them and so on.
 
@@ -43,11 +43,11 @@ Working with a table editor is done pretty much as you could expect. You can sel
 
 One big difference with other widespread spreadsheet editors is the use of multiple selections.
 
-![Multiple selections](https://github.com/abe33/atom-tablr/blob/master/resources/multiple-selections.png?raw=true)
+![Multiple selections](atom://tablr/resources/multiple-selections.png)
 
 Tablr implements multiple selections using the same controls than those of a text editor. However, tables multiple selections behavior is different than in a text editor. Here are the main differences:
 
-- Selections can intersect with other selections. In a text editor a range spans from the start character to the end one by including every lines between them and can be merged whenever two selections intersect. In a table, a range is a surface that group cells together and are merged only when one selection contains another one.<br/>![Intersecting selections](https://github.com/abe33/atom-tablr/blob/master/resources/intersecting-selections.png?raw=true)
+- Selections can intersect with other selections. In a text editor a range spans from the start character to the end one by including every lines between them and can be merged whenever two selections intersect. In a table, a range is a surface that group cells together and are merged only when one selection contains another one.<br/>![Intersecting selections](atom://tablr/resources/intersecting-selections.png)
 - When copying multiple selections from a table, each cell can be considered as a selection on its own. Various settings exist to allow you to alter this behavior to match your taste.
 - When editing a selection you only edit the cell at the cursor position and not the whole selection. In the case of multiple selections, an edit will change the value of each cursor cells. Commands exist to move the cursors within their own selection.
 

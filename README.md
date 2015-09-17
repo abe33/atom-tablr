@@ -1,3 +1,3 @@
-# <img src='https://cdn.rawgit.com/abe33/atom-tablr/master/resources/logo.svg' width='292' height='100'>
+<img src='atom://tablr/resources/logo.svg' width='858' height='80'>
 
 [![Build Status](https://travis-ci.org/abe33/atom-tablr.svg?branch=master)](https://travis-ci.org/abe33/atom-tablr)
