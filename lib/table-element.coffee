@@ -1172,6 +1172,8 @@ class TableElement extends HTMLElement
       @dirtyPositions = null
       @dirtyColumns = null
       @wholeTableIsDirty = false
+      requestAnimationFrame =>
+        cell.checkEllipsis() for key,cell of @cells
 
     # We never rendered anything
     unless @firstRenderedRow?

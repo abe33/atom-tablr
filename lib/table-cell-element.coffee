@@ -24,8 +24,6 @@ class TableCellElement extends HTMLElement
     @lastColumn = column
     @lastValue = cell.value
 
-    @requestEllipsisCheck()
-
   isReleased: -> @released
 
   release: (dispatchEvent=true) ->
@@ -41,9 +39,6 @@ class TableCellElement extends HTMLElement
     classes.push 'selected' if @tableElement.isSelectedCell([row, column])
     classes.push 'ellipsis' if @classList.contains('ellipsis') and @isSameCell(cell, column, row)
     classes
-
-  requestEllipsisCheck: ->
-    requestAnimationFrame => @checkEllipsis()
 
   checkEllipsis: ->
     @classList.toggle('ellipsis', @scrollHeight > @clientHeight or @scrollWidth > @clientWidth)
