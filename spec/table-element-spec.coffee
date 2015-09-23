@@ -64,7 +64,8 @@ isVisible = (node) ->
 # no forced layout update of the DOM when evaluating the size of the cell's
 # content. However, in tests, this lead to nasty side effects as we mock the
 # requestAnimationFrame method.
-TableCellElement::requestEllipsisCheck = -> @checkEllipsis()
+TableElement::requestEllipsisCheck = ->
+  cell.checkEllipsis() for key,cell of @cells
 
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []

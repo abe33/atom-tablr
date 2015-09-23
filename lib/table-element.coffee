@@ -1112,6 +1112,9 @@ class TableElement extends HTMLElement
       @update()
       @updateRequested = false
 
+  requestEllipsisCheck: ->
+    requestAnimationFrame => cell.checkEllipsis() for key,cell of @cells
+
   markDirtyCell: (position) ->
     @dirtyPositions ?= []
     @dirtyPositions[position.row] ?= []
@@ -1172,8 +1175,7 @@ class TableElement extends HTMLElement
       @dirtyPositions = null
       @dirtyColumns = null
       @wholeTableIsDirty = false
-      requestAnimationFrame =>
-        cell.checkEllipsis() for key,cell of @cells
+      @requestEllipsisCheck()
 
     # We never rendered anything
     unless @firstRenderedRow?
