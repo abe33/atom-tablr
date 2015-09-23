@@ -17,7 +17,9 @@ class CSVEditor
 
   @tableEditorForPath: {}
 
-  constructor: ({@uriToOpen, @options, @choice, @layout}={}) ->
+  constructor: (state={}) ->
+    {@uriToOpen, @options, @choice, @layout, editor: @editorState} = state
+
     Tablr ?= require './tablr'
     @options ?= {}
     @subscriptions = new CompositeDisposable
@@ -140,6 +142,11 @@ class CSVEditor
         tableEditor = new TableEditor({table, displayTable})
 
         resolve(tableEditor)
+      else if @editorState?
+        console.log @editorState
+        tableEditor = atom.deserializers.deserialize(@editorState)
+        @editorState = null
+        resolve(tableEditor)
       else
         fileContent = fs.readFileSync(@uriToOpen)
         options = _.clone(@options)
@@ -204,5 +211,8 @@ class CSVEditor
       @options
       @choice
     }
-    out.layout = @layout if @layout?
+    if @isModified()
+      out.editor = @editor.serialize()
+    else
+      out.layout = @layout if @layout?
     out

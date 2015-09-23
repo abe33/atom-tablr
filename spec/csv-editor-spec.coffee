@@ -594,6 +594,21 @@ describe "CSVEditor", ->
               ]
           })
 
+    describe 'that has unsaved changes', ->
+      it 'serializes the table editor and its children', ->
+        openFixture('sample.csv')
+        waitsForPromise -> csvEditor.openTableEditor()
+        runs ->
+          csvEditor.editor.addRow()
+
+          expect(csvEditor.serialize()).toEqual({
+            deserializer: 'CSVEditor'
+            uriToOpen: "/private#{csvDest}"
+            options: csvEditor.options
+            choice: 'TableEditor'
+            editor: csvEditor.editor.serialize()
+          })
+
   describe '.deserialize', ->
     it 'restores a CSVEditor using the provided state', ->
       csvEditor = atom.deserializers.deserialize({
@@ -648,3 +663,43 @@ describe "CSVEditor", ->
 
             expect(tableEditor.getScreenColumn(0).align).toEqual('right')
             expect(tableEditor.getScreenColumn(2).align).toEqual('center')
+
+      describe 'that has an editor with unsaved changes', ->
+        it 'applies the modified state', ->
+          restored = atom.deserializers.deserialize({
+            deserializer: "CSVEditor"
+            uriToOpen:"/path/to/file/sample.csv"
+            options: {}
+            choice: "TableEditor"
+            editor:
+              deserializer: 'TableEditor'
+              displayTable:
+                deserializer: 'DisplayTable'
+                rowHeights: [null,null,null,null]
+                table:
+                  deserializer: 'Table'
+                  modified: true
+                  cachedContents: undefined
+                  columns: [null,null,null]
+                  rows: [
+                    ["name","age","gender"]
+                    ["Jane","32","female"]
+                    ["John","30","male"]
+                    [null,null,null]
+                  ]
+                  id: 1
+
+              cursors: [[0,0]]
+              selections: [[[0,0],[1,1]]]
+          })
+
+          waitsFor -> tableEditor = restored.editor
+          runs ->
+            expect(restored.isModified()).toBeTruthy()
+            expect(restored.editor.getColumns()).toEqual([null, null, null])
+            expect(restored.editor.getRows()).toEqual([
+              ["name","age","gender"]
+              ["Jane","32","female"]
+              ["John","30","male"]
+              [null,null,null]
+            ])

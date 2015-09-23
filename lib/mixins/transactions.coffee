@@ -60,7 +60,7 @@ class Transactions extends Mixin
     @undoStack.push(commit)
 
   clearUndoStack: ->
-    @undoStack.length = 0
+    @undoStack?.length = 0
 
   clearRedoStack: ->
-    @redoStack.length = 0
+    @redoStack?.length = 0

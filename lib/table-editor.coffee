@@ -11,6 +11,14 @@ module.exports =
 class TableEditor
   Delegator.includeInto(this)
 
+  atom.deserializers.add(this)
+
+  @deserialize: (state) ->
+    state.displayTable = atom.deserializers.deserialize(state.displayTable)
+    state.table = state.displayTable.table
+
+    new TableEditor(state)
+
   @delegatesProperties(
     'order', 'direction',
     toProperty: 'displayTable'
@@ -41,7 +49,7 @@ class TableEditor
   )
 
   constructor: (options={}) ->
-    {@table, @displayTable} = options
+    {@table, @displayTable, cursors, selections} = options
     @table = new Table unless @table?
     @displayTable = new DisplayTable({@table}) unless @displayTable?
     @emitter = new Emitter
@@ -52,7 +60,10 @@ class TableEditor
 
     @table.retain()
 
-    @addCursorAtScreenPosition(new Point(0,0))
+    if selections? and selections.length
+      @createCursorAndSelection(cursors[i], sel) for sel,i in selections
+    else
+      @addCursorAtScreenPosition(new Point(0,0))
 
     @subscriptions.add @displayTable.onDidChange =>
       selection = @getLastSelection()
@@ -204,6 +215,7 @@ class TableEditor
 
   serialize: ->
     {
+      deserializer: 'TableEditor'
       displayTable: @displayTable.serialize()
       cursors: @getCursors().map (cursor) -> cursor.serialize()
       selections: @getSelections().map (sel) -> sel.serialize()

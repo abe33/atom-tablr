@@ -68,6 +68,7 @@ describe 'DisplayTable', ->
     describe '::serialize', ->
       it 'serializes the display table', ->
         expect(displayTable.serialize()).toEqual({
+          deserializer: 'DisplayTable'
           table: displayTable.table.serialize()
           rowHeights: displayTable.rowHeights
         })
@@ -76,11 +77,37 @@ describe 'DisplayTable', ->
         displayTable.sortBy('key', -1)
 
         expect(displayTable.serialize()).toEqual({
+          deserializer: 'DisplayTable'
           table: displayTable.table.serialize()
           rowHeights: displayTable.rowHeights
           order: 0
           direction: -1
         })
+
+    describe '.deserialize', ->
+      it 'creates a display table', ->
+        displayTable = atom.deserializers.deserialize({
+          deserializer: 'DisplayTable'
+          rowHeights: [100,null]
+          order: 0
+          direction: 1
+          table:
+            deserializer: 'Table'
+            columns: ['foo', 'bar']
+            rows: [
+              ['z',2]
+              ['a',4]
+            ]
+            id: 1
+        })
+
+        expect(displayTable.getScreenRowCount()).toEqual(2)
+        expect(displayTable.getScreenRows()).toEqual([
+          ['a',4]
+          ['z',2]
+        ])
+        expect(displayTable.getScreenRowHeightAt(1)).toEqual(100)
+        expect(displayTable.getScreenRowHeightAt(0)).toEqual(20)
 
     ##      ######   #######  ##       ##     ## ##     ## ##    ##  ######
     ##     ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##

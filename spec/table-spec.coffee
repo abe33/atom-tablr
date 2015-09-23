@@ -185,6 +185,7 @@ describe 'Table', ->
   describe '::serialize', ->
     it 'serializes the empty table', ->
       expect(table.serialize()).toEqual({
+        deserializer: 'Table'
         columns: []
         rows: []
         id: table.id
@@ -196,8 +197,10 @@ describe 'Table', ->
 
       table.addRow()
       table.addRow()
+      table.save()
 
       expect(table.serialize()).toEqual({
+        deserializer: 'Table'
         columns: [undefined, undefined]
         rows: [
           [undefined, undefined]
@@ -212,8 +215,10 @@ describe 'Table', ->
 
       table.addRow([1,2])
       table.addRow([3,4])
+      table.save()
 
       expect(table.serialize()).toEqual({
+        deserializer: 'Table'
         columns: ['foo', 'bar']
         rows: [
           [1,2]
@@ -221,6 +226,65 @@ describe 'Table', ->
         ]
         id: table.id
       })
+
+    it 'serializes the table in its modified state', ->
+      table.addColumn('foo')
+      table.addColumn('bar')
+
+      table.addRow([1,2])
+      table.addRow([3,4])
+
+      expect(table.serialize()).toEqual({
+        deserializer: 'Table'
+        columns: ['foo', 'bar']
+        modified: true
+        cachedContents: undefined
+        rows: [
+          [1,2]
+          [3,4]
+        ]
+        id: table.id
+      })
+
+  describe '.deserialize', ->
+    it 'deserialize a table', ->
+      table = atom.deserializers.deserialize({
+        deserializer: 'Table'
+        columns: ['foo', 'bar']
+        rows: [
+          [1,2]
+          [3,4]
+        ]
+        id: 1
+      })
+
+      expect(table.id).toEqual(1)
+      expect(table.getColumns()).toEqual(['foo','bar'])
+      expect(table.getRows()).toEqual([
+        [1,2]
+        [3,4]
+      ])
+      expect(table.isModified()).toBeFalsy()
+
+    it 'deserialize a table in a modified state', ->
+      table = atom.deserializers.deserialize({
+        deserializer: 'Table'
+        columns: ['foo', 'bar']
+        modified: true
+        cachedContents: undefined
+        rows: [
+          [1,2]
+          [3,4]
+        ]
+        id: 1
+      })
+
+      expect(table.getColumns()).toEqual(['foo','bar'])
+      expect(table.getRows()).toEqual([
+        [1,2]
+        [3,4]
+      ])
+      expect(table.isModified()).toBeTruthy()
 
 
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######

@@ -123,10 +123,46 @@ describe 'TableEditor', ->
     describe '::serialize', ->
       it 'serializes the table editor', ->
         expect(tableEditor.serialize()).toEqual({
+          deserializer: 'TableEditor'
           displayTable: tableEditor.displayTable.serialize()
           cursors: tableEditor.getCursors().map (cursor) -> cursor.serialize()
           selections: tableEditor.getSelections().map (sel) -> sel.serialize()
         })
+
+    describe '.deserialize', ->
+      it 'restores a table editor', ->
+        tableEditor = atom.deserializers.deserialize({
+          deserializer: 'TableEditor'
+          displayTable:
+            deserializer: 'DisplayTable'
+            rowHeights: [null,null,null,null]
+            table:
+              deserializer: 'Table'
+              modified: true
+              cachedContents: undefined
+              columns: [null,null,null]
+              rows: [
+                ["name","age","gender"]
+                ["Jane","32","female"]
+                ["John","30","male"]
+                [null,null,null]
+              ]
+              id: 1
+
+          cursors: [[2,2]]
+          selections: [[[2,2],[3,4]]]
+        })
+
+        expect(tableEditor.isModified()).toBeTruthy()
+        expect(tableEditor.getScreenRows()).toEqual([
+          ["name","age","gender"]
+          ["Jane","32","female"]
+          ["John","30","male"]
+          [null,null,null]
+        ])
+        expect(tableEditor.getSelections().length).toEqual(1)
+        expect(tableEditor.getSelectedRange()).toEqual([[2,2],[3,4]])
+        expect(tableEditor.getCursorPosition()).toEqual([2,2])
 
     ##     ######  ##     ## ########   ######   #######  ########   ######
     ##    ##    ## ##     ## ##     ## ##    ## ##     ## ##     ## ##    ##

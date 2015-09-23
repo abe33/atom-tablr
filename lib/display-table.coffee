@@ -8,6 +8,12 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
+  atom.deserializers.add(this)
+
+  @deserialize: (state) ->
+    state.table = atom.deserializers.deserialize(state.table) if state.table?
+    displayTable = new DisplayTable(state)
+
   @delegatesMethods(
     'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom',
     toProperty: 'table'
@@ -17,8 +23,8 @@ class DisplayTable
   columnOffsets: null
 
   constructor: (options={}) ->
-    {@table} = options
-    @table = new Table unless @table?
+    {@table, @rowHeights, @order, @direction} = options
+    @table ?= new Table
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @screenColumnsSubscriptions = new WeakMap
@@ -31,7 +37,7 @@ class DisplayTable
       @subscribeToScreenColumn(screenColumn)
       screenColumn
 
-    @rowHeights = @table.getColumns().map (column) => @getRowHeight()
+    @rowHeights ?= @table.getColumns().map (column) => @getRowHeight()
     @computeScreenColumnOffsets()
     @updateScreenRows()
 
@@ -142,9 +148,9 @@ class DisplayTable
     @observeConfig
       'tablr.undefinedDisplay': (@configUndefinedDisplay) =>
       'tablr.rowHeight': (@configRowHeight) =>
-        @computeRowOffsets() if @rowHeights?
+        @computeRowOffsets() if @rowHeights? and @screenRows?
       'tablr.minimumRowHeight': (@configMinimumRowHeight) =>
-        @computeRowOffsets() if @rowHeights?
+        @computeRowOffsets() if @rowHeights? and @screenRows?
       'tablr.columnWidth': (@configScreenColumnWidth) =>
         @computeScreenColumnOffsets() if @screenColumns?
       'tablr.minimumColumnWidth': (@configMinimumScreenColumnWidth) =>
@@ -158,6 +164,7 @@ class DisplayTable
 
   serialize: ->
     out = {
+      deserializer: 'DisplayTable'
       @rowHeights
       table: @table.serialize()
     }

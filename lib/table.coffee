@@ -9,12 +9,21 @@ class Table
   Identifiable.includeInto(this)
   Transactions.includeInto(this)
 
+  atom.deserializers.add(this)
+
   @MAX_HISTORY_SIZE: 100
 
-  constructor: (options={}) ->
-    @initID()
-    @columns = []
-    @rows = []
+  @deserialize: (state) ->
+    table = new Table(state)
+    table.initializeAfterOpen()
+    table
+
+  constructor: (state={}) ->
+    {@id, @columns, @rows, modified} = state
+    @cachedContents = state.cachedContents ? '' if modified
+    @initID() unless @id?
+    @columns ?= []
+    @rows ?= []
     @emitter = new Emitter
     @refcount = 0
 
@@ -68,7 +77,14 @@ class Table
       @emitter.emit 'did-save', this
       @emitModifiedStatusChange()
 
-  serialize: -> {@columns, @rows, @id}
+  serialize: ->
+    out = {@columns, @rows, @id, deserializer: 'Table'}
+
+    if @lastModified
+      out.modified = true
+      out.cachedContents = @cachedContents
+
+    out
 
   setSaveHandler: (@saveHandler) ->
 
@@ -80,7 +96,7 @@ class Table
 
   initializeAfterOpen: ->
     @clearUndoStack()
-    @updateCachedContents()
+    @updateCachedContents() unless @cachedContents?
     @lastModified = false
 
   lockModifiedStatus: ->
