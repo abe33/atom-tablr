@@ -63,10 +63,13 @@ class CSVEditor
     @emitter.on 'did-change-modified', callback
 
   applyChoice: ->
+    return if @choiceApplied
     if @choice?
       switch @choice
         when 'TextEditor' then @openTextEditor(@options)
         when 'TableEditor' then @openTableEditor(@options)
+
+    @choiceApplied = true
 
   openTextEditor: (@options={}) ->
     atom.project.open(@uriToOpen).then (editor) =>
@@ -82,7 +85,9 @@ class CSVEditor
       @subscriptions.add @editor.onDidChangeModified (status) =>
         @emitter.emit 'did-change-modified', status
 
-      @emitter.emit('did-open', {@editor, options: _.clone(options)})
+      @emitter.emit 'did-open', {@editor, options: _.clone(options)}
+      @emitter.emit 'did-change-modified', @editor.isModified()
+
       @saveConfig('TableEditor')
       @editor
 
@@ -143,7 +148,6 @@ class CSVEditor
 
         resolve(tableEditor)
       else if @editorState?
-        console.log @editorState
         tableEditor = atom.deserializers.deserialize(@editorState)
         @editorState = null
         resolve(tableEditor)
