@@ -1,3 +1,18 @@
 <img src='http://abe33.github.io/atom-tablr/logo.svg' width='858' height='80'>
 
 [![Build Status](https://travis-ci.org/abe33/atom-tablr.svg?branch=master)](https://travis-ci.org/abe33/atom-tablr)
+
+### Installation
+
+```sh
+apm install tablr
+```
+
+Or open the Atom settings and search `tablr`.
+
+### Usage
+
+See the [docs directory](https://github.com/abe33/atom-tablr/tree/master/docs) to access all the available documentation.
+
+- [Edit  A CSV File](https://github.com/abe33/atom-tablr/tree/master/docs/csv-edit.md)
+- [Commands Cheatsheet](https://github.com/abe33/atom-tablr/tree/master/docs/cheatsheet.md)
