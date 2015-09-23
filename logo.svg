@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="858px" height="80px" viewBox="0 0 858 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.3 (12072) - http://www.bohemiancoding.com/sketch -->
+    <title>logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="logo" sketch:type="MSArtboardGroup">
+            <g id="Ta" sketch:type="MSLayerGroup" transform="translate(2.000000, 2.000000)" fill="#0088FF">
+                <path d="M76.1267606,0 L0,0 L0,76 L76.1267606,76 L76.1267606,0 L76.1267606,0 Z M75,1 L1,1 L1,75 L75,75 L75,1 L75,1 Z" id="Shape" sketch:type="MSShapeGroup"></path>
+                <text id="73" sketch:type="MSTextLayer" font-family="Arial" font-size="12.6666667" font-weight="bold">
+                    <tspan x="4.61971831" y="14">73</tspan>
+                </text>
+                <text sketch:type="MSTextLayer" font-family="Arial" font-size="52.8695652" font-weight="normal" sketch:alignment="middle">
+                    <tspan x="5.4892931" y="59.5652174">Ta</tspan>
+                </text>
+                <rect id="Rectangle-1" opacity="0.5" sketch:type="MSShapeGroup" x="15.2394366" y="65.4347826" width="46.3380282" height="4.95652174"></rect>
+                <rect id="Rectangle-1-Copy-3" opacity="0.502740205" sketch:type="MSShapeGroup" x="51" y="5" width="19.8591549" height="4.95652174"></rect>
+            </g>
+            <g id="B" sketch:type="MSLayerGroup" transform="translate(81.000000, 2.000000)" fill="#9E9E9E">
+                <path d="M76.1267606,0 L0,0 L0,76 L76.1267606,76 L76.1267606,0 L76.1267606,0 Z M75,1 L1,1 L1,75 L75,75 L75,1 L75,1 Z" id="Shape" sketch:type="MSShapeGroup"></path>
+                <text id="5" sketch:type="MSTextLayer" font-family="Arial" font-size="12.6666667" font-weight="bold">
+                    <tspan x="4.61971831" y="14">5</tspan>
+                </text>
+                <text sketch:type="MSTextLayer" font-family="Arial" font-size="52.8695652" font-weight="normal" sketch:alignment="middle">
+                    <tspan x="20.7766572" y="59.5652174">B</tspan>
+                </text>
+                <rect id="Rectangle-1" opacity="0.5" sketch:type="MSShapeGroup" x="20" y="65.4347826" width="34.4084507" height="4.95652174"></rect>
+                <rect id="Rectangle-1-Copy-3" opacity="0.502740205" sketch:type="MSShapeGroup" x="47" y="5" width="23.8591549" height="4.95652174"></rect>
+            </g>
+            <g id="Lr" sketch:type="MSLayerGroup" transform="translate(160.000000, 2.000000)" fill="#9E9E9E">
+                <path d="M76.1267606,0 L0,0 L0,76 L76.1267606,76 L76.1267606,0 L76.1267606,0 Z M75,1 L1,1 L1,75 L75,75 L75,1 L75,1 Z" id="Shape" sketch:type="MSShapeGroup"></path>
+                <text id="103" sketch:type="MSTextLayer" font-family="Arial" font-size="12.6666667" font-weight="bold">
+                    <tspan x="4.61971831" y="14">103</tspan>
+                </text>
+                <text sketch:type="MSTextLayer" font-family="Arial" font-size="52.8695652" font-weight="normal" sketch:alignment="middle">
+                    <tspan x="12.9036953" y="59.5652174">Lr</tspan>
+                </text>
+                <rect id="Rectangle-1" opacity="0.5" sketch:type="MSShapeGroup" x="9.61971831" y="65.4347826" width="56.3802817" height="4.95652174"></rect>
+                <rect id="Rectangle-1-Copy-3" opacity="0.502740205" sketch:type="MSShapeGroup" x="56" y="5" width="14.8591549" height="4.95652174"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
