@@ -1,4 +1,4 @@
-<img src='atom://tablr/resources/heading.svg' width='858' height='50'>
+<img src='http://abe33.github.io/atom-tablr/heading.svg' width='858' height='50'>
 
 ## General
 
