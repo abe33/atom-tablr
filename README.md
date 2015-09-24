@@ -16,5 +16,11 @@ Or open the Atom settings and search `tablr`.
 
 See the [docs directory](https://github.com/abe33/atom-tablr/tree/master/docs) to access all the available documentation.
 
-- [Edit  A CSV File](https://github.com/abe33/atom-tablr/tree/master/docs/csv-edit.md)
+- [Edit A CSV File](https://github.com/abe33/atom-tablr/tree/master/docs/csv-edit.md)
 - [Commands Cheatsheet](https://github.com/abe33/atom-tablr/tree/master/docs/cheatsheet.md)
+
+### API
+
+Tablr also exposes an API to use the table editor in your own packages.
+
+- [Tablr Models](https://github.com/abe33/atom-tablr/tree/master/docs/csv-edit.md)
