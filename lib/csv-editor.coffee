@@ -173,7 +173,7 @@ class CSVEditor
           tableEditor.addRows(data)
           tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
           tableEditor.setSaveHandler(@save)
-          tableEditor.initializeAfterOpen()
+          tableEditor.initializeAfterSetup()
           tableEditor.unlockModifiedStatus()
 
           CSVEditor.tableEditorForPath[@uriToOpen] = tableEditor

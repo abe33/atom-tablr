@@ -15,7 +15,7 @@ class Table
 
   @deserialize: (state) ->
     table = new Table(state)
-    table.initializeAfterOpen()
+    table.initializeAfterSetup()
     table
 
   constructor: (state={}) ->
@@ -94,7 +94,7 @@ class Table
   getCacheContent: ->
     res = [@columns].concat(@rows).join('\n')
 
-  initializeAfterOpen: ->
+  initializeAfterSetup: ->
     @clearUndoStack()
     @updateCachedContents() unless @cachedContents?
     @lastModified = false

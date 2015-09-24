@@ -136,7 +136,7 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
-    table.initializeAfterOpen()
+    table.initializeAfterSetup()
     table.unlockModifiedStatus()
     return table
 
@@ -166,7 +166,7 @@ module.exports =
     table.addRows(rows)
 
     table.clearUndoStack()
-    table.initializeAfterOpen()
+    table.initializeAfterSetup()
     table.unlockModifiedStatus()
 
     return table

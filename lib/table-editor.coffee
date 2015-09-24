@@ -44,7 +44,7 @@ class TableEditor
     toProperty: 'displayTable'
   )
   @delegatesMethods(
-    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterOpen', 'lockModifiedStatus', 'unlockModifiedStatus',
+    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterSetup', 'lockModifiedStatus', 'unlockModifiedStatus',
     toProperty: 'table'
   )
 
