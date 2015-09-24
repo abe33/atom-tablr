@@ -14,6 +14,17 @@ Tablr exposes its models through a [service](https://atom.io/docs/v1.0.16/behind
 }
 ```
 
+```js
+exports default {
+  // ...
+  consumeTablrModelsServiceV1: (api) => {
+    let {Table, DisplayTable, Editor, Range} = api;
+
+    // ...
+  }
+}
+```
+
 The following classes are exposed by the service:
 
 Class|Role|
@@ -64,7 +75,7 @@ Again, to keep the example simple, we'll pretend to have a method that writes on
 ```js
 function save (table) {
   return new Promise((resolve, reject) =>
-    data = table.getRows();
+    let data = table.getRows();
     data.unshift(table.getColumns());
 
     writeFile(filePath, err => {
