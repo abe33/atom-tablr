@@ -2,11 +2,11 @@
 
 ## Edit A CSV File
 
-This package provides a specific opener for `CSV` files that will allow you to choose between editing the file as text or with the table editor.
+This package provides a specific opener for `*.csv` files that will allow you to choose between editing the file as text or with the table editor.
 
 ![CSV Opener](http://abe33.github.io/atom-tablr/csv-opener.png)
 
-As you can see in the screenshot above, there's a bunch of settings available before opening a file with the table editor. This is necessary as `CSV` isn't a [strictly defined format](https://en.wikipedia.org/wiki/Comma-separated_values) and delimiter and other options can't be guessed from the plain-text version. These settings aren't necessary when using the text editor mode but you can still set them, they'll be save for later use.
+As you can see in the screenshot above, there's a bunch of settings available before opening a file with the table editor. This is necessary as `CSV` isn't a [strictly defined format](https://en.wikipedia.org/wiki/Comma-separated_values) and delimiter and other options can't be guessed from the plain-text version. These settings aren't necessary when using the text editor mode but you can still set them, they'll be saved for later use.
 
 At the bottom of the panel lies the preview area. It displays a preview of the `.csv` file parsed using the current settings. If the file can't be parsed using the current configuration, a notice with the encountered error is displayed in place of the preview.
 
