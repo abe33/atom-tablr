@@ -2,6 +2,9 @@ _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
 [url] = []
 
+Range = require './range'
+Table = require './table'
+DisplayTable = require './display-table'
 TableEditor = require './table-editor'
 TableElement = require './table-element'
 TableSelectionElement = require './table-selection-element'
@@ -110,6 +113,9 @@ module.exports =
 
   deactivate: ->
     @subscriptions.dispose()
+
+  provideTablrModelsServiceV1: ->
+    {Table, DisplayTable, TableEditor, Range}
 
   getSmallTable: ->
     table = new TableEditor

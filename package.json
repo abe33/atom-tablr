@@ -8,6 +8,14 @@
   "engines": {
     "atom": ">=1.0.0"
   },
+  "providedServices": {
+    "tablr-models": {
+      "description": "Expose Tablr models to other Atom packages",
+      "versions": {
+        "1.0.0": "provideTablrModelsServiceV1"
+      }
+    }
+  },
   "dependencies": {
     "atom-utils": "0.6.x",
     "event-kit": ">= 0.7.2",
