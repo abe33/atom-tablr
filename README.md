@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/abe33/atom-tablr.svg?branch=master)](https://travis-ci.org/abe33/atom-tablr)
 
+Edit CSV files using a table editor.
+
 ### Installation
 
 ```sh

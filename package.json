@@ -2,7 +2,7 @@
   "name": "tablr",
   "main": "./lib/tablr",
   "version": "0.1.0",
-  "description": "Edit tabular data through an UI",
+  "description": "Edit CSV files using a table editor",
   "repository": "https://github.com/abe33/atom-tablr",
   "license": "MIT",
   "engines": {
