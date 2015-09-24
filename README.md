@@ -23,4 +23,4 @@ See the [docs directory](https://github.com/abe33/atom-tablr/tree/master/docs) t
 
 Tablr also exposes an API to use the table editor in your own packages.
 
-- [Tablr Models](https://github.com/abe33/atom-tablr/tree/master/docs/csv-edit.md)
+- [Tablr Models](https://github.com/abe33/atom-tablr/tree/master/docs/tablr-api.md)
