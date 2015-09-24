@@ -16,8 +16,8 @@ Tablr exposes its models through a [service](https://atom.io/docs/v1.0.16/behind
 
 The following classes are exposed by the service:
 
-Class|Role
---|--
+Class|Role|
+---|---|
 `Table`|The `Table` model is the lowest level in Tablr hierarchy. Its main purpose is to handle the raw data: the columns and the rows that constitute a table. It also provides basic mechanisms to save the model on disk when provided with a save handler (more on that below). Lastly it handles the `modified` state of the table and provides the undo/redo mechanism. It's the equivalent of the `TextBuffer` class in Atom.
 `DisplayTable`|The `DisplayTable` model handles the display state of a `Table` object, like the size of rows and columns, the sort to apply to the table rows and the alignment to use for each column. It's the equivalent of the `DisplayBuffer` class in Atom.
 `TableEditor`|The `TableEditor` model is the upper model in the hierarchy, it composes a `DisplayTable` and provides the controls necessary to modify it. It stores the cursors and selections the user can manipulate and handles the copy/paste operation. It's the equivalent of the `TextEditor` class in Atom.
