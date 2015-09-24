@@ -78,7 +78,7 @@ function save (table) {
     let data = table.getRows();
     data.unshift(table.getColumns());
 
-    writeFile(filePath, err => {
+    writeFile(filePath, data, err => {
       if (err) {
         reject(err);
       }
