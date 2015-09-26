@@ -4,6 +4,8 @@
 
 Edit CSV files using a table editor.
 
+![CSV Opener](http://abe33.github.io/atom-tablr/tablr.gif)
+
 ### Installation
 
 ```sh
