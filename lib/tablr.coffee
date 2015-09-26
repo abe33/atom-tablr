@@ -43,6 +43,9 @@ module.exports =
     minimumRowHeight:
       type: 'integer'
       default: 16
+    rowHeightIncrement:
+      type: 'integer'
+      default: 20
 
     columnWidth:
       type: 'integer'
@@ -53,6 +56,9 @@ module.exports =
     minimumColumnWidth:
       type: 'integer'
       default: 40
+    columnWidthIncrement:
+      type: 'integer'
+      default: 20
 
     flattenBufferMultiSelectionOnPaste:
       type: 'boolean'

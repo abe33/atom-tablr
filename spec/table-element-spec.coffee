@@ -1409,6 +1409,38 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('right')
 
+  describe 'tablr:expand-column', ->
+    it 'increases the column at cursors by the amount defined in the settings', ->
+      atom.config.set('tablr.columnWidthIncrement', 20)
+
+      tableElement.expandColumn()
+
+      expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(120)
+
+  describe 'tablr:shrink-column', ->
+    it 'shrinks the column at cursors by the amount defined in the settings', ->
+      atom.config.set('tablr.columnWidthIncrement', 20)
+
+      tableElement.shrinkColumn()
+
+      expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(80)
+
+  describe 'tablr:expand-row', ->
+    it 'increases the row at cursors by the amount defined in the settings', ->
+      atom.config.set('tablr.rowHeightIncrement', 20)
+
+      tableElement.expandRow()
+
+      expect(tableEditor.getScreenRowHeightAt(0)).toEqual(40)
+
+  describe 'tablr:shrink-row', ->
+    it 'shrinks the row at cursors by the amount defined in the settings', ->
+      atom.config.set('tablr.rowHeightIncrement', 20)
+
+      tableElement.shrinkRow()
+
+      expect(tableEditor.getScreenRowHeightAt(0)).toEqual(10)
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

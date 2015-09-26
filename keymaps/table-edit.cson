@@ -12,6 +12,10 @@
   'shift-tab': 'tablr:move-left-in-selection'
   'home': 'core:move-to-top'
   'end': 'core:move-to-bottom'
+  'ctrl-alt-left': 'tablr:shrink-column'
+  'ctrl-alt-right': 'tablr:expand-column'
+  'ctrl-alt-up': 'tablr:shrink-row'
+  'ctrl-alt-down': 'tablr:expand-row'
 
 '.platform-darwin atom-table-editor':
   'cmd-left': 'tablr:move-to-beginning-of-line'

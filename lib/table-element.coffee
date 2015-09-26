@@ -627,6 +627,50 @@ class TableElement extends HTMLElement
     else
       @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'right'
 
+  expandColumn: ->
+    amount = atom.config.get('tablr.columnWidthIncrement')
+
+    columns = []
+    @tableEditor.getCursors().forEach (cursor) =>
+      column = cursor.getPosition().column
+      return if column in columns
+
+      @tableEditor.setScreenColumnWidthAt(column, @tableEditor.getScreenColumnWidthAt(column) + amount)
+      columns.push(column)
+
+  shrinkColumn: ->
+    amount = atom.config.get('tablr.columnWidthIncrement')
+
+    columns = []
+    @tableEditor.getCursors().forEach (cursor) =>
+      column = cursor.getPosition().column
+      return if column in columns
+
+      @tableEditor.setScreenColumnWidthAt(column, @tableEditor.getScreenColumnWidthAt(column) - amount)
+      columns.push(column)
+
+  expandRow: ->
+    amount = atom.config.get('tablr.rowHeightIncrement')
+
+    rows = []
+    @tableEditor.getCursors().forEach (cursor) =>
+      row = cursor.getPosition().row
+      return if row in rows
+
+      @tableEditor.setScreenRowHeightAt(row, @tableEditor.getScreenRowHeightAt(row) + amount)
+      rows.push(row)
+
+  shrinkRow: ->
+    amount = atom.config.get('tablr.rowHeightIncrement')
+
+    rows = []
+    @tableEditor.getCursors().forEach (cursor) =>
+      row = cursor.getPosition().row
+      return if row in rows
+
+      @tableEditor.setScreenRowHeightAt(row, @tableEditor.getScreenRowHeightAt(row) - amount)
+      rows.push(row)
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##
@@ -1427,6 +1471,10 @@ atom.commands.add 'atom-table-editor',
   'tablr:add-selection-above': -> @addCursorAboveLastSelection()
   'tablr:add-selection-left': -> @addCursorLeftToLastSelection()
   'tablr:add-selection-right': -> @addCursorRightToLastSelection()
+  'tablr:expand-column': -> @expandColumn()
+  'tablr:shrink-column': -> @shrinkColumn()
+  'tablr:expand-row': -> @expandRow()
+  'tablr:shrink-row': -> @shrinkRow()
 
 atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
   'core:move-up': -> @moveUp()

@@ -68,6 +68,11 @@ Command|Action
 `tablr:align-left`|Change the alignment of the column at the last cursor's position to `left`.
 `tablr:align-center`|Change the alignment of the column at the last cursor's position to `center`.
 `tablr:align-right`|Change the alignment of the column at the last cursor's position to `right`.
+`tablr:expand-column`|<p>OSX/Win/Linux: <kbd>ctrl-alt-right</kbd></p>Increase the width of each column with a cursor by the amount specified in the `columnWidthIncrement` setting.
+`tablr:shrink-column`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the width of each column with a cursor by the amount specified in the `columnWidthIncrement` setting.
+`tablr:expand-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-right</kbd></p>Increase the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
+`tablr:shrink-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
+
 
 ## Cell Edit
 
