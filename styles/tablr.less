@@ -429,6 +429,27 @@ atom-table-editor {
     //    ##    ## ##       ##       ##       ##    ##
     //     ######  ######## ######## ########  ######
 
+    .ellipsis-display {
+      .cell;
+      height: auto;
+      position: fixed;
+      background: mix(@input-background-color, @background-color-info, 90%);
+      color: @text-color-selected;
+      font-size: 13px;
+      pointer-events: none;
+      white-space: pre-wrap;
+
+      &:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid fadeout(@background-color-info, 50%);
+      }
+    }
+
     atom-table-cell, atom-table-header-cell, atom-table-gutter-cell, .tablr-gutter-filler, .tablr-header-filler {
       font-size: 13px;
     }

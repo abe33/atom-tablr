@@ -98,7 +98,9 @@ class TableElement extends HTMLElement
           @tableEditor.sortBy(columnIndex)
 
     @subscriptions.add @subscribeTo @getRowsContainer(),
-      'scroll': (e) => @requestUpdate()
+      'scroll': (e) =>
+        @requestUpdate()
+        @cancelEllipsisDisplay()
 
     @subscriptions.add @subscribeTo @head, 'atom-table-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
@@ -120,6 +122,7 @@ class TableElement extends HTMLElement
         if position = @cellPositionAtScreenPosition(e.pageX, e.pageY)
           if metaKey or (ctrlKey and process.platform isnt 'darwin')
             @tableEditor.addCursorAtScreenPosition(position)
+            @checkEllipsisDisplay()
           else if shiftKey
             cursor = @tableEditor.getLastCursor().getPosition()
 
@@ -134,6 +137,7 @@ class TableElement extends HTMLElement
             ])
           else
             @tableEditor.setCursorAtScreenPosition position
+            @checkEllipsisDisplay()
 
         @startDrag(e)
         @focus()
@@ -607,7 +611,44 @@ class TableElement extends HTMLElement
     @afterCursorMove()
 
   afterCursorMove: ->
-    @makeCellVisible(@tableEditor.getLastCursor().getPosition())
+    @makeCellVisible(@tableEditor.getCursorPosition())
+    @checkEllipsisDisplay()
+
+  checkEllipsisDisplay: ->
+    @cancelEllipsisDisplay()
+    if @getScreenCellAtPosition(@tableEditor.getCursorPosition())?.classList.contains('ellipsis')
+      @scheduleEllipsisDisplay()
+
+  cancelEllipsisDisplay: ->
+    clearTimeout(@ellipsisTimeout) if @ellipsisTimeout?
+    if @ellipsisDisplay?
+      @ellipsisDisplay.parentNode?.removeChild(@ellipsisDisplay)
+      delete @ellipsisDisplay
+
+  scheduleEllipsisDisplay: ->
+    @ellipsisTimeout = setTimeout((=> @displayEllipsis()), 500)
+
+  displayEllipsis: ->
+    delete @ellipsisTimeout
+
+    cellPosition = @tableEditor.getCursorPosition()
+    cellElement = @getScreenCellAtPosition(cellPosition)
+    return unless cellElement?
+
+    cellRect = @cellScreenRect(cellPosition)
+    bounds = @getBoundingClientRect()
+
+    @ellipsisDisplay = document.createElement('div')
+    @ellipsisDisplay.className = 'ellipsis-display'
+    @ellipsisDisplay.textContent = cellElement.textContent
+    @ellipsisDisplay.style.cssText = "
+      top: #{cellRect.top + bounds.top}px;
+      left: #{cellRect.left + bounds.left}px;
+      min-width: #{cellRect.width}px;
+      min-height: #{cellRect.height}px;
+    "
+
+    @shadowRoot.appendChild(@ellipsisDisplay)
 
   alignLeft: ->
     if @targetColumnForAlignment?
@@ -638,6 +679,8 @@ class TableElement extends HTMLElement
       @tableEditor.setScreenColumnWidthAt(column, @tableEditor.getScreenColumnWidthAt(column) + amount)
       columns.push(column)
 
+    @checkEllipsisDisplay()
+
   shrinkColumn: ->
     amount = atom.config.get('tablr.columnWidthIncrement')
 
@@ -648,6 +691,8 @@ class TableElement extends HTMLElement
 
       @tableEditor.setScreenColumnWidthAt(column, @tableEditor.getScreenColumnWidthAt(column) - amount)
       columns.push(column)
+
+    @checkEllipsisDisplay()
 
   expandRow: ->
     amount = atom.config.get('tablr.rowHeightIncrement')
@@ -660,6 +705,8 @@ class TableElement extends HTMLElement
       @tableEditor.setScreenRowHeightAt(row, @tableEditor.getScreenRowHeightAt(row) + amount)
       rows.push(row)
 
+    @checkEllipsisDisplay()
+
   shrinkRow: ->
     amount = atom.config.get('tablr.rowHeightIncrement')
 
@@ -670,6 +717,8 @@ class TableElement extends HTMLElement
 
       @tableEditor.setScreenRowHeightAt(row, @tableEditor.getScreenRowHeightAt(row) - amount)
       rows.push(row)
+
+    @checkEllipsisDisplay()
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
