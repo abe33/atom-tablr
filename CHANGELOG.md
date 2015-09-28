@@ -1,3 +1,11 @@
+<a name="v0.2.1"></a>
+# v0.2.1 (2015-09-28)
+
+## :bug: Bug Fixes
+
+- Prevent errors raised when opening a context menu during an edit ([1f7eb563](https://github.com/abe33/atom-tablr/commit/1f7eb563ce2eb47d5cfc4df6a47fa43c02fd06a2), [#7](https://github.com/abe33/atom-tablr/issues/7))
+- Fix mini text editor styles polluted by themes ([711c1b1c](https://github.com/abe33/atom-tablr/commit/711c1b1ccba921f1f8dbdc1b37ecbdeea8eddef1), [#6](https://github.com/abe33/atom-tablr/issues/6))
+
 <a name="v0.2.0"></a>
 # v0.2.0 (2015-09-27)
 
