@@ -113,6 +113,7 @@ module.exports =
         ]
         created: (event) ->
           {pageX, pageY, target} = event
+          return unless target.getScreenColumnIndexAtPixelPosition?
           target.targetColumnForAlignment = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
           setTimeout (-> delete target.targetColumnForAlignment), 10
       }]
