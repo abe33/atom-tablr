@@ -1,3 +1,10 @@
+a name="v0.2.2"></a>
+# v0.2.2 (2015-09-29)
+
+## :bug: Bug Fixes
+
+- Fix cell cursor appearing on scrollbars ([2bc0bb16](https://github.com/abe33/atom-tablr/commit/2bc0bb163ebf4c6677c6de16ca41ce2c0d9b3688), [#5](https://github.com/abe33/atom-tablr/issues/5))
+
 <a name="v0.2.1"></a>
 # v0.2.1 (2015-09-28)
 
