@@ -98,15 +98,17 @@ describe "CSVEditor", ->
           copy.destroy()
 
     describe 'when the file is moved', ->
-      [spy, newPath] = []
+      [spy, newPath, spyTitle] = []
 
       beforeEach ->
         jasmine.useRealClock?()
 
-        openFixture('sample.csv')
+        openFixture('sample.csv', {})
         runs ->
           spy = jasmine.createSpy('did-change-path')
+          spyTitle = jasmine.createSpy('did-change-title')
           csvEditor.onDidChangePath(spy)
+          csvEditor.onDidChangeTitle(spyTitle)
 
           newPath = path.join(projectPath, 'new-file.csv')
           fsp.removeSync(newPath)
@@ -117,6 +119,13 @@ describe "CSVEditor", ->
       it 'detects the change in path', ->
         expect(spy).toHaveBeenCalledWith(newPath)
         expect(csvEditor.getPath()).toEqual(newPath)
+
+      it 'changes the key path to the settings', ->
+        expect(tableEditPackage.csvConfig.get(csvDest)).toBeUndefined()
+        expect(tableEditPackage.csvConfig.get(newPath)).toBeDefined()
+
+      it 'dispatches a did-change-title event', ->
+        expect(spyTitle).toHaveBeenCalledWith('new-file.csv')
 
     describe 'when the user choose to open a text editor', ->
       beforeEach ->

@@ -11,5 +11,9 @@ class CSVEditor
     @config[path] ?= {}
     @config[path][config] = value
 
+  move: (oldPath, newPath) ->
+    @config[newPath] = @config[oldPath]
+    delete @config[oldPath]
+
   serialize: ->
     _.clone(@config)

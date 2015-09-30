@@ -25,6 +25,7 @@ class CSVEditor
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
     @file = new File(filePath)
+    @previousPath = filePath
     @subscribeToFile()
 
   subscribeToFile: ->
@@ -37,7 +38,12 @@ class CSVEditor
       console.log 'deleted'
 
     @fileSubscriptions.add @file.onDidRename =>
-      @emitter.emit 'did-change-path', @getPath()
+      newPath = @getPath()
+      Tablr.csvConfig.move(@previousPath, newPath)
+
+      @emitter.emit 'did-change-path', newPath
+      @emitter.emit 'did-change-title', @getTitle()
+      @previousPath = newPath
 
     @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
       console.log 'error', errorObject
@@ -82,6 +88,9 @@ class CSVEditor
 
   onDidChangePath: (callback) ->
     @emitter.on 'did-change-path', callback
+
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
 
   applyChoice: ->
     return if @choiceApplied
