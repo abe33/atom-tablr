@@ -1,7 +1,7 @@
 _ = require 'underscore-plus'
 
 module.exports =
-class CSVEditor
+class CSVConfig
   constructor: (@config={}) ->
 
   get: (path, config) ->
