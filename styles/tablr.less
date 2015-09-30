@@ -588,7 +588,7 @@ atom-csv-editor {
       max-width: 750px;
       overflow: auto;
       border-radius: @component-border-radius;
-      border: 1px solid @input-border-color;
+      border: 1px solid darken(@syntax-selection-color, 10%);
     }
 
     .alert {
@@ -598,15 +598,15 @@ atom-csv-editor {
 
     table {
       min-width: 100%;
-      background: @input-background-color;
+      background: @syntax-selection-color;
 
       th, td {
         text-align: left;
         padding: 0.6em @component-padding;
         font-size: 1.2em;
         padding: 0.3em 0.6em;
-        border-right: 1px solid @background-color-highlight;
-        border-bottom: 1px solid @background-color-highlight;
+        border-right: 1px solid darken(@syntax-selection-color, 10%);
+        border-bottom: 1px solid darken(@syntax-selection-color, 10%);
 
         &:last-child {
           border-right: none;
@@ -618,11 +618,10 @@ atom-csv-editor {
       }
 
       th {
-        font-weight: normal;
-        color: @text-color-highlight;
+        color: @syntax-text-color;
       }
       td {
-        color: @text-color;
+        color: @syntax-text-color;
       }
     }
   }
@@ -802,7 +801,6 @@ atom-csv-editor {
     input[type="radio"]:checked + label {
       background: @button-background-color-selected;
       color: contrast(@button-background-color-selected, @base-background-color, @text-color-selected);
-
     }
   }
 }
