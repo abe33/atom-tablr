@@ -14,6 +14,9 @@
 @table-column-action-background: @syntax-gutter-background-color-selected;
 @table-selection-color: @background-color-info;
 
+@csv-form-background-color: @syntax-background-color;
+@csv-form-text-color: @syntax-text-color;
+
 .flex-container {
   position: relative;
   width: 100%;
@@ -551,8 +554,11 @@ atom-table-editor {
 //    ##    ## ##    ##   ## ##
 //     ######   ######     ###
 
+atom-pane-container atom-pane .item-views atom-csv-editor.pane-item {
+  color: @csv-form-text-color;
+  background: @csv-form-background-color;
+}
 atom-csv-editor {
-  color: @text-color;
   position: relative;
 
   atom-table-editor {
@@ -615,6 +621,9 @@ atom-csv-editor {
         font-weight: normal;
         color: @text-color-highlight;
       }
+      td {
+        color: @text-color;
+      }
     }
   }
 
@@ -643,6 +652,10 @@ atom-csv-editor {
 
     .settings-panel > .controls label {
       margin: @component-padding 0;
+
+      .setting-title {
+        color: @csv-form-text-color;
+      }
     }
 
     label * {
@@ -705,6 +718,7 @@ atom-csv-editor {
     .control-group > .setting-title {
       flex: 1 1 0;
       margin: 0;
+      color: @csv-form-text-color;
     }
 
     .split-panel {
@@ -724,6 +738,7 @@ atom-csv-editor {
         padding: 0;
         padding-right: @double-padding;
         margin: 0;
+        color: @csv-form-text-color;
       }
     }
 
