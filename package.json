@@ -28,6 +28,7 @@
     "csv": "~0.4.5"
   },
   "devDependencies": {
-    "temp": "~0.8.0"
+    "temp": "~0.8.0",
+    "fs-plus": "^2.8.1"
   }
 }

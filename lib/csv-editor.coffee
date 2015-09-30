@@ -2,7 +2,7 @@ _ = require 'underscore-plus'
 fs = require 'fs'
 csv = require 'csv'
 path = require 'path'
-{CompositeDisposable, Emitter} = require 'atom'
+{CompositeDisposable, Emitter, File} = require 'atom'
 TableEditor = require './table-editor'
 Tablr = null
 
@@ -18,12 +18,29 @@ class CSVEditor
   @tableEditorForPath: {}
 
   constructor: (state={}) ->
-    {@uriToOpen, @options, @choice, @layout, editor: @editorState} = state
+    {filePath, @options, @choice, @layout, editor: @editorState} = state
 
     Tablr ?= require './tablr'
     @options ?= {}
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
+    @file = new File(filePath)
+    @subscribeToFile()
+
+  subscribeToFile: ->
+    @fileSubscriptions = new CompositeDisposable
+
+    @fileSubscriptions.add @file.onDidChange =>
+      console.log 'changed'
+
+    @fileSubscriptions.add @file.onDidDelete =>
+      console.log 'deleted'
+
+    @fileSubscriptions.add @file.onDidRename =>
+      @emitter.emit 'did-change-path', @getPath()
+
+    @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
+      console.log 'error', errorObject
 
   getTitle: ->
     if sessionPath = @getPath()
@@ -40,15 +57,16 @@ class CSVEditor
     else
       'untitled'
 
-  getPath: -> @uriToOpen
+  getPath: -> @file.getPath()
 
-  getURI: -> @uriToOpen
+  getURI: -> @getPath()
 
   isDestroyed: -> @destroyed
 
   isModified: -> @editor?.isModified() ? false
 
-  copy: -> new CSVEditor({@uriToOpen, options: _.clone(@options), @choice})
+  copy: ->
+    new CSVEditor({filePath: @getPath(), options: _.clone(@options), @choice})
 
   shouldPromptToSave: (options) ->
     @editor?.shouldPromptToSave(options) ? false
@@ -62,6 +80,9 @@ class CSVEditor
   onDidChangeModified: (callback) ->
     @emitter.on 'did-change-modified', callback
 
+  onDidChangePath: (callback) ->
+    @emitter.on 'did-change-path', callback
+
   applyChoice: ->
     return if @choiceApplied
     if @choice?
@@ -72,7 +93,8 @@ class CSVEditor
     @choiceApplied = true
 
   openTextEditor: (@options={}) ->
-    atom.project.open(@uriToOpen).then (editor) =>
+    filePath = @getPath()
+    atom.project.open(filePath).then (editor) =>
       pane = atom.workspace.paneForItem(this)
       @emitter.emit('did-open', {editor, options: _.clone(@options)})
       @saveConfig('TextEditor')
@@ -98,6 +120,7 @@ class CSVEditor
       @saveLayout()
       @editor.destroy()
 
+    @fileSubscriptions?.dispose()
     @destroyed = true
     @emitter.emit('did-destroy', this)
     @emitter.dispose()
@@ -120,9 +143,10 @@ class CSVEditor
           resolve()
 
   saveConfig: (@choice) ->
-    Tablr.csvConfig.set(@uriToOpen, 'options', @options)
+    filePath = @getPath()
+    Tablr.csvConfig.set(filePath, 'options', @options)
     if @options.remember and @choice?
-      Tablr.csvConfig.set(@uriToOpen, 'choice', @choice)
+      Tablr.csvConfig.set(filePath, 'choice', @choice)
 
   saveLayout: ->
     @layout =
@@ -138,12 +162,13 @@ class CSVEditor
 
       rowHeights: @editor.displayTable.rowHeights.slice()
 
-    Tablr.csvConfig.set(@uriToOpen, 'layout', @layout)
+    Tablr.csvConfig.set(@getPath(), 'layout', @layout)
 
   openCSV: ->
     new Promise (resolve, reject) =>
-      if (previousEditor = CSVEditor.tableEditorForPath[@uriToOpen])? and previousEditor.table?
-        {table, displayTable} = CSVEditor.tableEditorForPath[@uriToOpen]
+      filePath = @getPath()
+      if (previousEditor = CSVEditor.tableEditorForPath[filePath])? and previousEditor.table?
+        {table, displayTable} = CSVEditor.tableEditorForPath[filePath]
         tableEditor = new TableEditor({table, displayTable})
 
         resolve(tableEditor)
@@ -152,9 +177,9 @@ class CSVEditor
         @editorState = null
         resolve(tableEditor)
       else
-        fileContent = fs.readFileSync(@uriToOpen)
+        fileContent = fs.readFileSync(filePath)
         options = _.clone(@options)
-        layout = @layout ? Tablr.csvConfig?.get(@uriToOpen, 'layout')
+        layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
 
         csv.parse String(fileContent), options, (err, data) =>
           return reject(err) if err?
@@ -176,12 +201,12 @@ class CSVEditor
           tableEditor.initializeAfterSetup()
           tableEditor.unlockModifiedStatus()
 
-          CSVEditor.tableEditorForPath[@uriToOpen] = tableEditor
+          CSVEditor.tableEditorForPath[filePath] = tableEditor
           resolve(tableEditor)
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>
-      input = fs.createReadStream(@uriToOpen)
+      input = fs.createReadStream(@getPath())
       parser = csv.parse(options)
       output = []
 
@@ -211,7 +236,7 @@ class CSVEditor
   serialize: ->
     out = {
       deserializer: 'CSVEditor'
-      @uriToOpen
+      filePath: @getPath()
       @options
       @choice
     }

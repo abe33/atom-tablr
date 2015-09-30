@@ -1,4 +1,5 @@
 fs = require 'fs'
+fsp = require 'fs-plus'
 path = require 'path'
 temp = require 'temp'
 
@@ -15,26 +16,6 @@ CHANGE_TIMEOUT = 400
 describe "CSVEditor", ->
   [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage, nextAnimationFrame] = []
 
-  beforeEach ->
-    [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
-
-    jasmineContent = document.body.querySelector('#jasmine-content')
-    workspaceElement = atom.views.getView(atom.workspace)
-    jasmineContent.appendChild(workspaceElement)
-
-    noAnimationFrame = -> throw new Error('No animation frame requested')
-    nextAnimationFrame = noAnimationFrame
-
-    requestAnimationFrameSafe = window.requestAnimationFrame
-    spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
-      lastFn = fn
-      nextAnimationFrame = ->
-        nextAnimationFrame = noAnimationFrame
-        fn()
-
-    waitsForPromise -> atom.packages.activatePackage('tablr').then (pkg) ->
-      tableEditPackage = pkg.mainModule
-
   sleep = (ms) ->
     start = new Date
     -> new Date - start >= ms
@@ -43,14 +24,15 @@ describe "CSVEditor", ->
     csvFixture = path.join(__dirname, 'fixtures', fixtureName)
 
     projectPath = temp.mkdirSync('tablr-project')
-    csvDest = path.join(projectPath, fixtureName)
+    atom.project.setPaths([projectPath])
 
-    if settings?
-      tableEditPackage.csvConfig.set("/private#{csvDest}", 'options',  settings)
+    projectPath = atom.project.resolvePath('.')
+    csvDest = path.join(projectPath, fixtureName)
 
     fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
 
-    atom.project.setPaths([projectPath])
+    if settings?
+      tableEditPackage.csvConfig.set(csvDest, 'options',  settings)
 
     waitsForPromise ->
       atom.workspace.open(fixtureName).then (t) ->
@@ -75,7 +57,28 @@ describe "CSVEditor", ->
 
     waitsFor -> fs.writeFile.callCount > 0
 
+  beforeEach ->
+    [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
+
+    jasmineContent = document.body.querySelector('#jasmine-content')
+    workspaceElement = atom.views.getView(atom.workspace)
+    jasmineContent.appendChild(workspaceElement)
+
+    noAnimationFrame = -> throw new Error('No animation frame requested')
+    nextAnimationFrame = noAnimationFrame
+
+    requestAnimationFrameSafe = window.requestAnimationFrame
+    spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
+      lastFn = fn
+      nextAnimationFrame = ->
+        nextAnimationFrame = noAnimationFrame
+        fn()
+
+    waitsForPromise -> atom.packages.activatePackage('tablr').then (pkg) ->
+      tableEditPackage = pkg.mainModule
+
   afterEach ->
+    csvEditor?.destroy()
     temp.cleanup()
 
   describe 'when a csv file is opened', ->
@@ -91,6 +94,29 @@ describe "CSVEditor", ->
           copy = csvEditor.copy()
 
           expect(copy.getPath()).toEqual(csvEditor.getPath())
+
+          copy.destroy()
+
+    describe 'when the file is moved', ->
+      [spy, newPath] = []
+
+      beforeEach ->
+        jasmine.useRealClock?()
+
+        openFixture('sample.csv')
+        runs ->
+          spy = jasmine.createSpy('did-change-path')
+          csvEditor.onDidChangePath(spy)
+
+          newPath = path.join(projectPath, 'new-file.csv')
+          fsp.removeSync(newPath)
+          fsp.moveSync(csvEditor.getPath(), newPath)
+
+        waitsFor -> spy.callCount > 0
+
+      it 'detects the change in path', ->
+        expect(spy).toHaveBeenCalledWith(newPath)
+        expect(csvEditor.getPath()).toEqual(newPath)
 
     describe 'when the user choose to open a text editor', ->
       beforeEach ->
@@ -120,6 +146,8 @@ describe "CSVEditor", ->
           copy = csvEditor.copy()
 
           expect(copy.choice).toEqual('TextEditor')
+
+          copy.destroy()
 
     describe 'when the remember choice setting is enabled', ->
       beforeEach ->
@@ -199,6 +227,8 @@ describe "CSVEditor", ->
             copy = csvEditor.copy()
 
             expect(copy.choice).toEqual('TableEditor')
+
+            copy.destroy()
 
         describe 'when panes are split', ->
           [secondCSVEditor, secondCSVEditorElement] = []
@@ -544,7 +574,7 @@ describe "CSVEditor", ->
       runs ->
         expect(csvEditor.serialize()).toEqual({
           deserializer: 'CSVEditor'
-          uriToOpen: "/private#{csvDest}"
+          filePath: csvDest
           options: csvEditor.options
           choice: undefined
         })
@@ -556,7 +586,7 @@ describe "CSVEditor", ->
         runs ->
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            uriToOpen: "/private#{csvDest}"
+            filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
           })
@@ -578,7 +608,7 @@ describe "CSVEditor", ->
 
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            uriToOpen: "/private#{csvDest}"
+            filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
             layout:
@@ -603,7 +633,7 @@ describe "CSVEditor", ->
 
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            uriToOpen: "/private#{csvDest}"
+            filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
             editor: csvEditor.editor.serialize()
@@ -613,7 +643,7 @@ describe "CSVEditor", ->
     it 'restores a CSVEditor using the provided state', ->
       csvEditor = atom.deserializers.deserialize({
         deserializer: 'CSVEditor'
-        uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+        filePath: "#{atom.project.getPaths()[0]}/sample.csv"
         options: {}
         choice: undefined
       })
@@ -625,7 +655,7 @@ describe "CSVEditor", ->
         spyOn(CSVEditor.prototype, 'applyChoice')
         csvEditor = atom.deserializers.deserialize({
           deserializer: 'CSVEditor'
-          uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+          filePath: "#{atom.project.getPaths()[0]}/sample.csv"
           options: {}
           choice: 'TableEditor'
         })
@@ -637,7 +667,7 @@ describe "CSVEditor", ->
         it 'applies the restored layout', ->
           csvEditor = atom.deserializers.deserialize({
             deserializer: 'CSVEditor'
-            uriToOpen: "#{atom.project.getPaths()[0]}/sample.csv"
+            filePath: "#{atom.project.getPaths()[0]}/sample.csv"
             options: {}
             choice: 'TableEditor'
             layout:
@@ -668,7 +698,7 @@ describe "CSVEditor", ->
         it 'applies the modified state', ->
           restored = atom.deserializers.deserialize({
             deserializer: "CSVEditor"
-            uriToOpen:"/path/to/file/sample.csv"
+            filePath:"/path/to/file/sample.csv"
             options: {}
             choice: "TableEditor"
             editor:
