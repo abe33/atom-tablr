@@ -43,7 +43,7 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
   font-family: "Octicons Regular";
   text-align: center;
   content: "\f062";
-  margin-right: 5px;
+  margin-right: 0.2em;
   color: @text-color-info;
   position: relative;
   vertical-align: middle;
@@ -52,12 +52,12 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
   font-weight: normal;
   font-style: normal;
   display: inline-block;
-  line-height: 1;
+  line-height: 1em;
   -webkit-font-smoothing: antialiased;
   text-decoration: none;
-  font-size: 16px !important;
-  width: 16px !important;
-  height: 16px !important;
+  font-size: 1.6em !important;
+  width: 1em !important;
+  height: 1em !important;
 }
 
 //    ######   ######## ##    ## ######## ########     ###    ##
@@ -211,7 +211,7 @@ atom-table-editor {
           width: 20px;
           height: 20px;
           text-align: center;
-          font-size: 16px;
+          font-size: 1.2em;
           line-height: 20px;
           margin-top: -10px;
         }
@@ -252,12 +252,12 @@ atom-table-editor {
       transition: opacity 0.2s;
       right: 2px;
       top: 50%;
-      width: 16px;
-      height: 16px;
+      width: 1.6em;
+      height: 1.6em;
       text-align: center;
-      font-size: 10px;
-      line-height: 16px;
-      margin-top: -8px;
+      font-size: 0.8em;
+      line-height: 1.6em;
+      margin-top: -0.8em;
       background: @table-column-action-background;
 
       &::before {
@@ -449,7 +449,7 @@ atom-table-editor {
       position: fixed;
       background: mix(@table-background-color, @table-selection-color, 90%);
       color: @table-text-highlight-color;
-      font-size: 13px;
+      font-size: 1.2em;
       pointer-events: none;
       white-space: pre-wrap;
 
@@ -465,7 +465,7 @@ atom-table-editor {
     }
 
     atom-table-cell, atom-table-header-cell, atom-table-gutter-cell, .tablr-gutter-filler, .tablr-header-filler {
-      font-size: 13px;
+      font-size: 1.2em;
     }
     atom-table-cell {
       .cell;
