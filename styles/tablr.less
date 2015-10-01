@@ -1,9 +1,21 @@
 @import "ui-variables";
+@import "syntax-variables";
 @import "buttons";
 
 @double-padding: @component-padding * 2;
 @half-padding: @component-padding / 2;
 @two-third-padding: (@component-padding / 3) * 2;
+
+@table-text-color: @syntax-text-color;
+@table-text-highlight-color: @syntax-cursor-color;
+@table-background-color: @syntax-background-color;
+@table-border-color: @syntax-selection-color;
+@table-gutter-color: @syntax-background-color;
+@table-column-action-background: @syntax-gutter-background-color-selected;
+@table-selection-color: @background-color-info;
+
+@csv-form-background-color: @syntax-background-color;
+@csv-form-text-color: @syntax-text-color;
 
 .flex-container {
   position: relative;
@@ -21,7 +33,7 @@
   float: left;
   height: 100%;
   padding: 2px 6px;
-  border-right: 1px solid @background-color-highlight;
+  border-right: 1px solid @table-border-color;
   position: absolute;
 }
 
@@ -31,7 +43,7 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
   font-family: "Octicons Regular";
   text-align: center;
   content: "\f062";
-  margin-right: 5px;
+  margin-right: 0.2em;
   color: @text-color-info;
   position: relative;
   vertical-align: middle;
@@ -40,12 +52,12 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
   font-weight: normal;
   font-style: normal;
   display: inline-block;
-  line-height: 1;
+  line-height: 1em;
   -webkit-font-smoothing: antialiased;
   text-decoration: none;
-  font-size: 16px !important;
-  width: 16px !important;
-  height: 16px !important;
+  font-size: 1.6em !important;
+  width: 1em !important;
+  height: 1em !important;
 }
 
 //    ######   ######## ##    ## ######## ########     ###    ##
@@ -57,25 +69,25 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
 //    ######   ######## ##    ## ######## ##     ## ##     ## ########
 
 atom-table-editor {
-  background: @pane-item-background-color;
+  background: @table-background-color;
   position: relative;
   -webkit-flex-direction: column;
   display: -webkit-flex;
-  color: @text-color;
+  color: @table-text-color;
   -webkit-user-select: none;
 
   atom-text-editor[mini].is-focused {
-    border: 1px solid @background-color-info;
+    border: 1px solid @table-selection-color;
     box-shadow: none;
 
     &[data-row]::before {
-      background: @background-color-info;
+      background: @table-selection-color;
     }
   }
   atom-text-editor[mini] {
     position: fixed;
     margin: 0;
-    border: 1px solid @background-color-selected;
+    border: 1px solid @table-border-color;
     box-shadow: 0 5px 10px 3px rgba(0,0,0,0.2);
     z-index: 3;
     overflow: visible;
@@ -95,8 +107,8 @@ atom-table-editor {
       left: -1px;
       transform: translate(0, -100%);
       font-size: 0.7em;
-      background: @background-color-selected;
-      color: @base-background-color;
+      background: @table-border-color;
+      color: @table-background-color;
       line-height: 1em;
       padding: 6px 6px;
     }
@@ -181,8 +193,8 @@ atom-table-editor {
       }
 
       &.selected {
-        background: @background-color-highlight;
-        border-color: @base-background-color;
+        background: @table-background-color;
+        border-color: @table-border-color;
       }
 
       &.order {
@@ -199,7 +211,7 @@ atom-table-editor {
           width: 20px;
           height: 20px;
           text-align: center;
-          font-size: 16px;
+          font-size: 1.2em;
           line-height: 20px;
           margin-top: -10px;
         }
@@ -219,7 +231,7 @@ atom-table-editor {
     }
 
     .tablr-header-filler + * {
-      border-left: 1px solid @background-color-highlight;
+      border-left: 1px solid @table-border-color;
       margin-left: -1px;
     }
 
@@ -240,13 +252,13 @@ atom-table-editor {
       transition: opacity 0.2s;
       right: 2px;
       top: 50%;
-      width: 16px;
-      height: 16px;
+      width: 1.6em;
+      height: 1.6em;
       text-align: center;
-      font-size: 10px;
-      line-height: 16px;
-      margin-top: -8px;
-      background: @background-color-highlight;
+      font-size: 0.8em;
+      line-height: 1.6em;
+      margin-top: -0.8em;
+      background: @table-column-action-background;
 
       &::before {
         content: '\f058';
@@ -265,7 +277,7 @@ atom-table-editor {
     .tablr-body {
       display: -webkit-flex;
       -webkit-flex: 1;
-      border-top: 1px solid @background-color-highlight;
+      border-top: 1px solid @table-border-color;
       position: relative;
     }
 
@@ -302,8 +314,8 @@ atom-table-editor {
       position: absolute;
       left: 0;
       width: 100%;
-      border-bottom: 1px solid @background-color-highlight;
-      border-right: 1px solid @background-color-highlight;
+      border-bottom: 1px solid @table-border-color;
+      border-right: 1px solid @table-border-color;
       pointer-events: none;
 
       &:nth-child(2) {
@@ -311,12 +323,12 @@ atom-table-editor {
       }
 
       &.selected {
-        background: @background-color-highlight;
-        border-color: @base-background-color;
+        background: @table-border-color;
+        border-color: @table-background-color;
       }
 
       &.active-row {
-        color: @text-color-selected;
+        color: @table-text-highlight-color;
       }
 
       .row-resize-handle {
@@ -346,7 +358,7 @@ atom-table-editor {
       display: block;
       position: absolute;
       pointer-events: none;
-      border: 1px solid fadeout(@background-color-info, 50%);
+      border: 1px solid fadeout(@table-selection-color, 50%);
       z-index: 2;
 
       .selection-box-handle {
@@ -354,7 +366,7 @@ atom-table-editor {
         width: 5px;
         height: 5px;
         z-index: 2;
-        background: @background-color-info;
+        background: @table-selection-color;
         right: -3px;
         pointer-events: auto;
         bottom: -3px;
@@ -377,7 +389,7 @@ atom-table-editor {
       display: none;
       min-height: 1px;
       min-width: 1px;
-      background: @background-color-info;
+      background: @table-selection-color;
       z-index: 1;
 
       &.visible {
@@ -413,7 +425,7 @@ atom-table-editor {
       -webkit-flex: 1;
       overflow: auto;
       height: 100%;
-      background: @input-background-color;
+      background: @table-background-color;
     }
 
     .tablr-rows-wrapper {
@@ -435,9 +447,9 @@ atom-table-editor {
       .cell;
       height: auto;
       position: fixed;
-      background: mix(@input-background-color, @background-color-info, 90%);
-      color: @text-color-selected;
-      font-size: 13px;
+      background: mix(@table-background-color, @table-selection-color, 90%);
+      color: @table-text-highlight-color;
+      font-size: 1.2em;
       pointer-events: none;
       white-space: pre-wrap;
 
@@ -448,24 +460,24 @@ atom-table-editor {
         top: 0;
         right: 0;
         bottom: 0;
-        border: 1px solid fadeout(@background-color-info, 50%);
+        border: 1px solid fadeout(@table-selection-color, 50%);
       }
     }
 
     atom-table-cell, atom-table-header-cell, atom-table-gutter-cell, .tablr-gutter-filler, .tablr-header-filler {
-      font-size: 13px;
+      font-size: 1.2em;
     }
     atom-table-cell {
       .cell;
-      border-bottom: 1px solid @background-color-highlight;
-      background: @input-background-color;
+      border-bottom: 1px solid @table-border-color;
+      background: @table-background-color;
 
       &.ellipsis::after {
         content: '\f09a';
         font-family: 'Octicons Regular';
         color: @text-color;
         display: inline-block;
-        background: @app-background-color;
+        background: @table-background-color;
         font-size: 1.6em;
         line-height: 0.4em;
         position: absolute;
@@ -476,7 +488,7 @@ atom-table-editor {
       }
 
       &.active.ellipsis::after {
-        color: @background-color-info;
+        color: @table-selection-color;
       }
     }
 
@@ -493,31 +505,32 @@ atom-table-editor {
     }
 
     .order {
-      background: fadeout(@background-color-info, 75%);
+      background: fadeout(@table-selection-color, 75%);
     }
 
     .active-column {
       background: fadeout(@background-color-error, 75%);
 
       &.order {
-        background: screen(fadeout(@background-color-error, 70%), fadeout(@background-color-info, 70%));
+        background: screen(fadeout(@background-color-error, 70%), fadeout(@table-selection-color, 70%));
       }
     }
 
     atom-table-header-cell.active-column {
-      color: @text-color-selected;
+      color: @table-text-highlight-color;
+      background: @table-border-color;
     }
 
     atom-table-cell {
       &.selected {
-        background: @background-color-highlight;
-        border-color: @base-background-color;
+        background: @table-border-color;
+        border-color: @table-background-color;
       }
 
 
       &.active {
-        background: fadeout(@background-color-info, 90%);
-        color: @text-color-selected;
+        background: fadeout(@table-selection-color, 90%);
+        color: @table-text-highlight-color;
 
         &:before {
           content: '';
@@ -526,7 +539,7 @@ atom-table-editor {
           top: 0;
           right: 0;
           bottom: 0;
-          border: 1px solid fadeout(@background-color-info, 50%);
+          border: 1px solid fadeout(@table-selection-color, 50%);
         }
       }
     }
@@ -541,8 +554,11 @@ atom-table-editor {
 //    ##    ## ##    ##   ## ##
 //     ######   ######     ###
 
+atom-pane-container atom-pane .item-views atom-csv-editor.pane-item {
+  color: @csv-form-text-color;
+  background: @csv-form-background-color;
+}
 atom-csv-editor {
-  color: @text-color;
   position: relative;
 
   atom-table-editor {
@@ -569,10 +585,9 @@ atom-csv-editor {
 
     .table-wrapper {
       max-height: 120px;
-      max-width: 750px;
       overflow: auto;
       border-radius: @component-border-radius;
-      border: 1px solid @input-border-color;
+      border: 1px solid darken(@syntax-selection-color, 10%);
     }
 
     .alert {
@@ -582,15 +597,15 @@ atom-csv-editor {
 
     table {
       min-width: 100%;
-      background: @input-background-color;
+      background: @syntax-selection-color;
 
       th, td {
         text-align: left;
         padding: 0.6em @component-padding;
         font-size: 1.2em;
         padding: 0.3em 0.6em;
-        border-right: 1px solid @background-color-highlight;
-        border-bottom: 1px solid @background-color-highlight;
+        border-right: 1px solid darken(@syntax-selection-color, 10%);
+        border-bottom: 1px solid darken(@syntax-selection-color, 10%);
 
         &:last-child {
           border-right: none;
@@ -602,8 +617,10 @@ atom-csv-editor {
       }
 
       th {
-        font-weight: normal;
-        color: @text-color-highlight;
+        color: @syntax-text-color;
+      }
+      td {
+        color: @syntax-text-color;
       }
     }
   }
@@ -633,6 +650,10 @@ atom-csv-editor {
 
     .settings-panel > .controls label {
       margin: @component-padding 0;
+
+      .setting-title {
+        color: @csv-form-text-color;
+      }
     }
 
     label * {
@@ -695,6 +716,7 @@ atom-csv-editor {
     .control-group > .setting-title {
       flex: 1 1 0;
       margin: 0;
+      color: @csv-form-text-color;
     }
 
     .split-panel {
@@ -707,6 +729,7 @@ atom-csv-editor {
       .panel {
         padding: @double-padding @component-padding;
         flex: 1 1 0;
+        width: 33.33%;
         min-width: 250px;
       }
 
@@ -714,6 +737,8 @@ atom-csv-editor {
         padding: 0;
         padding-right: @double-padding;
         margin: 0;
+        color: @csv-form-text-color;
+        white-space: nowrap;
       }
     }
 
@@ -776,7 +801,7 @@ atom-csv-editor {
 
     input[type="radio"]:checked + label {
       background: @button-background-color-selected;
-      color: @text-color-selected;
+      color: contrast(@button-background-color-selected, @base-background-color, @text-color-selected);
     }
   }
 }

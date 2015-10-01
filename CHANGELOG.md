@@ -1,3 +1,11 @@
+<a name="v0.2.3"></a>
+# v0.2.3 (2015-10-01)
+
+## :art: Styling
+
+- Make the package styles use the syntax theme rather than the ui one so that the tab and the pane item use the same background.
+- Use relative font-size rather than absolute one.
+
 a name="v0.2.2"></a>
 # v0.2.2 (2015-09-29)
 
