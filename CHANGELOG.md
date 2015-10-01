@@ -1,3 +1,10 @@
+<a name="v0.2.4"></a>
+# v0.2.4 (2015-10-01)
+
+## :bug: Bug Fixes
+
+- Fix preview table no longer constrained in cvs form ([1d9000c3](https://github.com/abe33/atom-tablr/commit/1d9000c39d905b087b2d6bd413da037d45833dbd))
+
 <a name="v0.2.3"></a>
 # v0.2.3 (2015-10-01)
 
