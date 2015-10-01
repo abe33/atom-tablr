@@ -127,6 +127,53 @@ describe "CSVEditor", ->
       it 'dispatches a did-change-title event', ->
         expect(spyTitle).toHaveBeenCalledWith('new-file.csv')
 
+    describe 'when the file is deleted', ->
+      [deleteSpy] = []
+
+      beforeEach ->
+        jasmine.useRealClock?()
+
+        openFixture('sample.csv', {})
+        runs ->
+          deleteSpy = jasmine.createSpy('delete')
+          csvEditor.file.onDidDelete(deleteSpy)
+
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
+
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
+          click(tableEditorButton)
+
+        waitsFor -> tableEditor?
+
+      describe 'when the table is modified', ->
+        beforeEach ->
+          csvEditor.editor.addRow()
+
+          fsp.removeSync(csvDest)
+          waitsFor -> deleteSpy.callCount > 0
+
+        it "retains its path and reports the buffer as modified", ->
+          expect(csvEditor.getPath()).toBe(csvDest)
+          expect(csvEditor.isModified()).toBeTruthy()
+
+      describe 'when the table is not modified', ->
+        beforeEach ->
+          fsp.removeSync(csvDest)
+          waitsFor -> deleteSpy.callCount > 0
+
+        it "retains its path and reports the buffer as not modified", ->
+          expect(csvEditor.getPath()).toBe(csvDest)
+          expect(csvEditor.isModified()).toBeFalsy()
+
+      describe 'when resaved', ->
+        it 'recreates the file on disk', ->
+          fsp.removeSync(csvDest)
+          waitsFor -> deleteSpy.callCount > 0
+          runs -> expect(fs.existsSync(csvDest)).toBeFalsy()
+          waitsForPromise -> csvEditor.save()
+          runs -> expect(fs.existsSync(csvDest)).toBeTruthy()
+
     describe 'when the user choose to open a text editor', ->
       beforeEach ->
         openFixture('sample.csv')
