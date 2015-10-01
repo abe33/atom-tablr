@@ -31,11 +31,11 @@ class CSVEditor
   subscribeToFile: ->
     @fileSubscriptions = new CompositeDisposable
 
-    @fileSubscriptions.add @file.onDidChange =>
-      console.log 'changed'
-
-    @fileSubscriptions.add @file.onDidDelete =>
-      console.log 'deleted'
+    # @fileSubscriptions.add @file.onDidChange =>
+    #   console.log 'changed'
+    #
+    # @fileSubscriptions.add @file.onDidDelete =>
+    #   console.log 'deleted'
 
     @fileSubscriptions.add @file.onDidRename =>
       newPath = @getPath()
@@ -45,8 +45,8 @@ class CSVEditor
       @emitter.emit 'did-change-title', @getTitle()
       @previousPath = newPath
 
-    @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
-      console.log 'error', errorObject
+    # @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
+    #   console.log 'error', errorObject
 
   getTitle: ->
     if sessionPath = @getPath()
