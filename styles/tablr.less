@@ -585,7 +585,6 @@ atom-csv-editor {
 
     .table-wrapper {
       max-height: 120px;
-      max-width: 750px;
       overflow: auto;
       border-radius: @component-border-radius;
       border: 1px solid darken(@syntax-selection-color, 10%);
@@ -730,6 +729,7 @@ atom-csv-editor {
       .panel {
         padding: @double-padding @component-padding;
         flex: 1 1 0;
+        width: 33.33%;
         min-width: 250px;
       }
 
@@ -738,6 +738,7 @@ atom-csv-editor {
         padding-right: @double-padding;
         margin: 0;
         color: @csv-form-text-color;
+        white-space: nowrap;
       }
     }
 
