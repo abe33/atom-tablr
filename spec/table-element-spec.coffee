@@ -1332,13 +1332,13 @@ describe 'tableElement', ->
     beforeEach ->
       atom.clipboard.write('foo')
 
-    it 'deletes the current active column', ->
+    it 'pastes the clipboard content', ->
       tableElement.pasteClipboard()
 
       expect(tableEditor.getScreenRow(0)).toEqual(['foo', 0, 'yes'])
 
     describe 'when the read-only attribute is set', ->
-      it 'does not delete the column', ->
+      it 'does not paste the content', ->
         tableElement.setAttribute('read-only', true)
         tableElement.pasteClipboard()
 
@@ -1348,13 +1348,13 @@ describe 'tableElement', ->
     beforeEach ->
       atom.clipboard.write('foo')
 
-    it 'deletes the current active column', ->
+    it 'copies and then deletes the selected cells', ->
       tableElement.cutSelectedCells()
 
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, 0, 'yes'])
 
     describe 'when the read-only attribute is set', ->
-      it 'does not delete the column', ->
+      it 'copies but does not delete the selected cells', ->
         tableElement.setAttribute('read-only', true)
         tableElement.cutSelectedCells()
 
