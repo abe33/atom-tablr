@@ -258,17 +258,13 @@ class CSVEditor
       parser = csv.parse(options)
       output = []
 
-      limit = 5
-      limit = 6 if options.header
-
       stop = ->
         input.unpipe(parser)
         parser.end()
-        resolve(output[0...limit])
+        resolve(output)
 
       read = ->
         output.push record while record = parser.read()
-        stop() if output.length > limit
 
       end = ->
         resolve(output)
