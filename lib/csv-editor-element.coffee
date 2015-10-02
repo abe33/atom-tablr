@@ -5,42 +5,38 @@ CSVEditorFormElement = require './csv-editor-form-element'
 CSVPreviewElement = require './csv-preview-element'
 TableEditor = require './table-editor'
 
-nextId = 0
-
 module.exports =
 class CSVEditorElement extends HTMLElement
   SpacePenDSL.includeInto(this)
   EventsDelegation.includeInto(this)
 
-  @content: ->
-    id = nextId++
-
-    @div class: 'settings-view', =>
-      @tag 'atom-csv-editor-form', outlet: 'form'
-
   createdCallback: ->
     @setAttribute 'tabindex', -1
     @subscriptions = new CompositeDisposable
+    @formSubscriptions = new CompositeDisposable
     @classList.add 'pane-item'
 
-    @subscriptions.add @subscribeTo @form.openTextEditorButton,
+    @createFormView()
+
+    @formSubscriptions.add @subscribeTo @form.openTextEditorButton,
       click: =>
         @model.choice = 'TextEditor'
         @model.openTextEditor(@collectOptions())
 
-    @subscriptions.add @subscribeTo @form.openTableEditorButton,
+    @formSubscriptions.add @subscribeTo @form.openTableEditorButton,
       click: =>
         @form.cleanMessages()
         @model.choice = 'TableEditor'
         @model.openTableEditor(@collectOptions()).catch (reason) =>
           @form.alert(reason.message)
 
-    @subscriptions.add @form.onDidChange (options) => @updatePreview(options)
+    @formSubscriptions.add @form.onDidChange (options) => @updatePreview(options)
 
   collectOptions: -> @form.collectOptions()
 
   destroy: ->
     @subscriptions.dispose()
+    @formSubscriptions?.dispose()
     @model = null
 
   focus: -> @tableElement?.focus()
@@ -49,22 +45,47 @@ class CSVEditorElement extends HTMLElement
     @form.setModel(@model.options)
     @subscriptions.add @model.onDidDestroy => @destroy()
 
+    @subscriptions.add @model.onDidChange =>
+      if @model.editor?
+        if @model.editor isnt @tableElement.getModel()
+          @displayTableEditor(@model.editor)
+      else if @tableElement?
+        delete @tableElement
+        @createFormView()
+      else
+        @updatePreview()
+
     @subscriptions.add @model.onDidOpen ({editor}) =>
       return unless editor instanceof TableEditor
 
-      @innerHTML = ''
+      @displayTableEditor(editor)
 
-      @tableElement = atom.views.getView(editor)
-      @appendChild(@tableElement)
-
-      @tableElement.focus()
-
-      @subscriptions.dispose()
-      @subscriptions = new CompositeDisposable
+      @formSubscriptions.dispose()
+      @formSubscriptions = null
 
     @updatePreview(@model.options)
 
     @model.applyChoice()
+
+  displayTableEditor: (editor) ->
+    delete @form
+    @innerHTML = ''
+
+    @tableElement = atom.views.getView(editor)
+    @appendChild(@tableElement)
+
+    @tableElement.focus()
+
+  createFormView: ->
+    @innerHTML = ''
+
+    container = document.createElement('div')
+    container.className = 'settings-view'
+
+    @form = document.createElement 'atom-csv-editor-form'
+
+    container.appendChild(@form)
+    @appendChild(container)
 
   updatePreview: (options) ->
     return if options.remember

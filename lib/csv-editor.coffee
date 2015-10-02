@@ -31,9 +31,38 @@ class CSVEditor
   subscribeToFile: ->
     @fileSubscriptions = new CompositeDisposable
 
-    # @fileSubscriptions.add @file.onDidChange =>
-    #   console.log 'changed'
-    #
+    changeFired = false
+    debounceChange = -> setTimeout (-> changeFired = false), 100
+
+    @fileSubscriptions.add @file.onDidChange =>
+      return if changeFired
+      changeFired = true
+
+      if @editor?
+        if @editor.isModified()
+          @emitter.emit 'did-conflict', this
+          debounceChange()
+        else
+          filePath = @getPath()
+          options = _.clone(@options)
+          layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
+
+          @getTableEditor(filePath, options, layout).then (tableEditor) =>
+            CSVEditor.tableEditorForPath[filePath] = tableEditor
+            @editor = tableEditor
+            @emitter.emit 'did-change', this
+            debounceChange()
+          .catch (err) =>
+            # The file content has changed for a format that cannot be parsed
+            # We drop the editor and replace it with the csv form
+            @editor.destroy()
+            delete @editor
+            @emitter.emit 'did-change', this
+            debounceChange()
+      else
+        @emitter.emit 'did-change', this
+        debounceChange()
+
     # @fileSubscriptions.add @file.onDidDelete =>
     #   console.log 'deleted'
 
@@ -82,6 +111,12 @@ class CSVEditor
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
+
+  onDidConflict: (callback) ->
+    @emitter.on 'did-conflict', callback
+
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
 
   onDidChangeModified: (callback) ->
     @emitter.on 'did-change-modified', callback
@@ -186,32 +221,36 @@ class CSVEditor
         @editorState = null
         resolve(tableEditor)
       else
-        fileContent = fs.readFileSync(filePath)
         options = _.clone(@options)
         layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
 
-        csv.parse String(fileContent), options, (err, data) =>
-          return reject(err) if err?
-
-          tableEditor = new TableEditor
-          return resolve(tableEditor) if data.length is 0
-          tableEditor.lockModifiedStatus()
-
-          if @options.header
-            for column,i in data.shift()
-              tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
-          else
-            for i in [0...data[0].length]
-              tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
-
-          tableEditor.addRows(data)
-          tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
-          tableEditor.setSaveHandler(@save)
-          tableEditor.initializeAfterSetup()
-          tableEditor.unlockModifiedStatus()
-
+        @getTableEditor(filePath, options, layout).then (tableEditor) =>
           CSVEditor.tableEditorForPath[filePath] = tableEditor
           resolve(tableEditor)
+
+  getTableEditor: (filePath, options, layout) ->
+    new Promise (resolve, reject) =>
+      fileContent = fs.readFileSync(filePath)
+      csv.parse String(fileContent), options, (err, data) =>
+        return reject(err) if err?
+
+        tableEditor = new TableEditor
+        return resolve(tableEditor) if data.length is 0
+        tableEditor.lockModifiedStatus()
+
+        if options.header
+          for column,i in data.shift()
+            tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
+        else
+          for i in [0...data[0].length]
+            tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
+
+        tableEditor.addRows(data)
+        tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
+        tableEditor.setSaveHandler(@save)
+        tableEditor.initializeAfterSetup()
+        tableEditor.unlockModifiedStatus()
+        resolve(tableEditor)
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>

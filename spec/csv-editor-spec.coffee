@@ -97,6 +97,100 @@ describe "CSVEditor", ->
 
           copy.destroy()
 
+    describe 'when the file is changed on disk', ->
+      [changeSpy, changeSubscription] = []
+      beforeEach ->
+        jasmine.useRealClock?()
+        openFixture('sample.csv')
+
+        runs ->
+          changeSpy = jasmine.createSpy('did-change')
+          changeSubscription = csvEditor.file.onDidChange(changeSpy)
+
+      afterEach ->
+        changeSubscription?.dispose()
+
+      describe 'and the user has still to make a choice', ->
+        beforeEach ->
+          spyOn(csvEditorElement, 'updatePreview')
+
+          fsp.writeFileSync(csvDest, """
+          foo,bar
+          1,2
+          """)
+
+          waitsFor -> changeSpy.callCount > 0
+
+        it 'updates the preview', ->
+          expect(csvEditorElement.updatePreview).toHaveBeenCalled()
+
+      describe 'and the user has open a table', ->
+        beforeEach ->
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
+
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
+          click(tableEditorButton)
+
+          waitsFor -> tableEditor?
+
+        describe 'and the new content can be parsed with the current settings', ->
+          describe 'when the table is in an unmodified state', ->
+            beforeEach ->
+              fsp.writeFileSync(csvDest, """
+              foo,bar
+              1,2
+              """)
+
+              waitsFor -> changeSpy.callCount > 1
+
+            it 'replaces the table content with the new one', ->
+              nextAnimationFrame()
+
+              expect(csvEditor.editor).not.toBe(tableEditor)
+              expect(csvEditorElement.tableElement.getModel()).toEqual(csvEditor.editor)
+
+              expect(csvEditor.editor.getColumns()).toEqual([undefined, undefined])
+              expect(csvEditor.editor.getRows()).toEqual([
+                ['foo', 'bar']
+                ['1', '2']
+              ])
+
+          describe 'when the table is in a modified state', ->
+            [conflictSpy] = []
+            beforeEach ->
+              conflictSpy = jasmine.createSpy('did-conflict')
+              csvEditor.onDidConflict(conflictSpy)
+              tableEditor.addRow()
+
+              fsp.writeFileSync(csvDest, """
+              foo,bar
+              1,2
+              """)
+
+              waitsFor -> changeSpy.callCount > 1
+              waitsFor -> conflictSpy.callCount > 0
+
+            it 'leaves the table in a modified state', ->
+              expect(csvEditor.editor).toBe(tableEditor)
+              expect(csvEditor.isModified()).toBeTruthy()
+
+        describe 'and the new content cannot be parsed with the current settings', ->
+          describe 'when the table is in an unmodified state', ->
+            beforeEach ->
+              fsp.writeFileSync(csvDest, """
+              "foo";"bar"
+              "1";"2"
+              """)
+
+              waitsFor -> changeSpy.callCount > 1
+              waitsFor -> csvEditor.editor is undefined
+
+            it 'replaces the table content with a form', ->
+              expect(csvEditor.editor).toBeUndefined()
+              expect(csvEditorElement.tableElement).toBeUndefined()
+              expect(csvEditorElement.form).toBeDefined()
+
     describe 'when the file is moved', ->
       [spy, newPath, spyTitle] = []
 
