@@ -1440,6 +1440,23 @@ class TableElement extends HTMLElement
 
   toUnit: (value, unit=PIXEL) -> "#{value}#{unit}"
 
+#    ######## ##       ######## ##     ## ######## ##    ## ########
+#    ##       ##       ##       ###   ### ##       ###   ##    ##
+#    ##       ##       ##       #### #### ##       ####  ##    ##
+#    ######   ##       ######   ## ### ## ######   ## ## ##    ##
+#    ##       ##       ##       ##     ## ##       ##  ####    ##
+#    ##       ##       ##       ##     ## ##       ##   ###    ##
+#    ######## ######## ######## ##     ## ######## ##    ##    ##
+
+module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
+
+TableElement.registerViewProvider = ->
+  atom.views.addViewProvider TableEditor, (model) ->
+    element = new TableElement
+    element.setModel(model)
+    element
+
+
 #     ######  ##     ## ########
 #    ##    ## ###   ### ##     ##
 #    ##       #### #### ##     ##
@@ -1473,123 +1490,110 @@ stopEventPropagationAndGroupUndo = (commandListeners) ->
           commandListener.call(model, event)
   newCommandListeners
 
-atom.commands.add 'atom-table-editor',
-  'core:save': preventAndStop (e) -> @save()
-  'core:confirm': -> @startCellEdit()
-  'core:cancel': -> @resetSelections()
-  'core:copy': -> @copySelectedCells()
-  'core:cut': -> @cutSelectedCells()
-  'core:paste': -> @pasteClipboard()
-  'core:undo': -> @tableEditor.undo()
-  'core:redo': -> @tableEditor.redo()
-  'core:backspace': -> @delete()
-  'core:move-left': -> @moveLeft()
-  'core:move-right': -> @moveRight()
-  'core:move-up': -> @moveUp()
-  'core:move-down': -> @moveDown()
-  'core:move-to-top': -> @moveToTop()
-  'core:move-to-bottom': -> @moveToBottom()
-  'tablr:move-to-end-of-line': -> @moveToRight()
-  'tablr:move-to-beginning-of-line': -> @moveToLeft()
-  'core:page-up': -> @pageUp()
-  'core:page-down': -> @pageDown()
-  'tablr:page-left': -> @pageLeft()
-  'tablr:page-right': -> @pageRight()
-  'core:select-right': -> @expandSelectionRight()
-  'core:select-left': -> @expandSelectionLeft()
-  'core:select-up': -> @expandSelectionUp()
-  'core:select-down': -> @expandSelectionDown()
-  'tablr:move-left-in-selection': -> @moveLeftInSelection()
-  'tablr:move-right-in-selection': -> @moveRightInSelection()
-  'tablr:move-up-in-selection': -> @moveUpInSelection()
-  'tablr:move-down-in-selection': -> @moveDownInSelection()
-  'tablr:select-to-end-of-line': -> @expandSelectionToEndOfLine()
-  'tablr:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
-  'tablr:select-to-end-of-table': -> @expandSelectionToEndOfTable()
-  'tablr:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
-  'tablr:insert-row-before': -> @insertRowBefore()
-  'tablr:insert-row-after': -> @insertRowAfter()
-  'tablr:delete-row': -> @deleteRowAtCursor()
-  'tablr:insert-column-before': -> @insertColumnBefore()
-  'tablr:insert-column-after': -> @insertColumnAfter()
-  'tablr:delete-column': -> @deleteColumnAtCursor()
-  'tablr:align-left': -> @alignLeft()
-  'tablr:align-center': -> @alignCenter()
-  'tablr:align-right': -> @alignRight()
-  'tablr:add-selection-below': -> @addCursorBelowLastSelection()
-  'tablr:add-selection-above': -> @addCursorAboveLastSelection()
-  'tablr:add-selection-left': -> @addCursorLeftToLastSelection()
-  'tablr:add-selection-right': -> @addCursorRightToLastSelection()
-  'tablr:expand-column': -> @expandColumn()
-  'tablr:shrink-column': -> @shrinkColumn()
-  'tablr:expand-row': -> @expandRow()
-  'tablr:shrink-row': -> @shrinkRow()
+TableElement.registerCommands = ->
+  atom.commands.add 'atom-table-editor',
+    'core:save': preventAndStop (e) -> @save()
+    'core:confirm': -> @startCellEdit()
+    'core:cancel': -> @resetSelections()
+    'core:copy': -> @copySelectedCells()
+    'core:cut': -> @cutSelectedCells()
+    'core:paste': -> @pasteClipboard()
+    'core:undo': -> @tableEditor.undo()
+    'core:redo': -> @tableEditor.redo()
+    'core:backspace': -> @delete()
+    'core:move-left': -> @moveLeft()
+    'core:move-right': -> @moveRight()
+    'core:move-up': -> @moveUp()
+    'core:move-down': -> @moveDown()
+    'core:move-to-top': -> @moveToTop()
+    'core:move-to-bottom': -> @moveToBottom()
+    'tablr:move-to-end-of-line': -> @moveToRight()
+    'tablr:move-to-beginning-of-line': -> @moveToLeft()
+    'core:page-up': -> @pageUp()
+    'core:page-down': -> @pageDown()
+    'tablr:page-left': -> @pageLeft()
+    'tablr:page-right': -> @pageRight()
+    'core:select-right': -> @expandSelectionRight()
+    'core:select-left': -> @expandSelectionLeft()
+    'core:select-up': -> @expandSelectionUp()
+    'core:select-down': -> @expandSelectionDown()
+    'tablr:move-left-in-selection': -> @moveLeftInSelection()
+    'tablr:move-right-in-selection': -> @moveRightInSelection()
+    'tablr:move-up-in-selection': -> @moveUpInSelection()
+    'tablr:move-down-in-selection': -> @moveDownInSelection()
+    'tablr:select-to-end-of-line': -> @expandSelectionToEndOfLine()
+    'tablr:select-to-beginning-of-line': -> @expandSelectionToBeginningOfLine()
+    'tablr:select-to-end-of-table': -> @expandSelectionToEndOfTable()
+    'tablr:select-to-beginning-of-table': -> @expandSelectionToBeginningOfTable()
+    'tablr:insert-row-before': -> @insertRowBefore()
+    'tablr:insert-row-after': -> @insertRowAfter()
+    'tablr:delete-row': -> @deleteRowAtCursor()
+    'tablr:insert-column-before': -> @insertColumnBefore()
+    'tablr:insert-column-after': -> @insertColumnAfter()
+    'tablr:delete-column': -> @deleteColumnAtCursor()
+    'tablr:align-left': -> @alignLeft()
+    'tablr:align-center': -> @alignCenter()
+    'tablr:align-right': -> @alignRight()
+    'tablr:add-selection-below': -> @addCursorBelowLastSelection()
+    'tablr:add-selection-above': -> @addCursorAboveLastSelection()
+    'tablr:add-selection-left': -> @addCursorLeftToLastSelection()
+    'tablr:add-selection-right': -> @addCursorRightToLastSelection()
+    'tablr:expand-column': -> @expandColumn()
+    'tablr:shrink-column': -> @shrinkColumn()
+    'tablr:expand-row': -> @expandRow()
+    'tablr:shrink-row': -> @shrinkRow()
 
-atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
-  'core:move-up': -> @moveUp()
-  'core:move-down': -> @moveDown()
-  'core:move-to-top': -> @moveToTop()
-  'core:move-to-bottom': -> @moveToBottom()
-  'core:page-up': -> @pageUp()
-  'core:page-down': -> @pageDown()
-  'core:select-to-top': -> @selectToTop()
-  'core:select-to-bottom': -> @selectToBottom()
-  'core:select-page-up': -> @selectPageUp()
-  'core:select-page-down': -> @selectPageDown()
-  'editor:add-selection-below': -> @addSelectionBelow()
-  'editor:add-selection-above': -> @addSelectionAbove()
-  'editor:split-selections-into-lines': -> @splitSelectionsIntoLines()
-  'editor:toggle-soft-tabs': -> @toggleSoftTabs()
-  'editor:toggle-soft-wrap': -> @toggleSoftWrapped()
-  'editor:fold-all': -> @foldAll()
-  'editor:unfold-all': -> @unfoldAll()
-  'editor:fold-current-row': -> @foldCurrentRow()
-  'editor:unfold-current-row': -> @unfoldCurrentRow()
-  'editor:fold-selection': -> @foldSelectedLines()
-  'editor:fold-at-indent-level-1': -> @foldAllAtIndentLevel(0)
-  'editor:fold-at-indent-level-2': -> @foldAllAtIndentLevel(1)
-  'editor:fold-at-indent-level-3': -> @foldAllAtIndentLevel(2)
-  'editor:fold-at-indent-level-4': -> @foldAllAtIndentLevel(3)
-  'editor:fold-at-indent-level-5': -> @foldAllAtIndentLevel(4)
-  'editor:fold-at-indent-level-6': -> @foldAllAtIndentLevel(5)
-  'editor:fold-at-indent-level-7': -> @foldAllAtIndentLevel(6)
-  'editor:fold-at-indent-level-8': -> @foldAllAtIndentLevel(7)
-  'editor:fold-at-indent-level-9': -> @foldAllAtIndentLevel(8)
-  'editor:log-cursor-scope': -> @logCursorScope()
-  'editor:copy-path': -> @copyPathToClipboard()
-  'editor:toggle-indent-guide': -> atom.config.set('editor.showIndentGuide', not atom.config.get('editor.showIndentGuide'))
-  'editor:toggle-line-numbers': -> atom.config.set('editor.showLineNumbers', not atom.config.get('editor.showLineNumbers'))
-  'editor:scroll-to-cursor': -> @scrollToCursorPosition()
-)
+  atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
+    'core:move-up': -> @moveUp()
+    'core:move-down': -> @moveDown()
+    'core:move-to-top': -> @moveToTop()
+    'core:move-to-bottom': -> @moveToBottom()
+    'core:page-up': -> @pageUp()
+    'core:page-down': -> @pageDown()
+    'core:select-to-top': -> @selectToTop()
+    'core:select-to-bottom': -> @selectToBottom()
+    'core:select-page-up': -> @selectPageUp()
+    'core:select-page-down': -> @selectPageDown()
+    'editor:add-selection-below': -> @addSelectionBelow()
+    'editor:add-selection-above': -> @addSelectionAbove()
+    'editor:split-selections-into-lines': -> @splitSelectionsIntoLines()
+    'editor:toggle-soft-tabs': -> @toggleSoftTabs()
+    'editor:toggle-soft-wrap': -> @toggleSoftWrapped()
+    'editor:fold-all': -> @foldAll()
+    'editor:unfold-all': -> @unfoldAll()
+    'editor:fold-current-row': -> @foldCurrentRow()
+    'editor:unfold-current-row': -> @unfoldCurrentRow()
+    'editor:fold-selection': -> @foldSelectedLines()
+    'editor:fold-at-indent-level-1': -> @foldAllAtIndentLevel(0)
+    'editor:fold-at-indent-level-2': -> @foldAllAtIndentLevel(1)
+    'editor:fold-at-indent-level-3': -> @foldAllAtIndentLevel(2)
+    'editor:fold-at-indent-level-4': -> @foldAllAtIndentLevel(3)
+    'editor:fold-at-indent-level-5': -> @foldAllAtIndentLevel(4)
+    'editor:fold-at-indent-level-6': -> @foldAllAtIndentLevel(5)
+    'editor:fold-at-indent-level-7': -> @foldAllAtIndentLevel(6)
+    'editor:fold-at-indent-level-8': -> @foldAllAtIndentLevel(7)
+    'editor:fold-at-indent-level-9': -> @foldAllAtIndentLevel(8)
+    'editor:log-cursor-scope': -> @logCursorScope()
+    'editor:copy-path': -> @copyPathToClipboard()
+    'editor:toggle-indent-guide': -> atom.config.set('editor.showIndentGuide', not atom.config.get('editor.showIndentGuide'))
+    'editor:toggle-line-numbers': -> atom.config.set('editor.showLineNumbers', not atom.config.get('editor.showLineNumbers'))
+    'editor:scroll-to-cursor': -> @scrollToCursorPosition()
+  )
 
-atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagationAndGroupUndo(
-  'editor:indent': -> @indent()
-  'editor:auto-indent': -> @autoIndentSelectedRows()
-  'editor:indent-selected-rows': -> @indentSelectedRows()
-  'editor:outdent-selected-rows': -> @outdentSelectedRows()
-  'editor:newline': -> @insertNewline()
-  'editor:newline-below': -> @insertNewlineBelow()
-  'editor:newline-above': -> @insertNewlineAbove()
-  'editor:toggle-line-comments': -> @toggleLineCommentsInSelection()
-  'editor:checkout-head-revision': -> @checkoutHeadRevision()
-  'editor:move-line-up': -> @moveLineUp()
-  'editor:move-line-down': -> @moveLineDown()
-  'editor:duplicate-lines': -> @duplicateLines()
-  'editor:join-lines': -> @joinLines()
-)
+  atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagationAndGroupUndo(
+    'editor:indent': -> @indent()
+    'editor:auto-indent': -> @autoIndentSelectedRows()
+    'editor:indent-selected-rows': -> @indentSelectedRows()
+    'editor:outdent-selected-rows': -> @outdentSelectedRows()
+    'editor:newline': -> @insertNewline()
+    'editor:newline-below': -> @insertNewlineBelow()
+    'editor:newline-above': -> @insertNewlineAbove()
+    'editor:toggle-line-comments': -> @toggleLineCommentsInSelection()
+    'editor:checkout-head-revision': -> @checkoutHeadRevision()
+    'editor:move-line-up': -> @moveLineUp()
+    'editor:move-line-down': -> @moveLineDown()
+    'editor:duplicate-lines': -> @duplicateLines()
+    'editor:join-lines': -> @joinLines()
+  )
 
-#    ######## ##       ######## ##     ## ######## ##    ## ########
-#    ##       ##       ##       ###   ### ##       ###   ##    ##
-#    ##       ##       ##       #### #### ##       ####  ##    ##
-#    ######   ##       ######   ## ### ## ######   ## ## ##    ##
-#    ##       ##       ##       ##     ## ##       ##  ####    ##
-#    ##       ##       ##       ##     ## ##       ##   ###    ##
-#    ######## ######## ######## ##     ## ######## ##    ##    ##
-
-module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
-
-TableElement.registerViewProvider = ->
-  atom.views.addViewProvider TableEditor, (model) ->
-    element = new TableElement
-    element.setModel(model)
-    element
+TableElement.registerCommands()

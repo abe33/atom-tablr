@@ -76,6 +76,7 @@ describe 'tableElement', ->
   beforeEach ->
     TableElement.registerViewProvider()
     TableSelectionElement.registerViewProvider()
+    TableElement.registerCommands()
 
     jasmineContent = document.body.querySelector('#jasmine-content')
 
@@ -962,134 +963,113 @@ describe 'tableElement', ->
     expect(tableShadowRoot.querySelectorAll('atom-table-gutter-cell.active-row').length).toEqual(1)
     expect(tableShadowRoot.querySelectorAll('atom-table-cell.active').length).toEqual(1)
 
-  describe '::moveRight', ->
+  describe 'core:move-right', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
     it 'moves the cursor cursor to the right', ->
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
 
       expect(tableEditor.getLastCursor().getValue()).toEqual(0)
 
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
 
       expect(tableEditor.getLastCursor().getValue()).toEqual('yes')
 
     it 'moves the cursor to the next row when on last cell of a row', ->
-      tableElement.moveRight()
-      tableElement.moveRight()
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-right')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row1')
 
     it 'moves the cursor to the first row when on last cell of last row', ->
       tableEditor.setCursorAtScreenPosition([99, 2])
 
-      tableElement.moveRight()
+      atom.commands.dispatch(tableElement, 'core:move-right')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
-  describe '::moveLeft', ->
+  describe 'core:move-left', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      tableElement.moveLeft()
+      atom.commands.dispatch(tableElement, 'core:move-left')
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      tableElement.moveLeft()
+      atom.commands.dispatch(tableElement, 'core:move-left')
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
-    it 'is triggered on core:move-left', ->
-      spyOn(tableElement, 'moveLeft')
-
-      tableElement.moveLeft()
-
-      expect(tableElement.moveLeft).toHaveBeenCalled()
-
     it 'moves the cursor to the last cell when on the first cell', ->
-      tableElement.moveLeft()
+      atom.commands.dispatch(tableElement, 'core:move-left')
       expect(tableEditor.getLastCursor().getValue()).toEqual('no')
 
     it 'moves the cursor cursor to the left', ->
-      tableElement.moveRight()
-      tableElement.moveLeft()
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-left')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
     it 'moves the cursor cursor to the upper row', ->
-      tableElement.moveRight()
-      tableElement.moveRight()
-      tableElement.moveRight()
-      tableElement.moveLeft()
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-right')
+      atom.commands.dispatch(tableElement, 'core:move-left')
       expect(tableEditor.getLastCursor().getValue()).toEqual('yes')
 
-  describe '::moveUp', ->
+  describe 'core:move-up', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      tableElement.moveUp()
+      atom.commands.dispatch(tableElement, 'core:move-up')
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      tableElement.moveUp()
+      atom.commands.dispatch(tableElement, 'core:move-up')
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
-    it 'is triggered on core:move-up', ->
-      spyOn(tableElement, 'moveUp')
-
-      tableElement.moveUp()
-
-      expect(tableElement.moveUp).toHaveBeenCalled()
-
     it 'moves the cursor to the last row when on the first row', ->
-      tableElement.moveUp()
+      atom.commands.dispatch(tableElement, 'core:move-up')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row99')
 
     it 'moves the cursor on the upper row', ->
       tableEditor.setCursorAtScreenPosition([10, 0])
 
-      tableElement.moveUp()
+      atom.commands.dispatch(tableElement, 'core:move-up')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row9')
 
-  describe '::moveDown', ->
+  describe 'core:move-down', ->
     it 'requests an update', ->
       spyOn(tableElement, 'requestUpdate')
-      tableElement.moveDown()
+      atom.commands.dispatch(tableElement, 'core:move-down')
 
       expect(tableElement.requestUpdate).toHaveBeenCalled()
 
     it 'attempts to make the active row visible', ->
       spyOn(tableElement, 'makeRowVisible')
-      tableElement.moveDown()
+      atom.commands.dispatch(tableElement, 'core:move-down')
 
       expect(tableElement.makeRowVisible).toHaveBeenCalled()
 
-    it 'is triggered on core:move-down', ->
-      spyOn(tableElement, 'moveDown')
-
-      tableElement.moveDown()
-
-      expect(tableElement.moveDown).toHaveBeenCalled()
-
     it 'moves the cursor to the row below', ->
-      tableElement.moveDown()
+      atom.commands.dispatch(tableElement, 'core:move-down')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row1')
 
     it 'moves the cursor to the first row when on the last row', ->
       tableEditor.setCursorAtScreenPosition([99, 0])
 
-      tableElement.moveDown()
+      atom.commands.dispatch(tableElement, 'core:move-down')
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
 
   describe '::makeRowVisible', ->
@@ -1103,14 +1083,14 @@ describe 'tableElement', ->
       atom.config.set 'tablr.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows below', ->
-      tableElement.pageDown()
+      atom.commands.dispatch(tableElement, 'core:page-down')
 
       expect(tableEditor.getCursorPosition().row).toEqual(20)
 
     it 'stops to the last row without looping', ->
       tableEditor.setCursorAtScreenPosition([90, 0])
 
-      tableElement.pageDown()
+      atom.commands.dispatch(tableElement, 'core:page-down')
 
       expect(tableEditor.getCursorPosition().row).toEqual(99)
 
@@ -1118,7 +1098,7 @@ describe 'tableElement', ->
       it 'moves the cursor 30 rows below', ->
         atom.config.set 'tablr.pageMoveRowAmount', 30
 
-        tableElement.pageDown()
+        atom.commands.dispatch(tableElement, 'core:page-down')
 
         expect(tableEditor.getCursorPosition().row).toEqual(30)
 
@@ -1129,18 +1109,18 @@ describe 'tableElement', ->
     it 'moves the cursor 20 rows up', ->
       tableEditor.setCursorAtScreenPosition([20, 0])
 
-      tableElement.pageUp()
+      atom.commands.dispatch(tableElement, 'core:page-up')
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
     it 'stops to the first cell without looping', ->
       tableEditor.setCursorAtScreenPosition([10, 0])
 
-      tableElement.pageUp()
+      atom.commands.dispatch(tableElement, 'core:page-up')
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
-  describe '::pageLeft', ->
+  describe 'tablr:page-left', ->
     beforeEach ->
       tableEditor.addColumn()
       tableEditor.addColumn()
@@ -1154,22 +1134,45 @@ describe 'tableElement', ->
     it 'moves the cursor 4 cells left', ->
       tableEditor.setCursorAtScreenPosition([0, 5])
 
-      tableElement.pageLeft()
+      atom.commands.dispatch(tableElement, 'tablr:page-left')
 
       expect(tableEditor.getCursorPosition().column).toEqual(1)
 
     it 'stops to the first cell without looping', ->
       tableEditor.setCursorAtScreenPosition([0, 2])
 
-      tableElement.pageLeft()
+      atom.commands.dispatch(tableElement, 'tablr:page-left')
 
       expect(tableEditor.getCursorPosition().column).toEqual(0)
+
+  describe 'tablr:page-right', ->
+    beforeEach ->
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      tableEditor.addColumn()
+      atom.config.set 'tablr.pageMoveColumnAmount', 4
+
+    it 'moves the cursor 4 cells right', ->
+      atom.commands.dispatch(tableElement, 'tablr:page-right')
+
+      expect(tableEditor.getCursorPosition().column).toEqual(4)
+
+    it 'stops to the first cell without looping', ->
+      tableEditor.setCursorAtScreenPosition([0,6])
+
+      atom.commands.dispatch(tableElement, 'tablr:page-right')
+
+      expect(tableEditor.getCursorPosition().column).toEqual(9)
 
   describe 'core:move-to-top', ->
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
-      tableElement.moveToTop()
+      atom.commands.dispatch(tableElement, 'core:move-to-top')
 
       expect(tableEditor.getCursorPosition().row).toEqual(0)
 
@@ -1177,22 +1180,22 @@ describe 'tableElement', ->
     it 'moves the cursor to the first row', ->
       tableEditor.setCursorAtScreenPosition([50, 0])
 
-      tableElement.moveToBottom()
+      atom.commands.dispatch(tableElement, 'core:move-to-bottom')
 
       expect(tableEditor.getCursorPosition().row).toEqual(99)
 
   describe 'tablr:insert-row-before', ->
     it 'inserts a new row before the active row', ->
-      tableElement.moveDown()
-      tableElement.moveDown()
-      tableElement.moveDown()
-      tableElement.insertRowBefore()
+      atom.commands.dispatch(tableElement, 'core:move-down')
+      atom.commands.dispatch(tableElement, 'core:move-down')
+      atom.commands.dispatch(tableElement, 'core:move-down')
+      atom.commands.dispatch(tableElement, 'tablr:insert-row-before')
 
       expect(tableEditor.getScreenRow(3)).toEqual([undefined, undefined, undefined])
 
     it 'refreshes the rows offsets', ->
       tableEditor.setScreenRowHeightAt(0, 60)
-      tableElement.insertRowBefore()
+      atom.commands.dispatch(tableElement, 'tablr:insert-row-before')
 
       expect(tableEditor.getScreenRowHeightAt(0)).toEqual(tableEditor.getRowHeight())
       expect(tableEditor.getScreenRowHeightAt(1)).toEqual(60)
@@ -1203,49 +1206,49 @@ describe 'tableElement', ->
         tableEditor.removeRowsInRange([0, Infinity])
 
       it 'creates a new row', ->
-        tableElement.insertRowBefore()
+        atom.commands.dispatch(tableElement, 'tablr:insert-row-before')
 
         expect(tableEditor.getScreenRowHeightAt(0)).toEqual(tableEditor.getRowHeight())
 
     describe 'when the read-only attribute is set', ->
       it 'does insert a new row before the active row', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.insertRowBefore()
+        atom.commands.dispatch(tableElement, 'tablr:insert-row-before')
 
         expect(tableEditor.getScreenRow(0)).not.toEqual([undefined, undefined, undefined])
 
   describe 'tablr:insert-row-after', ->
     it 'inserts a new row after the active row', ->
-      tableElement.insertRowAfter()
+      atom.commands.dispatch(tableElement, 'tablr:insert-row-after')
 
       expect(tableEditor.getScreenRow(1)).toEqual([undefined, undefined, undefined])
 
     it 'inserts a new row at the end of the table when on the last row', ->
-      tableElement.moveToBottom()
-      tableElement.insertRowAfter()
+      atom.commands.dispatch(tableElement, 'core:move-to-bottom')
+      atom.commands.dispatch(tableElement, 'tablr:insert-row-after')
 
       expect(tableEditor.getScreenRow(tableEditor.getLastRowIndex())).toEqual([undefined, undefined, undefined])
 
     it 'moves the cursor to the new row on the same column', ->
       tableEditor.setCursorAtScreenPosition([1,1])
-      tableElement.insertRowAfter()
+      atom.commands.dispatch(tableElement, 'tablr:insert-row-after')
       expect(tableEditor.getCursorPosition()).toEqual([2,1])
 
     describe 'when the read-only attribute is set', ->
       it 'does insert a new row after the active row', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.insertRowAfter()
+        atom.commands.dispatch(tableElement, 'tablr:insert-row-after')
 
         expect(tableEditor.getScreenRowCount()).toEqual(100)
 
   describe 'tablr:delete-row', ->
     it 'deletes the current active row', ->
-      tableElement.deleteRowAtCursor()
+      atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
 
     it 'moves the cursor on the remaining first row', ->
-      tableElement.deleteRowAtCursor()
+      atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
       expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
 
@@ -1254,8 +1257,8 @@ describe 'tableElement', ->
         spy = jasmine.createSpy('did-change')
         tableEditor.onDidChange(spy)
 
-        tableElement.moveToBottom()
-        tableElement.deleteRowAtCursor()
+        atom.commands.dispatch(tableElement, 'core:move-to-bottom')
+        atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
         waitsFor -> spy.callCount > 0
         runs ->
@@ -1264,44 +1267,43 @@ describe 'tableElement', ->
     describe 'when the read-only attribute is set', ->
       it 'does not delete the active row', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.deleteRowAtCursor()
+        atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
         expect(tableEditor.getScreenRowCount()).toEqual(100)
 
   describe 'tablr:insert-column-before', ->
     it 'inserts a new column before the active column', ->
-      tableElement.insertColumnBefore()
+      atom.commands.dispatch(tableElement, 'tablr:insert-column-before')
 
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, 'row0', 0, 'yes'])
 
     describe 'called several times', ->
       it 'uses incremental placeholders for column names', ->
-        tableElement.insertColumnBefore()
-        tableElement.insertColumnBefore()
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-before')
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-before')
 
         nextAnimationFrame()
 
         expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="0"] span').textContent).toEqual('A')
         expect(tableShadowRoot.querySelector('atom-table-header-cell[data-column="1"] span').textContent).toEqual('B')
 
-
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.insertColumnBefore()
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-before')
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
   describe 'tablr:insert-column-after', ->
     it 'inserts a new column after the active column', ->
-      tableElement.insertColumnAfter()
+      atom.commands.dispatch(tableElement, 'tablr:insert-column-after')
 
       expect(tableEditor.getScreenRow(0)).toEqual(['row0', undefined, 0, 'yes'])
 
     describe 'called several times', ->
       it 'uses incremental placeholders for column names', ->
-        tableElement.insertColumnAfter()
-        tableElement.insertColumnAfter()
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-after')
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-after')
 
         nextAnimationFrame()
 
@@ -1311,20 +1313,20 @@ describe 'tableElement', ->
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.insertColumnAfter()
+        atom.commands.dispatch(tableElement, 'tablr:insert-column-after')
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
   describe 'tablr:delete-column', ->
     it 'deletes the current active column', ->
-      tableElement.deleteColumnAtCursor()
+      atom.commands.dispatch(tableElement, 'tablr:delete-column')
 
       expect(tableEditor.getScreenRow(0)).toEqual([0, 'yes'])
 
     describe 'when the read-only attribute is set', ->
       it 'does not delete the column', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.deleteColumnAtCursor()
+        atom.commands.dispatch(tableElement, 'tablr:delete-column')
 
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
@@ -1333,14 +1335,14 @@ describe 'tableElement', ->
       atom.clipboard.write('foo')
 
     it 'pastes the clipboard content', ->
-      tableElement.pasteClipboard()
+      atom.commands.dispatch(tableElement, 'core:paste')
 
       expect(tableEditor.getScreenRow(0)).toEqual(['foo', 0, 'yes'])
 
     describe 'when the read-only attribute is set', ->
       it 'does not paste the content', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.pasteClipboard()
+        atom.commands.dispatch(tableElement, 'core:paste')
 
         expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
 
@@ -1349,14 +1351,14 @@ describe 'tableElement', ->
       atom.clipboard.write('foo')
 
     it 'copies and then deletes the selected cells', ->
-      tableElement.cutSelectedCells()
+      atom.commands.dispatch(tableElement, 'core:cut')
 
       expect(tableEditor.getScreenRow(0)).toEqual([undefined, 0, 'yes'])
 
     describe 'when the read-only attribute is set', ->
       it 'copies but does not delete the selected cells', ->
         tableElement.setAttribute('read-only', true)
-        tableElement.cutSelectedCells()
+        atom.commands.dispatch(tableElement, 'core:cut')
 
         expect(tableEditor.getScreenRow(0)).toEqual(['row0', 0, 'yes'])
         expect(atom.clipboard.read()).toEqual('row0')
@@ -1366,7 +1368,7 @@ describe 'tableElement', ->
       it 'change the alignment of the active column', ->
         tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align = 'right'
 
-        tableElement.alignLeft()
+        atom.commands.dispatch(tableElement, 'tablr:align-left')
 
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('left')
 
@@ -1375,14 +1377,14 @@ describe 'tableElement', ->
         tableElement.targetColumnForAlignment = 2
         tableEditor.getScreenColumn(2).align = 'right'
 
-        tableElement.alignLeft()
+        atom.commands.dispatch(tableElement, 'tablr:align-left')
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('left')
 
   describe 'tablr:align-center', ->
     describe 'when there is no target column', ->
       it 'change the alignment of the active column', ->
-        tableElement.alignCenter()
+        atom.commands.dispatch(tableElement, 'tablr:align-center')
 
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('center')
 
@@ -1390,14 +1392,14 @@ describe 'tableElement', ->
       it 'change the alignment of the target column', ->
         tableElement.targetColumnForAlignment = 2
 
-        tableElement.alignCenter()
+        atom.commands.dispatch(tableElement, 'tablr:align-center')
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('center')
 
   describe 'tablr:align-right', ->
     describe 'when there is no target column', ->
       it 'change the alignment of the active column', ->
-        tableElement.alignRight()
+        atom.commands.dispatch(tableElement, 'tablr:align-right')
 
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('right')
 
@@ -1405,7 +1407,7 @@ describe 'tableElement', ->
       it 'change the alignment of the target column', ->
         tableElement.targetColumnForAlignment = 2
 
-        tableElement.alignRight()
+        atom.commands.dispatch(tableElement, 'tablr:align-right')
 
         expect(tableEditor.getScreenColumn(2).align).toEqual('right')
 
@@ -1413,7 +1415,7 @@ describe 'tableElement', ->
     it 'increases the column at cursors by the amount defined in the settings', ->
       atom.config.set('tablr.columnWidthIncrement', 20)
 
-      tableElement.expandColumn()
+      atom.commands.dispatch(tableElement, 'tablr:expand-column')
 
       expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(120)
 
@@ -1421,7 +1423,7 @@ describe 'tableElement', ->
     it 'shrinks the column at cursors by the amount defined in the settings', ->
       atom.config.set('tablr.columnWidthIncrement', 20)
 
-      tableElement.shrinkColumn()
+      atom.commands.dispatch(tableElement, 'tablr:shrink-column')
 
       expect(tableEditor.getScreenColumnWidthAt(0)).toEqual(80)
 
@@ -1429,7 +1431,7 @@ describe 'tableElement', ->
     it 'increases the row at cursors by the amount defined in the settings', ->
       atom.config.set('tablr.rowHeightIncrement', 20)
 
-      tableElement.expandRow()
+      atom.commands.dispatch(tableElement, 'tablr:expand-row')
 
       expect(tableEditor.getScreenRowHeightAt(0)).toEqual(40)
 
@@ -1437,7 +1439,7 @@ describe 'tableElement', ->
     it 'shrinks the row at cursors by the amount defined in the settings', ->
       atom.config.set('tablr.rowHeightIncrement', 20)
 
-      tableElement.shrinkRow()
+      atom.commands.dispatch(tableElement, 'tablr:shrink-row')
 
       expect(tableEditor.getScreenRowHeightAt(0)).toEqual(10)
 
@@ -1776,20 +1778,20 @@ describe 'tableElement', ->
 
       describe 'core:cancel', ->
         it 'resets all the selections to the last cursor range', ->
-          tableElement.resetSelections()
+          atom.commands.dispatch(tableElement, 'core:cancel')
 
           expect(tableEditor.getSelections().length).toEqual(1)
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,3]])
 
     describe 'core:select-right', ->
       it 'expands the selection by one cell on the right', ->
-        tableElement.expandSelectionRight()
+        atom.commands.dispatch(tableElement, 'core:select-right')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
 
       it 'stops at the last column', ->
-        tableElement.expandSelectionRight()
-        tableElement.expandSelectionRight()
-        tableElement.expandSelectionRight()
+        atom.commands.dispatch(tableElement, 'core:select-right')
+        atom.commands.dispatch(tableElement, 'core:select-right')
+        atom.commands.dispatch(tableElement, 'core:select-right')
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
@@ -1797,8 +1799,8 @@ describe 'tableElement', ->
         it 'collapse the selection back to the left', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
-          tableElement.expandSelectionRight()
-          tableElement.expandSelectionLeft()
+          atom.commands.dispatch(tableElement, 'core:select-right')
+          atom.commands.dispatch(tableElement, 'core:select-left')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,2]])
 
@@ -1807,21 +1809,21 @@ describe 'tableElement', ->
         tableEditor.setCursorAtScreenPosition([0,2])
 
       it 'expands the selection by one cell on the left', ->
-        tableElement.expandSelectionLeft()
+        atom.commands.dispatch(tableElement, 'core:select-left')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 
       it 'stops at the first column', ->
-        tableElement.expandSelectionLeft()
-        tableElement.expandSelectionLeft()
-        tableElement.expandSelectionLeft()
+        atom.commands.dispatch(tableElement, 'core:select-left')
+        atom.commands.dispatch(tableElement, 'core:select-left')
+        atom.commands.dispatch(tableElement, 'core:select-left')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
       describe 'then triggering core:select-right', ->
         it 'collapse the selection back to the right', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
-          tableElement.expandSelectionLeft()
-          tableElement.expandSelectionRight()
+          atom.commands.dispatch(tableElement, 'core:select-left')
+          atom.commands.dispatch(tableElement, 'core:select-right')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,2]])
 
@@ -1830,20 +1832,20 @@ describe 'tableElement', ->
         tableEditor.setCursorAtScreenPosition([2,0])
 
       it 'expands the selection by one cell to the top', ->
-        tableElement.expandSelectionUp()
+        atom.commands.dispatch(tableElement, 'core:select-up')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[3,1]])
 
       it 'stops at the first row', ->
-        tableElement.expandSelectionUp()
-        tableElement.expandSelectionUp()
-        tableElement.expandSelectionUp()
+        atom.commands.dispatch(tableElement, 'core:select-up')
+        atom.commands.dispatch(tableElement, 'core:select-up')
+        atom.commands.dispatch(tableElement, 'core:select-up')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[3,1]])
 
       it 'scrolls the view to make the added row visible', ->
         tableElement.setScrollTop(200)
         tableEditor.setCursorAtScreenPosition([10,0])
 
-        tableElement.expandSelectionUp()
+        atom.commands.dispatch(tableElement, 'core:select-up')
 
         expect(tableElement.getRowsContainer().scrollTop).toEqual(180)
 
@@ -1851,8 +1853,8 @@ describe 'tableElement', ->
         it 'collapse the selection back to the bottom', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
-          tableElement.expandSelectionUp()
-          tableElement.expandSelectionDown()
+          atom.commands.dispatch(tableElement, 'core:select-up')
+          atom.commands.dispatch(tableElement, 'core:select-down')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,1]])
 
@@ -1861,19 +1863,19 @@ describe 'tableElement', ->
         tableEditor.setCursorAtScreenPosition([97,0])
 
       it 'expands the selection by one cell to the bottom', ->
-        tableElement.expandSelectionDown()
+        atom.commands.dispatch(tableElement, 'core:select-down')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[97,0],[99,1]])
 
       it 'stops at the last row', ->
-        tableElement.expandSelectionDown()
-        tableElement.expandSelectionDown()
-        tableElement.expandSelectionDown()
+        atom.commands.dispatch(tableElement, 'core:select-down')
+        atom.commands.dispatch(tableElement, 'core:select-down')
+        atom.commands.dispatch(tableElement, 'core:select-down')
         expect(tableEditor.getLastSelection().getRange()).toEqual([[97,0],[100,1]])
 
       it 'scrolls the view to make the added row visible', ->
         tableEditor.setCursorAtScreenPosition([8,0])
 
-        tableElement.expandSelectionDown()
+        atom.commands.dispatch(tableElement, 'core:select-down')
 
         expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
@@ -1881,14 +1883,14 @@ describe 'tableElement', ->
         it 'collapse the selection back to the bottom', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
-          tableElement.expandSelectionDown()
-          tableElement.expandSelectionUp()
+          atom.commands.dispatch(tableElement, 'core:select-down')
+          atom.commands.dispatch(tableElement, 'core:select-up')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[2,1]])
 
     describe 'tablr:select-to-end-of-line', ->
       it 'expands the selection to the end of the current row', ->
-        tableElement.expandSelectionToEndOfLine()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-line')
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
@@ -1896,8 +1898,8 @@ describe 'tableElement', ->
         it 'expands the selection to the beginning of the current row', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
-          tableElement.expandSelectionToEndOfLine()
-          tableElement.expandSelectionToBeginningOfLine()
+          atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-line')
+          atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-line')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,2]])
 
@@ -1905,7 +1907,7 @@ describe 'tableElement', ->
       it 'expands the selection to the beginning of the current row', ->
         tableEditor.setCursorAtScreenPosition([0,2])
 
-        tableElement.expandSelectionToBeginningOfLine()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-line')
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[1,3]])
 
@@ -1913,19 +1915,19 @@ describe 'tableElement', ->
         it 'expands the selection to the end of the current row', ->
           tableEditor.setCursorAtScreenPosition([0,1])
 
-          tableElement.expandSelectionToBeginningOfLine()
-          tableElement.expandSelectionToEndOfLine()
+          atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-line')
+          atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-line')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,1],[1,3]])
 
     describe 'tablr:select-to-end-of-table', ->
       it 'expands the selection to the end of the table', ->
-        tableElement.expandSelectionToEndOfTable()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-table')
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[100,1]])
 
       it 'scrolls the view to make the added row visible', ->
-        tableElement.expandSelectionToEndOfTable()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-table')
 
         expect(tableElement.getRowsContainer().scrollTop).not.toEqual(0)
 
@@ -1933,8 +1935,8 @@ describe 'tableElement', ->
         it 'expands the selection to the beginning of the table', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
-          tableElement.expandSelectionToEndOfTable()
-          tableElement.expandSelectionToBeginningOfTable()
+          atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-table')
+          atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-table')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[2,1]])
 
@@ -1942,14 +1944,14 @@ describe 'tableElement', ->
       it 'expands the selection to the beginning of the table', ->
         tableEditor.setCursorAtScreenPosition([2,0])
 
-        tableElement.expandSelectionToBeginningOfTable()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-table')
 
         expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[3,1]])
 
       it 'scrolls the view to make the added row visible', ->
         tableEditor.setCursorAtScreenPosition([99,0])
 
-        tableElement.expandSelectionToBeginningOfTable()
+        atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-table')
 
         expect(tableElement.getRowsContainer().scrollTop).toEqual(0)
 
@@ -1957,8 +1959,8 @@ describe 'tableElement', ->
         it 'expands the selection to the end of the table', ->
           tableEditor.setCursorAtScreenPosition([1,0])
 
-          tableElement.expandSelectionToBeginningOfTable()
-          tableElement.expandSelectionToEndOfTable()
+          atom.commands.dispatch(tableElement, 'tablr:select-to-beginning-of-table')
+          atom.commands.dispatch(tableElement, 'tablr:select-to-end-of-table')
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[100,1]])
 
