@@ -13,24 +13,9 @@ class CSVEditorElement extends HTMLElement
   createdCallback: ->
     @setAttribute 'tabindex', -1
     @subscriptions = new CompositeDisposable
-    @formSubscriptions = new CompositeDisposable
     @classList.add 'pane-item'
 
     @createFormView()
-
-    @formSubscriptions.add @subscribeTo @form.openTextEditorButton,
-      click: =>
-        @model.choice = 'TextEditor'
-        @model.openTextEditor(@collectOptions())
-
-    @formSubscriptions.add @subscribeTo @form.openTableEditorButton,
-      click: =>
-        @form.cleanMessages()
-        @model.choice = 'TableEditor'
-        @model.openTableEditor(@collectOptions()).catch (reason) =>
-          @form.alert(reason.message)
-
-    @formSubscriptions.add @form.onDidChange (options) => @updatePreview(options)
 
   collectOptions: -> @form.collectOptions()
 
@@ -83,6 +68,22 @@ class CSVEditorElement extends HTMLElement
     container.className = 'settings-view'
 
     @form = document.createElement 'atom-csv-editor-form'
+    @formSubscriptions = new CompositeDisposable
+
+    @formSubscriptions.add @subscribeTo @form.openTextEditorButton,
+      click: =>
+        @model.choice = 'TextEditor'
+        @model.openTextEditor(@collectOptions())
+
+    @formSubscriptions.add @subscribeTo @form.openTableEditorButton,
+      click: =>
+        @form.cleanMessages()
+        @model.choice = 'TableEditor'
+        @model.openTableEditor(@collectOptions()).catch (reason) =>
+          @form.alert(reason.message)
+
+    @formSubscriptions.add @form.onDidChange (options) =>
+      @updatePreview(options)
 
     container.appendChild(@form)
     @appendChild(container)
@@ -92,9 +93,11 @@ class CSVEditorElement extends HTMLElement
 
     @form.preview.clean()
     @model.previewCSV(options).then (preview) =>
+      return unless @form?
       @form.preview.render(preview, options)
       @form.openTableEditorButton.removeAttribute('disabled')
     .catch (reason) =>
+      return unless @form?
       @form.preview.error(reason)
       @form.openTableEditorButton.setAttribute('disabled', 'true')
 

@@ -191,6 +191,26 @@ describe "CSVEditor", ->
               expect(csvEditorElement.tableElement).toBeUndefined()
               expect(csvEditorElement.form).toBeDefined()
 
+            describe 'and the csv setting is changed to a valid format', ->
+              beforeEach ->
+                tableEditor = null
+                csvEditorElement.querySelector('[id^="semi-colon"]').checked = true
+
+                csvEditor.onDidOpen ({editor}) ->
+                  tableEditor = editor
+
+                tableEditorButton = csvEditorElement.form.openTableEditorButton
+                click(tableEditorButton)
+
+                waitsFor -> tableEditor?
+
+              it 'now opens the new version of the file', ->
+                expect(csvEditor.editor.getColumns()).toEqual([undefined, undefined])
+                expect(csvEditor.editor.getRows()).toEqual([
+                  ['foo', 'bar']
+                  ['1', '2']
+                ])
+
     describe 'when the file is moved', ->
       [spy, newPath, spyTitle] = []
 
