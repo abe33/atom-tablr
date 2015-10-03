@@ -1443,6 +1443,38 @@ describe 'tableElement', ->
 
       expect(tableEditor.getScreenRowHeightAt(0)).toEqual(10)
 
+  describe 'tablr:go-to-line', ->
+    [goToLineElement] = []
+
+    beforeEach ->
+      jasmineContent.appendChild(atom.views.getView(atom.workspace))
+      atom.commands.dispatch(tableElement, 'tablr:go-to-line')
+
+      waitsFor ->
+        goToLineElement = document.querySelector('atom-table-go-to-line')
+
+    it 'adds a modal panel', ->
+      expect(goToLineElement).toExist()
+
+  describe '::goToLine', ->
+    describe 'with only a row', ->
+      it 'selects the first cell of the specified line', ->
+        tableElement.goToLine([10])
+
+        expect(tableEditor.getCursorPosition()).toEqual([9,0])
+
+    describe 'with a row and a column index', ->
+      it 'selects the cell at the specified position', ->
+        tableElement.goToLine([10, 2])
+
+        expect(tableEditor.getCursorPosition()).toEqual([9,1])
+
+    describe 'with a row and a column name', ->
+      it 'selects the cell at the specified position', ->
+        tableElement.goToLine([10, 'value'])
+
+        expect(tableEditor.getCursorPosition()).toEqual([9,1])
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

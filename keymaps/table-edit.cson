@@ -16,6 +16,7 @@
   'ctrl-alt-right': 'tablr:expand-column'
   'ctrl-alt-up': 'tablr:shrink-row'
   'ctrl-alt-down': 'tablr:expand-row'
+  'ctrl-g': 'tablr:go-to-line'
 
 '.platform-darwin atom-table-editor':
   'cmd-left': 'tablr:move-to-beginning-of-line'

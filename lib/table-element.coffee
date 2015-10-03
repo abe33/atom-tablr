@@ -10,6 +10,7 @@ TableEditor = require './table-editor'
 TableCellElement = require './table-cell-element'
 TableHeaderCellElement = require './table-header-cell-element'
 TableGutterCellElement = require './table-gutter-cell-element'
+GoToLineElement = require './go-to-line-element'
 Range = require './range'
 Pool = require './mixins/pool'
 PIXEL = 'px'
@@ -719,6 +720,21 @@ class TableElement extends HTMLElement
       rows.push(row)
 
     @checkEllipsisDisplay()
+
+  goToLine: ([row, column]) ->
+    if row? and column?
+      if typeof column is 'string'
+        column = @tableEditor.getColumnIndex(column) + 1
+
+      @tableEditor.setCursorAtScreenPosition([row - 1, column - 1])
+    else if row?
+      @tableEditor.setCursorAtScreenPosition([row - 1, 0])
+
+  openGoToLineModal: ->
+    goToLineElement = new GoToLineElement()
+    goToLineElement.setModel(this)
+    goToLineElement.attach()
+    goToLineElement
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
@@ -1542,6 +1558,7 @@ TableElement.registerCommands = ->
     'tablr:shrink-column': -> @shrinkColumn()
     'tablr:expand-row': -> @expandRow()
     'tablr:shrink-row': -> @shrinkRow()
+    'tablr:go-to-line': -> @openGoToLineModal()
 
   atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
     'core:move-up': -> @moveUp()
