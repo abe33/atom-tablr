@@ -1,3 +1,12 @@
+<a name="v0.3.0"></a>
+# v0.3.0 (2015-10-03)
+
+## :sparkles: Features
+
+- Add a go to line command mimicking the text editor one ([d65488f5](https://github.com/abe33/atom-tablr/commit/d65488f56a5e2e288b654b19e911276fb9039719))
+- Implement handling of file change on disk while an editor is opened ([1a433466](https://github.com/abe33/atom-tablr/commit/1a433466918e383f5b184b9832208ef90d73abdd))
+- Implement title and config changes on file rename ([0323a01b](https://github.com/abe33/atom-tablr/commit/0323a01bcb6c59b2995d0fc17fe758cb06192d26))
+
 <a name="v0.2.4"></a>
 # v0.2.4 (2015-10-01)
 
