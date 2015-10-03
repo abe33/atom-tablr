@@ -730,6 +730,8 @@ class TableElement extends HTMLElement
     else if row?
       @tableEditor.setCursorAtScreenPosition([row - 1, 0])
 
+    @makeCellVisible(@tableEditor.getCursorPosition())
+
   openGoToLineModal: ->
     goToLineElement = new GoToLineElement()
     goToLineElement.setModel(this)
