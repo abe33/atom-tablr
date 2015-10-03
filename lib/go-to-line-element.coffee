@@ -1,4 +1,3 @@
-{CompositeDisposable} = require 'event-kit'
 {SpacePenDSL} = require 'atom-utils'
 
 module.exports =
@@ -14,6 +13,7 @@ class GoToLineElement extends HTMLElement
   createdCallback: ->
 
   attachedCallback: ->
+    @miniEditor.focus()
 
   attach: ->
     @panel = atom.workspace.addModalPanel(item: this, visible: true)
@@ -31,6 +31,7 @@ class GoToLineElement extends HTMLElement
 
   destroy: ->
     @panel?.destroy()
+    @tableElement.focus()
 
   setModel: (@tableElement) ->
 
