@@ -36,6 +36,7 @@ Command|Action
 `tablr:add-selection-right`|Add a new cursor on the right of the last selection bounds and on the same row as the selection's cursor.
 `tablr:add-selection-above`|<p>OSX: <kbd>ctrl-shift-up</kbd><br/>Win/Linux: <kbd>ctrl-alt-up</kbd></p>Add a new cursor above the last selection bounds and on the same column as the selection's cursor.
 `tablr:add-selection-below`|<p>OSX: <kbd>ctrl-shift-down</kbd><br/>Win/Linux: <kbd>ctrl-alt-down</kbd></p>Add a new cursor below the last selection bounds and on the same column as the selection's cursor.
+`tablr:go-to-line`|<p>OSX/Win/Linux: <kbd>ctrl-g</kbd></p>Jump to the specified row and column.
 
 ## Selections
 
