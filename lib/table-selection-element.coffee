@@ -54,7 +54,7 @@ class TableSelectionElement extends HTMLElement
     bottom: @tableEditor.getScreenRowOffsetAt(range.end.row - 1) + @tableEditor.getScreenRowHeightAt(range.end.row - 1)
 
 
-module.exports = TableSelectionElement = document.registerElement 'atom-table-editor-selection', prototype: TableSelectionElement.prototype
+module.exports = TableSelectionElement = document.registerElement 'tablr-editor-selection', prototype: TableSelectionElement.prototype
 
 TableSelectionElement.registerViewProvider = ->
   atom.views.addViewProvider Selection, (model) ->

@@ -104,7 +104,7 @@ module.exports =
         when 'small' then @getSmallTable()
 
     @subscriptions.add atom.contextMenu.add
-      'atom-table-editor': [{
+      'tablr-editor': [{
         label: 'Table'
         submenu: [
           {label: 'Align left', command: 'tablr:align-left'}

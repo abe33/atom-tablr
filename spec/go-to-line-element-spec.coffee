@@ -39,7 +39,7 @@ describe 'GoToLineElement', ->
   describe 'core:cancel', ->
     it 'destroys the modal', ->
       atom.commands.dispatch(goToLineElement, 'core:cancel')
-      expect(document.querySelector('atom-table-go-to-line')).not.toExist()
+      expect(document.querySelector('tablr-go-to-line')).not.toExist()
 
   describe 'core:confirm', ->
     beforeEach ->

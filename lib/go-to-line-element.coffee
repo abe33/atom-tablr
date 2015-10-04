@@ -35,10 +35,10 @@ class GoToLineElement extends HTMLElement
 
   setModel: (@tableElement) ->
 
-module.exports = GoToLineElement = document.registerElement 'atom-table-go-to-line', prototype: GoToLineElement.prototype
+module.exports = GoToLineElement = document.registerElement 'tablr-go-to-line', prototype: GoToLineElement.prototype
 
 GoToLineElement.registerCommands = ->
-  atom.commands.add 'atom-table-go-to-line',
+  atom.commands.add 'tablr-go-to-line',
     'core:cancel': -> @destroy()
     'core:confirm': -> @confirm()
 

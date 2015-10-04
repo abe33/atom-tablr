@@ -68,7 +68,7 @@ atom-pane .tab-bar .tab[data-type="CSVEditor"] .title[data-path]::before,
 //   ##    ##  ##       ##   ### ##       ##    ##  ##     ## ##
 //    ######   ######## ##    ## ######## ##     ## ##     ## ########
 
-atom-table-editor {
+tablr-editor {
   background: @table-background-color;
   position: relative;
   -webkit-flex-direction: column;
@@ -181,7 +181,7 @@ atom-table-editor {
       // transform: translateZ(0);
     }
 
-    atom-table-header-cell {
+    tablr-header-cell {
       .cell;
       cursor: s-resize;
       padding-right: 24px;
@@ -310,7 +310,7 @@ atom-table-editor {
       visibility: hidden;
     }
 
-    atom-table-gutter-cell {
+    tablr-gutter-cell {
       position: absolute;
       left: 0;
       width: 100%;
@@ -342,7 +342,7 @@ atom-table-editor {
       }
     }
 
-    atom-table-gutter-cell, .tablr-gutter-filler {
+    tablr-gutter-cell, .tablr-gutter-filler {
       .row-number-placeholder;
     }
 
@@ -354,7 +354,7 @@ atom-table-editor {
     //   ##    ##  ##     ## ##       ##       ##    ##  ##    ##
     //   ##     ##  #######  ######## ######## ##     ##  ######
 
-    atom-table-editor-selection {
+    tablr-editor-selection {
       display: block;
       position: absolute;
       pointer-events: none;
@@ -464,10 +464,10 @@ atom-table-editor {
       }
     }
 
-    atom-table-cell, atom-table-header-cell, atom-table-gutter-cell, .tablr-gutter-filler, .tablr-header-filler {
+    tablr-cell, tablr-header-cell, tablr-gutter-cell, .tablr-gutter-filler, .tablr-header-filler {
       font-size: 1.2em;
     }
-    atom-table-cell {
+    tablr-cell {
       .cell;
       border-bottom: 1px solid @table-border-color;
       background: @table-background-color;
@@ -516,12 +516,12 @@ atom-table-editor {
       }
     }
 
-    atom-table-header-cell.active-column {
+    tablr-header-cell.active-column {
       color: @table-text-highlight-color;
       background: @table-border-color;
     }
 
-    atom-table-cell {
+    tablr-cell {
       &.selected {
         background: @table-border-color;
         border-color: @table-background-color;
@@ -561,7 +561,7 @@ atom-pane-container atom-pane .item-views atom-csv-editor.pane-item {
 atom-csv-editor {
   position: relative;
 
-  atom-table-editor {
+  tablr-editor {
     position: absolute;
     left: 0;
     right: 0;

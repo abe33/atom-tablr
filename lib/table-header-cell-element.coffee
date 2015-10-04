@@ -44,4 +44,4 @@ class TableHeaderCellElement extends HTMLElement
 
     classes
 
-module.exports = TableHeaderCellElement = document.registerElement 'atom-table-header-cell', prototype: TableHeaderCellElement.prototype
+module.exports = TableHeaderCellElement = document.registerElement 'tablr-header-cell', prototype: TableHeaderCellElement.prototype

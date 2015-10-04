@@ -41,7 +41,7 @@ describe "CSVEditor", ->
 
   modifyAndSave = (block) ->
     waitsFor ->
-      csvEditorElement.querySelector('atom-table-editor')
+      csvEditorElement.querySelector('tablr-editor')
 
     runs block
 
@@ -386,7 +386,7 @@ describe "CSVEditor", ->
 
         it 'clears the csv editor content and replace it with a table element', ->
           waitsFor ->
-            tableEditorElement = csvEditorElement.querySelector('atom-table-editor')
+            tableEditorElement = csvEditorElement.querySelector('tablr-editor')
 
           runs ->
             expect(tableEditorElement).toExist()

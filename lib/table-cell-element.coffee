@@ -46,4 +46,4 @@ class TableCellElement extends HTMLElement
   isSameCell: (cell, column, row) ->
     cell.value is @lastValue and column is @lastColumn and row is @lastRow
 
-module.exports = TableCellElement = document.registerElement 'atom-table-cell', prototype: TableCellElement.prototype
+module.exports = TableCellElement = document.registerElement 'tablr-cell', prototype: TableCellElement.prototype

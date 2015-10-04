@@ -31,4 +31,4 @@ class TableGutterCellElement extends HTMLElement
     classes.push 'selected' if @tableElement.isSelectedRow(row)
     classes
 
-module.exports = TableGutterCellElement = document.registerElement 'atom-table-gutter-cell', prototype: TableGutterCellElement.prototype
+module.exports = TableGutterCellElement = document.registerElement 'tablr-gutter-cell', prototype: TableGutterCellElement.prototype

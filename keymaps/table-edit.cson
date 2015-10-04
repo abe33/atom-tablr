@@ -7,7 +7,7 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
-'atom-table-editor':
+'tablr-editor':
   'tab': 'tablr:move-right-in-selection'
   'shift-tab': 'tablr:move-left-in-selection'
   'home': 'core:move-to-top'
@@ -18,7 +18,7 @@
   'ctrl-alt-down': 'tablr:expand-row'
   'ctrl-g': 'tablr:go-to-line'
 
-'.platform-darwin atom-table-editor':
+'.platform-darwin tablr-editor':
   'cmd-left': 'tablr:move-to-beginning-of-line'
   'cmd-right': 'tablr:move-to-end-of-line'
   'cmd-shift-right': 'tablr:select-to-end-of-line'
@@ -58,7 +58,7 @@
   'ctrl-up': 'tablr:move-line-up'
   'ctrl-down': 'tablr:move-line-down'
 
-'atom-table-editor atom-text-editor[mini]':
+'tablr-editor atom-text-editor[mini]':
   'enter': 'core:confirm'
   'ctrl-enter': 'editor:newline'
   'cmd-enter': 'editor:newline'

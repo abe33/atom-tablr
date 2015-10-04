@@ -103,11 +103,11 @@ class TableElement extends HTMLElement
         @requestUpdate()
         @cancelEllipsisDisplay()
 
-    @subscriptions.add @subscribeTo @head, 'atom-table-header-cell .column-edit-action',
+    @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-edit-action',
       'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
-    @subscriptions.add @subscribeTo @head, 'atom-table-header-cell .column-resize-handle',
+    @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
 
@@ -851,7 +851,7 @@ class TableElement extends HTMLElement
 
   subscribeToCellTextEditor: (editor) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
+    @textEditorSubscriptions.add atom.commands.add 'tablr-editor atom-text-editor[mini]',
 
       'tablr:move-right-in-selection': (e) =>
         e.stopPropagation()
@@ -878,7 +878,7 @@ class TableElement extends HTMLElement
 
   subscribeToColumnTextEditor: (editorView) ->
     @textEditorSubscriptions = new CompositeDisposable
-    @textEditorSubscriptions.add atom.commands.add 'atom-table-editor atom-text-editor[mini]',
+    @textEditorSubscriptions.add atom.commands.add 'tablr-editor atom-text-editor[mini]',
 
       'tablr:move-right-in-selection': (e) =>
         e.stopPropagation()
@@ -1474,7 +1474,7 @@ class TableElement extends HTMLElement
 #    ##       ##       ##       ##     ## ##       ##   ###    ##
 #    ######## ######## ######## ##     ## ######## ##    ##    ##
 
-module.exports = TableElement = document.registerElement 'atom-table-editor', prototype: TableElement.prototype
+module.exports = TableElement = document.registerElement 'tablr-editor', prototype: TableElement.prototype
 
 TableElement.registerViewProvider = ->
   atom.views.addViewProvider TableEditor, (model) ->
@@ -1517,7 +1517,7 @@ stopEventPropagationAndGroupUndo = (commandListeners) ->
   newCommandListeners
 
 TableElement.registerCommands = ->
-  atom.commands.add 'atom-table-editor',
+  atom.commands.add 'tablr-editor',
     'core:save': preventAndStop (e) -> @save()
     'core:confirm': -> @startCellEdit()
     'core:cancel': -> @resetSelections()
@@ -1572,7 +1572,7 @@ TableElement.registerCommands = ->
     'tablr:move-line-down': -> @moveLineDown()
     'tablr:move-line-up': -> @moveLineUp()
 
-  atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
+  atom.commands.add 'tablr-editor atom-text-editor[mini]', stopEventPropagation(
     'core:move-up': -> @moveUp()
     'core:move-down': -> @moveDown()
     'core:move-to-top': -> @moveToTop()
@@ -1609,7 +1609,7 @@ TableElement.registerCommands = ->
     'editor:scroll-to-cursor': -> @scrollToCursorPosition()
   )
 
-  atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagationAndGroupUndo(
+  atom.commands.add 'tablr-editor atom-text-editor[mini]', stopEventPropagationAndGroupUndo(
     'editor:indent': -> @indent()
     'editor:auto-indent': -> @autoIndentSelectedRows()
     'editor:indent-selected-rows': -> @indentSelectedRows()
