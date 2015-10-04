@@ -73,6 +73,8 @@ Command|Action
 `tablr:shrink-column`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the width of each column with a cursor by the amount specified in the `columnWidthIncrement` setting.
 `tablr:expand-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-right</kbd></p>Increase the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
 `tablr:shrink-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
+`tablr:move-line-up`|<p>OSX: <kbd>ctrl-cmd-up</kbd> <br/>Win/Linux: <kbd>ctrl-up</kbd></p>Move the lines at cursors one row to the top.
+`tablr:move-line-down`|<p>OSX: <kbd>ctrl-cmd-down</kbd> <br/>Win/Linux: <kbd>ctrl-down</kbd></p>Move the lines at cursors one row to the bottom.
 
 
 ## Cell Edit

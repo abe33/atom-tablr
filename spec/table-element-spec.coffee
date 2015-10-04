@@ -1475,6 +1475,22 @@ describe 'tableElement', ->
 
         expect(tableEditor.getCursorPosition()).toEqual([9,1])
 
+  describe 'tablr:move-line-down', ->
+    it 'calls tableEditor::moveLineDown', ->
+      spyOn(tableEditor, 'moveLineDown')
+
+      atom.commands.dispatch(tableElement, 'tablr:move-line-down')
+
+      expect(tableEditor.moveLineDown).toHaveBeenCalled()
+
+  describe 'tablr:move-line-up', ->
+    it 'calls tableEditor::moveLineUp', ->
+      spyOn(tableEditor, 'moveLineUp')
+
+      atom.commands.dispatch(tableElement, 'tablr:move-line-up')
+
+      expect(tableEditor.moveLineUp).toHaveBeenCalled()
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

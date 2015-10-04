@@ -15,7 +15,7 @@ class DisplayTable
     displayTable = new DisplayTable(state)
 
   @delegatesMethods(
-    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom',
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows',
     toProperty: 'table'
   )
 

@@ -29,7 +29,7 @@ class TableEditor
     'getContentWidth', 'getContentHeight',
     'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange',
     'getValueAtScreenPosition', 'setValueAtScreenPosition', 'setValuesAtScreenPositions', 'setValuesInScreenRange',
-    'getRow', 'getRows', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'addRows', 'addRowsAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange',
+    'getRow', 'getRows', 'addRow', 'addRowAt', 'removeRow', 'removeRowAt', 'addRows', 'addRowsAt', 'removeScreenRowAt', 'removeRowsInRange', 'removeRowsInScreenRange', 'swapRows',
     'getRowHeightAt', 'getRowHeight', 'setRowHeight', 'setRowHeightAt', 'getLastRowIndex', 'getRowIndexAtPixelPosition',
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChange', 'onDidChangeRowHeight',
@@ -384,6 +384,9 @@ class TableEditor
   getCursors: ->
     @cursors.slice()
 
+  getCursorsInRowOrder: ->
+    @getCursors().sort (a,b) -> a.getPosition().row - b.getPosition().row
+
   hasMultipleCursors: ->
     @getCursors().length > 1
 
@@ -521,3 +524,49 @@ class TableEditor
 
   pageRight: ->
     @moveCursors (cursor) -> cursor.pageRight()
+
+  moveLineDown: ->
+    cursors = @getCursorsInRowOrder().reverse()
+
+    originalCursorPositions = @getCursors().map (cursor) ->
+      cursor.getPosition().copy()
+
+    @table.batchTransaction ->
+      cursors.forEach (cursor) -> cursor.moveLineDown()
+
+    finalCursorPositions = @getCursors().map (cursor) ->
+      cursor.getPosition().copy()
+
+    @table.ammendLastTransaction
+      undo: (commit) =>
+        commit.undo()
+        @getCursors().forEach (cursor,i) ->
+          cursor.setPosition(originalCursorPositions[i])
+
+      redo: (commit) =>
+        commit.redo()
+        @getCursors().forEach (cursor,i) ->
+          cursor.setPosition(finalCursorPositions[i])
+
+  moveLineUp: ->
+    cursors = @getCursorsInRowOrder()
+
+    originalCursorPositions = @getCursors().map (cursor) ->
+      cursor.getPosition().copy()
+
+    @table.batchTransaction ->
+      cursors.forEach (cursor) -> cursor.moveLineUp()
+
+    finalCursorPositions = @getCursors().map (cursor) ->
+      cursor.getPosition().copy()
+
+    @table.ammendLastTransaction
+      undo: (commit) =>
+        commit.undo()
+        @getCursors().forEach (cursor,i) ->
+          cursor.setPosition(originalCursorPositions[i])
+
+      redo: (commit) =>
+        commit.redo()
+        @getCursors().forEach (cursor,i) ->
+          cursor.setPosition(finalCursorPositions[i])

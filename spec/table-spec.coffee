@@ -669,6 +669,29 @@ describe 'Table', ->
         it 'is marked as modified', ->
           expect(table.isModified()).toBeTruthy()
 
+    describe '::swapRows', ->
+      beforeEach ->
+        table.addRow key: 'foo', value: 'bar'
+        table.addRow key: 'oof', value: 'rab'
+        table.addRow key: 'ofo', value: 'arb'
+
+      it 'swaps the rows', ->
+        table.swapRows(0,2)
+
+        expect(table.getRows()).toEqual([
+          ['ofo','arb']
+          ['oof','rab']
+          ['foo','bar']
+        ])
+
+      it 'dispatches a change event', ->
+        changeSpy = jasmine.createSpy('did-change')
+        table.onDidChange(changeSpy)
+
+        table.swapRows(0,2)
+
+        expect(changeSpy).toHaveBeenCalledWith({rowIndices: [0,2]})
+
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
   #    ##       ##       ##       ##       ##
@@ -1087,6 +1110,41 @@ describe 'Table', ->
         expect(table.undoStack.length).toEqual(1)
         expect(table.redoStack.length).toEqual(0)
         expect(table.getRow(0)).toEqual(['hello', 'world'])
+
+      it 'rolls back a swap of rows', ->
+        table.addRows([
+          ['foo', 'bar']
+          ['oof', 'rab']
+          ['ofo', 'arb']
+        ])
+
+        table.clearUndoStack()
+        table.save()
+
+        table.swapRows(0,2)
+
+        table.undo()
+
+        expect(table.isModified()).toBeFalsy()
+        expect(table.undoStack.length).toEqual(0)
+        expect(table.redoStack.length).toEqual(1)
+        expect(table.getRows()).toEqual([
+          ['foo', 'bar']
+          ['oof', 'rab']
+          ['ofo', 'arb']
+        ])
+
+        table.redo()
+
+        expect(table.isModified()).toBeTruthy()
+        expect(table.undoStack.length).toEqual(1)
+        expect(table.redoStack.length).toEqual(0)
+        expect(table.getRows()).toEqual([
+          ['ofo','arb']
+          ['oof','rab']
+          ['foo','bar']
+        ])
+
 
       describe '::clearUndoStack', ->
         it 'removes all the transactions in the undo stack', ->

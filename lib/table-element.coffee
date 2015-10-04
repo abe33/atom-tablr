@@ -611,6 +611,14 @@ class TableElement extends HTMLElement
     @tableEditor.addCursorRightToLastSelection()
     @afterCursorMove()
 
+  moveLineDown: ->
+    @tableEditor.moveLineDown()
+    @afterCursorMove()
+
+  moveLineUp: ->
+    @tableEditor.moveLineUp()
+    @afterCursorMove()
+
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getCursorPosition())
     @checkEllipsisDisplay()
@@ -1561,6 +1569,8 @@ TableElement.registerCommands = ->
     'tablr:expand-row': -> @expandRow()
     'tablr:shrink-row': -> @shrinkRow()
     'tablr:go-to-line': -> @openGoToLineModal()
+    'tablr:move-line-down': -> @moveLineDown()
+    'tablr:move-line-up': -> @moveLineUp()
 
   atom.commands.add 'atom-table-editor atom-text-editor[mini]', stopEventPropagation(
     'core:move-up': -> @moveUp()

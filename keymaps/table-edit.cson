@@ -35,6 +35,8 @@
   'cmd-alt-backspace down': 'tablr:delete-column'
   'ctrl-shift-up': 'tablr:add-selection-above'
   'ctrl-shift-down': 'tablr:add-selection-below'
+  'ctrl-cmd-up': 'tablr:move-line-up'
+  'ctrl-cmd-down': 'tablr:move-line-down'
 
 '.platform-win32, .platform-linux':
   'ctrl-left': 'tablr:move-to-beginning-of-line'
@@ -53,6 +55,8 @@
   'ctrl-alt-backspace right': 'tablr:delete-row'
   'ctrl-alt-backspace up': 'tablr:delete-column'
   'ctrl-alt-backspace down': 'tablr:delete-column'
+  'ctrl-up': 'tablr:move-line-up'
+  'ctrl-down': 'tablr:move-line-down'
 
 'atom-table-editor atom-text-editor[mini]':
   'enter': 'core:confirm'

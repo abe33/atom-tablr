@@ -402,6 +402,23 @@ class Table
 
     removedRows
 
+  swapRows: (rowA, rowB, transaction=true) ->
+    rowAData = @rows[rowA]
+    rowBData = @rows[rowB]
+
+    @rows[rowA] = rowBData
+    @rows[rowB] = rowAData
+
+    if transaction
+      @transaction
+        undo: ->
+          @swapRows(rowA, rowB, false)
+        redo: ->
+          @swapRows(rowA, rowB, false)
+
+    @emitModifiedStatusChange()
+    @emitter.emit 'did-change', {rowIndices: [rowA, rowB]}
+
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
 

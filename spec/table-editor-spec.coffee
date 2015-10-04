@@ -370,6 +370,133 @@ describe 'TableEditor', ->
         expect(tableEditor.getCursorScreenPosition()).toEqual([1,1])
         expect(tableEditor.getCursorPosition()).toEqual([2,1])
 
+    describe '::moveLineDown', ->
+      beforeEach ->
+        tableEditor = new TableEditor
+        tableEditor.addColumn 'key'
+        tableEditor.addColumn 'value'
+        tableEditor.addColumn 'foo'
+
+        for i in [0...100]
+          tableEditor.addRow [
+            "row#{i}"
+            i * 100
+            if i % 2 is 0 then 'yes' else 'no'
+          ]
+
+        tableEditor.addCursorAtPosition([2,0])
+        tableEditor.addCursorAtPosition([4,0])
+
+        table.clearUndoStack()
+
+      it 'moves the lines at cursors one line down', ->
+        tableEditor.moveLineDown()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,0]
+          [5,0]
+        ])
+
+        expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
+        expect(tableEditor.getScreenRow(1)).toEqual(['row0', 0, 'yes'])
+        expect(tableEditor.getScreenRow(2)).toEqual(['row3', 300, 'no'])
+        expect(tableEditor.getScreenRow(3)).toEqual(['row2', 200, 'yes'])
+        expect(tableEditor.getScreenRow(4)).toEqual(['row5', 500, 'no'])
+        expect(tableEditor.getScreenRow(5)).toEqual(['row4', 400, 'yes'])
+
+      it 'updates the selections', ->
+        tableEditor.moveLineDown()
+
+        expect(tableEditor.getSelectedRanges()).toEqual([
+          [[1,0],[2,1]]
+          [[3,0],[4,1]]
+          [[5,0],[6,1]]
+        ])
+
+      it 'can undo the cursors moves', ->
+        tableEditor.moveLineDown()
+
+        tableEditor.undo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [0,0]
+          [2,0]
+          [4,0]
+        ])
+
+        tableEditor.redo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,0]
+          [5,0]
+        ])
+
+    describe '::moveLineUp', ->
+      beforeEach ->
+        tableEditor = new TableEditor
+        tableEditor.addColumn 'key'
+        tableEditor.addColumn 'value'
+        tableEditor.addColumn 'foo'
+
+        for i in [0...100]
+          tableEditor.addRow [
+            "row#{i}"
+            i * 100
+            if i % 2 is 0 then 'yes' else 'no'
+          ]
+
+        tableEditor.setCursorAtPosition([1,0])
+        tableEditor.addCursorAtPosition([3,0])
+        tableEditor.addCursorAtPosition([5,0])
+
+        table.clearUndoStack()
+
+      it 'moves the lines at cursors one line down', ->
+        tableEditor.moveLineUp()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [0,0]
+          [2,0]
+          [4,0]
+        ])
+
+        expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
+        expect(tableEditor.getScreenRow(1)).toEqual(['row0', 0, 'yes'])
+        expect(tableEditor.getScreenRow(2)).toEqual(['row3', 300, 'no'])
+        expect(tableEditor.getScreenRow(3)).toEqual(['row2', 200, 'yes'])
+        expect(tableEditor.getScreenRow(4)).toEqual(['row5', 500, 'no'])
+        expect(tableEditor.getScreenRow(5)).toEqual(['row4', 400, 'yes'])
+
+      it 'updates the selections', ->
+        tableEditor.moveLineUp()
+
+        expect(tableEditor.getSelectedRanges()).toEqual([
+          [[0,0],[1,1]]
+          [[2,0],[3,1]]
+          [[4,0],[5,1]]
+        ])
+
+      it 'can undo the cursors moves', ->
+        tableEditor.moveLineUp()
+
+        tableEditor.undo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,0]
+          [5,0]
+        ])
+
+        tableEditor.redo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [0,0]
+          [2,0]
+          [4,0]
+        ])
+
     ##      ######  ######## ##       ########  ######  ########  ######
     ##     ##    ## ##       ##       ##       ##    ##    ##    ##    ##
     ##     ##       ##       ##       ##       ##          ##    ##
