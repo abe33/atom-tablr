@@ -184,7 +184,7 @@ class CSVEditorFormElement extends HTMLElement
             @label class: 'setting-title', for: "skip-empty-lines-#{id}", 'Skip Empty Lines'
             @input type: 'checkbox', name: 'skip-empty-lines', id: "skip-empty-lines-#{id}"
 
-      @p 'Preview of the parsed CSV (down to the fifth row):'
+      @p 'Preview of the parsed CSV:'
       @tag 'atom-csv-preview', outlet: 'preview'
 
   createdCallback: ->
