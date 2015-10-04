@@ -453,7 +453,7 @@ describe 'TableEditor', ->
 
         table.clearUndoStack()
 
-      it 'moves the lines at cursors one line down', ->
+      it 'moves the lines at cursors one line up', ->
         tableEditor.moveLineUp()
 
         expect(tableEditor.getCursorPositions()).toEqual([
