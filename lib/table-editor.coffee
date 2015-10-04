@@ -462,21 +462,6 @@ class TableEditor
   removeCursor: (cursor) ->
     cursor.destroy()
 
-  moveCursors: (fn) ->
-    fn(cursor) for cursor in @getCursors()
-    @mergeCursors()
-
-  # Merge cursors that have the same screen position
-  mergeCursors: ->
-    positions = {}
-    for cursor in @getCursors()
-      position = cursor.getPosition().toString()
-      if positions.hasOwnProperty(position)
-        cursor.destroy()
-      else
-        positions[position] = true
-    return
-
   moveUp: (delta=1) ->
     @moveCursors (cursor) -> cursor.moveUp(delta)
 
@@ -526,6 +511,8 @@ class TableEditor
     @moveCursors (cursor) -> cursor.pageRight()
 
   moveLineDown: ->
+    return @notifyLineMoveWithOrder() if @order?
+
     cursors = @getCursorsInRowOrder().reverse()
 
     originalCursorPositions = @getCursors().map (cursor) ->
@@ -549,6 +536,8 @@ class TableEditor
           cursor.setPosition(finalCursorPositions[i])
 
   moveLineUp: ->
+    return @notifyLineMoveWithOrder() if @order?
+
     cursors = @getCursorsInRowOrder()
 
     originalCursorPositions = @getCursors().map (cursor) ->
@@ -570,3 +559,21 @@ class TableEditor
         commit.redo()
         @getCursors().forEach (cursor,i) ->
           cursor.setPosition(finalCursorPositions[i])
+
+  moveCursors: (fn) ->
+    fn(cursor) for cursor in @getCursors()
+    @mergeCursors()
+
+  # Merge cursors that have the same screen position
+  mergeCursors: ->
+    positions = {}
+    for cursor in @getCursors()
+      position = cursor.getPosition().toString()
+      if positions.hasOwnProperty(position)
+        cursor.destroy()
+      else
+        positions[position] = true
+    return
+
+  notifyLineMoveWithOrder: ->
+    atom.notifications.addWarning("Moving lines isn't possible as long as an order is defined in the table, otherwise you may alter the table without noticing.")

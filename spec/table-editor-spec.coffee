@@ -433,6 +433,23 @@ describe 'TableEditor', ->
           [5,0]
         ])
 
+      describe 'when there is an order defined', ->
+        beforeEach ->
+          tableEditor.sortBy('key')
+
+        it 'does nothing and creates a notification instead', ->
+          spyOn(atom.notifications, 'addWarning')
+
+          tableEditor.moveLineDown()
+
+          expect(tableEditor.getCursorPositions()).toEqual([
+            [0,0]
+            [2,0]
+            [4,0]
+          ])
+
+          expect(atom.notifications.addWarning).toHaveBeenCalled()
+
     describe '::moveLineUp', ->
       beforeEach ->
         tableEditor = new TableEditor
@@ -496,6 +513,23 @@ describe 'TableEditor', ->
           [2,0]
           [4,0]
         ])
+
+      describe 'when there is an order defined', ->
+        beforeEach ->
+          tableEditor.sortBy('key')
+
+        it 'does nothing and creates a notification instead', ->
+          spyOn(atom.notifications, 'addWarning')
+
+          tableEditor.moveLineUp()
+
+          expect(tableEditor.getCursorPositions()).toEqual([
+            [1,0]
+            [3,0]
+            [5,0]
+          ])
+
+          expect(atom.notifications.addWarning).toHaveBeenCalled()
 
     ##      ######  ######## ##       ########  ######  ########  ######
     ##     ##    ## ##       ##       ##       ##    ##    ##    ##    ##
