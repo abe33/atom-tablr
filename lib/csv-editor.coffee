@@ -24,11 +24,24 @@ class CSVEditor
     @options ?= {}
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
-    @file = new File(filePath)
-    @previousPath = filePath
-    @subscribeToFile()
+    @setPath(filePath)
+
+  setPath: (filePath) ->
+    return if filePath is @getPath()
+
+    if filePath
+      @file = new File(filePath)
+      @previousPath = filePath
+      @subscribeToFile()
+    else
+      @file = null
+
+    @emitter.emit 'did-change-path', @getPath()
+    @emitter.emit 'did-change-title', @getTitle()
 
   subscribeToFile: ->
+    @fileSubscriptions?.dispose()
+
     @fileSubscriptions = new CompositeDisposable
 
     changeFired = false
@@ -92,7 +105,7 @@ class CSVEditor
     else
       'untitled'
 
-  getPath: -> @file.getPath()
+  getPath: -> @file?.getPath()
 
   getURI: -> @getPath()
 
@@ -177,6 +190,7 @@ class CSVEditor
       options = _.clone(@options)
       options.columns = @editor.getColumns() if options.header
 
+      @setPath(path)
       @saveLayout()
 
       csv.stringify @editor.getTable().getRows(), options, (err, data) =>

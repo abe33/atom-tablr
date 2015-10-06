@@ -392,6 +392,34 @@ describe "CSVEditor", ->
             expect(tableEditorElement).toExist()
             expect(csvEditorElement.children.length).toEqual(1)
 
+        describe '::saveAs', ->
+          newPath = null
+          beforeEach ->
+            newPath = "#{projectPath}/other-sample.csv"
+
+            waitsForPromise ->
+              csvEditor.saveAs(newPath)
+
+          it 'saves the csv at the specified path', ->
+            expect(fs.existsSync(newPath)).toBeTruthy()
+
+          it 'changes the csvEditor path', ->
+            expect(csvEditor.getPath()).toEqual(newPath)
+
+          it 'saves the layout and display settings at the new path', ->
+            expect(tableEditPackage.csvConfig.get(newPath, 'layout')).toEqual({
+              columns: [
+                {}
+                {}
+                {}
+              ]
+              rowHeights: [
+                undefined
+                undefined
+                undefined
+              ]
+            })
+
         describe '::copy', ->
           it 'returns a CSVEditor in a pending state', ->
             copy = csvEditor.copy()
