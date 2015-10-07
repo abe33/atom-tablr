@@ -1,3 +1,21 @@
+<a name="v0.4.0"></a>
+# v0.4.0 (2015-10-07)
+
+## :sparkles: Features
+
+- Add a warning and stop operation when moving lines with an order defined on the table ([0a34bfaf](https://github.com/abe33/atom-tablr/commit/0a34bfaf19122b44dbf15c6c0d3058719a336363))
+- Implement move lines up and down commands ([f61d61b6](https://github.com/abe33/atom-tablr/commit/f61d61b65c7d1651d3e9df61fee0db493ff01c91))
+
+## :bug: Bug Fixes
+
+- Fix saveAs not changing the csv editor path ([dbaf82b9](https://github.com/abe33/atom-tablr/commit/dbaf82b9f3e11f81344b7130cad4960fa074b613))
+
+## Breaking Changes
+
+- due to [147cdb55](https://github.com/abe33/atom-tablr/commit/147cdb55882ba375c4a06f8579259ee336cc9c4d), as the various custom elements names have been
+changed, the custom CSS users wrote to adjust the table to their taste
+will breaks.
+
 <a name="v0.3.0"></a>
 # v0.3.0 (2015-10-03)
 
