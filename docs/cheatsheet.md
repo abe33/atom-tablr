@@ -73,8 +73,8 @@ Command|Action
 `tablr:shrink-column`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the width of each column with a cursor by the amount specified in the `columnWidthIncrement` setting.
 `tablr:expand-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-right</kbd></p>Increase the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
 `tablr:shrink-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
-`tablr:move-line-up`|<p>OSX: <kbd>ctrl-cmd-up</kbd> <br/>Win/Linux: <kbd>ctrl-up</kbd></p>Move the lines at cursors one row to the top.
-`tablr:move-line-down`|<p>OSX: <kbd>ctrl-cmd-down</kbd> <br/>Win/Linux: <kbd>ctrl-down</kbd></p>Move the lines at cursors one row to the bottom.
+`tablr:move-line-up`|<p>OSX: <kbd>ctrl-cmd-up</kbd> <br/>Win/Linux: <kbd>ctrl-up</kbd></p>Move the lines at cursors one row to the top. This command is not available when an order is defined for the table as the result will not be perceived.
+`tablr:move-line-down`|<p>OSX: <kbd>ctrl-cmd-down</kbd> <br/>Win/Linux: <kbd>ctrl-down</kbd></p>Move the lines at cursors one row to the bottom. This command is not available when an order is defined for the table as the result will not be perceived.
 
 
 ## Cell Edit
