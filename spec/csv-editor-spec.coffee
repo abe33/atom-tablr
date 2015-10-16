@@ -5,7 +5,6 @@ fsp = require 'fs-plus'
 path = require 'path'
 temp = require 'temp'
 
-{TextEditor} = require 'atom'
 TableEdit = require '../lib/tablr'
 TableEditor = require '../lib/table-editor'
 CSVEditor = require '../lib/csv-editor'
@@ -758,7 +757,7 @@ describe "CSVEditor", ->
 
       runs ->
         expect(editor).toBeDefined()
-        expect(editor instanceof TextEditor).toBeTruthy()
+        expect(editor.getText?).toBeTruthy()
 
   ##    ########  ########  ######  ########  #######  ########  ########
   ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
