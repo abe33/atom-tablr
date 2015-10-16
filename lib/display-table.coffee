@@ -8,8 +8,6 @@ module.exports =
 class DisplayTable
   Delegator.includeInto(this)
 
-  atom.deserializers.add(this)
-
   @deserialize: (state) ->
     state.table = atom.deserializers.deserialize(state.table) if state.table?
     displayTable = new DisplayTable(state)

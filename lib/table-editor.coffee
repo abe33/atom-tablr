@@ -11,8 +11,6 @@ module.exports =
 class TableEditor
   Delegator.includeInto(this)
 
-  atom.deserializers.add(this)
-
   @deserialize: (state) ->
     state.displayTable = atom.deserializers.deserialize(state.displayTable)
     state.table = state.displayTable.table

@@ -8,8 +8,6 @@ Tablr = null
 
 module.exports =
 class CSVEditor
-  atom.deserializers.add(this)
-
   @deserialize: (state) ->
     csvEditor = new CSVEditor(state)
     csvEditor.applyChoice()

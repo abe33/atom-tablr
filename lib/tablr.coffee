@@ -182,4 +182,9 @@ module.exports =
     TableElement.registerViewProvider()
     TableSelectionElement.registerViewProvider()
 
+    atom.deserializers.add(CSVEditor)
+    atom.deserializers.add(TableEditor)
+    atom.deserializers.add(DisplayTable)
+    atom.deserializers.add(Table)
+
 module.exports.loadModelsAndRegisterViews()
