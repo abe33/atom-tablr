@@ -491,14 +491,14 @@ describe "CSVEditor", ->
             tableEditor.addRow ['Bill', 45, 'male']
             tableEditor.addRow ['Bonnie', 42, 'female']
 
-            spyOn(atom, 'confirm').andReturn(0)
+            spyOn(atom.workspace.applicationDelegate, 'confirm').andReturn(0)
 
             expect(csvEditor.isModified()).toBeTruthy()
 
             atom.workspace.getActivePane().destroyItem(csvEditor)
 
           it 'prompts the user to save', ->
-            expect(atom.confirm).toHaveBeenCalled()
+            expect(atom.workspace.applicationDelegate.confirm).toHaveBeenCalled()
 
         describe 'when the table is modified', ->
           beforeEach ->
