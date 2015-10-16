@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 path = require 'path'
 
 Table = require '../lib/table'

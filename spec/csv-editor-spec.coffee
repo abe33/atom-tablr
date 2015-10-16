@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 fs = require 'fs'
 fsp = require 'fs-plus'
 path = require 'path'

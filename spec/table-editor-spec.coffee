@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 TableEditor = require '../lib/table-editor'
 Table = require '../lib/table'
 
