@@ -1,3 +1,10 @@
+<a name="v0.5.0"></a>
+# v0.5.0 (2015-10-21)
+
+## :sparkles: Features
+
+- Add new setting to extend support to other extensions beside CSV ([f783c877](https://github.com/abe33/atom-tablr/commit/f783c8775372b11ede3db105b3c8cf4c3a7d25aa), [#11](https://github.com/abe33/atom-tablr/issues/11))
+
 <a name="v0.4.0"></a>
 # v0.4.0 (2015-10-07)
 
