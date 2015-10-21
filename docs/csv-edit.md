@@ -2,7 +2,7 @@
 
 ## Edit A CSV File
 
-This package provides a specific opener for `*.csv` files that will allow you to choose between editing the file as text or with the table editor.
+This package provides a specific opener for `*.csv` and `*.tsv` files that will allow you to choose between editing the file as text or with the table editor.
 
 ![CSV Opener](http://abe33.github.io/atom-tablr/csv-opener.png)
 
