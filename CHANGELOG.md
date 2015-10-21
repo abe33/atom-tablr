@@ -1,3 +1,10 @@
+<a name="v0.5.1"></a>
+# v0.5.1 (2015-10-21)
+
+## :bug: Bug Fixes
+
+- Fix bad method used to retrieve the column count to find last column ([a6de5f83](https://github.com/abe33/atom-tablr/commit/a6de5f834973e8c9dc54517d16d58f1b7f13db4b), [#12](https://github.com/abe33/atom-tablr/issues/12))
+
 <a name="v0.5.0"></a>
 # v0.5.0 (2015-10-21)
 
