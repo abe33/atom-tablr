@@ -1,4 +1,5 @@
 
+namingMethod=atom.config.get('tablr.defaultColumnNamingMethod')
 module.exports =
 columnName = (index) ->
   if atom.config.get('tablr.defaultColumnNamingMethod') == 'numeric'
