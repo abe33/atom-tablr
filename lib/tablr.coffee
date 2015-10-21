@@ -81,7 +81,7 @@ module.exports =
       type: 'string'
       default: 'alphabetic'
       enum: ['alphabetic', 'numeric', 'numericZeroBased']
-      description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,..., Z, AA, AB.. `numeric` is for simple numbers, ie 1,2.. `numericZeroBased` is similar as numeric, except that it starts numbering from 0 instead of 1'
+      description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,..., Z, AA, AB.. `numeric` is for simple numbers, ie 1,2.. `numericZeroBased` is similar to "numeric", except that it starts numbering from 0 instead of 1'
 
   activate: ({csvConfig}) ->
     @csvConfig = new CSVConfig(csvConfig)
