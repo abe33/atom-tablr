@@ -1,3 +1,10 @@
+<a name="v0.6.0"></a>
+# v0.6.0 (2015-10-21)
+
+## :sparkles: Features
+
+- Add a new setting to define the default columns naming strategy. ([84260ecf](https://github.com/abe33/atom-tablr/commit/84260ecff56ff608d7dc505951ec0bba6cb50486), [#13](https://github.com/abe33/atom-tablr/issues/13))
+
 <a name="v0.5.1"></a>
 # v0.5.1 (2015-10-21)
 
