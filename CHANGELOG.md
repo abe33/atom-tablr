@@ -1,3 +1,24 @@
+<a name="v0.6.0"></a>
+# v0.6.0 (2015-10-21)
+
+## :sparkles: Features
+
+- Add a new setting to define the default columns naming strategy. ([84260ecf](https://github.com/abe33/atom-tablr/commit/84260ecff56ff608d7dc505951ec0bba6cb50486), [#13](https://github.com/abe33/atom-tablr/issues/13))
+
+<a name="v0.5.1"></a>
+# v0.5.1 (2015-10-21)
+
+## :bug: Bug Fixes
+
+- Fix bad method used to retrieve the column count to find last column ([a6de5f83](https://github.com/abe33/atom-tablr/commit/a6de5f834973e8c9dc54517d16d58f1b7f13db4b), [#12](https://github.com/abe33/atom-tablr/issues/12))
+
+<a name="v0.5.0"></a>
+# v0.5.0 (2015-10-21)
+
+## :sparkles: Features
+
+- Add new setting to extend support to other extensions beside CSV ([f783c877](https://github.com/abe33/atom-tablr/commit/f783c8775372b11ede3db105b3c8cf4c3a7d25aa), [#11](https://github.com/abe33/atom-tablr/issues/11))
+
 <a name="v0.4.0"></a>
 # v0.4.0 (2015-10-07)
 

@@ -59,6 +59,15 @@ module.exports =
       type: 'boolean'
       default: true
       description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
+    supportedCsvExtensions:
+      type: 'array'
+      default: ['csv', 'tsv']
+      description: 'The extensions for which the CSV opener will be used.'
+    defaultColumnNamingMethod:
+      type: 'string'
+      default: 'alphabetic'
+      enum: ['alphabetic', 'numeric', 'numericZeroBased']
+      description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,..., Z, AA, AB.. `numeric` is for simple numbers, ie 1,2.. `numericZeroBased` is similar to "numeric", except that it starts numbering from 0 instead of 1'
 
   activate: ({csvConfig}) ->
     @csvConfig = new CSVConfig(csvConfig)
@@ -70,7 +79,7 @@ module.exports =
       'tablr:demo-small': => atom.workspace.open('tablr://small')
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
-      return unless /\.csv$/.test uriToOpen
+      return unless ///\.#{atom.config.get('tablr.supportedCsvExtensions').join('|')}$///.test uriToOpen
 
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})

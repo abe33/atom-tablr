@@ -223,7 +223,7 @@ class DisplayTable
   getScreenColumnOffsetAt: (column) -> @screenColumnOffsets[column]
 
   getScreenColumnIndexAtPixelPosition: (position) ->
-    for i in [0...@getScreenColumnWidth()]
+    for i in [0...@getScreenColumnCount()]
       offset = @getScreenColumnOffsetAt(i)
       return i - 1 if position < offset
 

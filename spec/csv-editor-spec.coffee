@@ -40,8 +40,10 @@ describe "CSVEditor", ->
         csvEditor = t
         csvEditorElement = atom.views.getView(csvEditor)
 
+    runs -> expect(csvEditor.file).toBeDefined()
+
   modifyAndSave = (block) ->
-    waitsFor ->
+    waitsFor 'tablr editor attached to DOM', ->
       csvEditorElement.querySelector('tablr-editor')
 
     runs block
@@ -56,7 +58,7 @@ describe "CSVEditor", ->
 
       tableEditor.save()
 
-    waitsFor -> fs.writeFile.callCount > 0
+    waitsFor 'file written on disk', -> fs.writeFile.callCount > 0
 
   beforeEach ->
     [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
@@ -120,7 +122,7 @@ describe "CSVEditor", ->
           1,2
           """)
 
-          waitsFor -> changeSpy.callCount > 0
+          waitsFor 'change callback called', -> changeSpy.callCount > 0
 
         it 'updates the preview', ->
           expect(csvEditorElement.updatePreview).toHaveBeenCalled()
@@ -133,7 +135,7 @@ describe "CSVEditor", ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-          waitsFor -> tableEditor?
+          waitsFor 'table editor created', -> tableEditor?
 
         describe 'and the new content can be parsed with the current settings', ->
           describe 'when the table is in an unmodified state', ->
@@ -143,7 +145,7 @@ describe "CSVEditor", ->
               1,2
               """)
 
-              waitsFor -> changeSpy.callCount > 1
+              waitsFor 'change callback called', -> changeSpy.callCount > 0
 
             it 'replaces the table content with the new one', ->
               nextAnimationFrame()
@@ -169,8 +171,8 @@ describe "CSVEditor", ->
               1,2
               """)
 
-              waitsFor -> changeSpy.callCount > 1
-              waitsFor -> conflictSpy.callCount > 0
+              waitsFor 'change callback called', -> changeSpy.callCount > 0
+              waitsFor 'conflict callback called', -> conflictSpy.callCount > 0
 
             it 'leaves the table in a modified state', ->
               expect(csvEditor.editor).toBe(tableEditor)
@@ -184,7 +186,7 @@ describe "CSVEditor", ->
               "1";"2"
               """)
 
-              waitsFor -> changeSpy.callCount > 1
+              waitsFor 'change callback called', -> changeSpy.callCount > 0
               waitsFor -> csvEditor.editor is undefined
 
             it 'replaces the table content with a form', ->
@@ -203,7 +205,7 @@ describe "CSVEditor", ->
                 tableEditorButton = csvEditorElement.form.openTableEditorButton
                 click(tableEditorButton)
 
-                waitsFor -> tableEditor?
+                waitsFor 'table editor created', -> tableEditor?
 
               it 'now opens the new version of the file', ->
                 expect(csvEditor.editor.getColumns()).toEqual([undefined, undefined])
@@ -229,7 +231,7 @@ describe "CSVEditor", ->
           fsp.removeSync(newPath)
           fsp.moveSync(csvEditor.getPath(), newPath)
 
-        waitsFor -> spy.callCount > 0
+        waitsFor 'change path callback called', -> spy.callCount > 0
 
       it 'detects the change in path', ->
         expect(spy).toHaveBeenCalledWith(newPath)
@@ -259,14 +261,14 @@ describe "CSVEditor", ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> tableEditor?
+        waitsFor 'table editor created', -> tableEditor?
 
       describe 'when the table is modified', ->
         beforeEach ->
           csvEditor.editor.addRow()
 
           fsp.removeSync(csvDest)
-          waitsFor -> deleteSpy.callCount > 0
+          waitsFor 'delete callback called', -> deleteSpy.callCount > 0
 
         it "retains its path and reports the buffer as modified", ->
           expect(csvEditor.getPath()).toBe(csvDest)
@@ -275,7 +277,7 @@ describe "CSVEditor", ->
       describe 'when the table is not modified', ->
         beforeEach ->
           fsp.removeSync(csvDest)
-          waitsFor -> deleteSpy.callCount > 0
+          waitsFor 'delete callback called', -> deleteSpy.callCount > 0
 
         it "retains its path and reports the buffer as not modified", ->
           expect(csvEditor.getPath()).toBe(csvDest)
@@ -284,7 +286,7 @@ describe "CSVEditor", ->
       describe 'when resaved', ->
         it 'recreates the file on disk', ->
           fsp.removeSync(csvDest)
-          waitsFor -> deleteSpy.callCount > 0
+          waitsFor 'delete callback called', -> deleteSpy.callCount > 0
           runs -> expect(fs.existsSync(csvDest)).toBeFalsy()
           waitsForPromise -> csvEditor.save()
           runs -> expect(fs.existsSync(csvDest)).toBeTruthy()
@@ -300,8 +302,7 @@ describe "CSVEditor", ->
           textEditorButton = csvEditorElement.form.openTextEditorButton
           click(textEditorButton)
 
-        waitsFor ->
-          destroySpy.callCount > 0
+        waitsFor 'destroy callback called', -> destroySpy.callCount > 0
 
       it 'opens a new text editor for that file', ->
         expect(atom.workspace.getActiveTextEditor()).toBeDefined()
@@ -330,13 +331,13 @@ describe "CSVEditor", ->
           destroySpy = jasmine.createSpy('did-destroy')
           csvEditor.onDidDestroy(destroySpy)
 
-        waitsFor sleep CHANGE_TIMEOUT
+        waitsFor "for #{CHANGE_TIMEOUT}ms", sleep CHANGE_TIMEOUT
 
         runs ->
           textEditorButton = csvEditorElement.form.openTextEditorButton
           click(textEditorButton)
 
-        waitsFor -> destroySpy.callCount > 0
+        waitsFor 'destroy callback called', -> destroySpy.callCount > 0
 
         runs ->
           csvEditor.destroy()
@@ -361,7 +362,7 @@ describe "CSVEditor", ->
             tableEditorButton = csvEditorElement.form.openTableEditorButton
             click(tableEditorButton)
 
-          waitsFor -> tableEditor?
+          waitsFor 'table editor created', -> tableEditor?
 
         it 'has a table filled with the file content', ->
           expect(tableEditor.getScreenColumnCount()).toEqual(3)
@@ -386,7 +387,7 @@ describe "CSVEditor", ->
           expect(tableElement.focus).toHaveBeenCalled()
 
         it 'clears the csv editor content and replace it with a table element', ->
-          waitsFor ->
+          waitsFor 'tablr editor attached to DOM', ->
             tableEditorElement = csvEditorElement.querySelector('tablr-editor')
 
           runs ->
@@ -443,7 +444,7 @@ describe "CSVEditor", ->
                 tableEditorButton = secondCSVEditorElement.form.openTableEditorButton
                 click(tableEditorButton)
 
-            waitsFor ->
+            waitsFor 'second editor choice applied', ->
               secondCSVEditor.editor
 
           it 'reuses the same table for two different table editors', ->
@@ -480,7 +481,7 @@ describe "CSVEditor", ->
                     tableEditorButton = csvEditorElement.form.openTableEditorButton
                     click(tableEditorButton)
 
-                waitsFor -> tableEditor?
+                waitsFor 'table editor created', -> tableEditor?
 
               it 'returns a living editor', ->
                 expect(tableEditor.table.getColumnCount()).toEqual(3)
@@ -552,10 +553,12 @@ describe "CSVEditor", ->
           click(tableEditorButton)
 
       it 'displays the error in the csv preview', ->
-        waitsFor -> csvEditorElement.querySelector('atom-csv-preview .alert')
+        waitsFor 'csv alert displayed in the DOM', ->
+          csvEditorElement.querySelector('atom-csv-preview .alert')
 
       it 'disables the open table action', ->
-        waitsFor -> csvEditorElement.form.openTableEditorButton.disabled
+        waitsFor 'open button disabled', ->
+          csvEditorElement.form.openTableEditorButton.disabled
 
     describe 'changing the delimiter settings', ->
       beforeEach ->
@@ -566,13 +569,13 @@ describe "CSVEditor", ->
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
-        waitsFor sleep CHANGE_TIMEOUT
+        waitsFor "for #{CHANGE_TIMEOUT}ms", sleep CHANGE_TIMEOUT
 
         runs ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> tableEditor?
+        waitsFor 'table editor created', -> tableEditor?
 
       it 'now parses the table data properly', ->
         expect(tableEditor).toBeDefined()
@@ -605,13 +608,13 @@ describe "CSVEditor", ->
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
-        waitsFor sleep CHANGE_TIMEOUT
+        waitsFor "for #{CHANGE_TIMEOUT}ms", sleep CHANGE_TIMEOUT
 
         runs ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> tableEditor?
+        waitsFor 'table editor created', -> tableEditor?
 
       it 'now parses the table data properly', ->
         expect(tableEditor).toBeDefined()
@@ -648,13 +651,13 @@ describe "CSVEditor", ->
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
 
-        waitsFor sleep CHANGE_TIMEOUT
+        waitsFor "for #{CHANGE_TIMEOUT}ms", sleep CHANGE_TIMEOUT
 
         runs ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> tableEditor?
+        waitsFor 'table editor created', -> tableEditor?
 
       it 'now parses the table data properly', ->
         expect(tableEditor).toBeDefined()
@@ -697,7 +700,7 @@ describe "CSVEditor", ->
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
-        waitsFor -> tableEditor?
+        waitsFor 'table editor created', -> tableEditor?
 
       it 'uses this layout to setup the display table', ->
         expect(tableEditor.getScreenRowHeightAt(1)).toEqual(100)
@@ -748,7 +751,7 @@ describe "CSVEditor", ->
       atom.packages.observeDisabledPackages()
       atom.packages.disablePackage('tablr')
 
-      waitsFor -> tableEditPackage.deactivate.callCount > 0
+      waitsFor "package deactivated", -> tableEditPackage.deactivate.callCount > 0
 
     it 'disposes the csv opener', ->
       editor = null
@@ -882,7 +885,7 @@ describe "CSVEditor", ->
               ]
           })
 
-          waitsFor -> tableEditor = csvEditor.editor
+          waitsFor 'table editor restored', -> tableEditor = csvEditor.editor
           runs ->
             expect(tableEditor.getScreenRowHeightAt(1)).toEqual(100)
             expect(tableEditor.getScreenRowHeightAt(2)).toEqual(200)
@@ -922,7 +925,7 @@ describe "CSVEditor", ->
               selections: [[[0,0],[1,1]]]
           })
 
-          waitsFor -> tableEditor = restored.editor
+          waitsFor 'table editor restored', -> tableEditor = restored.editor
           runs ->
             expect(restored.isModified()).toBeTruthy()
             expect(restored.editor.getColumns()).toEqual([null, null, null])
