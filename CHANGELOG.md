@@ -1,3 +1,10 @@
+<a name="v0.6.1"></a>
+# v0.6.1 (2015-10-27)
+
+## :bug: Bug Fixes
+
+- Fix bad selector for linux and windows keybindings ([31e6d0f7](https://github.com/abe33/atom-tablr/commit/31e6d0f7b52d9900516f2a118f7eab6195b2d64f))
+
 <a name="v0.6.0"></a>
 # v0.6.0 (2015-10-21)
 
