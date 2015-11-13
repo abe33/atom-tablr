@@ -1,3 +1,13 @@
+<a name="v0.6.2"></a>
+# v0.6.2 (2015-11-13)
+
+## :bug: Bug Fixes
+
+- Fix broken deserialization tests ([64172d1b](https://github.com/abe33/atom-tablr/commit/64172d1b48fa0164fa14a8f24ab3a944c876f1bc))
+- Fix confirm spy no longer working ([bba16568](https://github.com/abe33/atom-tablr/commit/bba16568f943ced72bbb42b645358630fb7a267c))
+- Fix deprecated use of atom.project.open ([c9d81aaf](https://github.com/abe33/atom-tablr/commit/c9d81aaf7be3b4d683fd27ffb8317371c2bec77e))
+- Fix use of the deprecated TextEditor constructor ([683c5ea6](https://github.com/abe33/atom-tablr/commit/683c5ea6c2e720fb8822a996f1a66b51db5186ea))
+
 <a name="v0.6.1"></a>
 # v0.6.1 (2015-10-27)
 
