@@ -84,7 +84,7 @@ module.exports =
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})
 
-      return atom.project.open(uriToOpen) if choice is 'TextEditor'
+      return atom.workspace.openTextFile(uriToOpen) if choice is 'TextEditor'
 
       new CSVEditor({filePath: uriToOpen, options, choice})
 
