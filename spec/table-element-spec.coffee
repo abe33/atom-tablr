@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 path = require 'path'
 
 Table = require '../lib/table'
@@ -599,7 +601,7 @@ describe 'tableElement', ->
         mousedown(handle)
 
         expect(isVisible(ruler)).toBeTruthy()
-        expect(ruler.getBoundingClientRect().left).toEqual(handle.getBoundingClientRect().left + handle.offsetWidth - 1)
+        expect(ruler.getBoundingClientRect().left).toEqual(Math.floor(handle.getBoundingClientRect().left + handle.offsetWidth - 1))
 
       it 'moves the handle during the drag', ->
         ruler = tableShadowRoot.querySelector('.column-resize-ruler')

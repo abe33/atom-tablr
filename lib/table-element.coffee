@@ -1,5 +1,5 @@
 Delegator = require 'delegato'
-{Point, TextEditor} = require 'atom'
+{Point} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
 {EventsDelegation, SpacePenDSL} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
@@ -845,7 +845,7 @@ class TableElement extends HTMLElement
     @focus()
 
   createTextEditor: ->
-    @editor = new TextEditor({mini: true})
+    @editor = atom.workspace.buildTextEditor({mini: true})
     @editorElement = atom.views.getView(@editor)
     @appendChild(@editorElement)
 

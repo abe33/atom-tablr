@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 Range = require '../lib/range'
 
 describe "Range", ->

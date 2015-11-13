@@ -8,8 +8,6 @@ Tablr = null
 
 module.exports =
 class CSVEditor
-  atom.deserializers.add(this)
-
   @deserialize: (state) ->
     csvEditor = new CSVEditor(state)
     csvEditor.applyChoice()
@@ -151,7 +149,7 @@ class CSVEditor
 
   openTextEditor: (@options={}) ->
     filePath = @getPath()
-    atom.project.open(filePath).then (editor) =>
+    atom.workspace.openTextFile(filePath).then (editor) =>
       pane = atom.workspace.paneForItem(this)
       @emitter.emit('did-open', {editor, options: _.clone(@options)})
       @saveConfig('TextEditor')

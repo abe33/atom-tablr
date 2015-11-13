@@ -1,9 +1,10 @@
+require './helpers/spec-helper'
+
 fs = require 'fs'
 fsp = require 'fs-plus'
 path = require 'path'
 temp = require 'temp'
 
-{TextEditor} = require 'atom'
 TableEdit = require '../lib/tablr'
 TableEditor = require '../lib/table-editor'
 CSVEditor = require '../lib/csv-editor'
@@ -491,14 +492,14 @@ describe "CSVEditor", ->
             tableEditor.addRow ['Bill', 45, 'male']
             tableEditor.addRow ['Bonnie', 42, 'female']
 
-            spyOn(atom, 'confirm').andReturn(0)
+            spyOn(atom.workspace.applicationDelegate, 'confirm').andReturn(0)
 
             expect(csvEditor.isModified()).toBeTruthy()
 
             atom.workspace.getActivePane().destroyItem(csvEditor)
 
           it 'prompts the user to save', ->
-            expect(atom.confirm).toHaveBeenCalled()
+            expect(atom.workspace.applicationDelegate.confirm).toHaveBeenCalled()
 
         describe 'when the table is modified', ->
           beforeEach ->
@@ -759,7 +760,7 @@ describe "CSVEditor", ->
 
       runs ->
         expect(editor).toBeDefined()
-        expect(editor instanceof TextEditor).toBeTruthy()
+        expect(editor.getText?).toBeTruthy()
 
   ##    ########  ########  ######  ########  #######  ########  ########
   ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##

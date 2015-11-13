@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 {Point} = require 'atom'
 Table = require '../lib/table'
 

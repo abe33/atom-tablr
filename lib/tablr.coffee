@@ -1,20 +1,6 @@
 _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
-[url] = []
-
-Range = require './range'
-Table = require './table'
-DisplayTable = require './display-table'
-TableEditor = require './table-editor'
-TableElement = require './table-element'
-TableSelectionElement = require './table-selection-element'
-CSVConfig = require './csv-config'
-CSVEditor = require './csv-editor'
-CSVEditorElement = require './csv-editor-element'
-
-CSVEditorElement.registerViewProvider()
-TableElement.registerViewProvider()
-TableSelectionElement.registerViewProvider()
+[url, Range, Table, DisplayTable, TableEditor, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
 
 module.exports =
   config:
@@ -189,3 +175,25 @@ module.exports =
 
   serialize: ->
     csvConfig: @csvConfig.serialize()
+
+  loadModelsAndRegisterViews: ->
+    Range = require './range'
+    Table = require './table'
+    DisplayTable = require './display-table'
+    TableEditor = require './table-editor'
+    TableElement = require './table-element'
+    TableSelectionElement = require './table-selection-element'
+    CSVConfig = require './csv-config'
+    CSVEditor = require './csv-editor'
+    CSVEditorElement = require './csv-editor-element'
+
+    CSVEditorElement.registerViewProvider()
+    TableElement.registerViewProvider()
+    TableSelectionElement.registerViewProvider()
+
+    atom.deserializers.add(CSVEditor)
+    atom.deserializers.add(TableEditor)
+    atom.deserializers.add(DisplayTable)
+    atom.deserializers.add(Table)
+
+module.exports.loadModelsAndRegisterViews()

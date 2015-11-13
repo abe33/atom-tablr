@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 Tablr = require '../lib/tablr'
 Table = require '../lib/table'
 DisplayTable = require '../lib/display-table'

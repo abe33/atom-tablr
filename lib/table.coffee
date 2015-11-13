@@ -9,8 +9,6 @@ class Table
   Identifiable.includeInto(this)
   Transactions.includeInto(this)
 
-  atom.deserializers.add(this)
-
   @MAX_HISTORY_SIZE: 100
 
   @deserialize: (state) ->

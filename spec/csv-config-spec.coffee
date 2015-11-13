@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 CSVConfig = require '../lib/csv-config'
 
 describe 'CSVConfig', ->

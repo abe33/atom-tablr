@@ -1,3 +1,5 @@
+require './helpers/spec-helper'
+
 TableEditor = require '../lib/table-editor'
 TableElement = require '../lib/table-element'
 GoToLineElement = require '../lib/go-to-line-element'
