@@ -1,3 +1,15 @@
+<a name="v0.6.4"></a>
+# v0.6.4 (2015-11-13)
+
+## :bug: Bug Fixes
+
+- Fix use of atom.project.open in csv opener ([418fc9ed](https://github.com/abe33/atom-tablr/commit/418fc9ed224d9d6bd3f43d24ea96e345023ae764))
+
+<a name="v0.6.4"></a>
+# v0.6.4 (2015-11-13)
+
+Just screwed up previous publication.
+
 <a name="v0.6.2"></a>
 # v0.6.2 (2015-11-13)
 
