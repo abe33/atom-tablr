@@ -1,3 +1,14 @@
+<a name="v0.7.0"></a>
+# v0.7.0 (2015-11-14)
+
+## :sparkles: Features
+
+- Implement custom elements update through atom-utils ([3c9bb193](https://github.com/abe33/atom-tablr/commit/3c9bb193e6c7a56f95dd35cb4c4ca23dc28c83ae))
+
+## :arrow_up: Dependencies Update
+
+- Bump version of atom-utils ([29af70ea](https://github.com/abe33/atom-tablr/commit/29af70eae3a824fe5b47b3f4b00140484de0fc06))
+
 <a name="v0.6.4"></a>
 # v0.6.4 (2015-11-13)
 
