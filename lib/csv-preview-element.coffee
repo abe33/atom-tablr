@@ -1,3 +1,4 @@
+{registerOrUpdateElement} = require 'atom-utils'
 columnName = require './column-name'
 
 module.exports =
@@ -49,4 +50,6 @@ class CSVPreviewElement extends HTMLElement
     @innerHTML = ''
     @appendChild(wrapper)
 
-module.exports = CSVPreviewElement = document.registerElement 'atom-csv-preview', prototype: CSVPreviewElement.prototype
+module.exports =
+CSVPreviewElement =
+registerOrUpdateElement 'atom-csv-preview', CSVPreviewElement.prototype

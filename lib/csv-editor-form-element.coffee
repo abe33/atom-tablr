@@ -1,5 +1,5 @@
 {CompositeDisposable, Emitter} = require 'atom'
-{SpacePenDSL, EventsDelegation} = require 'atom-utils'
+{SpacePenDSL, EventsDelegation, registerOrUpdateElement} = require 'atom-utils'
 
 nextId = 0
 
@@ -24,9 +24,9 @@ class CSVEditorFormElement extends HTMLElement
     radios = (options) =>
       {name, label, options, outlet, selected} = options
 
-      @div class: 'controls btn-group', =>
+      @div class: 'controls btn-group', 'data-initial': selected, 'data-id': outlet, =>
         for optionName, value of options
-          inputOption = type: 'radio', value: normalizeValue(value), name: name, id: "#{optionName}-#{name}-#{id}"
+          inputOption = type: 'radio', value: normalizeValue(value), name: name, id: "#{optionName}-#{name}-#{id}", 'data-name': optionName
           inputOption.checked = true if selected is optionName
           @input(inputOption)
           @label class: 'btn', for: "#{optionName}-#{name}-#{id}", labelFromValue(value)
@@ -42,45 +42,10 @@ class CSVEditorFormElement extends HTMLElement
       @div class: "control-group with-text-editor #{name}", =>
         @div class: 'controls', =>
           @label class: 'setting-title', label
-          @tag 'atom-text-editor', outlet: "#{outlet}TextEditorElement", mini: true
+          @tag 'atom-text-editor', outlet: "#{outlet}TextEditorElement", mini: true, 'data-id': outlet
 
         options.options["custom"] = 'custom'
         radios(options)
-
-      reversedOptions = {}
-      reversedOptions[v] = k for k,v of options.options
-
-      CSVEditorFormElement::__bindings__ ?= []
-      CSVEditorFormElement::initializeBindings ?= ->
-        @__bindings__.forEach (f) => f.call(this)
-        @__bindings__.length = 0
-      CSVEditorFormElement::__bindings__.push ->
-        @["#{outlet}TextEditor"] = @["#{outlet}TextEditorElement"].getModel()
-        @subscriptions.add @["#{outlet}TextEditor"].onDidChange =>
-          return unless @attached
-          if @["#{outlet}TextEditor"].getText() isnt ''
-            @querySelector("#custom-#{name}-#{id}")?.checked = true
-          else
-            @querySelector("##{selected}-#{name}-#{id}")?.checked = true
-
-          @emitChangeEvent()
-
-      CSVEditorFormElement::__defaults__ ?= []
-      CSVEditorFormElement::initializeDefaults ?= (options) ->
-        @__defaults__.forEach (f) => f.call(this, options)
-        @__defaults__.length = 0
-        @initialized = true
-      CSVEditorFormElement::__defaults__.push (options) ->
-        value = options[outlet]
-        optionName = reversedOptions[value]
-
-        if optionName? and radio = @querySelector("##{optionName}-#{name}-#{id}")
-          radio.checked = true
-        else if value?
-          @["#{outlet}TextEditor"].setText(value)
-          @querySelector("#custom-#{name}-#{id}")?.checked = true
-        else if radio = @querySelector("##{selected}-#{name}-#{id}")
-          radio.checked = true
 
     @div class: 'settings-panel', =>
       @div class: 'setting-title', 'Choose between table and text editor:'
@@ -160,6 +125,7 @@ class CSVEditorFormElement extends HTMLElement
             name: 'trim'
             label: 'Trim'
             selected: 'no'
+            outlet: 'trim'
             options:
               no: 'no'
               left: 'left'
@@ -195,6 +161,42 @@ class CSVEditorFormElement extends HTMLElement
       change: => @emitChangeEvent()
 
     @initializeBindings()
+
+  initializeBindings: ->
+    Array::forEach.call @querySelectorAll('atom-text-editor'), (editorElement) =>
+      outlet = editorElement.dataset.id
+      radioGroup = editorElement.parentNode.parentNode.querySelector('[data-initial]')
+      initial = radioGroup.dataset.initial
+
+      @["#{outlet}TextEditor"] = element = editorElement.getModel()
+      @subscriptions.add element.onDidChange =>
+        return unless @attached
+        if element.getText() isnt ''
+          @querySelector("[id^='custom-']")?.checked = true
+        else
+          @querySelector("[id^='#{initial}-']")?.checked = true
+
+        @emitChangeEvent()
+
+  initializeDefaults: (options) ->
+    radioGroups = @querySelectorAll('.with-text-editor .btn-group')
+
+    Array::forEach.call radioGroups, (radioGroup) =>
+      outlet = radioGroup.dataset.id
+      initial = radioGroup.dataset.initial
+
+      radios = radioGroup.querySelectorAll('input[type="radio"]')
+      radioOptions = {}
+
+      value = options[outlet]
+
+      if value? and radio = Array::filter.call(radios, (r) -> r.value is value)[0]
+        radio.checked = true
+      else if value?
+        @["#{outlet}TextEditor"].setText(value)
+        radioGroup.querySelector("[id^='custom-']")?.checked = true
+      else if radio = radioGroup.querySelector("[id^='#{initial}-']")
+        radio.checked = true
 
   attachedCallback: ->
     @attached = true
@@ -283,4 +285,6 @@ class CSVEditorFormElement extends HTMLElement
     options
 
 
-module.exports = CSVEditorFormElement = document.registerElement 'atom-csv-editor-form', prototype: CSVEditorFormElement.prototype
+module.exports =
+CSVEditorFormElement =
+registerOrUpdateElement 'atom-csv-editor-form', CSVEditorFormElement.prototype

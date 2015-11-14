@@ -1,4 +1,4 @@
-{SpacePenDSL} = require 'atom-utils'
+{SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 
 module.exports =
 class GoToLineElement extends HTMLElement
@@ -35,7 +35,9 @@ class GoToLineElement extends HTMLElement
 
   setModel: (@tableElement) ->
 
-module.exports = GoToLineElement = document.registerElement 'tablr-go-to-line', prototype: GoToLineElement.prototype
+module.exports =
+GoToLineElement =
+registerOrUpdateElement 'tablr-go-to-line', GoToLineElement.prototype
 
 GoToLineElement.registerCommands = ->
   atom.commands.add 'tablr-go-to-line',

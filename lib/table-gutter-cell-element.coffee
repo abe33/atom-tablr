@@ -1,4 +1,4 @@
-{SpacePenDSL} = require 'atom-utils'
+{SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 
 module.exports =
 class TableGutterCellElement extends HTMLElement
@@ -31,4 +31,6 @@ class TableGutterCellElement extends HTMLElement
     classes.push 'selected' if @tableElement.isSelectedRow(row)
     classes
 
-module.exports = TableGutterCellElement = document.registerElement 'tablr-gutter-cell', prototype: TableGutterCellElement.prototype
+module.exports =
+TableGutterCellElement =
+registerOrUpdateElement 'tablr-gutter-cell', TableGutterCellElement.prototype

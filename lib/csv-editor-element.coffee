@@ -1,5 +1,5 @@
 {CompositeDisposable} = require 'atom'
-{SpacePenDSL, EventsDelegation} = require 'atom-utils'
+{SpacePenDSL, EventsDelegation, registerOrUpdateElement} = require 'atom-utils'
 CSVEditor = require './csv-editor'
 CSVEditorFormElement = require './csv-editor-form-element'
 CSVPreviewElement = require './csv-preview-element'
@@ -101,7 +101,9 @@ class CSVEditorElement extends HTMLElement
       @form.preview.error(reason)
       @form.openTableEditorButton.setAttribute('disabled', 'true')
 
-module.exports = CSVEditorElement = document.registerElement 'atom-csv-editor', prototype: CSVEditorElement.prototype
+module.exports =
+CSVEditorElement =
+registerOrUpdateElement 'atom-csv-editor', CSVEditorElement.prototype
 
 CSVEditorElement.registerViewProvider = ->
   atom.views.addViewProvider CSVEditor, (model) ->

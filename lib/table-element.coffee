@@ -1,7 +1,7 @@
 Delegator = require 'delegato'
 {Point} = require 'atom'
 {CompositeDisposable, Disposable} = require 'event-kit'
-{EventsDelegation, SpacePenDSL} = require 'atom-utils'
+{EventsDelegation, SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 
 columnName = require './column-name'
@@ -1474,7 +1474,9 @@ class TableElement extends HTMLElement
 #    ##       ##       ##       ##     ## ##       ##   ###    ##
 #    ######## ######## ######## ##     ## ######## ##    ##    ##
 
-module.exports = TableElement = document.registerElement 'tablr-editor', prototype: TableElement.prototype
+module.exports =
+TableElement =
+registerOrUpdateElement 'tablr-editor', TableElement.prototype
 
 TableElement.registerViewProvider = ->
   atom.views.addViewProvider TableEditor, (model) ->

@@ -1,3 +1,4 @@
+{registerOrUpdateElement} = require 'atom-utils'
 
 module.exports =
 class TableCellElement extends HTMLElement
@@ -46,4 +47,6 @@ class TableCellElement extends HTMLElement
   isSameCell: (cell, column, row) ->
     cell.value is @lastValue and column is @lastColumn and row is @lastRow
 
-module.exports = TableCellElement = document.registerElement 'tablr-cell', prototype: TableCellElement.prototype
+module.exports =
+TableCellElement =
+registerOrUpdateElement 'tablr-cell', TableCellElement.prototype

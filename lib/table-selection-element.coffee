@@ -1,5 +1,5 @@
 {CompositeDisposable} = require 'event-kit'
-{EventsDelegation, SpacePenDSL} = require 'atom-utils'
+{EventsDelegation, SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 Selection = require './selection'
 
 class TableSelectionElement extends HTMLElement
@@ -54,7 +54,9 @@ class TableSelectionElement extends HTMLElement
     bottom: @tableEditor.getScreenRowOffsetAt(range.end.row - 1) + @tableEditor.getScreenRowHeightAt(range.end.row - 1)
 
 
-module.exports = TableSelectionElement = document.registerElement 'tablr-editor-selection', prototype: TableSelectionElement.prototype
+module.exports =
+TableSelectionElement =
+registerOrUpdateElement 'tablr-editor-selection', TableSelectionElement.prototype
 
 TableSelectionElement.registerViewProvider = ->
   atom.views.addViewProvider Selection, (model) ->

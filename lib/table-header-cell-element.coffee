@@ -1,4 +1,4 @@
-{SpacePenDSL} = require 'atom-utils'
+{SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 columnName = require './column-name'
 
 module.exports =
@@ -44,4 +44,6 @@ class TableHeaderCellElement extends HTMLElement
 
     classes
 
-module.exports = TableHeaderCellElement = document.registerElement 'tablr-header-cell', prototype: TableHeaderCellElement.prototype
+module.exports =
+TableHeaderCellElement =
+registerOrUpdateElement 'tablr-header-cell', TableHeaderCellElement.prototype
