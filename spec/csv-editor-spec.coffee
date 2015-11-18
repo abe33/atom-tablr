@@ -791,6 +791,9 @@ describe "CSVEditor", ->
             filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
+            layout:
+              columns: [{},{},{}]
+              rowHeights: [undefined, undefined, undefined]
           })
 
     describe 'when the table editor has a layout', ->

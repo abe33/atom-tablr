@@ -18,6 +18,8 @@ class CSVEditor
   constructor: (state={}) ->
     {filePath, @options, @choice, @layout, editor: @editorState} = state
 
+    console.log @layout
+
     Tablr ?= require './tablr'
     @options ?= {}
     @subscriptions = new CompositeDisposable
@@ -57,6 +59,7 @@ class CSVEditor
           filePath = @getPath()
           options = _.clone(@options)
           layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
+          console.log layout
 
           @getTableEditor(filePath, options, layout).then (tableEditor) =>
             CSVEditor.tableEditorForPath[filePath] = tableEditor
@@ -205,20 +208,22 @@ class CSVEditor
       Tablr.csvConfig.set(filePath, 'choice', @choice)
 
   saveLayout: ->
-    @layout =
-      columns: @editor.getScreenColumns().map (column) =>
-        conf = {}
-        if column.width? and column.width isnt @editor.getScreenColumnWidth()
-          conf.width = column.width
-
-        if column.align? and column.align isnt 'left'
-          conf.align = column.align
-
-        conf
-
-      rowHeights: @editor.displayTable.rowHeights.slice()
+    @layout = @getCurrentLayout()
 
     Tablr.csvConfig.set(@getPath(), 'layout', @layout)
+
+  getCurrentLayout: ->
+    columns: @editor.getScreenColumns().map (column) =>
+      conf = {}
+      if column.width? and column.width isnt @editor.getScreenColumnWidth()
+        conf.width = column.width
+
+      if column.align? and column.align isnt 'left'
+        conf.align = column.align
+
+      conf
+
+    rowHeights: @editor.displayTable.rowHeights.slice()
 
   openCSV: ->
     new Promise (resolve, reject) =>
@@ -299,5 +304,5 @@ class CSVEditor
     if @isModified()
       out.editor = @editor.serialize()
     else
-      out.layout = @layout if @layout?
+      out.layout = @getCurrentLayout() if @editor?
     out
