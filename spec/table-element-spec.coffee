@@ -80,7 +80,7 @@ describe 'tableElement', ->
     TableSelectionElement.registerViewProvider()
     TableElement.registerCommands()
 
-    jasmineContent = document.body.querySelector('#jasmine-content')
+    jasmineContent = document.body#.querySelector('#jasmine-content')
 
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
     spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
@@ -638,19 +638,30 @@ describe 'tableElement', ->
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
+      startHeaderCellEdit = (selector) ->
+        cell = header.querySelector(selector)
+        action = cell.querySelector('.column-edit-action')
+        cellOffset = cell.getBoundingClientRect()
+
+        click(action)
+
+        editorElement = tableElement.querySelector('atom-text-editor')
+        editor = editorElement.model
+
+      confirmHeaderCellEdit = (value='') ->
+        editor.setText(value)
+        atom.commands.dispatch(editorElement, 'core:confirm')
+
+      editHeaderCell = (selector, value) ->
+        startHeaderCellEdit(selector)
+        confirmHeaderCellEdit(value)
+
       describe 'that does not have a name', ->
         beforeEach ->
           tableEditor.insertColumnBefore()
           nextAnimationFrame()
 
-          cell = header.querySelector('tablr-header-cell')
-          action = cell.querySelector('.column-edit-action')
-          cellOffset = cell.getBoundingClientRect()
-
-          click(action)
-
-          editorElement = tableElement.querySelector('atom-text-editor')
-          editor = editorElement.model
+          startHeaderCellEdit('tablr-header-cell')
 
         it 'opens the editor with the dynamic name as content', ->
           expect(editor.getText()).toEqual('A')
@@ -663,9 +674,31 @@ describe 'tableElement', ->
 
           describe 'when the editor is empty', ->
             it 'does not change the cell value', ->
-              editor.setText('')
-              atom.commands.dispatch(editorElement, 'core:confirm')
+              confirmHeaderCellEdit()
               expect(tableEditor.getScreenColumn(0).name).toEqual(undefined)
+
+          describe 'when the editor is not empty', ->
+            it 'changes the column name', ->
+              confirmHeaderCellEdit('oof')
+              expect(tableEditor.getScreenColumn(0).name).toEqual('oof')
+
+          describe 'when several header cells are edited consecutively', ->
+            beforeEach ->
+              confirmHeaderCellEdit('oof')
+              editHeaderCell('tablr-header-cell:nth-child(2)', 'FFF')
+              editHeaderCell('tablr-header-cell:nth-child(3)', 'GGG')
+
+            it 'changes each column name accordingly', ->
+              expect(tableEditor.getScreenColumn(0).name).toEqual('oof')
+              expect(tableEditor.getScreenColumn(1).name).toEqual('FFF')
+              expect(tableEditor.getScreenColumn(2).name).toEqual('GGG')
+
+            xit 'updates the header cells', ->
+              nextAnimationFrame()
+
+              expect(header.querySelector('tablr-header-cell').textextContent).toEqual('oof')
+              expect(header.querySelector('tablr-header-cell:nth-child(2)').textextContent).toEqual('FFF')
+              expect(header.querySelector('tablr-header-cell:nth-child(3)').textextContent).toEqual('GGG')
 
       describe 'that have a name', ->
         beforeEach ->
