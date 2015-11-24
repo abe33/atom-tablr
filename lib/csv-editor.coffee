@@ -18,8 +18,6 @@ class CSVEditor
   constructor: (state={}) ->
     {filePath, @options, @choice, @layout, editor: @editorState} = state
 
-    console.log @layout
-
     Tablr ?= require './tablr'
     @options ?= {}
     @subscriptions = new CompositeDisposable
