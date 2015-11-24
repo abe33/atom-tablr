@@ -80,7 +80,7 @@ describe 'tableElement', ->
     TableSelectionElement.registerViewProvider()
     TableElement.registerCommands()
 
-    jasmineContent = document.body#.querySelector('#jasmine-content')
+    jasmineContent = document.body.querySelector('#jasmine-content')
 
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
     spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
@@ -659,6 +659,8 @@ describe 'tableElement', ->
       describe 'that does not have a name', ->
         beforeEach ->
           tableEditor.insertColumnBefore()
+          tableEditor.insertColumnBefore()
+          tableEditor.insertColumnBefore()
           nextAnimationFrame()
 
           startHeaderCellEdit('tablr-header-cell')
@@ -693,12 +695,12 @@ describe 'tableElement', ->
               expect(tableEditor.getScreenColumn(1).name).toEqual('FFF')
               expect(tableEditor.getScreenColumn(2).name).toEqual('GGG')
 
-            xit 'updates the header cells', ->
+            it 'updates the header cells', ->
               nextAnimationFrame()
 
-              expect(header.querySelector('tablr-header-cell').textextContent).toEqual('oof')
-              expect(header.querySelector('tablr-header-cell:nth-child(2)').textextContent).toEqual('FFF')
-              expect(header.querySelector('tablr-header-cell:nth-child(3)').textextContent).toEqual('GGG')
+              expect(header.querySelector('tablr-header-cell').textContent).toEqual('oof')
+              expect(header.querySelector('tablr-header-cell:nth-child(2)').textContent).toEqual('FFF')
+              expect(header.querySelector('tablr-header-cell:nth-child(3)').textContent).toEqual('GGG')
 
       describe 'that have a name', ->
         beforeEach ->

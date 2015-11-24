@@ -291,8 +291,9 @@ class DisplayTable
     subs = new CompositeDisposable
     @screenColumnsSubscriptions.set(screenColumn, subs)
 
-    subs.add screenColumn.onDidChangeName ({oldName, newName}) =>
-      @table.changeColumnName(oldName, newName)
+    subs.add screenColumn.onDidChangeName ({newName}) =>
+      columnIndex = @getScreenColumnIndex(screenColumn)
+      @table.changeColumnNameAt(columnIndex, newName)
 
     subs.add screenColumn.onDidChangeOption (event) =>
       newEvent = _.clone(event)

@@ -229,17 +229,20 @@ class Table
 
   changeColumnName: (column, newName, transaction=true, event=true) ->
     index = @columns.indexOf(column)
+    @changeColumnNameAt(index, newName, transaction, event)
 
+  changeColumnNameAt: (index, newName, transaction=true, event=true) ->
+    oldName = @columns[index]
     @columns[index] = newName
     @emitModifiedStatusChange()
 
     if event
-      @emitter.emit('did-rename-column', {oldName: column, newName, index})
+      @emitter.emit('did-rename-column', {oldName, newName, index})
 
     if transaction
       @transaction
         undo: ->
-          @columns[index] = column
+          @columns[index] = oldName
           @emitModifiedStatusChange()
         redo: ->
           @columns[index] = newName
