@@ -897,6 +897,12 @@ class TableElement extends HTMLElement
         @confirmColumnEdit()
         return false
 
+    @textEditorSubscriptions.add @subscribeTo @editorElement,
+      'click': (e) =>
+        e.stopPropagation()
+        e.preventDefault()
+        @editorElement.focus()
+
   #     ######  ######## ##       ########  ######  ########
   #    ##    ## ##       ##       ##       ##    ##    ##
   #    ##       ##       ##       ##       ##          ##
