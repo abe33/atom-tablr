@@ -1,3 +1,11 @@
+<a name="v0.7.1"></a>
+# v0.7.1 (2015-11-24)
+
+## :bug: Bug Fixes
+
+- Fix rename columns with no name ([9682095b](https://github.com/abe33/atom-tablr/commit/9682095b99f1de3e87c5165070c11e3011b21d1a), [#16](https://github.com/abe33/atom-tablr/issues/16))
+- Fix layout not serialized if an open editor was not modified ([80327b70](https://github.com/abe33/atom-tablr/commit/80327b704742faa590b544b9f30396a85ffc8ccd))
+
 <a name="v0.7.0"></a>
 # v0.7.0 (2015-11-14)
 
