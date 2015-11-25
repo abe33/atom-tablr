@@ -1555,6 +1555,42 @@ describe 'tableElement', ->
 
       expect(tableEditor.moveLineUp).toHaveBeenCalled()
 
+  describe 'tablr:fit-column-to-content', ->
+    [dummyCell] = []
+    beforeEach ->
+      content = 'abcdefghijklmnopqrstuvwxyz'
+      tableEditor.setValueAtPosition([5,1], content)
+      dummyCell = document.createElement('d')
+      dummyCell.className = 'tablr-cell'
+      dummyCell.textContent = content
+      dummyCell.style.height = 'auto'
+      jasmineContent.appendChild(dummyCell)
+
+    it 'sets the width of the screen column to the width of its biggest content', ->
+      tableElement.moveRight()
+
+      atom.commands.dispatch(tableElement, 'tablr:fit-column-to-content')
+
+      expect(tableEditor.getScreenColumnWidthAt(1)).toEqual(dummyCell.offsetWidth)
+
+  describe 'tablr:fit-row-to-content', ->
+    [dummyCell] = []
+    beforeEach ->
+      content = 'abcdef\nghijkl\nmnopqr\nstuvwxyz'
+      tableEditor.setValueAtPosition([1,1], content)
+      dummyCell = document.createElement('d')
+      dummyCell.className = 'tablr-cell'
+      dummyCell.textContent = content
+      dummyCell.style.height = 'auto'
+      jasmineContent.appendChild(dummyCell)
+
+    it 'sets the width of the screen row to the width of its biggest content', ->
+      tableElement.moveDown()
+
+      atom.commands.dispatch(tableElement, 'tablr:fit-row-to-content')
+
+      expect(tableEditor.getScreenRowHeightAt(1)).toEqual(dummyCell.offsetHeight)
+
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
   #    ##       ##     ##  ##     ##

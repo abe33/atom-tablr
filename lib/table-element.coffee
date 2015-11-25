@@ -390,6 +390,11 @@ class TableElement extends HTMLElement
 
     height
 
+  fitRowToContent: (row) ->
+    height = @measureRowHeight(@tableEditor.screenRowToModelRow(row))
+
+    @tableEditor.setScreenRowHeightAt(row, height)
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -479,6 +484,11 @@ class TableElement extends HTMLElement
       width = Math.max(width, @measuringCell.offsetWidth)
 
     width
+
+  fitColumnToContent: (column) ->
+    width = @measureColumnWidth(column)
+
+    @tableEditor.setScreenColumnWidthAt(column, width)
 
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
@@ -1605,6 +1615,12 @@ TableElement.registerCommands = ->
     'tablr:go-to-line': -> @openGoToLineModal()
     'tablr:move-line-down': -> @moveLineDown()
     'tablr:move-line-up': -> @moveLineUp()
+    'tablr:fit-column-to-content': ->
+      column = @tableEditor.getCursorPosition().column
+      @fitColumnToContent(column)
+    'tablr:fit-row-to-content': ->
+      row = @tableEditor.getCursorPosition().row
+      @fitRowToContent(row)
 
   atom.commands.add 'tablr-editor atom-text-editor[mini]', stopEventPropagation(
     'core:move-up': -> @moveUp()
