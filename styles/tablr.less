@@ -17,18 +17,18 @@
 @csv-form-background-color: @syntax-background-color;
 @csv-form-text-color: @syntax-text-color;
 
-.flex-container {
+.tablr-flex-container {
   position: relative;
   width: 100%;
   display: -webkit-flex;
 }
 
-.row-number-placeholder {
+.tablr-row-number-placeholder {
   padding: 2px 10px;
   text-align: right;
 }
 
-.cell {
+.tablr-cell {
   overflow: hidden;
   float: left;
   height: 100%;
@@ -153,7 +153,7 @@ tablr-editor {
     }
 
     .tablr-header, .tablr-header-content, .tablr-header-row {
-      .flex-container;
+      .tablr-flex-container;
     }
 
     .tablr-header-row {
@@ -163,7 +163,7 @@ tablr-editor {
       overflow-x: hidden;
 
       &::before {
-        .cell;
+        .tablr-cell;
         content: 'H';
         position: relative;
         visibility: hidden;
@@ -182,7 +182,7 @@ tablr-editor {
     }
 
     tablr-header-cell {
-      .cell;
+      .tablr-cell;
       cursor: s-resize;
       padding-right: 24px;
       height: 100%;
@@ -227,7 +227,7 @@ tablr-editor {
     }
 
     .tablr-header-filler {
-      .row-number-placeholder;
+      .tablr-row-number-placeholder;
     }
 
     .tablr-header-filler + * {
@@ -282,7 +282,7 @@ tablr-editor {
     }
 
     .tablr-content {
-      .flex-container;
+      .tablr-flex-container;
       position: absolute;
       top: 0;
       left: 0;
@@ -343,7 +343,7 @@ tablr-editor {
     }
 
     tablr-gutter-cell, .tablr-gutter-filler {
-      .row-number-placeholder;
+      .tablr-row-number-placeholder;
     }
 
     //   ########  ##     ## ##       ######## ########   ######
@@ -419,7 +419,7 @@ tablr-editor {
     //   ##     ##  #######   ###  ###   ######
 
     .tablr-rows {
-      .flex-container;
+      .tablr-flex-container;
       position: relative;
       order: 2;
       -webkit-flex: 1;
@@ -444,7 +444,7 @@ tablr-editor {
     //     ######  ######## ######## ########  ######
 
     .ellipsis-display {
-      .cell;
+      .tablr-cell;
       height: auto;
       position: fixed;
       background: mix(@table-background-color, @table-selection-color, 90%);
@@ -468,7 +468,7 @@ tablr-editor {
       font-size: 1.2em;
     }
     tablr-cell {
-      .cell;
+      .tablr-cell;
       border-bottom: 1px solid @table-border-color;
       background: @table-background-color;
 
