@@ -33,6 +33,10 @@ stylesheet = "
     padding: 0;
   }
 
+  tablr-editor::shadow .measuring-cell {
+    border-bottom: none;
+  }
+
   tablr-editor::shadow tablr-gutter-cell {
     border: none;
     padding: 0;
