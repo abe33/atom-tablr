@@ -195,7 +195,6 @@ tablr-editor {
     tablr-header-cell {
       .tablr-cell;
       cursor: s-resize;
-      padding-right: 24px;
       height: 100%;
       text-overflow: ellipsis;
 
@@ -209,7 +208,7 @@ tablr-editor {
       }
 
       &.order {
-        padding-right: 40px;
+        padding-right: 20px;
         cursor: n-resize;
 
         &::after {
@@ -217,7 +216,7 @@ tablr-editor {
           content: '\f0a3';
           display: inline-block;
           position: absolute;
-          right: 20px;
+          right: 0px;
           top: 50%;
           width: 20px;
           height: 20px;
@@ -225,6 +224,7 @@ tablr-editor {
           font-size: 1.2em;
           line-height: 20px;
           margin-top: -10px;
+          z-index: -1;
         }
 
         &.descending {
@@ -270,10 +270,17 @@ tablr-editor {
       line-height: 1.6em;
       margin-top: -0.8em;
       background: @table-column-action-background;
+      display: none;
 
       &::before {
         content: '\f058';
         font-family: 'Octicons Regular';
+      }
+    }
+
+    tablr-header-cell:hover {
+      .column-edit-action {
+        display: block;
       }
     }
 
