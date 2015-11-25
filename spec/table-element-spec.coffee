@@ -493,6 +493,33 @@ describe 'tableElement', ->
 
         expect(tableEditor.getLastCursor().getValue()).toEqual(9900)
 
+  describe '::measureColumnWidth', ->
+    [dummyCell] = []
+    beforeEach ->
+      content = 'abcdefghijklmnopqrstuvwxyz'
+      tableEditor.setValueAtPosition([50,1], content)
+      dummyCell = document.createElement('d')
+      dummyCell.className = 'tablr-cell'
+      dummyCell.textContent = content
+      jasmineContent.appendChild(dummyCell)
+
+    it 'measures the column cells and returns the biggest width', ->
+      expect(tableElement.measureColumnWidth(1)).toEqual(dummyCell.offsetWidth)
+
+  describe '::measureRowHeight', ->
+    [dummyCell] = []
+    beforeEach ->
+      content = 'abcdef\nghijklmn\nopqrst\nuvwxyz'
+      tableEditor.setValueAtPosition([50,1], content)
+      dummyCell = document.createElement('d')
+      dummyCell.className = 'tablr-cell'
+      dummyCell.textContent = content
+      dummyCell.style.height = 'auto'
+      jasmineContent.appendChild(dummyCell)
+
+    it 'measures the column cells and returns the biggest width', ->
+      expect(tableElement.measureRowHeight(50)).toEqual(dummyCell.offsetHeight)
+
   #    ##     ## ########    ###    ########  ######## ########
   #    ##     ## ##         ## ##   ##     ## ##       ##     ##
   #    ##     ## ##        ##   ##  ##     ## ##       ##     ##

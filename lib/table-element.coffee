@@ -380,6 +380,16 @@ class TableElement extends HTMLElement
     else
       container.scrollTop = scrollTopAsFirstVisibleRow
 
+  measureRowHeight: (row) ->
+    @ensureMeasuringCell()
+
+    height = 0
+    for value in @tableEditor.table.getRow(row)
+      @measuringCell.textContent = value
+      height = Math.max(height, @measuringCell.offsetHeight)
+
+    height
+
   #     ######   #######  ##       ##     ## ##     ## ##    ##  ######
   #    ##    ## ##     ## ##       ##     ## ###   ### ###   ## ##    ##
   #    ##       ##     ## ##       ##     ## #### #### ####  ## ##
@@ -460,6 +470,16 @@ class TableElement extends HTMLElement
     else
       container.scrollLeft = scrollLeftAsFirstVisibleColumn
 
+  measureColumnWidth: (column) ->
+    @ensureMeasuringCell()
+
+    width = 0
+    for value in @tableEditor.table.getColumnValues(column)
+      @measuringCell.textContent = value
+      width = Math.max(width, @measuringCell.offsetWidth)
+
+    width
+
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
   #    ##       ##       ##       ##       ##
@@ -504,6 +524,12 @@ class TableElement extends HTMLElement
   isSelectedCell: (position) ->
     @tableEditor.getSelections().some (selection) ->
       selection.getRange().containsPoint(position)
+
+  ensureMeasuringCell: ->
+    unless @measuringCell?
+      @measuringCell = document.createElement('div')
+      @measuringCell.className = 'measuring-cell'
+      @shadowRoot.appendChild(@measuringCell)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
