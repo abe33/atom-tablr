@@ -1,3 +1,4 @@
+{CompositeDisposable} = require 'atom'
 {SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 columnName = require './column-name'
 
@@ -7,8 +8,12 @@ class TableHeaderCellElement extends HTMLElement
 
   @content: ->
     @span outlet: 'label'
-    @div class: 'column-edit-action'
+    @div class: 'column-edit-action', outlet: 'editButton'
     @div class: 'column-resize-handle'
+
+  createdCallback: ->
+    @subscriptions = new CompositeDisposable()
+    @subscriptions.add atom.tooltips.add(@editButton, {title: 'Edit column name'})
 
   setModel: ({column, index}) ->
     @released = false
