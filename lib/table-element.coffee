@@ -107,6 +107,12 @@ class TableElement extends HTMLElement
       'mousedown': stopPropagationAndDefault (e) =>
       'click': stopPropagationAndDefault (e) => @startColumnEdit(e)
 
+    @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-fit-action',
+      'mousedown': stopPropagationAndDefault (e) =>
+      'click': stopPropagationAndDefault (e) =>
+        headerCell = e.target.parentNode.parentNode
+        @fitColumnToContent(Number(headerCell.dataset.column))
+
     @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()

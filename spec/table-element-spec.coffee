@@ -666,6 +666,20 @@ describe 'tableElement', ->
 
         expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('tablr.minimumColumnWidth'))
 
+
+    describe 'clicking on a header cell fit column action', ->
+      [cell] = []
+
+      beforeEach ->
+        cell = header.querySelector('tablr-header-cell .column-fit-action')
+
+        spyOn(tableElement, 'fitColumnToContent')
+
+        click(cell)
+
+      it 'invokes the fitColumnToContent method', ->
+        expect(tableElement.fitColumnToContent).toHaveBeenCalledWith(0)
+
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
