@@ -37,7 +37,7 @@ class TableEditor
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn', 'onDidChangeLayout',
     'getScreenCellRect', 'getScreenCellPosition',
     'onDidChangeCellValue',
-    'sortBy', 'toggleSortDirection', 'resetSort',
+    'sortBy', 'toggleSortDirection', 'resetSort', 'applySort',
     'undo', 'redo', 'clearUndoStack', 'clearRedoStack',
     toProperty: 'displayTable'
   )

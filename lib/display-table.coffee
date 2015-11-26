@@ -13,7 +13,7 @@ class DisplayTable
     displayTable = new DisplayTable(state)
 
   @delegatesMethods(
-    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows',
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows', 'getRow',
     toProperty: 'table'
   )
 
@@ -603,6 +603,27 @@ class DisplayTable
       oldScreenRange: {start: 0, end: @getRowCount()}
       newScreenRange: {start: 0, end: @getRowCount()}
     }
+
+  applySort: ->
+    if @order?
+      if typeof @order is 'function'
+        orderFunction = @order
+      else
+        orderFunction = @compareRows(@order, @direction)
+
+      order = @order
+
+      @table.sortRows(orderFunction)
+      @table.ammendLastTransaction
+        undo: (commit) =>
+          commit.undo()
+          @sortBy(order)
+
+        redo: (commit) =>
+          commit.redo()
+          @resetSort()
+
+      @resetSort()
 
   toggleSortDirection: ->
     @direction *= -1

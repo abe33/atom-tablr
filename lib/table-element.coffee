@@ -113,6 +113,10 @@ class TableElement extends HTMLElement
         headerCell = e.target.parentNode.parentNode
         @fitColumnToContent(Number(headerCell.dataset.column))
 
+    @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-apply-sort-action',
+      'mousedown': stopPropagationAndDefault (e) =>
+      'click': stopPropagationAndDefault (e) => @applySort()
+
     @subscriptions.add @subscribeTo @head, 'tablr-header-cell .column-resize-handle',
       'mousedown': stopPropagationAndDefault (e) => @startColumnResizeDrag(e)
       'click': stopPropagationAndDefault()
@@ -787,6 +791,8 @@ class TableElement extends HTMLElement
     goToLineElement.setModel(this)
     goToLineElement.attach()
     goToLineElement
+
+  applySort: -> @tableEditor.applySort()
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##
@@ -1623,6 +1629,7 @@ TableElement.registerCommands = ->
     'tablr:go-to-line': -> @openGoToLineModal()
     'tablr:move-line-down': -> @moveLineDown()
     'tablr:move-line-up': -> @moveLineUp()
+    'tablr:apply-sort': -> @applySort()
     'tablr:fit-column-to-content': ->
       column = @tableEditor.getCursorPosition().column
       @fitColumnToContent(column)

@@ -607,6 +607,19 @@ describe 'tableElement', ->
           expect(tableEditor.order).toEqual(1)
           expect(tableEditor.direction).toEqual(1)
 
+      describe 'clicking on a header cell apply sort action', ->
+        [cell] = []
+
+        beforeEach ->
+          cell = header.querySelector('tablr-header-cell .column-apply-sort-action')
+
+          spyOn(tableElement, 'applySort')
+
+          click(cell)
+
+        it 'invokes the applySort method', ->
+          expect(tableElement.applySort).toHaveBeenCalled()
+
     describe 'dragging a resize handle', ->
       beforeEach ->
         tableElement.absoluteColumnsWidths = true
@@ -665,7 +678,6 @@ describe 'tableElement', ->
         mouseup(handle, x - 100, y)
 
         expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('tablr.minimumColumnWidth'))
-
 
     describe 'clicking on a header cell fit column action', ->
       [cell] = []
@@ -1572,6 +1584,14 @@ describe 'tableElement', ->
       atom.commands.dispatch(tableElement, 'tablr:move-line-up')
 
       expect(tableEditor.moveLineUp).toHaveBeenCalled()
+
+  describe 'tablr:apply-sort', ->
+    it 'calls tableEditor::applySort', ->
+      spyOn(tableEditor, 'applySort')
+
+      atom.commands.dispatch(tableElement, 'tablr:apply-sort')
+
+      expect(tableEditor.applySort).toHaveBeenCalled()
 
   describe 'tablr:fit-column-to-content', ->
     [dummyCell] = []

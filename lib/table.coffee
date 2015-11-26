@@ -420,6 +420,30 @@ class Table
     @emitModifiedStatusChange()
     @emitter.emit 'did-change', {rowIndices: [rowA, rowB]}
 
+  sortRows: (sortFunction, transaction=true) ->
+    originalRows = @rows.slice()
+    sortedRows = @rows.slice().sort(sortFunction)
+
+    @rows = sortedRows.slice()
+
+    emitEvents = =>
+      @emitModifiedStatusChange()
+      @emitter.emit 'did-change', {
+        oldRange: {start: 0, end: originalRows.length}
+        newRange: {start: 0, end: originalRows.length}
+      }
+
+    if transaction
+      @transaction
+        undo: ->
+          @rows = originalRows
+          emitEvents()
+        redo: ->
+          @rows = sortedRows
+          emitEvents()
+
+    emitEvents()
+
   extendExistingRows: (column, index) ->
     row.splice index, 0, undefined for row in @rows
 

@@ -509,6 +509,32 @@ describe 'DisplayTable', ->
           expect(displayTable.getScreenRowHeightAt(1)).toEqual(20)
           expect(displayTable.getScreenRowHeightAt(2)).toEqual(100)
 
+    describe '::applySort', ->
+      describe 'when no sort is applied', ->
+        it 'does nothing', ->
+          displayTable.applySort()
+
+          expect(displayTable.getRow(0)).toEqual(['name', 'Jane Doe'])
+          expect(displayTable.getRow(1)).toEqual(['age', 30])
+          expect(displayTable.getRow(2)).toEqual(['gender', 'female'])
+
+      describe 'when a sort is applied', ->
+        beforeEach ->
+          displayTable.sortBy('key')
+          displayTable.applySort()
+
+        it 'modifies the table to match the sort', ->
+          expect(displayTable.getRow(0)).toEqual(['age', 30])
+          expect(displayTable.getRow(1)).toEqual(['gender', 'female'])
+          expect(displayTable.getRow(2)).toEqual(['name', 'Jane Doe'])
+
+          expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
+          expect(displayTable.getScreenRow(1)).toEqual(['gender', 'female'])
+          expect(displayTable.getScreenRow(2)).toEqual(['name', 'Jane Doe'])
+
+        it 'removes the current sort', ->
+          expect(displayTable.order).toBeNull()
+
     ##     ######  ######## ##       ##        ######
     ##    ##    ## ##       ##       ##       ##    ##
     ##    ##       ##       ##       ##       ##
@@ -947,3 +973,51 @@ describe 'DisplayTable', ->
       expect(displayTable.getScreenRow(1)).toEqual(['age', 20])
       expect(table.undoStack.length).toEqual(1)
       expect(table.redoStack.length).toEqual(0)
+
+    it 'rolls back a sort applied to the underlying table', ->
+      displayTable.addColumn 'key'
+      displayTable.addColumn 'value'
+
+      displayTable.addRow ['name', 'Jane Doe'], height: 200
+      displayTable.addRow ['age', 30], height: 50
+      displayTable.addRow ['gender', 'female'], height: 100
+      displayTable.addRow ['blood type', 'ab-'], height: 50
+
+      displayTable.clearUndoStack()
+
+      displayTable.sortBy('key')
+      displayTable.applySort()
+
+      displayTable.undo()
+
+      expect(table.getRow(0)).toEqual(['name', 'Jane Doe'])
+      expect(table.getRow(1)).toEqual(['age', 30])
+      expect(table.getRow(2)).toEqual(['gender', 'female'])
+      expect(table.getRow(3)).toEqual(['blood type', 'ab-'])
+
+      expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
+      expect(displayTable.getScreenRow(1)).toEqual(['blood type', 'ab-'])
+      expect(displayTable.getScreenRow(2)).toEqual(['gender', 'female'])
+      expect(displayTable.getScreenRow(3)).toEqual(['name', 'Jane Doe'])
+
+      expect(table.undoStack.length).toEqual(0)
+      expect(table.redoStack.length).toEqual(1)
+
+      expect(displayTable.order).toEqual(0)
+
+      displayTable.redo()
+
+      expect(table.getRow(0)).toEqual(['age', 30])
+      expect(table.getRow(1)).toEqual(['blood type', 'ab-'])
+      expect(table.getRow(2)).toEqual(['gender', 'female'])
+      expect(table.getRow(3)).toEqual(['name', 'Jane Doe'])
+
+      expect(displayTable.getScreenRow(0)).toEqual(['age', 30])
+      expect(displayTable.getScreenRow(1)).toEqual(['blood type', 'ab-'])
+      expect(displayTable.getScreenRow(2)).toEqual(['gender', 'female'])
+      expect(displayTable.getScreenRow(3)).toEqual(['name', 'Jane Doe'])
+
+      expect(table.undoStack.length).toEqual(1)
+      expect(table.redoStack.length).toEqual(0)
+
+      expect(displayTable.order).toBeNull()
