@@ -1,3 +1,18 @@
+<a name="v0.8.0"></a>
+# v0.8.0 (2015-11-26)
+
+## :sparkles: Features
+
+- Implement applying sort to the table for save ([28b03dcc](https://github.com/abe33/atom-tablr/commit/28b03dccb2c09f51241cc174e73968bead3b749d), [#14](https://github.com/abe33/atom-tablr/issues/14))
+- Implement fit column to content action in header cell ([3d725da1](https://github.com/abe33/atom-tablr/commit/3d725da1c5bf2f7a4c71d1a372ca8be8ed25c482), [#17](https://github.com/abe33/atom-tablr/issues/17))
+- Add buttons and new styles for header cells actions ([8dc93993](https://github.com/abe33/atom-tablr/commit/8dc939936aa07690cf7a1d1a1eb1550c7145c99e))
+- Implement commands to fit the column and row at cursor to its content size ([847c412d](https://github.com/abe33/atom-tablr/commit/847c412d2538654c001743f30c772171f9700b99))
+- Add methods to measure rows height and columns width ([a0ce6de3](https://github.com/abe33/atom-tablr/commit/a0ce6de3e3e37f209ec5ae7b37a75016db3c89a1))
+
+## :bug: Bug Fixes
+
+- Give focus back to the text editor when clicking on it when editing a column ([19091af3](https://github.com/abe33/atom-tablr/commit/19091af3d7c6ad5cb454a5b7d59b062d9d5d42de))
+
 <a name="v0.7.1"></a>
 # v0.7.1 (2015-11-24)
 
