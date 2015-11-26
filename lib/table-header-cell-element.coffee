@@ -8,12 +8,17 @@ class TableHeaderCellElement extends HTMLElement
 
   @content: ->
     @span outlet: 'label'
-    @div class: 'column-edit-action', outlet: 'editButton'
+    @div class: 'column-actions', =>
+      @button class: 'column-fit-action', outlet: 'fitButton'
+      @button class: 'column-apply-sort-action', outlet: 'sortButton'
+      @button class: 'column-edit-action', outlet: 'editButton'
     @div class: 'column-resize-handle'
 
   createdCallback: ->
     @subscriptions = new CompositeDisposable()
     @subscriptions.add atom.tooltips.add(@editButton, {title: 'Edit column name'})
+    @subscriptions.add atom.tooltips.add(@fitButton, {title: 'Adjust width to content'})
+    @subscriptions.add atom.tooltips.add(@sortButton, {title: 'Apply sort on table'})
 
   setModel: ({column, index}) ->
     @released = false

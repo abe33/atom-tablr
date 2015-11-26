@@ -841,10 +841,12 @@ class TableElement extends HTMLElement
 
     @editing = true
 
-    columnIndex = @getScreenColumnIndexAtPixelPosition(pageX, pageY)
+    headerCell = target.parentNode.parentNode
+    columnIndex = Number(headerCell.dataset.column)
+
     if @columnUnderEdit = @tableEditor.getScreenColumn(columnIndex)
       @columnUnderEditIndex = columnIndex
-      columnRect = target.parentNode.getBoundingClientRect()
+      columnRect = headerCell.getBoundingClientRect()
 
       @editorElement.style.top = @toUnit(columnRect.top)
       @editorElement.style.left =  @toUnit(columnRect.left)
