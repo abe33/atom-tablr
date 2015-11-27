@@ -194,12 +194,15 @@ class CSVEditor
 
           @getTableEditor(filePath, options, layout).then (tableEditor) =>
             CSVEditor.tableEditorForPath[filePath] = tableEditor
+            @editorSubscriptions.dispose()
             @editor = tableEditor
+            @subscribeToEditor()
             @emitter.emit 'did-change', this
             debounceChange()
           .catch (err) =>
             # The file content has changed for a format that cannot be parsed
             # We drop the editor and replace it with the csv form
+            @editorSubscriptions.dispose()
             @editor.destroy()
             delete @editor
             @emitter.emit 'did-change', this

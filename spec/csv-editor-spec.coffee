@@ -159,6 +159,30 @@ describe "CSVEditor", ->
                 ['1', '2']
               ])
 
+            describe 'making new changes', ->
+              [modifiedSpy] = []
+
+              beforeEach ->
+                nextAnimationFrame()
+
+                modifiedSpy = jasmine.createSpy('did-change-modified')
+
+                csvEditor.onDidChangeModified(modifiedSpy)
+
+              describe 'on the previous table', ->
+                beforeEach ->
+                  tableEditor.addRow ['Jack', 68, 'male']
+
+                it 'does not dispatch a did-change-modified event', ->
+                  expect(modifiedSpy).not.toHaveBeenCalled()
+
+              describe 'on the new table', ->
+                beforeEach ->
+                  csvEditor.editor.addRow ['Jack', 68, 'male']
+
+                it 'dispatches a did-change-modified event', ->
+                  expect(modifiedSpy).toHaveBeenCalled()
+
           describe 'when the table is in a modified state', ->
             [conflictSpy] = []
             beforeEach ->
