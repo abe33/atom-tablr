@@ -20,7 +20,6 @@ class CSVEditor
 
     Tablr ?= require './tablr'
     @options ?= {}
-    @subscriptions = new CompositeDisposable
     @emitter = new Emitter
     @setPath(filePath)
 
@@ -36,6 +35,135 @@ class CSVEditor
 
     @emitter.emit 'did-change-path', @getPath()
     @emitter.emit 'did-change-title', @getTitle()
+
+  getTitle: ->
+    if sessionPath = @getPath()
+      path.basename(sessionPath)
+    else
+      'untitled'
+
+  getLongTitle: ->
+    if sessionPath = @getPath()
+      fileName = path.basename(sessionPath)
+      directory = atom.project.relativize(path.dirname(sessionPath))
+      directory = if directory.length > 0 then directory else path.basename(path.dirname(sessionPath))
+      "#{fileName} - #{directory}"
+    else
+      'untitled'
+
+  getPath: -> @file?.getPath()
+
+  getURI: -> @getPath()
+
+  isDestroyed: -> @destroyed
+
+  isModified: -> @editor?.isModified() ? false
+
+  copy: ->
+    new CSVEditor({filePath: @getPath(), options: _.clone(@options), @choice})
+
+  destroy: ->
+    return if @destroyed
+
+    if @editor?
+      @saveLayout()
+      @editor.destroy()
+
+    @fileSubscriptions?.dispose()
+    @editorSubscriptions?.dispose()
+    @destroyed = true
+    @emitter.emit('did-destroy', this)
+    @emitter.dispose()
+
+  save: =>
+    @saveAs(@getPath())
+
+  saveAs: (path) ->
+    new Promise (resolve, reject) =>
+      options = _.clone(@options)
+      options.columns = @editor.getColumns() if options.header
+
+      @setPath(path)
+      @saveLayout()
+
+      csv.stringify @editor.getTable().getRows(), options, (err, data) =>
+        return reject(err) if err?
+
+        @preventFileChangeEvents()
+        fs.writeFile path, data, (err) =>
+          if err?
+            @allowFileChangeEvents()
+            return reject(err)
+          resolve()
+
+  saveConfig: (@choice) ->
+    filePath = @getPath()
+    Tablr.csvConfig.set(filePath, 'options', @options)
+    if @options.remember and @choice?
+      Tablr.csvConfig.set(filePath, 'choice', @choice)
+
+  saveLayout: ->
+    @layout = @getCurrentLayout()
+
+    Tablr.csvConfig.set(@getPath(), 'layout', @layout)
+
+  shouldPromptToSave: (options) ->
+    @editor?.shouldPromptToSave(options) ? false
+
+  onDidOpen: (callback) ->
+    @emitter.on 'did-open', callback
+
+  onDidDestroy: (callback) ->
+    @emitter.on 'did-destroy', callback
+
+  onDidConflict: (callback) ->
+    @emitter.on 'did-conflict', callback
+
+  onDidChange: (callback) ->
+    @emitter.on 'did-change', callback
+
+  onDidChangeModified: (callback) ->
+    @emitter.on 'did-change-modified', callback
+
+  onDidChangePath: (callback) ->
+    @emitter.on 'did-change-path', callback
+
+  onDidChangeTitle: (callback) ->
+    @emitter.on 'did-change-title', callback
+
+  applyChoice: ->
+    return if @choiceApplied
+    if @choice?
+      switch @choice
+        when 'TextEditor' then @openTextEditor(@options)
+        when 'TableEditor' then @openTableEditor(@options)
+
+    @choiceApplied = true
+
+  openTextEditor: (@options={}) ->
+    filePath = @getPath()
+    atom.workspace.openTextFile(filePath).then (editor) =>
+      pane = atom.workspace.paneForItem(this)
+      @emitter.emit('did-open', {editor, options: _.clone(@options)})
+      @saveConfig('TextEditor')
+      @destroy()
+
+      pane.activateItem(editor)
+
+  openTableEditor: (@options={}) ->
+    @openCSV().then (@editor) =>
+      @subscribeToEditor()
+
+      @emitter.emit 'did-open', {@editor, options: _.clone(options)}
+      @emitter.emit 'did-change-modified', @editor.isModified()
+
+      @saveConfig('TableEditor')
+      @editor
+
+  subscribeToEditor: ->
+    @editorSubscriptions = new CompositeDisposable
+    @editorSubscriptions.add @editor.onDidChangeModified (status) =>
+      @emitter.emit 'did-change-modified', status
 
   subscribeToFile: ->
     @fileSubscriptions?.dispose()
@@ -93,130 +221,6 @@ class CSVEditor
 
     # @fileSubscriptions.add @file.onWillThrowWatchError (errorObject) =>
     #   console.log 'error', errorObject
-
-  getTitle: ->
-    if sessionPath = @getPath()
-      path.basename(sessionPath)
-    else
-      'untitled'
-
-  getLongTitle: ->
-    if sessionPath = @getPath()
-      fileName = path.basename(sessionPath)
-      directory = atom.project.relativize(path.dirname(sessionPath))
-      directory = if directory.length > 0 then directory else path.basename(path.dirname(sessionPath))
-      "#{fileName} - #{directory}"
-    else
-      'untitled'
-
-  getPath: -> @file?.getPath()
-
-  getURI: -> @getPath()
-
-  isDestroyed: -> @destroyed
-
-  isModified: -> @editor?.isModified() ? false
-
-  copy: ->
-    new CSVEditor({filePath: @getPath(), options: _.clone(@options), @choice})
-
-  shouldPromptToSave: (options) ->
-    @editor?.shouldPromptToSave(options) ? false
-
-  onDidOpen: (callback) ->
-    @emitter.on 'did-open', callback
-
-  onDidDestroy: (callback) ->
-    @emitter.on 'did-destroy', callback
-
-  onDidConflict: (callback) ->
-    @emitter.on 'did-conflict', callback
-
-  onDidChange: (callback) ->
-    @emitter.on 'did-change', callback
-
-  onDidChangeModified: (callback) ->
-    @emitter.on 'did-change-modified', callback
-
-  onDidChangePath: (callback) ->
-    @emitter.on 'did-change-path', callback
-
-  onDidChangeTitle: (callback) ->
-    @emitter.on 'did-change-title', callback
-
-  applyChoice: ->
-    return if @choiceApplied
-    if @choice?
-      switch @choice
-        when 'TextEditor' then @openTextEditor(@options)
-        when 'TableEditor' then @openTableEditor(@options)
-
-    @choiceApplied = true
-
-  openTextEditor: (@options={}) ->
-    filePath = @getPath()
-    atom.workspace.openTextFile(filePath).then (editor) =>
-      pane = atom.workspace.paneForItem(this)
-      @emitter.emit('did-open', {editor, options: _.clone(@options)})
-      @saveConfig('TextEditor')
-      @destroy()
-
-      pane.activateItem(editor)
-
-  openTableEditor: (@options={}) ->
-    @openCSV().then (@editor) =>
-      @subscriptions.add @editor.onDidChangeModified (status) =>
-        @emitter.emit 'did-change-modified', status
-
-      @emitter.emit 'did-open', {@editor, options: _.clone(options)}
-      @emitter.emit 'did-change-modified', @editor.isModified()
-
-      @saveConfig('TableEditor')
-      @editor
-
-  destroy: ->
-    return if @destroyed
-
-    if @editor?
-      @saveLayout()
-      @editor.destroy()
-
-    @fileSubscriptions?.dispose()
-    @destroyed = true
-    @emitter.emit('did-destroy', this)
-    @emitter.dispose()
-
-  save: =>
-    @saveAs(@getPath())
-
-  saveAs: (path) ->
-    new Promise (resolve, reject) =>
-      options = _.clone(@options)
-      options.columns = @editor.getColumns() if options.header
-
-      @setPath(path)
-      @saveLayout()
-
-      csv.stringify @editor.getTable().getRows(), options, (err, data) =>
-        return reject(err) if err?
-
-        @preventFileChangeEvents()
-        fs.writeFile path, data, (err) =>
-          if err?
-            @allowFileChangeEvents()
-            return reject(err)
-          resolve()
-
-  saveConfig: (@choice) ->
-    filePath = @getPath()
-    Tablr.csvConfig.set(filePath, 'options', @options)
-    if @options.remember and @choice?
-      Tablr.csvConfig.set(filePath, 'choice', @choice)
-
-  saveLayout: ->
-    @layout = @getCurrentLayout()
-
-    Tablr.csvConfig.set(@getPath(), 'layout', @layout)
 
   getCurrentLayout: ->
     columns: @editor.getScreenColumns().map (column) =>
