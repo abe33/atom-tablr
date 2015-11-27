@@ -43,11 +43,17 @@ class CSVEditor
     @fileSubscriptions = new CompositeDisposable
 
     changeFired = false
-    debounceChange = -> setTimeout (-> changeFired = false), 100
+    debounceChange = =>
+      setTimeout =>
+        changeFired = false
+        @allowFileChangeEvents()
+      , 100
 
     @fileSubscriptions.add @file.onDidChange =>
       return if changeFired
       changeFired = true
+
+      return if @nofileChangeEvent
 
       if @editor?
         if @editor.isModified()
@@ -57,7 +63,6 @@ class CSVEditor
           filePath = @getPath()
           options = _.clone(@options)
           layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
-          console.log layout
 
           @getTableEditor(filePath, options, layout).then (tableEditor) =>
             CSVEditor.tableEditorForPath[filePath] = tableEditor
@@ -195,8 +200,11 @@ class CSVEditor
       csv.stringify @editor.getTable().getRows(), options, (err, data) =>
         return reject(err) if err?
 
+        @preventFileChangeEvents()
         fs.writeFile path, data, (err) =>
-          return reject(err) if err?
+          if err?
+            @allowFileChangeEvents()
+            return reject(err)
           resolve()
 
   saveConfig: (@choice) ->
@@ -291,6 +299,10 @@ class CSVEditor
       parser.on 'error', error
 
       input.pipe(parser)
+
+  preventFileChangeEvents: -> @nofileChangeEvent = true
+
+  allowFileChangeEvents: -> @nofileChangeEvent = false
 
   serialize: ->
     out = {

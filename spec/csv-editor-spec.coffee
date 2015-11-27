@@ -544,6 +544,19 @@ describe "CSVEditor", ->
                 ]
               })
 
+            describe 'making new changes', ->
+              [modifiedSpy] = []
+
+              beforeEach ->
+                modifiedSpy = jasmine.createSpy('did-change-modified')
+
+                csvEditor.onDidChangeModified(modifiedSpy)
+
+                tableEditor.addRow ['Jack', 68, 'male']
+
+              it 'dispatches a did-change-modified event', ->
+                expect(modifiedSpy).toHaveBeenCalled()
+
     describe 'when the file cannot be parsed with the default', ->
       beforeEach ->
         openFixture('invalid.csv')
