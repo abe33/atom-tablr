@@ -1,3 +1,11 @@
+<a name="v0.8.1"></a>
+# v0.8.1 (2015-11-27)
+
+## :bug: Bug Fixes
+
+- Fix modified state subscriptions not changed when the editor is changed ([8b38aac9](https://github.com/abe33/atom-tablr/commit/8b38aac99a4269452e841d17dd3e4f23879b2f63))
+- Fix file change event make editor partially unusable after save ([9c533b41](https://github.com/abe33/atom-tablr/commit/9c533b4141b8551efa3d730a0b0ef0dd422e8c0b))
+
 <a name="v0.8.0"></a>
 # v0.8.0 (2015-11-26)
 
