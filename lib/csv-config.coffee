@@ -15,5 +15,7 @@ class CSVConfig
     @config[newPath] = @config[oldPath]
     delete @config[oldPath]
 
+  clear: -> @config = {}
+
   serialize: ->
     _.clone(@config)

@@ -92,3 +92,9 @@ Command|Action
 `tablr:move-left-in-selection`|<p>OSX/Win/Linux: <kbd>shift-tab</kbd></p>Confirm the edit and move cursors one cell to the right in their respective selections.
 `editor:newline`|<p>OSX: <kbd>cmd-enter</kbd> <kbd>ctrl-enter</kbd><br/>Win/Linux: <kbd>ctrl-enter</kbd></p> As the <kbd>enter</kbd> key is used to confirm the edit, alternative keybindings are necessary to insert new lines in a cell.
 `editor:indent`|<p>OSX/Win/Linux: <kbd>ctrl-tab</kbd></p>As the <kbd>tab</kbd> key is already used to confirm the edit and move the cursors an alternative keybinding is necessary to insert a tabulation in a cell.
+
+## Other
+
+Command|Context|Action
+---|---|---
+`tablr:clear-csv-storage`|`atom-workspace`|Removes any data stored for previously opened csv files.

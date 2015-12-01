@@ -799,6 +799,27 @@ describe "CSVEditor", ->
         expect(editor).toBeDefined()
         expect(editor.getText?).toBeTruthy()
 
+  describe 'tablr:clear-csv-storage', ->
+    beforeEach ->
+      tableEditPackage.csvConfig.set '/some/path/to.csv', 'layout', {
+        columns: [
+          {width: 200, align: 'right'}
+          {width: 300}
+          {align: 'center'}
+        ]
+        rowHeights: [
+          undefined
+          100
+          200
+        ]
+      }
+
+    it 'removes the stored data', ->
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tablr:clear-csv-storage')
+
+      expect(tableEditPackage.csvConfig.get '/some/path/to.csv').toBeUndefined()
+
+
   ##    ########  ########  ######  ########  #######  ########  ########
   ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
   ##    ##     ## ##       ##          ##    ##     ## ##     ## ##

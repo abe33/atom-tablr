@@ -73,10 +73,13 @@ module.exports =
     @csvConfig = new CSVConfig(csvConfig)
 
     @subscriptions = new CompositeDisposable
+    if atom.inDevMode()
+      @subscriptions.add atom.commands.add 'atom-workspace',
+        'tablr:demo-large': => atom.workspace.open('tablr://large')
+        'tablr:demo-small': => atom.workspace.open('tablr://small')
 
     @subscriptions.add atom.commands.add 'atom-workspace',
-      'tablr:demo-large': => atom.workspace.open('tablr://large')
-      'tablr:demo-small': => atom.workspace.open('tablr://small')
+      'tablr:clear-csv-storage': => @csvConfig.clear()
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless ///\.#{atom.config.get('tablr.supportedCsvExtensions').join('|')}$///.test uriToOpen
