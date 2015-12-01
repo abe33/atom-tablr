@@ -98,18 +98,27 @@ module.exports =
         when 'large' then @getLargeTable()
         when 'small' then @getSmallTable()
 
+    mouseOverColumn = ({pageX, pageY, target}) ->
+      console.log target
+      return false unless target.getScreenColumnIndexAtPixelPosition?
+      column = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+      column? and column >= 0
+
     @subscriptions.add atom.contextMenu.add
       'tablr-editor': [{
-        label: 'Table'
+        label: 'Tablr Column'
         submenu: [
           {label: 'Align left', command: 'tablr:align-left'}
           {label: 'Align center', command: 'tablr:align-center'}
           {label: 'Align right', command: 'tablr:align-right'}
         ]
+        shouldDisplay: mouseOverColumn
         created: (event) ->
           {pageX, pageY, target} = event
           return unless target.getScreenColumnIndexAtPixelPosition?
-          target.targetColumnForAlignment = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+          targetColumnForAlignment = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+          return unless targetColumnForAlignment? and targetColumnForAlignment >= 0
+          target.targetColumnForAlignment = targetColumnForAlignment
           setTimeout (-> delete target.targetColumnForAlignment), 10
       }]
 
