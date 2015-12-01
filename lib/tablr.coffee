@@ -104,17 +104,18 @@ module.exports =
         created: (event) ->
           {pageX, pageY, target} = event
           return unless target.getScreenColumnIndexAtPixelPosition?
-          targetColumnForAlignment = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
 
-          if targetColumnForAlignment? and targetColumnForAlignment >= 0
-            target.targetColumnForAlignment = targetColumnForAlignment
+          contextMenuColumn = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+
+          if contextMenuColumn? and contextMenuColumn >= 0
+            target.contextMenuColumn = contextMenuColumn
             @submenu = [
               {label: 'Align left', command: 'tablr:align-left'}
               {label: 'Align center', command: 'tablr:align-center'}
               {label: 'Align right', command: 'tablr:align-right'}
             ]
 
-          setTimeout (-> delete target.targetColumnForAlignment), 10
+          setTimeout (-> delete target.contextMenuColumn), 10
       }]
 
   deactivate: ->

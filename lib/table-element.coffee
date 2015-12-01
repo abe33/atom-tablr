@@ -709,20 +709,20 @@ class TableElement extends HTMLElement
     @shadowRoot.appendChild(@ellipsisDisplay)
 
   alignLeft: ->
-    if @targetColumnForAlignment?
-      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'left'
+    if @contextMenuColumn?
+      @tableEditor.getScreenColumn(@contextMenuColumn).align = 'left'
     else
       @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'left'
 
   alignCenter: ->
-    if @targetColumnForAlignment?
-      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'center'
+    if @contextMenuColumn?
+      @tableEditor.getScreenColumn(@contextMenuColumn).align = 'center'
     else
       @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'center'
 
   alignRight: ->
-    if @targetColumnForAlignment?
-      @tableEditor.getScreenColumn(@targetColumnForAlignment).align = 'right'
+    if @contextMenuColumn?
+      @tableEditor.getScreenColumn(@contextMenuColumn).align = 'right'
     else
       @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'right'
 

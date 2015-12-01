@@ -1468,7 +1468,7 @@ describe 'tableElement', ->
 
     describe 'when there is a target column', ->
       it 'change the alignment of the target column', ->
-        tableElement.targetColumnForAlignment = 2
+        tableElement.contextMenuColumn = 2
         tableEditor.getScreenColumn(2).align = 'right'
 
         atom.commands.dispatch(tableElement, 'tablr:align-left')
@@ -1484,7 +1484,7 @@ describe 'tableElement', ->
 
     describe 'when there is a target column', ->
       it 'change the alignment of the target column', ->
-        tableElement.targetColumnForAlignment = 2
+        tableElement.contextMenuColumn = 2
 
         atom.commands.dispatch(tableElement, 'tablr:align-center')
 
@@ -1499,7 +1499,7 @@ describe 'tableElement', ->
 
     describe 'when there is a target column', ->
       it 'change the alignment of the target column', ->
-        tableElement.targetColumnForAlignment = 2
+        tableElement.contextMenuColumn = 2
 
         atom.commands.dispatch(tableElement, 'tablr:align-right')
 
