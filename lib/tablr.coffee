@@ -103,19 +103,31 @@ module.exports =
         label: 'Tablr'
         created: (event) ->
           {pageX, pageY, target} = event
-          return unless target.getScreenColumnIndexAtPixelPosition?
+          return unless target.getScreenColumnIndexAtPixelPosition? and target.getScreenRowIndexAtPixelPosition?
 
-          contextMenuColumn = target.getScreenColumnIndexAtPixelPosition(pageX, pageY)
+          contextMenuColumn = target.getScreenColumnIndexAtPixelPosition(pageX)
+          contextMenuRow = target.getScreenRowIndexAtPixelPosition(pageY)
+
+          @submenu = []
+
+          if contextMenuRow? and contextMenuRow >= 0
+            target.contextMenuRow = contextMenuRow
+
+            @submenu.push {label: 'Fit Row Height To Content', command: 'tablr:fit-row-to-content'}
 
           if contextMenuColumn? and contextMenuColumn >= 0
             target.contextMenuColumn = contextMenuColumn
-            @submenu = [
-              {label: 'Align left', command: 'tablr:align-left'}
-              {label: 'Align center', command: 'tablr:align-center'}
-              {label: 'Align right', command: 'tablr:align-right'}
-            ]
 
-          setTimeout (-> delete target.contextMenuColumn), 10
+            @submenu.push {label: 'Fit Column Width To Content', command: 'tablr:fit-column-to-content'}
+            @submenu.push {type: 'separator'}
+            @submenu.push {label: 'Align left', command: 'tablr:align-left'}
+            @submenu.push {label: 'Align center', command: 'tablr:align-center'}
+            @submenu.push {label: 'Align right', command: 'tablr:align-right'}
+
+          setTimeout ->
+            delete target.contextMenuColumn
+            delete target.contextMenuRow
+          , 10
       }]
 
   deactivate: ->

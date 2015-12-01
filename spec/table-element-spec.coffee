@@ -1611,6 +1611,14 @@ describe 'tableElement', ->
 
       expect(tableEditor.getScreenColumnWidthAt(1)).toEqual(dummyCell.offsetWidth)
 
+    describe 'when there is a target column', ->
+      it 'change sets the width of the target column', ->
+        tableElement.contextMenuColumn = 1
+
+        atom.commands.dispatch(tableElement, 'tablr:fit-column-to-content')
+
+        expect(tableEditor.getScreenColumnWidthAt(1)).toEqual(dummyCell.offsetWidth)
+
   describe 'tablr:fit-row-to-content', ->
     [dummyCell] = []
     beforeEach ->
@@ -1628,6 +1636,14 @@ describe 'tableElement', ->
       atom.commands.dispatch(tableElement, 'tablr:fit-row-to-content')
 
       expect(tableEditor.getScreenRowHeightAt(1)).toEqual(dummyCell.offsetHeight)
+
+    describe 'when there is a target row', ->
+      it 'sets the width of the target row', ->
+        tableElement.contextMenuRow = 1
+
+        atom.commands.dispatch(tableElement, 'tablr:fit-row-to-content')
+
+        expect(tableEditor.getScreenRowHeightAt(1)).toEqual(dummyCell.offsetHeight)
 
   #    ######## ########  #### ########
   #    ##       ##     ##  ##     ##

@@ -1634,10 +1634,10 @@ TableElement.registerCommands = ->
     'tablr:move-line-up': -> @moveLineUp()
     'tablr:apply-sort': -> @applySort()
     'tablr:fit-column-to-content': ->
-      column = @tableEditor.getCursorPosition().column
+      column = @contextMenuColumn ? @tableEditor.getCursorPosition().column
       @fitColumnToContent(column)
     'tablr:fit-row-to-content': ->
-      row = @tableEditor.getCursorPosition().row
+      row = @contextMenuRow ? @tableEditor.getCursorPosition().row
       @fitRowToContent(row)
 
   atom.commands.add 'tablr-editor atom-text-editor[mini]', stopEventPropagation(
