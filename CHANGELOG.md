@@ -1,3 +1,15 @@
+<a name="v0.9.0"></a>
+# v0.9.0 (2015-12-02)
+
+## :sparkles: Features
+
+- Add command to clear stored data ([696e3c7c](https://github.com/abe33/atom-tablr/commit/696e3c7ca8d9ac8e6eb07b53e47feb236667be9e), [#21](https://github.com/abe33/atom-tablr/issues/21))
+- Add context menu to fit columns and rows to content ([c286c22e](https://github.com/abe33/atom-tablr/commit/c286c22e2bbd707603380a19b9804d4f48bb4733), [#20](https://github.com/abe33/atom-tablr/issues/20))
+
+## :bug: Bug Fixes
+
+- Prevent display of column related context menu when in the gutter ([0953463f](https://github.com/abe33/atom-tablr/commit/0953463f38ed7dc47589f4449fab11dd577d6a01), [#19](https://github.com/abe33/atom-tablr/issues/19))
+
 <a name="v0.8.1"></a>
 # v0.8.1 (2015-11-27)
 
