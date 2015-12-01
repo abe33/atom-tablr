@@ -727,12 +727,12 @@ describe 'tableElement', ->
 
         describe 'core:confirm', ->
           describe 'when the editor is still on the dynamic name', ->
-            it 'does not change the cell value', ->
+            it 'does not changes the cell value', ->
               atom.commands.dispatch(editorElement, 'core:confirm')
               expect(tableEditor.getScreenColumn(0).name).toEqual(undefined)
 
           describe 'when the editor is empty', ->
-            it 'does not change the cell value', ->
+            it 'does not changes the cell value', ->
               confirmHeaderCellEdit()
               expect(tableEditor.getScreenColumn(0).name).toEqual(undefined)
 
@@ -1459,7 +1459,7 @@ describe 'tableElement', ->
 
   describe 'tablr:align-left', ->
     describe 'when there is no target column', ->
-      it 'change the alignment of the active column', ->
+      it 'changes the alignment of the active column', ->
         tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align = 'right'
 
         atom.commands.dispatch(tableElement, 'tablr:align-left')
@@ -1467,7 +1467,7 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('left')
 
     describe 'when there is a target column', ->
-      it 'change the alignment of the target column', ->
+      it 'changes the alignment of the target column', ->
         tableElement.contextMenuColumn = 2
         tableEditor.getScreenColumn(2).align = 'right'
 
@@ -1477,13 +1477,13 @@ describe 'tableElement', ->
 
   describe 'tablr:align-center', ->
     describe 'when there is no target column', ->
-      it 'change the alignment of the active column', ->
+      it 'changes the alignment of the active column', ->
         atom.commands.dispatch(tableElement, 'tablr:align-center')
 
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('center')
 
     describe 'when there is a target column', ->
-      it 'change the alignment of the target column', ->
+      it 'changes the alignment of the target column', ->
         tableElement.contextMenuColumn = 2
 
         atom.commands.dispatch(tableElement, 'tablr:align-center')
@@ -1492,13 +1492,13 @@ describe 'tableElement', ->
 
   describe 'tablr:align-right', ->
     describe 'when there is no target column', ->
-      it 'change the alignment of the active column', ->
+      it 'changes the alignment of the active column', ->
         atom.commands.dispatch(tableElement, 'tablr:align-right')
 
         expect(tableEditor.getScreenColumn(tableEditor.getCursorPosition().column).align).toEqual('right')
 
     describe 'when there is a target column', ->
-      it 'change the alignment of the target column', ->
+      it 'changes the alignment of the target column', ->
         tableElement.contextMenuColumn = 2
 
         atom.commands.dispatch(tableElement, 'tablr:align-right')
