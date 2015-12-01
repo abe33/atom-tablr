@@ -20,6 +20,8 @@ stopPropagationAndDefault = (f) -> (e) ->
   e.preventDefault()
   f?(e)
 
+leftClick = (f) -> (e) -> f?(e) if e.which is 1
+
 module.exports =
 class TableElement extends HTMLElement
   PropertyAccessors.includeInto(this)
@@ -155,7 +157,8 @@ class TableElement extends HTMLElement
       'click': stopPropagationAndDefault()
 
     @subscriptions.add @subscribeTo @body, '.tablr-gutter',
-      'mousedown': stopPropagationAndDefault (e) => @startGutterDrag(e)
+      'mousedown': stopPropagationAndDefault leftClick (e) =>
+        @startGutterDrag(e)
       'click': stopPropagationAndDefault()
 
     @subscriptions.add @subscribeTo @body, '.tablr-gutter .row-resize-handle',
