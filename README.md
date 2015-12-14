@@ -1,8 +1,8 @@
 <img src='http://abe33.github.io/atom-tablr/logo.svg' width='858' height='80'>
 
 [![Build Status](https://travis-ci.org/abe33/atom-tablr.svg?branch=master)](https://travis-ci.org/abe33/atom-tablr)
-[![APM Version](https://img.shields.io/apm/v/tablr.svg)](https://atom.io/packages/atom-tablr)
-[![APM Downloads](https://img.shields.io/apm/dm/tablr.svg)](https://atom.io/packages/atom-tablr)
+[![APM Version](https://img.shields.io/apm/v/tablr.svg)](https://atom.io/packages/tablr)
+[![APM Downloads](https://img.shields.io/apm/dm/tablr.svg)](https://atom.io/packages/tablr)
 
 
 Edit CSV files using a table editor.
