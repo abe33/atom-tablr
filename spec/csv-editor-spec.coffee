@@ -1,5 +1,6 @@
 require './helpers/spec-helper'
 
+os = require 'os'
 fs = require 'fs'
 fsp = require 'fs-plus'
 path = require 'path'
@@ -238,35 +239,37 @@ describe "CSVEditor", ->
                   ['1', '2']
                 ])
 
-    describe 'when the file is moved', ->
-      [spy, newPath, spyTitle] = []
+    # File moves aren't detected on linux
+    if os.platform() is 'darwin'
+      describe 'when the file is moved', ->
+        [spy, newPath, spyTitle] = []
 
-      beforeEach ->
-        jasmine.useRealClock?()
+        beforeEach ->
+          jasmine.useRealClock?()
 
-        openFixture('sample.csv', {})
-        runs ->
-          spy = jasmine.createSpy('did-change-path')
-          spyTitle = jasmine.createSpy('did-change-title')
-          csvEditor.onDidChangePath(spy)
-          csvEditor.onDidChangeTitle(spyTitle)
+          openFixture('sample.csv', {})
+          runs ->
+            spy = jasmine.createSpy('did-change-path')
+            spyTitle = jasmine.createSpy('did-change-title')
+            csvEditor.onDidChangePath(spy)
+            csvEditor.onDidChangeTitle(spyTitle)
 
-          newPath = path.join(projectPath, 'new-file.csv')
-          fsp.removeSync(newPath)
-          fsp.moveSync(csvEditor.getPath(), newPath)
+            newPath = path.join(projectPath, 'new-file.csv')
+            fsp.removeSync(newPath)
+            fsp.moveSync(csvEditor.getPath(), newPath)
 
-        waitsFor 'change path callback called', -> spy.callCount > 0
+          waitsFor 'change path callback called', -> spy.callCount > 0
 
-      it 'detects the change in path', ->
-        expect(spy).toHaveBeenCalledWith(newPath)
-        expect(csvEditor.getPath()).toEqual(newPath)
+        it 'detects the change in path', ->
+          expect(spy).toHaveBeenCalledWith(newPath)
+          expect(csvEditor.getPath()).toEqual(newPath)
 
-      it 'changes the key path to the settings', ->
-        expect(tableEditPackage.csvConfig.get(csvDest)).toBeUndefined()
-        expect(tableEditPackage.csvConfig.get(newPath)).toBeDefined()
+        it 'changes the key path to the settings', ->
+          expect(tableEditPackage.csvConfig.get(csvDest)).toBeUndefined()
+          expect(tableEditPackage.csvConfig.get(newPath)).toBeDefined()
 
-      it 'dispatches a did-change-title event', ->
-        expect(spyTitle).toHaveBeenCalledWith('new-file.csv')
+        it 'dispatches a did-change-title event', ->
+          expect(spyTitle).toHaveBeenCalledWith('new-file.csv')
 
     describe 'when the file is deleted', ->
       [deleteSpy] = []
