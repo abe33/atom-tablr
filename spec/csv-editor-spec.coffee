@@ -15,7 +15,7 @@ TableElement = require '../lib/table-element'
 CHANGE_TIMEOUT = 400
 
 describe "CSVEditor", ->
-  [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage, nextAnimationFrame] = []
+  [csvEditor, csvEditorElement, csvDest, absCsvDest, projectPath, absProjectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy, tableEditPackage, nextAnimationFrame] = []
 
   sleep = (ms) ->
     start = new Date
@@ -27,13 +27,14 @@ describe "CSVEditor", ->
     projectPath = temp.mkdirSync('tablr-project')
     atom.project.setPaths([projectPath])
 
-    projectPath = atom.project.resolvePath('.')
+    absProjectPath = atom.project.resolvePath('.')
     csvDest = path.join(projectPath, fixtureName)
+    absCsvDest = path.join(absProjectPath, fixtureName)
 
     fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
 
     if settings?
-      tableEditPackage.csvConfig.set(csvDest, 'options',  settings)
+      tableEditPackage.csvConfig.set(absCsvDest, 'options',  settings)
 
     waitsForPromise ->
       atom.workspace.open(fixtureName).then (t) ->
@@ -239,7 +240,7 @@ describe "CSVEditor", ->
                 ])
 
     describe 'when the file is moved', ->
-      [spy, newPath, spyTitle] = []
+      [spy, configSpy, newPath, spyTitle] = []
 
       beforeEach ->
         jasmine.useRealClock?()
@@ -250,6 +251,7 @@ describe "CSVEditor", ->
           spyTitle = jasmine.createSpy('did-change-title')
           csvEditor.onDidChangePath(spy)
           csvEditor.onDidChangeTitle(spyTitle)
+          spyOn(tableEditPackage.csvConfig, 'move')
 
           newPath = path.join(projectPath, 'new-file.csv')
           fsp.removeSync(newPath)
@@ -258,12 +260,12 @@ describe "CSVEditor", ->
         waitsFor 'change path callback called', -> spy.callCount > 0
 
       it 'detects the change in path', ->
-        expect(spy).toHaveBeenCalledWith(newPath)
-        expect(csvEditor.getPath()).toEqual(newPath)
+        relativePath = atom.project.relativizePath(newPath)
+        expect(atom.project.relativizePath(spy.mostRecentCall.args[0])).toEqual(relativePath)
+        expect(atom.project.relativizePath(csvEditor.getPath())).toEqual(relativePath)
 
       it 'changes the key path to the settings', ->
-        expect(tableEditPackage.csvConfig.get(csvDest)).toBeUndefined()
-        expect(tableEditPackage.csvConfig.get(newPath)).toBeDefined()
+        expect(tableEditPackage.csvConfig.move).toHaveBeenCalled()
 
       it 'dispatches a did-change-title event', ->
         expect(spyTitle).toHaveBeenCalledWith('new-file.csv')
@@ -295,7 +297,7 @@ describe "CSVEditor", ->
           waitsFor 'delete callback called', -> deleteSpy.callCount > 0
 
         it "retains its path and reports the buffer as modified", ->
-          expect(csvEditor.getPath()).toBe(csvDest)
+          expect(csvEditor.getPath()).toBe(absCsvDest)
           expect(csvEditor.isModified()).toBeTruthy()
 
       describe 'when the table is not modified', ->
@@ -304,7 +306,7 @@ describe "CSVEditor", ->
           waitsFor 'delete callback called', -> deleteSpy.callCount > 0
 
         it "retains its path and reports the buffer as not modified", ->
-          expect(csvEditor.getPath()).toBe(csvDest)
+          expect(csvEditor.getPath()).toBe(absCsvDest)
           expect(csvEditor.isModified()).toBeFalsy()
 
       describe 'when resaved', ->
@@ -834,7 +836,7 @@ describe "CSVEditor", ->
       runs ->
         expect(csvEditor.serialize()).toEqual({
           deserializer: 'CSVEditor'
-          filePath: csvDest
+          filePath: absCsvDest
           options: csvEditor.options
           choice: undefined
         })
@@ -846,7 +848,7 @@ describe "CSVEditor", ->
         runs ->
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            filePath: csvDest
+            filePath: absCsvDest
             options: csvEditor.options
             choice: 'TableEditor'
             layout:
@@ -871,7 +873,7 @@ describe "CSVEditor", ->
 
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            filePath: csvDest
+            filePath: absCsvDest
             options: csvEditor.options
             choice: 'TableEditor'
             layout:
@@ -896,7 +898,7 @@ describe "CSVEditor", ->
 
           expect(csvEditor.serialize()).toEqual({
             deserializer: 'CSVEditor'
-            filePath: csvDest
+            filePath: absCsvDest
             options: csvEditor.options
             choice: 'TableEditor'
             editor: csvEditor.editor.serialize()
