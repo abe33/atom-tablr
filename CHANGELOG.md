@@ -1,3 +1,15 @@
+<a name="v0.9.1"></a>
+# v0.9.1 (2016-01-05)
+
+## :bug: Bug Fixes
+
+- Fix change event never emitted by the CSV form ([eeec6637](https://github.com/abe33/atom-tablr/commit/eeec6637418c3bc6832cd22736bffc744c441ad9))
+- Fix changing mini text editor value target the wrong radio group ([65a68800](https://github.com/abe33/atom-tablr/commit/65a688003678dae968bdac2a27e1fff1b592ebea))
+
+## :arrow_up: Dependencies Update
+
+- Bump atom-utils version ([6ed3f38e](https://github.com/abe33/atom-tablr/commit/6ed3f38ef3f946f74c01a175730770b2d45d1e4a))
+
 <a name="v0.9.0"></a>
 # v0.9.0 (2015-12-02)
 
