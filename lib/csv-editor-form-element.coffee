@@ -198,6 +198,8 @@ class CSVEditorFormElement extends HTMLElement
       else if radio = radioGroup.querySelector("[id^='#{initial}-']")
         radio.checked = true
 
+    @initialized = true
+
   attachedCallback: ->
     @attached = true
 
