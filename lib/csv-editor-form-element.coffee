@@ -172,9 +172,9 @@ class CSVEditorFormElement extends HTMLElement
       @subscriptions.add element.onDidChange =>
         return unless @attached
         if element.getText() isnt ''
-          @querySelector("[id^='custom-']")?.checked = true
+          radioGroup.querySelector("[id^='custom-']")?.checked = true
         else
-          @querySelector("[id^='#{initial}-']")?.checked = true
+          radioGroup.querySelector("[id^='#{initial}-']")?.checked = true
 
         @emitChangeEvent()
 
