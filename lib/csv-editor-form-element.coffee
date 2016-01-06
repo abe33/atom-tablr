@@ -1,5 +1,6 @@
 {CompositeDisposable, Emitter} = require 'atom'
 {SpacePenDSL, EventsDelegation, registerOrUpdateElement} = require 'atom-utils'
+encodings = require('./encodings')
 
 nextId = 0
 
@@ -46,6 +47,16 @@ class CSVEditorFormElement extends HTMLElement
 
         options.options["custom"] = 'custom'
         radios(options)
+
+    select = (options={}) =>
+      {name, label, outlet, options} = options
+
+      @div class: "control-group #{name}", =>
+        @div class: 'controls', =>
+          @label class: 'setting-title', label
+          @select class: 'form-control', outlet: "#{outlet}Select", =>
+            options.forEach (option) =>
+              @option value: option.value, option.name
 
     @div class: 'settings-panel', =>
       @div class: 'setting-title', 'Choose between table and text editor:'
@@ -134,6 +145,15 @@ class CSVEditorFormElement extends HTMLElement
           }
 
         @div class: 'panel', =>
+          select {
+            name: 'encoding'
+            label: 'Encoding'
+            outlet: 'encoding'
+            options: Object.keys(encodings).map (key) ->
+              value: encodings[key].status
+              name: encodings[key].list
+          }
+
           @div class: 'control-group header', =>
             @label class: 'setting-title', for: "header-#{id}", 'Header'
             @input type: 'checkbox', name: 'header', id: "header-#{id}"
@@ -246,6 +266,7 @@ class CSVEditorFormElement extends HTMLElement
       eof: @querySelector('[id^="eof"]').checked
       quoted: @querySelector('[id^="quoted"]').checked
       skip_empty_lines: @querySelector('[id^="skip-empty-lines"]').checked
+      encoding: @encodingSelect.value
 
     trim = @querySelector('[name="trim"]:checked')?.value
     comment = @querySelector('[name="comment"]:checked')?.value

@@ -192,7 +192,7 @@ class CSVEditor
           options = _.clone(@options)
           layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
 
-          @getTableEditor(filePath, options, layout).then (tableEditor) =>
+          @getTableEditor(options, layout).then (tableEditor) =>
             CSVEditor.tableEditorForPath[filePath] = tableEditor
             @editorSubscriptions.dispose()
             @editor = tableEditor
@@ -254,33 +254,39 @@ class CSVEditor
         options = _.clone(@options)
         layout = @layout ? Tablr.csvConfig?.get(filePath, 'layout')
 
-        @getTableEditor(filePath, options, layout).then (tableEditor) =>
+        @getTableEditor(options, layout).then (tableEditor) =>
           CSVEditor.tableEditorForPath[filePath] = tableEditor
           resolve(tableEditor)
 
-  getTableEditor: (filePath, options, layout) ->
+  getTableEditor: (options, layout) ->
     new Promise (resolve, reject) =>
-      fileContent = fs.readFileSync(filePath)
-      csv.parse String(fileContent), options, (err, data) =>
-        return reject(err) if err?
+      @file.setEncoding(options.encoding)
 
-        tableEditor = new TableEditor
-        return resolve(tableEditor) if data.length is 0
-        tableEditor.lockModifiedStatus()
+      delete options.encoding
 
-        if options.header
-          for column,i in data.shift()
-            tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
-        else
-          for i in [0...data[0].length]
-            tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
+      @file.read().then (fileContent) =>
+        csv.parse String(fileContent), options, (err, data) =>
+          return reject(err) if err?
 
-        tableEditor.addRows(data)
-        tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
-        tableEditor.setSaveHandler(@save)
-        tableEditor.initializeAfterSetup()
-        tableEditor.unlockModifiedStatus()
-        resolve(tableEditor)
+          tableEditor = new TableEditor
+          return resolve(tableEditor) if data.length is 0
+          tableEditor.lockModifiedStatus()
+
+          if options.header
+            for column,i in data.shift()
+              tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
+          else
+            for i in [0...data[0].length]
+              tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
+
+          tableEditor.addRows(data)
+          tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
+          tableEditor.setSaveHandler(@save)
+          tableEditor.initializeAfterSetup()
+          tableEditor.unlockModifiedStatus()
+          resolve(tableEditor)
+
+      .catch (err) -> reject(err)
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>

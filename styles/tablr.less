@@ -860,6 +860,39 @@ atom-csv-editor {
       .btn;
     }
 
+    .control-group.encoding {
+      .controls {
+        position: relative;
+        width: 100%;
+
+        label:not(.btn) {
+          line-height: 2em;
+          margin-bottom: @two-third-padding;
+        }
+
+        select.form-control {
+          -webkit-appearance: none;
+          font-size: 1em;
+          .btn;
+
+        }
+        &::after {
+          content: '\f05f';
+          font-family: 'Octicons Regular';
+          position: absolute;
+          transform: rotate(90deg);
+          display: block;
+          text-align: center;
+          width: 2em;
+          height: 2em;
+          font-size: 1em;
+          bottom: 0;
+          right: 0.5em;
+          color: @text-color;
+        }
+      }
+    }
+
     .quotes .btn,
     .escapes .btn,
     .delimiters .btn {

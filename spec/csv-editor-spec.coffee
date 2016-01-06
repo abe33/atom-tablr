@@ -22,8 +22,18 @@ describe "CSVEditor", ->
     start = new Date
     -> new Date - start >= ms
 
-  openFixture = (fixtureName, settings) ->
+  openFixture = (fixtureName, settings, noCopy) ->
     csvFixture = path.join(__dirname, 'fixtures', fixtureName)
+
+    if noCopy
+      waitsForPromise ->
+        atom.workspace.open(fixtureName).then (t) ->
+          csvEditor = t
+          csvEditorElement = atom.views.getView(csvEditor)
+
+      runs -> expect(csvEditor.file).toBeDefined()
+
+      return
 
     projectPath = temp.mkdirSync('tablr-project')
     atom.project.setPaths([projectPath])
@@ -583,6 +593,28 @@ describe "CSVEditor", ->
 
               it 'dispatches a did-change-modified event', ->
                 expect(modifiedSpy).toHaveBeenCalled()
+
+      describe 'with a specific encoding', ->
+        beforeEach ->
+          openFixture('iso-8859-1.csv', null, true)
+
+          runs ->
+            csvEditor.onDidOpen ({editor}) -> tableEditor = editor
+
+            encodingSelect = csvEditorElement.form.encodingSelect
+            encodingSelect.value = 'ISO 8859-1'
+
+            tableEditorButton = csvEditorElement.form.openTableEditorButton
+            click(tableEditorButton)
+
+            waitsFor 'table editor created', -> tableEditor?
+
+        it 'uses the given encoding to open the file', ->
+          expect(tableEditor.table.getColumnValues(0)).toEqual([
+            'name',
+            'Cédric',
+            'Émile'
+          ])
 
     describe 'when the file cannot be parsed with the default', ->
       beforeEach ->
