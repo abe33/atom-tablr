@@ -260,7 +260,7 @@ class CSVEditor
 
   getTableEditor: (options, layout) ->
     new Promise (resolve, reject) =>
-      @file.setEncoding(options.encoding)
+      @file.setEncoding(options.fileEncoding)
 
       delete options.encoding
 

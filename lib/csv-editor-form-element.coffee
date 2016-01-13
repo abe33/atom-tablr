@@ -177,7 +177,7 @@ class CSVEditorFormElement extends HTMLElement
     @subscriptions = new CompositeDisposable
     @emitter = new Emitter
 
-    @subscriptions.add @subscribeTo this, 'input',
+    @subscriptions.add @subscribeTo this, 'input, select',
       change: => @emitChangeEvent()
 
     @initializeBindings()
@@ -266,7 +266,7 @@ class CSVEditorFormElement extends HTMLElement
       eof: @querySelector('[id^="eof"]').checked
       quoted: @querySelector('[id^="quoted"]').checked
       skip_empty_lines: @querySelector('[id^="skip-empty-lines"]').checked
-      encoding: @encodingSelect.value
+      fileEncoding: @encodingSelect.value
 
     trim = @querySelector('[name="trim"]:checked')?.value
     comment = @querySelector('[name="comment"]:checked')?.value
