@@ -606,17 +606,19 @@ describe "CSVEditor", ->
             encodingSelect = csvEditorElement.form.encodingSelect
             encodingSelect.value = 'ISO 8859-1'
 
+        describe 'when the table editor is opened', ->
+          beforeEach ->
             tableEditorButton = csvEditorElement.form.openTableEditorButton
             click(tableEditorButton)
 
             waitsFor 'table editor created', -> tableEditor?
 
-        it 'uses the given encoding to open the file', ->
-          expect(tableEditor.table.getColumnValues(0)).toEqual([
-            'name',
-            'Cédric',
-            'Émile'
-          ])
+          it 'uses the given encoding to fill the table', ->
+            expect(tableEditor.table.getColumnValues(0)).toEqual([
+              'name',
+              'Cédric',
+              'Émile'
+            ])
 
     describe 'when the file cannot be parsed with the default', ->
       beforeEach ->
