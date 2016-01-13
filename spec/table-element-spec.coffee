@@ -780,7 +780,7 @@ describe 'tableElement', ->
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
         it 'gives the focus to the editor', ->
-          expect(editorElement.matches('.is-focused')).toBeTruthy()
+          expect(document.activeElement).toBe(editorElement)
 
         it 'fills the editor with the cell value', ->
           expect(editor.getText()).toEqual('key')
@@ -1696,7 +1696,7 @@ describe 'tableElement', ->
       expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
     it 'gives the focus to the editor', ->
-      expect(editorElement.matches('.is-focused')).toBeTruthy()
+      expect(document.activeElement).toBe(editorElement)
 
     it 'fills the editor with the cell value', ->
       expect(editor.getText()).toEqual('row0')
