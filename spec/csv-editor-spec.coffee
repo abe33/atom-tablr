@@ -407,7 +407,9 @@ describe "CSVEditor", ->
 
         it 'places the focus on the table element', ->
           tableElement = atom.views.getView(tableEditor)
-          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+
+          expect(document.activeElement).toBe(tableElement)
+          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
         it 'clears the table undo stack', ->
           expect(tableEditor.getTable().undoStack.length).toEqual(0)

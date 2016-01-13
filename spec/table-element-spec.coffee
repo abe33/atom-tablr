@@ -803,7 +803,8 @@ describe 'tableElement', ->
             expect(isVisible(editorElement)).toBeFalsy()
 
           it 'gives the focus back to the table view', ->
-            expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+            expect(document.activeElement).toBe(tableElement)
+            expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
           it 'changes the cell value', ->
             expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
@@ -1029,7 +1030,8 @@ describe 'tableElement', ->
   it 'gains focus when mouse is pressed on the table view', ->
     mousedown(tableElement)
 
-    expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+    expect(document.activeElement).toBe(tableElement)
+    expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
   it 'activates the cell under the mouse when pressed', ->
     cell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="2"]')
@@ -1045,7 +1047,8 @@ describe 'tableElement', ->
 
     expect(tableElement.hiddenInput.focus).toHaveBeenCalled()
     expect(tableElement.hiddenInput.focus.calls.length).toEqual(1)
-    expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+    expect(document.activeElement).toBe(tableElement)
+    expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
   it 'has an cursor', ->
     cursor = tableEditor.getLastCursor()
@@ -1712,7 +1715,8 @@ describe 'tableElement', ->
       expect(isVisible(tableElement.querySelector('atom-text-editor'))).toBeFalsy()
 
     it 'gives the focus back to the table view', ->
-      expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+      expect(document.activeElement).toBe(tableElement)
+      expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
     it 'leaves the cell value as is', ->
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
@@ -1762,7 +1766,8 @@ describe 'tableElement', ->
           expect(tableShadowRoot.querySelectorAll('atom-text-editor').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
-          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+          expect(document.activeElement).toBe(tableElement)
+          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
         it 'changes the cell value', ->
           expect(tableEditor.getLastCursor().getValue()).toEqual('foobar')
@@ -1776,7 +1781,8 @@ describe 'tableElement', ->
           expect(isVisible(tableElement.querySelector('atom-text-editor'))).toBeFalsy()
 
         it 'gives the focus back to the table view', ->
-          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+          expect(document.activeElement).toBe(tableElement)
+          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
         it 'leaves the cell value as is', ->
           expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
@@ -1812,7 +1818,8 @@ describe 'tableElement', ->
           expect(tableShadowRoot.querySelectorAll('atom-text-editor').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
-          expect(tableElement.hiddenInput.matches(':focus')).toBeTruthy()
+          expect(document.activeElement).toBe(tableElement)
+          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
         it 'changes the cells value', ->
           expect(tableEditor.getCursors().length).toEqual(2)
