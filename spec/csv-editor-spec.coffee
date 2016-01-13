@@ -41,7 +41,7 @@ describe "CSVEditor", ->
     projectPath = atom.project.resolvePath('.')
     csvDest = path.join(projectPath, fixtureName)
 
-    fs.writeFileSync(csvDest, fs.readFileSync(csvFixture).toString().replace(/\s+$/g,''))
+    fs.writeFileSync(csvDest, fs.readFileSync(csvFixture))
 
     if settings?
       tableEditPackage.csvConfig.set(csvDest, 'options',  settings)
@@ -596,7 +596,7 @@ describe "CSVEditor", ->
 
       describe 'with a specific encoding', ->
         beforeEach ->
-          openFixture('iso-8859-1.csv', null, true)
+          openFixture('iso-8859-1.csv')
 
           runs ->
             csvEditor.onDidOpen ({editor}) -> tableEditor = editor
@@ -743,7 +743,7 @@ describe "CSVEditor", ->
             tableEditor.addRow ['JKL', 78]
 
         it 'save the new csv content on disk', ->
-          expect(savedContent).toEqual("ABC,12::DEF,34::GHI,56::JKL,78")
+          expect(savedContent).toEqual("ABC,12::DEF,\"34\n\"::GHI,56::JKL,78")
 
         it 'marks the table editor as saved', ->
           expect(tableEditor.isModified()).toBeFalsy()
