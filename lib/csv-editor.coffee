@@ -90,11 +90,12 @@ class CSVEditor
         return reject(err) if err?
 
         @preventFileChangeEvents()
-        fs.writeFile path, data, (err) =>
-          if err?
-            @allowFileChangeEvents()
-            return reject(err)
+        @file.writeFile(path, data).then =>
           resolve()
+        .catch (err) =>
+          @allowFileChangeEvents()
+          reject(err)
+
 
   saveConfig: (@choice) ->
     filePath = @getPath()

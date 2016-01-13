@@ -64,7 +64,7 @@ describe "CSVEditor", ->
       expect(csvEditor.isModified()).toBeTruthy()
 
       spyOn(fs, 'writeFile').andCallFake (path, data, callback) ->
-        savedContent = data
+        savedContent = String(data)
         callback()
 
       tableEditor.save()
@@ -619,6 +619,19 @@ describe "CSVEditor", ->
               'Cédric',
               'Émile'
             ])
+
+          describe 'when save again', ->
+            beforeEach ->
+              modifyAndSave ->
+                tableEditor.addRow ['Bill', 45, 'male']
+
+            it 'honors the specified encoding', ->
+              expect(savedContent).not.toEqual('''
+              name,age,gender
+              Cédric,34,male
+              Émile,30,male
+              Bill,45,male
+              ''')
 
     describe 'when the file cannot be parsed with the default', ->
       beforeEach ->
