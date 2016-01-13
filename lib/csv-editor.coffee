@@ -262,10 +262,8 @@ class CSVEditor
     new Promise (resolve, reject) =>
       @file.setEncoding(options.fileEncoding)
 
-      delete options.encoding
-
-      @file.read().then (fileContent) =>
-        csv.parse String(fileContent), options, (err, data) =>
+      @file.read(true).then (fileContent) =>
+        csv.parse fileContent, options, (err, data) =>
           return reject(err) if err?
 
           tableEditor = new TableEditor
@@ -290,28 +288,15 @@ class CSVEditor
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>
-      input = fs.createReadStream(@getPath())
-      parser = csv.parse(options)
-      output = []
+      @file.setEncoding(options.fileEncoding)
 
-      stop = ->
-        input.unpipe(parser)
-        parser.end()
-        resolve(output)
+      @file.read(true).then (fileContent) =>
+        csv.parse fileContent, options, (err, data) =>
+          return reject(err) if err?
 
-      read = ->
-        output.push record while record = parser.read()
+          resolve(data)
 
-      end = ->
-        resolve(output)
-
-      error = (err) -> reject(err)
-
-      parser.on 'readable', read
-      parser.on 'end', end
-      parser.on 'error', error
-
-      input.pipe(parser)
+      .catch (err) -> reject(err)
 
   preventFileChangeEvents: -> @nofileChangeEvent = true
 
