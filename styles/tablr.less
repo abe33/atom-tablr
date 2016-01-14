@@ -777,22 +777,6 @@ atom-csv-editor {
       }
     }
 
-    .control-group {
-      display: flex;
-      align-items: center;
-      text-align: left;
-
-      input[type='checkbox'] {
-        margin-left: 0;
-        margin-right: 0;
-      }
-    }
-    .control-group > .setting-title {
-      flex: 1 1 0;
-      margin: 0;
-      color: @csv-form-text-color;
-    }
-
     .split-panel {
       display: flex;
       flex-direction: row;
@@ -817,7 +801,26 @@ atom-csv-editor {
     }
 
     .control-group {
-      &.with-radios, &.with-text-editor {
+      display: flex;
+      align-items: center;
+      text-align: left;
+
+      input[type='checkbox'] {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      & > .setting-title {
+        flex: 1 1 0;
+        margin: 0;
+        color: @csv-form-text-color;
+      }
+
+      +.control-group.boolean {
+        margin-top: 1.65em;
+      }
+
+      &.radios {
         flex-direction: column;
         align-items: stretch;
 
@@ -825,30 +828,63 @@ atom-csv-editor {
           line-height: 2em;
           flex: 1 0;
         }
-      }
 
-      &.with-text-editor {
-        .controls:last-child {
-          display: flex;
-          flex-direction: row;
-          justify-content: flex-end;
+        &.with-text-editor {
+          .controls:last-child {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+          }
+
+          .controls:first-child {
+            flex-direction: row;
+            display: flex;
+            margin-bottom: @two-third-padding;
+            align-items: center;
+
+            atom-text-editor {
+              width: 6em;
+              height: 2em;
+            }
+          }
         }
-
-        .controls:first-child {
-          flex-direction: row;
-          display: flex;
-          margin-bottom: @two-third-padding;
-          align-items: center;
-
-          atom-text-editor {
-            width: 6em;
-            height: 2em;
+        &.with-radios-only {
+          .setting-title {
+            margin-bottom: @two-third-padding;
           }
         }
       }
-      &.with-radios {
-        .setting-title {
-          margin-bottom: @two-third-padding;
+
+      &.select {
+        .controls {
+          position: relative;
+          width: 100%;
+
+          label:not(.btn) {
+            line-height: 2em;
+            margin-bottom: @two-third-padding;
+          }
+
+          select.form-control {
+            -webkit-appearance: none;
+            font-size: 1em;
+            .btn;
+
+          }
+          &::after {
+            content: '\f05f';
+            font-family: 'Octicons Regular';
+            position: absolute;
+            transform: rotate(90deg);
+            display: block;
+            text-align: center;
+            width: 2em;
+            height: 2em;
+            font-size: 1em;
+            bottom: 0;
+            right: 0.5em;
+            color: @text-color;
+          }
         }
       }
     }
@@ -858,39 +894,6 @@ atom-csv-editor {
     }
     input[type="radio"] + label {
       .btn;
-    }
-
-    .control-group.encoding {
-      .controls {
-        position: relative;
-        width: 100%;
-
-        label:not(.btn) {
-          line-height: 2em;
-          margin-bottom: @two-third-padding;
-        }
-
-        select.form-control {
-          -webkit-appearance: none;
-          font-size: 1em;
-          .btn;
-
-        }
-        &::after {
-          content: '\f05f';
-          font-family: 'Octicons Regular';
-          position: absolute;
-          transform: rotate(90deg);
-          display: block;
-          text-align: center;
-          width: 2em;
-          height: 2em;
-          font-size: 1em;
-          bottom: 0;
-          right: 0.5em;
-          color: @text-color;
-        }
-      }
     }
 
     .quotes .btn,

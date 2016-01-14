@@ -34,13 +34,13 @@ class CSVEditorFormElement extends HTMLElement
 
     radiosOnly = (options={}) =>
       {name, label} = options
-      @div class: "control-group with-radios #{name}", =>
+      @div class: "control-group with-radios-only radios #{name}", =>
         @label class: 'setting-title', label
         radios(options)
 
     radiosWithTextEditor = (options={}) =>
       {name, label, outlet, selected} = options
-      @div class: "control-group with-text-editor #{name}", =>
+      @div class: "control-group with-text-editor radios #{name}", =>
         @div class: 'controls', =>
           @label class: 'setting-title', label
           @tag 'atom-text-editor', outlet: "#{outlet}TextEditorElement", mini: true, 'data-id': outlet
@@ -51,7 +51,7 @@ class CSVEditorFormElement extends HTMLElement
     select = (options={}) =>
       {name, label, outlet, options} = options
 
-      @div class: "control-group #{name}", =>
+      @div class: "control-group select #{name}", =>
         @div class: 'controls', =>
           @label class: 'setting-title', label
           @select class: 'form-control', outlet: "#{outlet}Select", =>
@@ -154,19 +154,19 @@ class CSVEditorFormElement extends HTMLElement
               name: encodings[key].list
           }
 
-          @div class: 'control-group header', =>
+          @div class: 'control-group boolean header', =>
             @label class: 'setting-title', for: "header-#{id}", 'Header'
             @input type: 'checkbox', name: 'header', id: "header-#{id}"
 
-          @div class: 'control-group eof', =>
+          @div class: 'control-group boolean eof', =>
             @label class: 'setting-title', for: "eof-#{id}", 'End Of File'
             @input type: 'checkbox', name: 'eof', id: "eof-#{id}"
 
-          @div class: 'control-group quoted', =>
+          @div class: 'control-group boolean quoted', =>
             @label class: 'setting-title', for: "quoted-#{id}", 'Quoted'
             @input type: 'checkbox', name: 'quoted', id: "quoted-#{id}"
 
-          @div class: 'control-group skip-empty-lines', =>
+          @div class: 'control-group boolean skip-empty-lines', =>
             @label class: 'setting-title', for: "skip-empty-lines-#{id}", 'Skip Empty Lines'
             @input type: 'checkbox', name: 'skip-empty-lines', id: "skip-empty-lines-#{id}"
 
