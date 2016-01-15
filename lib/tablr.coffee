@@ -80,6 +80,8 @@ module.exports =
 
     @subscriptions.add atom.commands.add 'atom-workspace',
       'tablr:clear-csv-storage': => @csvConfig.clear()
+      'tablr:clear-csv-choice': => @csvConfig.clearOption('choice')
+      'tablr:clear-csv-layout': => @csvConfig.clearOption('layout')
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless ///\.#{atom.config.get('tablr.supportedCsvExtensions').join('|')}$///.test uriToOpen

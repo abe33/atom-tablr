@@ -17,5 +17,8 @@ class CSVConfig
 
   clear: -> @config = {}
 
+  clearOption: (option) ->
+    delete config[option] for path, config of @config
+
   serialize: ->
     _.clone(@config)

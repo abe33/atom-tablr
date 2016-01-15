@@ -851,7 +851,15 @@ describe "CSVEditor", ->
         expect(editor).toBeDefined()
         expect(editor.getText?).toBeTruthy()
 
-  describe 'tablr:clear-csv-storage', ->
+  ##     ######  ##     ## ########
+  ##    ##    ## ###   ### ##     ##
+  ##    ##       #### #### ##     ##
+  ##    ##       ## ### ## ##     ##
+  ##    ##       ##     ## ##     ##
+  ##    ##    ## ##     ## ##     ##
+  ##     ######  ##     ## ########
+
+  describe 'storage commands', ->
     beforeEach ->
       tableEditPackage.csvConfig.set '/some/path/to.csv', 'layout', {
         columns: [
@@ -865,12 +873,29 @@ describe "CSVEditor", ->
           200
         ]
       }
+      tableEditPackage.csvConfig.set '/some/path/to.csv', 'choice', 'TableEditor'
 
-    it 'removes the stored data', ->
-      atom.commands.dispatch(atom.views.getView(atom.workspace), 'tablr:clear-csv-storage')
+    describe 'tablr:clear-csv-storage', ->
+      it 'removes the stored data', ->
+        atom.commands.dispatch(atom.views.getView(atom.workspace), 'tablr:clear-csv-storage')
 
-      expect(tableEditPackage.csvConfig.get '/some/path/to.csv').toBeUndefined()
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv').toBeUndefined()
 
+    describe 'tablr:clear-csv-choice', ->
+      it 'removes only the stored choice', ->
+        atom.commands.dispatch(atom.views.getView(atom.workspace), 'tablr:clear-csv-choice')
+
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv').not.toBeUndefined()
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv', 'layout').not.toBeUndefined()
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv', 'choice').toBeUndefined()
+
+    describe 'tablr:clear-csv-layout', ->
+      it 'removes only the stored choice', ->
+        atom.commands.dispatch(atom.views.getView(atom.workspace), 'tablr:clear-csv-layout')
+
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv').not.toBeUndefined()
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv', 'layout').toBeUndefined()
+        expect(tableEditPackage.csvConfig.get '/some/path/to.csv', 'choice').not.toBeUndefined()
 
   ##    ########  ########  ######  ########  #######  ########  ########
   ##    ##     ## ##       ##    ##    ##    ##     ## ##     ## ##
