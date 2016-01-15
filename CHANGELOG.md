@@ -1,3 +1,16 @@
+<a name="v0.10.0"></a>
+# v0.10.0 (2016-01-16)
+
+## :sparkles: Features
+
+- Add a none option to the comment field ([1f9e7e18](https://github.com/abe33/atom-tablr/commit/1f9e7e1894e5590c1fc44c0b02d3168cd132e6c8))
+- Implement columns swapping and moving ([5a0c3db4](https://github.com/abe33/atom-tablr/commit/5a0c3db49a1fa53ef3772b16e4402d6e0a16a932), [#24](https://github.com/abe33/atom-tablr/issues/24))
+- Add clear-cdv-choice and clear-cdv-layout commands ([8f923539](https://github.com/abe33/atom-tablr/commit/8f923539a2fd972d216cf2d5d280340b8b3dc364))  <br>They allow to remove only the specified stored data without affecting
+  the other data
+- Implement saving CSV with the specified encoding ([225a12a2](https://github.com/abe33/atom-tablr/commit/225a12a2064f3c8ac53581badaa5faac783092d8))
+- Implement encoding support in preview ([e5bba7b1](https://github.com/abe33/atom-tablr/commit/e5bba7b18fe61ac2f7908001b06d0e2be6496a87))
+- Add a select to chose encoding in CSV form ([005e8aa6](https://github.com/abe33/atom-tablr/commit/005e8aa68dfd5e06e166dc5494a7dee5be099dcb))
+
 <a name="v0.9.1"></a>
 # v0.9.1 (2016-01-05)
 
