@@ -13,7 +13,7 @@ class DisplayTable
     displayTable = new DisplayTable(state)
 
   @delegatesMethods(
-    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows', 'getRow',
+    'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'swapColumns', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows', 'getRow',
     toProperty: 'table'
   )
 
@@ -68,6 +68,9 @@ class DisplayTable
   onDidRenameColumn: (callback) ->
     @emitter.on 'did-rename-column', callback
 
+  onDidSwapColumns: (callback) ->
+    @emitter.on 'did-swap-columns', callback
+
   onDidChangeColumnOption: (callback) ->
     @emitter.on 'did-change-column-options', callback
 
@@ -99,6 +102,15 @@ class DisplayTable
     @subscriptions.add @table.onDidRenameColumn ({newName, oldName, index}) =>
       @screenColumns[index].setOption 'name', newName
       @emitter.emit('did-rename-column', {screenColumn: @screenColumns[index], oldName, newName, index})
+
+    @subscriptions.add @table.onDidSwapColumns ({columnA, columnB}) =>
+      screenColumnA = @screenColumns[columnA]
+      screenColumnB = @screenColumns[columnB]
+
+      @screenColumns[columnA] = screenColumnB
+      @screenColumns[columnB] = screenColumnA
+
+      @emitter.emit('did-rename-column', {columnA, screenColumnA, columnB, screenColumnB})
 
     @subscriptions.add @table.onDidAddRow ({index}) =>
       @rowHeights.splice(index, 0, undefined)

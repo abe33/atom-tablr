@@ -1588,6 +1588,22 @@ describe 'tableElement', ->
 
       expect(tableEditor.moveLineUp).toHaveBeenCalled()
 
+  describe 'tablr:move-column-left', ->
+    it 'calls tableEditor::moveColumnLeft', ->
+      spyOn(tableEditor, 'moveColumnLeft')
+
+      atom.commands.dispatch(tableElement, 'tablr:move-column-left')
+
+      expect(tableEditor.moveColumnLeft).toHaveBeenCalled()
+
+  describe 'tablr:move-column-right', ->
+    it 'calls tableEditor::moveColumnRight', ->
+      spyOn(tableEditor, 'moveColumnRight')
+
+      atom.commands.dispatch(tableElement, 'tablr:move-column-right')
+
+      expect(tableEditor.moveColumnRight).toHaveBeenCalled()
+
   describe 'tablr:apply-sort', ->
     it 'calls tableEditor::applySort', ->
       spyOn(tableEditor, 'applySort')

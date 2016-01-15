@@ -533,6 +533,118 @@ describe 'TableEditor', ->
 
           expect(atom.notifications.addWarning).toHaveBeenCalled()
 
+    describe '::moveColumnLeft', ->
+      beforeEach ->
+        tableEditor = new TableEditor
+        tableEditor.addColumn 'key'
+        tableEditor.addColumn 'value'
+        tableEditor.addColumn 'foo'
+
+        for i in [0...100]
+          tableEditor.addRow [
+            "row#{i}"
+            i * 100
+            if i % 2 is 0 then 'yes' else 'no'
+          ]
+
+        tableEditor.setCursorAtPosition([1,1])
+        tableEditor.addCursorAtPosition([3,2])
+
+        table.clearUndoStack()
+
+      it 'moves the column to the left', ->
+        tableEditor.moveColumnLeft()
+
+        expect(tableEditor.getScreenColumn(0).name).toEqual('value')
+        expect(tableEditor.getScreenColumn(1).name).toEqual('foo')
+        expect(tableEditor.getScreenColumn(2).name).toEqual('key')
+
+      it 'updates the selections', ->
+        tableEditor.moveColumnLeft()
+
+        expect(tableEditor.getSelectedRanges()).toEqual([
+          [[1,0],[2,1]]
+          [[3,1],[4,2]]
+        ])
+
+      it 'can undo the cursors moves', ->
+        tableEditor.moveColumnLeft()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,1]
+        ])
+
+        tableEditor.undo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,1]
+          [3,2]
+        ])
+
+        tableEditor.redo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,1]
+        ])
+
+    describe '::moveColumnRight', ->
+      beforeEach ->
+        tableEditor = new TableEditor
+        tableEditor.addColumn 'key'
+        tableEditor.addColumn 'value'
+        tableEditor.addColumn 'foo'
+
+        for i in [0...100]
+          tableEditor.addRow [
+            "row#{i}"
+            i * 100
+            if i % 2 is 0 then 'yes' else 'no'
+          ]
+
+        tableEditor.setCursorAtPosition([1,0])
+        tableEditor.addCursorAtPosition([3,1])
+
+        table.clearUndoStack()
+
+      it 'moves the column to the right', ->
+        tableEditor.moveColumnRight()
+
+        expect(tableEditor.getScreenColumn(0).name).toEqual('foo')
+        expect(tableEditor.getScreenColumn(1).name).toEqual('key')
+        expect(tableEditor.getScreenColumn(2).name).toEqual('value')
+
+      it 'updates the selections', ->
+        tableEditor.moveColumnRight()
+
+        expect(tableEditor.getSelectedRanges()).toEqual([
+          [[1,1],[2,2]]
+          [[3,2],[4,3]]
+        ])
+
+      it 'can undo the cursors moves', ->
+        tableEditor.moveColumnRight()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,1]
+          [3,2]
+        ])
+
+        tableEditor.undo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,0]
+          [3,1]
+        ])
+
+        tableEditor.redo()
+
+        expect(tableEditor.getCursorPositions()).toEqual([
+          [1,1]
+          [3,2]
+        ])
+
     ##      ######  ######## ##       ########  ######  ########  ######
     ##     ##    ## ##       ##       ##       ##    ##    ##    ##    ##
     ##     ##       ##       ##       ##       ##          ##    ##

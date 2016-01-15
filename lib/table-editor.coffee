@@ -33,7 +33,7 @@ class TableEditor
     'onDidAddRow', 'onDidRemoveRow', 'onDidChange', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex', 'getScreenColumnIndex',
     'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'setScreenColumnAlignAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth', 'getColumnIndex',
-    'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'getColumns',
+    'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'swapColumns', 'getColumns',
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn', 'onDidChangeLayout',
     'getScreenCellRect', 'getScreenCellPosition',
     'onDidChangeCellValue',
@@ -385,6 +385,9 @@ class TableEditor
   getCursorsInRowOrder: ->
     @getCursors().sort (a,b) -> a.getPosition().row - b.getPosition().row
 
+  getCursorsInColumnOrder: ->
+    @getCursors().sort (a,b) -> a.getPosition().column - b.getPosition().column
+
   hasMultipleCursors: ->
     @getCursors().length > 1
 
@@ -513,36 +516,42 @@ class TableEditor
 
     cursors = @getCursorsInRowOrder().reverse()
 
-    originalCursorPositions = @getCursors().map (cursor) ->
-      cursor.getPosition().copy()
-
-    @table.batchTransaction ->
-      cursors.forEach (cursor) -> cursor.moveLineDown()
-
-    finalCursorPositions = @getCursors().map (cursor) ->
-      cursor.getPosition().copy()
-
-    @table.ammendLastTransaction
-      undo: (commit) =>
-        commit.undo()
-        @getCursors().forEach (cursor,i) ->
-          cursor.setPosition(originalCursorPositions[i])
-
-      redo: (commit) =>
-        commit.redo()
-        @getCursors().forEach (cursor,i) ->
-          cursor.setPosition(finalCursorPositions[i])
+    @initiateCursorManipulation ->
+      @table.batchTransaction ->
+        cursors.forEach (cursor) -> cursor.moveLineDown()
 
   moveLineUp: ->
     return @notifyLineMoveWithOrder() if @order?
 
     cursors = @getCursorsInRowOrder()
 
+    @initiateCursorManipulation ->
+      @table.batchTransaction ->
+        cursors.forEach (cursor) -> cursor.moveLineUp()
+
+  moveColumnLeft: ->
+    cursors = @getCursorsInColumnOrder()
+
+    @initiateCursorManipulation ->
+      @table.batchTransaction ->
+        cursors.forEach (cursor) -> cursor.moveColumnLeft()
+
+  moveColumnRight: ->
+    cursors = @getCursorsInColumnOrder().reverse()
+
+    @initiateCursorManipulation ->
+      @table.batchTransaction ->
+        cursors.forEach (cursor) -> cursor.moveColumnRight()
+
+  moveCursors: (fn) ->
+    fn(cursor) for cursor in @getCursors()
+    @mergeCursors()
+
+  initiateCursorManipulation: (block) ->
     originalCursorPositions = @getCursors().map (cursor) ->
       cursor.getPosition().copy()
 
-    @table.batchTransaction ->
-      cursors.forEach (cursor) -> cursor.moveLineUp()
+    block.call(this)
 
     finalCursorPositions = @getCursors().map (cursor) ->
       cursor.getPosition().copy()
@@ -557,10 +566,6 @@ class TableEditor
         commit.redo()
         @getCursors().forEach (cursor,i) ->
           cursor.setPosition(finalCursorPositions[i])
-
-  moveCursors: (fn) ->
-    fn(cursor) for cursor in @getCursors()
-    @mergeCursors()
 
   # Merge cursors that have the same screen position
   mergeCursors: ->

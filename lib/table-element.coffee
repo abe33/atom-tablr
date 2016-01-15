@@ -668,6 +668,14 @@ class TableElement extends HTMLElement
     @tableEditor.moveLineUp()
     @afterCursorMove()
 
+  moveColumnLeft: ->
+    @tableEditor.moveColumnLeft()
+    @afterCursorMove()
+
+  moveColumnRight: ->
+    @tableEditor.moveColumnRight()
+    @afterCursorMove()
+
   afterCursorMove: ->
     @makeCellVisible(@tableEditor.getCursorPosition())
     @checkEllipsisDisplay()
@@ -1632,6 +1640,8 @@ TableElement.registerCommands = ->
     'tablr:go-to-line': -> @openGoToLineModal()
     'tablr:move-line-down': -> @moveLineDown()
     'tablr:move-line-up': -> @moveLineUp()
+    'tablr:move-column-left': -> @moveColumnLeft()
+    'tablr:move-column-right': -> @moveColumnRight()
     'tablr:apply-sort': -> @applySort()
     'tablr:fit-column-to-content': ->
       column = @contextMenuColumn ? @tableEditor.getCursorPosition().column

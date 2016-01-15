@@ -37,6 +37,8 @@
   'ctrl-shift-down': 'tablr:add-selection-below'
   'ctrl-cmd-up': 'tablr:move-line-up'
   'ctrl-cmd-down': 'tablr:move-line-down'
+  'ctrl-cmd-left': 'tablr:move-column-left'
+  'ctrl-cmd-right': 'tablr:move-column-right'
 
 '.platform-win32 tablr-editor, .platform-linux tablr-editor':
   'ctrl-left': 'tablr:move-to-beginning-of-line'
@@ -57,6 +59,8 @@
   'ctrl-alt-backspace down': 'tablr:delete-column'
   'ctrl-up': 'tablr:move-line-up'
   'ctrl-down': 'tablr:move-line-down'
+  'ctrl-alt-left': 'tablr:move-column-left'
+  'ctrl-alt-right': 'tablr:move-column-right'
 
 'tablr-editor atom-text-editor[mini]':
   'enter': 'core:confirm'

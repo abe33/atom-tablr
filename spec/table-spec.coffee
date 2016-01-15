@@ -694,6 +694,42 @@ describe 'Table', ->
 
         expect(changeSpy).toHaveBeenCalledWith({rowIndices: [0,2]})
 
+    describe '::swapColumns', ->
+      beforeEach ->
+        table.addRow key: 'foo', value: 'bar'
+        table.addRow key: 'oof', value: 'rab'
+        table.addRow key: 'ofo', value: 'arb'
+
+      it 'swaps the column', ->
+        table.swapColumns(0,1)
+
+        expect(table.getRows()).toEqual([
+          ['bar', 'foo']
+          ['rab', 'oof']
+          ['arb', 'ofo']
+        ])
+
+        expect(table.getColumn(0)).toEqual('value')
+        expect(table.getColumn(1)).toEqual('key')
+
+      it 'dispatches a change event', ->
+        changeSpy = jasmine.createSpy('did-change')
+        swapSpy = jasmine.createSpy('did-swap-columns')
+        table.onDidChange(changeSpy)
+        table.onDidSwapColumns(swapSpy)
+
+        table.swapColumns(0,1)
+
+        expect(changeSpy).toHaveBeenCalledWith({
+          oldRange: {start: 0, end: 3}
+          newRange: {start: 0, end: 3}
+        })
+        expect(swapSpy).toHaveBeenCalledWith({
+          columnA: 0
+          columnB: 1
+        })
+
+
   #     ######  ######## ##       ##        ######
   #    ##    ## ##       ##       ##       ##    ##
   #    ##       ##       ##       ##       ##
@@ -1147,6 +1183,43 @@ describe 'Table', ->
           ['foo','bar']
         ])
 
+      it 'rolls back a swap of columns', ->
+        table.addRows([
+          ['foo', 'bar']
+          ['oof', 'rab']
+          ['ofo', 'arb']
+        ])
+
+        table.clearUndoStack()
+        table.save()
+
+        table.swapColumns(0,1)
+
+        table.undo()
+
+        expect(table.isModified()).toBeFalsy()
+        expect(table.undoStack.length).toEqual(0)
+        expect(table.redoStack.length).toEqual(1)
+        expect(table.getColumn(1)).toEqual('value')
+        expect(table.getColumn(0)).toEqual('key')
+        expect(table.getRows()).toEqual([
+          ['foo', 'bar']
+          ['oof', 'rab']
+          ['ofo', 'arb']
+        ])
+
+        table.redo()
+
+        expect(table.isModified()).toBeTruthy()
+        expect(table.undoStack.length).toEqual(1)
+        expect(table.redoStack.length).toEqual(0)
+        expect(table.getColumn(0)).toEqual('value')
+        expect(table.getColumn(1)).toEqual('key')
+        expect(table.getRows()).toEqual([
+          ['bar', 'foo']
+          ['rab', 'oof']
+          ['arb', 'ofo']
+        ])
 
       describe '::clearUndoStack', ->
         it 'removes all the transactions in the undo stack', ->

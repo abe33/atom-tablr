@@ -140,6 +140,9 @@ class Table
   onDidRenameColumn: (callback) ->
     @emitter.on 'did-rename-column', callback
 
+  onDidSwapColumns: (callback) ->
+    @emitter.on 'did-swap-columns', callback
+
   onDidAddRow: (callback) ->
     @emitter.on 'did-add-row', callback
 
@@ -249,6 +252,34 @@ class Table
           @emitModifiedStatusChange()
 
     return
+
+  swapColumns: (columnA, columnB, transaction=true) ->
+    nameA = @columns[columnA]
+    nameB = @columns[columnB]
+
+    columnAData = @getColumnValues(columnA)
+    columnBData = @getColumnValues(columnB)
+
+    @columns[columnA] = nameB
+    @columns[columnB] = nameA
+
+    @rows.forEach (row, i) ->
+      row.splice(columnA, 1, columnBData[i])
+      row.splice(columnB, 1, columnAData[i])
+
+    if transaction
+      @transaction
+        undo: ->
+          @swapColumns(columnA, columnB, false)
+        redo: ->
+          @swapColumns(columnA, columnB, false)
+
+    @emitModifiedStatusChange()
+    @emitter.emit('did-swap-columns', {columnA, columnB})
+    @emitter.emit 'did-change', {
+      oldRange: {start: 0, end: @getRowCount()}
+      newRange: {start: 0, end: @getRowCount()}
+    }
 
   #    ########   #######  ##      ##  ######
   #    ##     ## ##     ## ##  ##  ## ##    ##

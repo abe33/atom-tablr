@@ -157,6 +157,24 @@ class Cursor
 
     @cursorMoved(oldPosition)
 
+  moveColumnLeft: ->
+    return if @position.column is 0
+    oldPosition = @position.copy()
+
+    @tableEditor.swapColumns(@position.column - 1, @position.column)
+    @position.column -= 1
+
+    @cursorMoved(oldPosition)
+
+  moveColumnRight: ->
+    return if @position.column is @tableEditor.getScreenColumnCount() - 1
+    oldPosition = @position.copy()
+
+    @tableEditor.swapColumns(@position.column, @position.column + 1)
+    @position.column += 1
+
+    @cursorMoved(oldPosition)
+
   pageUp: ->
     oldPosition = @position.copy()
     newRow = @position.row - atom.config.get('tablr.pageMoveRowAmount')

@@ -75,6 +75,8 @@ Command|Action
 `tablr:shrink-row`|<p>OSX/Win/Linux: <kbd>ctrl-alt-left</kbd></p>Decrease the height of each row with a cursor by the amount specified in the `rowHeightIncrement` setting.
 `tablr:move-line-up`|<p>OSX: <kbd>ctrl-cmd-up</kbd> <br/>Win/Linux: <kbd>ctrl-up</kbd></p>Move the lines at cursors one row to the top. This command is not available when an order is defined for the table as the result will not be perceived.
 `tablr:move-line-down`|<p>OSX: <kbd>ctrl-cmd-down</kbd> <br/>Win/Linux: <kbd>ctrl-down</kbd></p>Move the lines at cursors one row to the bottom. This command is not available when an order is defined for the table as the result will not be perceived.
+`tablr:move-column-left`|<p>OSX: <kbd>ctrl-cmd-left</kbd> <br/>Win/Linux: <kbd>ctrl-alt-left</kbd></p>Move the columns at cursors one column to the left.
+`tablr:move-column-right`|<p>OSX: <kbd>ctrl-cmd-right</kbd> <br/>Win/Linux: <kbd>ctrl-alt-right</kbd></p>Move the columns at cursors one column to the right.
 `tablr:apply-sort`|Applies the current sorting to the table so that the order can be saved on disk.
 `tablr:fit-column-to-content`|Adjust the width of the column at the last cursor to the width of the widest cell's content.
 `tablr:fit-row-to-content`|Adjust the height of the row at the last cursor to the height of the tallest cell's content.
