@@ -106,6 +106,7 @@ class CSVEditorFormElement extends HTMLElement
             selected: 'hash'
             options:
               'hash': "#"
+              'none': 'none'
           }
 
         @div class: 'panel', =>
@@ -287,6 +288,8 @@ class CSVEditorFormElement extends HTMLElement
 
     if comment is 'custom'
       options.comment = @commentTextEditor.getText()
+    else if comment is 'none'
+      options.comment = ''
     else
       options.comment = comment
 
