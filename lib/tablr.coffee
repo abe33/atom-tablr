@@ -8,44 +8,70 @@ module.exports =
       type: 'object'
       properties:
         undefinedDisplay:
+          title: 'Undefined Value Display'
+          description: 'How to render undefined values in a cell. Leave the field blank to display an empty cell.'
           type: 'string'
           default: ''
         pageMoveRowAmount:
+          title: 'Page Move Row Amount'
+          description: 'The number of rows to jump when using the `core:page-up` and `core:page-down` commands.'
           type: 'integer'
           default: 20
         pageMoveColumnAmount:
+          title: 'Page Move Column Amount'
+          description: 'The number of columns to jump when using the `tablr:page-left` and `tablr:page-right` commands.'
           type: 'integer'
           default: 5
         scrollSpeedDuringDrag:
+          title: 'Scroll Speed During Drag'
+          description: 'The speed of the scrolling motion during a drag gesture, in pixels.'
           type: 'integer'
           default: 20
         scrollPastEnd:
+          title: 'Scroll Past End'
+          description: 'When enabled, the table can scroll past the end of the table both vertically and horizontally to let manipulate rows and columns more easily.'
           type: 'boolean'
           default: false
 
         rowHeight:
+          title: 'Row Height'
+          description: 'The default row height in pixels.'
           type: 'integer'
           default: 24
         rowOverdraw:
+          description: 'The number of rows to render outside the bounds of the visible area to smooth the scrolling motion.'
+          title: 'Row Overdraw'
           type: 'integer'
           default: 3
         minimumRowHeight:
+          title: 'Minimum Row Height'
+          description: 'The minimum height of a row in pixels.'
           type: 'integer'
           default: 16
         rowHeightIncrement:
+          title: 'Row Height Increment'
+          description: 'The amount of pixels to add or remove to a row when using the row resizing commands.'
           type: 'integer'
           default: 20
 
         columnWidth:
+          title: 'Column Width'
+          description: 'The default column width in pixels.'
           type: 'integer'
           default: 120
         columnOverdraw:
+          title: 'Column Overdraw'
+          description: 'The number of columns to render outside the bounds of the visible area to smooth the scrolling motion.'
           type: 'integer'
           default: 2
         minimumColumnWidth:
+          title: 'Minimum Column Width'
+          description: 'The minimum column width in pixels.'
           type: 'integer'
           default: 40
         columnWidthIncrement:
+          title: 'Column Width Increment'
+          description: 'The amount of pixels to add or remove to a column when using the column resizing commands.'
           type: 'integer'
           default: 20
 
@@ -53,18 +79,45 @@ module.exports =
       type: 'object'
       properties:
         flattenBufferMultiSelectionOnPaste:
+          title: 'Flatten Buffer Multi Selection On Paste'
           type: 'boolean'
           default: false
           description: 'If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection.'
         distributeBufferMultiSelectionOnPaste:
+          title: 'Distribute Buffer Multi Selection On Paste'
           type: 'string'
           default: 'vertically'
           enum: ['horizontally', 'vertically']
           description: 'If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`).'
         treatEachCellAsASelectionWhenPastingToABuffer:
+          title: 'Treat Each Cell As A Selection When Pasting To A Buffer'
           type: 'boolean'
           default: true
           description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
+
+    csvEditor:
+      type: 'object'
+      properties:
+        columnDelimiter:
+          title: 'Default Column Delimiter'
+          type: 'string'
+          default: ','
+        rowDelimiter:
+          title: 'Default Row Delimiter'
+          type: 'string'
+          default: 'auto'
+        quotes:
+          title: 'Default Quote Character'
+          type: 'string'
+          default: '"'
+        escape:
+          title: 'Default Espace Character'
+          type: 'string'
+          default: '"'
+        comments:
+          title: 'Default Comment Character'
+          type: 'string'
+          default: '#'
 
     supportedCsvExtensions:
       type: 'array'
@@ -75,25 +128,6 @@ module.exports =
       default: 'alphabetic'
       enum: ['alphabetic', 'numeric', 'numericZeroBased']
       description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,…, Z, AA, AB… `numeric` is for simple numbers, ie 1, 2… `numericZeroBased` is similar to `numeric`, except that it starts numbering from 0 instead of 1'
-
-    csvEditor:
-      type: 'object'
-      properties:
-        columnDelimiter:
-          type: 'string'
-          default: ','
-        rowDelimiter:
-          type: 'string'
-          default: 'auto'
-        quotes:
-          type: 'string'
-          default: '"'
-        escape:
-          type: 'string'
-          default: '"'
-        comments:
-          type: 'string'
-          default: '#'
 
 
   activate: ({csvConfig}) ->
