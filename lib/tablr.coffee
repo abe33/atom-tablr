@@ -4,61 +4,68 @@ _ = require 'underscore-plus'
 
 module.exports =
   config:
-    undefinedDisplay:
-      type: 'string'
-      default: ''
-    pageMoveRowAmount:
-      type: 'integer'
-      default: 20
-    pageMoveColumnAmount:
-      type: 'integer'
-      default: 5
-    scrollSpeedDuringDrag:
-      type: 'integer'
-      default: 20
-    scrollPastEnd:
-      type: 'boolean'
-      default: false
+    tableEditor:
+      type: 'object'
+      properties:
+        undefinedDisplay:
+          type: 'string'
+          default: ''
+        pageMoveRowAmount:
+          type: 'integer'
+          default: 20
+        pageMoveColumnAmount:
+          type: 'integer'
+          default: 5
+        scrollSpeedDuringDrag:
+          type: 'integer'
+          default: 20
+        scrollPastEnd:
+          type: 'boolean'
+          default: false
 
-    rowHeight:
-      type: 'integer'
-      default: 24
-    rowOverdraw:
-      type: 'integer'
-      default: 3
-    minimumRowHeight:
-      type: 'integer'
-      default: 16
-    rowHeightIncrement:
-      type: 'integer'
-      default: 20
+        rowHeight:
+          type: 'integer'
+          default: 24
+        rowOverdraw:
+          type: 'integer'
+          default: 3
+        minimumRowHeight:
+          type: 'integer'
+          default: 16
+        rowHeightIncrement:
+          type: 'integer'
+          default: 20
 
-    columnWidth:
-      type: 'integer'
-      default: 120
-    columnOverdraw:
-      type: 'integer'
-      default: 2
-    minimumColumnWidth:
-      type: 'integer'
-      default: 40
-    columnWidthIncrement:
-      type: 'integer'
-      default: 20
+        columnWidth:
+          type: 'integer'
+          default: 120
+        columnOverdraw:
+          type: 'integer'
+          default: 2
+        minimumColumnWidth:
+          type: 'integer'
+          default: 40
+        columnWidthIncrement:
+          type: 'integer'
+          default: 20
 
-    flattenBufferMultiSelectionOnPaste:
-      type: 'boolean'
-      default: false
-      description: 'If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection.'
-    distributeBufferMultiSelectionOnPaste:
-      type: 'string'
-      default: 'vertically'
-      enum: ['horizontally', 'vertically']
-      description: 'If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`).'
-    treatEachCellAsASelectionWhenPastingToABuffer:
-      type: 'boolean'
-      default: true
-      description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
+    copyPaste:
+      type: 'object'
+      properties:
+        flattenBufferMultiSelectionOnPaste:
+          type: 'boolean'
+          default: false
+          description: 'If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection.'
+        distributeBufferMultiSelectionOnPaste:
+          type: 'string'
+          default: 'vertically'
+          enum: ['horizontally', 'vertically']
+          description: 'If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`).'
+        treatEachCellAsASelectionWhenPastingToABuffer:
+          type: 'boolean'
+          default: true
+          description: 'When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections.'
+
     supportedCsvExtensions:
       type: 'array'
       default: ['csv', 'tsv']
@@ -68,6 +75,26 @@ module.exports =
       default: 'alphabetic'
       enum: ['alphabetic', 'numeric', 'numericZeroBased']
       description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,…, Z, AA, AB… `numeric` is for simple numbers, ie 1, 2… `numericZeroBased` is similar to `numeric`, except that it starts numbering from 0 instead of 1'
+
+    csvEditor:
+      type: 'object'
+      properties:
+        columnDelimiter:
+          type: 'string'
+          default: ','
+        rowDelimiter:
+          type: 'string'
+          default: 'auto'
+        quotes:
+          type: 'string'
+          default: '"'
+        escape:
+          type: 'string'
+          default: '"'
+        comments:
+          type: 'string'
+          default: '#'
+
 
   activate: ({csvConfig}) ->
     @csvConfig = new CSVConfig(csvConfig)
