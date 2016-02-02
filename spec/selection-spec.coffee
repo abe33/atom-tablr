@@ -11,10 +11,10 @@ describe 'Selection', ->
   [table, displayTable, tableEditor, selection, cursor] = []
 
   beforeEach ->
-    atom.config.set 'tablr.columnWidth', 100
+    atom.config.set 'tablr.tableEditor.columnWidth', 100
     atom.config.set 'tablr.minimuColumnWidth', 10
-    atom.config.set 'tablr.rowHeight', 20
-    atom.config.set 'tablr.minimumRowHeight', 10
+    atom.config.set 'tablr.tableEditor.rowHeight', 20
+    atom.config.set 'tablr.tableEditor.minimumRowHeight', 10
 
     table = new Table
 

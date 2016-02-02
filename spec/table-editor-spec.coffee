@@ -7,10 +7,10 @@ describe 'TableEditor', ->
   [table, displayTable, tableEditor] = []
 
   beforeEach ->
-    atom.config.set 'tablr.columnWidth', 100
+    atom.config.set 'tablr.tableEditor.columnWidth', 100
     atom.config.set 'tablr.minimuColumnWidth', 10
-    atom.config.set 'tablr.rowHeight', 20
-    atom.config.set 'tablr.minimumRowHeight', 10
+    atom.config.set 'tablr.tableEditor.rowHeight', 20
+    atom.config.set 'tablr.tableEditor.minimumRowHeight', 10
 
   describe 'when initialized without a table', ->
     beforeEach ->
@@ -747,7 +747,7 @@ describe 'TableEditor', ->
 
       describe 'when the treatEachCellAsASelectionWhenPastingToATextBuffer setting is enabled', ->
         beforeEach ->
-          atom.config.set 'tablr.treatEachCellAsASelectionWhenPastingToABuffer', true
+          atom.config.set 'tablr.copyPaste.treatEachCellAsASelectionWhenPastingToABuffer', true
 
         it 'copies each cells as a buffer selection', ->
           tableEditor.setSelectedRanges([[[0,0],[1,2]], [[1,0],[2,2]]])
@@ -941,7 +941,7 @@ describe 'TableEditor', ->
 
             describe 'when flattenBufferMultiSelectionOnPaste option is enabled', ->
               beforeEach ->
-                atom.config.set 'tablr.flattenBufferMultiSelectionOnPaste', true
+                atom.config.set 'tablr.copyPaste.flattenBufferMultiSelectionOnPaste', true
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}
@@ -966,7 +966,7 @@ describe 'TableEditor', ->
 
             describe 'when distributeBufferMultiSelectionOnPaste option is set to vertical', ->
               beforeEach ->
-                atom.config.set 'tablr.distributeBufferMultiSelectionOnPaste', 'vertically'
+                atom.config.set 'tablr.copyPaste.distributeBufferMultiSelectionOnPaste', 'vertically'
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}
@@ -992,7 +992,7 @@ describe 'TableEditor', ->
 
             describe 'when distributeBufferMultiSelectionOnPaste option is set to horizontal', ->
               beforeEach ->
-                atom.config.set 'tablr.distributeBufferMultiSelectionOnPaste', 'horizontally'
+                atom.config.set 'tablr.copyPaste.distributeBufferMultiSelectionOnPaste', 'horizontally'
                 atom.clipboard.write('foo\nbar', selections: [
                   {indentBasis: 0, fullLine: false, text: 'foo'}
                   {indentBasis: 0, fullLine: false, text: 'bar'}

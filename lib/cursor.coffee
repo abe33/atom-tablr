@@ -177,25 +177,25 @@ class Cursor
 
   pageUp: ->
     oldPosition = @position.copy()
-    newRow = @position.row - atom.config.get('tablr.pageMoveRowAmount')
+    newRow = @position.row - atom.config.get('tablr.tableEditor.pageMoveRowAmount')
     @position.row = Math.max 0, newRow
     @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageDown: ->
     oldPosition = @position.copy()
-    newRow = @position.row + atom.config.get('tablr.pageMoveRowAmount')
+    newRow = @position.row + atom.config.get('tablr.tableEditor.pageMoveRowAmount')
     @position.row = Math.min @tableEditor.getLastRowIndex(), newRow
     @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageLeft: ->
     oldPosition = @position.copy()
-    newColumn = @position.column - atom.config.get('tablr.pageMoveColumnAmount')
+    newColumn = @position.column - atom.config.get('tablr.tableEditor.pageMoveColumnAmount')
     @position.column = Math.max 0, newColumn
     @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 
   pageRight: ->
     oldPosition = @position.copy()
-    newColumn = @position.column + atom.config.get('tablr.pageMoveColumnAmount')
+    newColumn = @position.column + atom.config.get('tablr.tableEditor.pageMoveColumnAmount')
     @position.column = Math.min @tableEditor.getLastColumnIndex(), newColumn
     @cursorMoved(oldPosition) unless @position.isEqual(oldPosition)
 

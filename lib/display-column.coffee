@@ -15,7 +15,7 @@ class DisplayColumn
       @emitter.emit 'did-change-name', {oldName, newName, column: this}
 
   @::accessor 'width',
-    get: -> @options.width ? atom.config.get('tablr.columnWidth')
+    get: -> @options.width ? atom.config.get('tablr.tableEditor.columnWidth')
     set: (newWidth) -> @setOption 'width', newWidth
 
   @::accessor 'align',

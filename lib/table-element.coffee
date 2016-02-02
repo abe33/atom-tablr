@@ -171,15 +171,15 @@ class TableElement extends HTMLElement
 
   subscribeToConfig: ->
     @observeConfig
-      'tablr.undefinedDisplay': (@configUndefinedDisplay) =>
+      'tablr.tableEditor.undefinedDisplay': (@configUndefinedDisplay) =>
         @requestUpdate() if @attached
-      'tablr.pageMoveRowAmount': (@configPageMoveRowAmount) =>
+      'tablr.tableEditor.pageMoveRowAmount': (@configPageMoveRowAmount) =>
         @requestUpdate() if @attached
-      'tablr.rowOverdraw': (@configRowOverdraw) =>
+      'tablr.tableEditor.rowOverdraw': (@configRowOverdraw) =>
         @requestUpdate() if @attached
-      'tablr.columnOverdraw': (@configColumnOverdraw) =>
+      'tablr.tableEditor.columnOverdraw': (@configColumnOverdraw) =>
         @requestUpdate() if @attached
-      'tablr.scrollPastEnd': (@scrollPastEnd) =>
+      'tablr.tableEditor.scrollPastEnd': (@scrollPastEnd) =>
         @requestUpdate() if @attached
 
   observeConfig: (configs) ->
@@ -735,7 +735,7 @@ class TableElement extends HTMLElement
       @tableEditor.getScreenColumn(@tableEditor.getCursorPosition().column).align = 'right'
 
   expandColumn: ->
-    amount = atom.config.get('tablr.columnWidthIncrement')
+    amount = atom.config.get('tablr.tableEditor.columnWidthIncrement')
 
     columns = []
     @tableEditor.getCursors().forEach (cursor) =>
@@ -748,7 +748,7 @@ class TableElement extends HTMLElement
     @checkEllipsisDisplay()
 
   shrinkColumn: ->
-    amount = atom.config.get('tablr.columnWidthIncrement')
+    amount = atom.config.get('tablr.tableEditor.columnWidthIncrement')
 
     columns = []
     @tableEditor.getCursors().forEach (cursor) =>
@@ -761,7 +761,7 @@ class TableElement extends HTMLElement
     @checkEllipsisDisplay()
 
   expandRow: ->
-    amount = atom.config.get('tablr.rowHeightIncrement')
+    amount = atom.config.get('tablr.tableEditor.rowHeightIncrement')
 
     rows = []
     @tableEditor.getCursors().forEach (cursor) =>
@@ -774,7 +774,7 @@ class TableElement extends HTMLElement
     @checkEllipsisDisplay()
 
   shrinkRow: ->
-    amount = atom.config.get('tablr.rowHeightIncrement')
+    amount = atom.config.get('tablr.tableEditor.rowHeightIncrement')
 
     rows = []
     @tableEditor.getCursors().forEach (cursor) =>
@@ -1249,9 +1249,9 @@ class TableElement extends HTMLElement
     rowHeight = @tableEditor.getScreenRowHeightAt(row)
 
     if row >= @getLastVisibleRow() - 1 and rowOffset + rowHeight >= scrollTop + @height - @height / 5
-      container.scrollTop += atom.config.get('tablr.scrollSpeedDuringDrag')
+      container.scrollTop += atom.config.get('tablr.tableEditor.scrollSpeedDuringDrag')
     else if row <= @getFirstVisibleRow() + 1
-      container.scrollTop -= atom.config.get('tablr.scrollSpeedDuringDrag')
+      container.scrollTop -= atom.config.get('tablr.tableEditor.scrollSpeedDuringDrag')
 
     if column?
       scrollLeft = container.scrollLeft
@@ -1259,9 +1259,9 @@ class TableElement extends HTMLElement
       columnWidth = @tableEditor.getScreenColumnWidthAt(row)
 
       if column >= @getLastVisibleColumn() - 1  and columnOffset + columnWidth >= scrollLeft + @width - @width / 5
-        container.scrollLeft += atom.config.get('tablr.scrollSpeedDuringDrag')
+        container.scrollLeft += atom.config.get('tablr.tableEditor.scrollSpeedDuringDrag')
       else if column <= @getFirstVisibleColumn() + 1
-        container.scrollLeft -= atom.config.get('tablr.scrollSpeedDuringDrag')
+        container.scrollLeft -= atom.config.get('tablr.tableEditor.scrollSpeedDuringDrag')
 
   initializeDragEvents: (object, events) ->
     @dragSubscription = new CompositeDisposable

@@ -107,7 +107,7 @@ class Selection
 
       metadata.values.push(values)
 
-      if atom.config.get 'tablr.treatEachCellAsASelectionWhenPastingToABuffer'
+      if atom.config.get 'tablr.copyPaste.treatEachCellAsASelectionWhenPastingToABuffer'
         @getFlattenValue().forEach (value) ->
           metadata.selections.push({
             text: value
@@ -123,7 +123,7 @@ class Selection
 
       atom.clipboard.write([clipboardText, selectionText].join("\n"), metadata)
     else
-      if atom.config.get 'tablr.treatEachCellAsASelectionWhenPastingToABuffer'
+      if atom.config.get 'tablr.copyPaste.treatEachCellAsASelectionWhenPastingToABuffer'
         atom.clipboard.write(selectionText, {
           values: [values]
           indentBasis: 0

@@ -111,13 +111,13 @@ describe 'tableElement', ->
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
-    atom.config.set 'tablr.rowHeight', 20
-    atom.config.set 'tablr.columnWidth', 100
-    atom.config.set 'tablr.rowOverdraw', 10
-    atom.config.set 'tablr.columnOverdraw', 2
-    atom.config.set 'tablr.minimumRowHeight', 10
-    atom.config.set 'tablr.minimumColumnWidth', 40
-    atom.config.set 'tablr.scrollSpeedDuringDrag', 20
+    atom.config.set 'tablr.tableEditor.rowHeight', 20
+    atom.config.set 'tablr.tableEditor.columnWidth', 100
+    atom.config.set 'tablr.tableEditor.rowOverdraw', 10
+    atom.config.set 'tablr.tableEditor.columnOverdraw', 2
+    atom.config.set 'tablr.tableEditor.minimumRowHeight', 10
+    atom.config.set 'tablr.tableEditor.minimumColumnWidth', 40
+    atom.config.set 'tablr.tableEditor.scrollSpeedDuringDrag', 20
 
     tableElement = atom.views.getView(tableEditor)
     tableShadowRoot = tableElement.shadowRoot
@@ -210,7 +210,7 @@ describe 'tableElement', ->
 
   describe 'when the scrollPastEnd setting is enabled', ->
     beforeEach ->
-      atom.config.set('tablr.scrollPastEnd', true)
+      atom.config.set('tablr.tableEditor.scrollPastEnd', true)
       nextAnimationFrame()
 
     it 'increases the dimensions of the cells container', ->
@@ -225,7 +225,7 @@ describe 'tableElement', ->
       expect(cells.length).toEqual(3)
 
     it 'renders undefined cells based on a config', ->
-      atom.config.set('tablr.undefinedDisplay', 'foo')
+      atom.config.set('tablr.tableEditor.undefinedDisplay', 'foo')
 
       tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
@@ -233,7 +233,7 @@ describe 'tableElement', ->
 
     it 'renders undefined cells based on the view property', ->
       tableElement.undefinedDisplay = 'bar'
-      atom.config.set('tablr.undefinedDisplay', 'foo')
+      atom.config.set('tablr.tableEditor.undefinedDisplay', 'foo')
 
       tableEditor.setValueAtPosition([0,0], undefined)
       nextAnimationFrame()
@@ -677,7 +677,7 @@ describe 'tableElement', ->
 
         mouseup(handle, x - 100, y)
 
-        expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('tablr.minimumColumnWidth'))
+        expect(tableEditor.getScreenColumnWidthAt(2)).toEqual(atom.config.get('tablr.tableEditor.minimumColumnWidth'))
 
     describe 'clicking on a header cell fit column action', ->
       [cell] = []
@@ -1177,7 +1177,7 @@ describe 'tableElement', ->
 
   describe 'core:page-down', ->
     beforeEach ->
-      atom.config.set 'tablr.pageMoveRowAmount', 20
+      atom.config.set 'tablr.tableEditor.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows below', ->
       atom.commands.dispatch(tableElement, 'core:page-down')
@@ -1193,7 +1193,7 @@ describe 'tableElement', ->
 
     describe 'with a custom amount on the instance', ->
       it 'moves the cursor 30 rows below', ->
-        atom.config.set 'tablr.pageMoveRowAmount', 30
+        atom.config.set 'tablr.tableEditor.pageMoveRowAmount', 30
 
         atom.commands.dispatch(tableElement, 'core:page-down')
 
@@ -1201,7 +1201,7 @@ describe 'tableElement', ->
 
   describe 'core:page-up', ->
     beforeEach ->
-      atom.config.set 'tablr.pageMoveRowAmount', 20
+      atom.config.set 'tablr.tableEditor.pageMoveRowAmount', 20
 
     it 'moves the cursor 20 rows up', ->
       tableEditor.setCursorAtScreenPosition([20, 0])
@@ -1226,7 +1226,7 @@ describe 'tableElement', ->
       tableEditor.addColumn()
       tableEditor.addColumn()
       tableEditor.addColumn()
-      atom.config.set 'tablr.pageMoveColumnAmount', 4
+      atom.config.set 'tablr.tableEditor.pageMoveColumnAmount', 4
 
     it 'moves the cursor 4 cells left', ->
       tableEditor.setCursorAtScreenPosition([0, 5])
@@ -1251,7 +1251,7 @@ describe 'tableElement', ->
       tableEditor.addColumn()
       tableEditor.addColumn()
       tableEditor.addColumn()
-      atom.config.set 'tablr.pageMoveColumnAmount', 4
+      atom.config.set 'tablr.tableEditor.pageMoveColumnAmount', 4
 
     it 'moves the cursor 4 cells right', ->
       atom.commands.dispatch(tableElement, 'tablr:page-right')
@@ -1510,7 +1510,7 @@ describe 'tableElement', ->
 
   describe 'tablr:expand-column', ->
     it 'increases the column at cursors by the amount defined in the settings', ->
-      atom.config.set('tablr.columnWidthIncrement', 20)
+      atom.config.set('tablr.tableEditor.columnWidthIncrement', 20)
 
       atom.commands.dispatch(tableElement, 'tablr:expand-column')
 
@@ -1518,7 +1518,7 @@ describe 'tableElement', ->
 
   describe 'tablr:shrink-column', ->
     it 'shrinks the column at cursors by the amount defined in the settings', ->
-      atom.config.set('tablr.columnWidthIncrement', 20)
+      atom.config.set('tablr.tableEditor.columnWidthIncrement', 20)
 
       atom.commands.dispatch(tableElement, 'tablr:shrink-column')
 
@@ -1526,7 +1526,7 @@ describe 'tableElement', ->
 
   describe 'tablr:expand-row', ->
     it 'increases the row at cursors by the amount defined in the settings', ->
-      atom.config.set('tablr.rowHeightIncrement', 20)
+      atom.config.set('tablr.tableEditor.rowHeightIncrement', 20)
 
       atom.commands.dispatch(tableElement, 'tablr:expand-row')
 
@@ -1534,7 +1534,7 @@ describe 'tableElement', ->
 
   describe 'tablr:shrink-row', ->
     it 'shrinks the row at cursors by the amount defined in the settings', ->
-      atom.config.set('tablr.rowHeightIncrement', 20)
+      atom.config.set('tablr.tableEditor.rowHeightIncrement', 20)
 
       atom.commands.dispatch(tableElement, 'tablr:shrink-row')
 
@@ -1885,7 +1885,7 @@ describe 'tableElement', ->
 
     describe 'selection', ->
       it 'follows the cursor when it moves', ->
-        atom.config.set 'tablr.pageMoveRowAmount', 10
+        atom.config.set 'tablr.tableEditor.pageMoveRowAmount', 10
         tableElement.pageDown()
         tableElement.moveRight()
 

@@ -23,13 +23,13 @@ describe 'GoToLineElement', ->
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
-    atom.config.set 'tablr.rowHeight', 20
-    atom.config.set 'tablr.columnWidth', 100
-    atom.config.set 'tablr.rowOverdraw', 10
-    atom.config.set 'tablr.columnOverdraw', 2
-    atom.config.set 'tablr.minimumRowHeight', 10
-    atom.config.set 'tablr.minimumColumnWidth', 40
-    atom.config.set 'tablr.scrollSpeedDuringDrag', 20
+    atom.config.set 'tablr.tableEditor.rowHeight', 20
+    atom.config.set 'tablr.tableEditor.columnWidth', 100
+    atom.config.set 'tablr.tableEditor.rowOverdraw', 10
+    atom.config.set 'tablr.tableEditor.columnOverdraw', 2
+    atom.config.set 'tablr.tableEditor.minimumRowHeight', 10
+    atom.config.set 'tablr.tableEditor.minimumColumnWidth', 40
+    atom.config.set 'tablr.tableEditor.scrollSpeedDuringDrag', 20
 
     tableElement = atom.views.getView(tableEditor)
 
