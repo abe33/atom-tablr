@@ -1,5 +1,6 @@
 _ = require 'underscore-plus'
 {CompositeDisposable} = require 'atom'
+encodings = require './encodings'
 [url, Range, Table, DisplayTable, TableEditor, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
 
 module.exports =
@@ -123,6 +124,38 @@ module.exports =
           description: 'The default character that indicate a comment. Everything past this character in a line will be ignored. You can set it to `none` to disable the use of comments.'
           type: 'string'
           default: '#'
+        quoted:
+          title: 'Quoted Content'
+          description: 'Whether the column\'s content are wrapped into quotes or not.'
+          type: 'boolean'
+          default: false
+        header:
+          title: 'File Header'
+          description: 'Whether to treat the first line of a CSV as the file header or not.'
+          type: 'boolean'
+          default: false
+        eof:
+          title: 'Ensure New Line At End Of File'
+          description: 'When checked, every file will be saved with an extra new-line character at the end of the file.'
+          type: 'boolean'
+          default: false
+        skipEmptyLines:
+          title: 'Skip Empty Lines'
+          description: 'When checked, empty lines will simply be ignored.'
+          type: 'boolean'
+          default: false
+        trim:
+          title: 'Trim Cell Content'
+          description: 'How to treat cell\'s content when parsing a CSV file.'
+          type: 'string'
+          default: 'no'
+          enum: ['no', 'left', 'right', 'both']
+        encoding:
+          title: 'Default Encoding'
+          description: 'The default encoding to use when opening a new CSV file.'
+          type: 'string'
+          default: 'UTF-8'
+          enum: Object.keys(encodings).map (key) -> encodings[key].list
 
     supportedCsvExtensions:
       type: 'array'

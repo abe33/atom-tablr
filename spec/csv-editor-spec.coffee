@@ -80,6 +80,12 @@ describe "CSVEditor", ->
     atom.config.set('tablr.csvEditor.quote', '"')
     atom.config.set('tablr.csvEditor.escape', '"')
     atom.config.set('tablr.csvEditor.comment', '#')
+    atom.config.set('tablr.csvEditor.quoted', false)
+    atom.config.set('tablr.csvEditor.header', false)
+    atom.config.set('tablr.csvEditor.eof', false)
+    atom.config.set('tablr.csvEditor.skipEmptyLines', false)
+    atom.config.set('tablr.csvEditor.trim', 'no')
+    atom.config.set('tablr.csvEditor.encoding', 'UTF-8')
 
     jasmineContent = document.body.querySelector('#jasmine-content')
     workspaceElement = atom.views.getView(atom.workspace)
@@ -114,6 +120,12 @@ describe "CSVEditor", ->
       atom.config.set('tablr.csvEditor.quote', '\'')
       atom.config.set('tablr.csvEditor.escape', '\\')
       atom.config.set('tablr.csvEditor.comment', '$')
+      atom.config.set('tablr.csvEditor.quoted', true)
+      atom.config.set('tablr.csvEditor.header', true)
+      atom.config.set('tablr.csvEditor.eof', true)
+      atom.config.set('tablr.csvEditor.skipEmptyLines', true)
+      atom.config.set('tablr.csvEditor.trim', 'left')
+      atom.config.set('tablr.csvEditor.encoding', 'Western (ISO 8859-1)')
 
       openFixture('sample.csv')
       runs ->
@@ -125,6 +137,12 @@ describe "CSVEditor", ->
         expect(csvEditorElement.form.commentTextEditor.getText()).toEqual('$')
         expect(csvEditorElement.querySelector('[id^="single-quote-quote"]:checked')).toExist()
         expect(csvEditorElement.querySelector('[id^="backslash-escape"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="quoted"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="header"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="eof"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="skip-empty-lines"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="left-trim"]:checked')).toExist()
+        expect(csvEditorElement.form.encodingSelect.value).toEqual('ISO 8859-1')
 
     describe '::copy', ->
       it 'returns a CSVEditor in a pending state', ->

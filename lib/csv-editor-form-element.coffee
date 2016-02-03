@@ -3,6 +3,14 @@
 encodings = require('./encodings')
 
 nextId = 0
+encodingOptions = Object.keys(encodings).map (key) ->
+  value: encodings[key].status
+  name: encodings[key].list
+
+findEncodingValue = (name) ->
+  res = encodingOptions.filter (opt) -> opt.name is name
+
+  res[0].value if res.length > 0
 
 labelFromValue = (value) ->
   String(value)
@@ -159,9 +167,7 @@ class CSVEditorFormElement extends HTMLElement
             name: 'encoding'
             label: 'Encoding'
             outlet: 'encoding'
-            options: Object.keys(encodings).map (key) ->
-              value: encodings[key].status
-              name: encodings[key].list
+            options: encodingOptions
           }
 
           @div class: 'control-group boolean header', =>
@@ -209,14 +215,27 @@ class CSVEditorFormElement extends HTMLElement
         @emitChangeEvent()
 
   initializeDefaults: (options) ->
-    @querySelector('[id^="header"]').checked = true if options.header
-    @querySelector('[id^="eof"]').checked = true if options.eof
-    @querySelector('[id^="quoted"]').checked = true if options.quoted
-    @querySelector('[id^="skip-empty-lines"]').checked = true if options.skip_empty_lines
+    if options.header ? atom.config.get('tablr.csvEditor.header')
+      @querySelector('[id^="header"]').checked = true
 
-    @querySelector('[id^="left-trim"]').checked = true if options.ltrim
-    @querySelector('[id^="right-trim"]').checked = true if options.rtrim
-    @querySelector('[id^="both-trim"]').checked = true if options.trim
+    if options.eof ? atom.config.get('tablr.csvEditor.eof')
+      @querySelector('[id^="eof"]').checked = true
+
+    if options.quoted ? atom.config.get('tablr.csvEditor.quoted')
+      @querySelector('[id^="quoted"]').checked = true
+
+    if options.skip_empty_lines ? atom.config.get('tablr.csvEditor.skipEmptyLines')
+      @querySelector('[id^="skip-empty-lines"]').checked = true
+
+    if options.ltrim ? (atom.config.get('tablr.csvEditor.trim') is 'left')
+      @querySelector('[id^="left-trim"]').checked = true
+    if options.rtrim ? (atom.config.get('tablr.csvEditor.trim') is 'right')
+      @querySelector('[id^="right-trim"]').checked = true
+    if options.trim ? (atom.config.get('tablr.csvEditor.trim') is 'both')
+      @querySelector('[id^="both-trim"]').checked = true
+
+    if encoding = (options.encoding ? findEncodingValue(atom.config.get('tablr.csvEditor.encoding')))
+      @encodingSelect.value = encoding
 
     radioGroups = @querySelectorAll('.with-text-editor .btn-group')
 
