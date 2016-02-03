@@ -106,7 +106,7 @@ module.exports =
           title: 'Default Row Delimiter'
           type: 'string'
           default: 'auto'
-        quotes:
+        quote:
           title: 'Default Quote Character'
           type: 'string'
           default: '"'
@@ -114,7 +114,7 @@ module.exports =
           title: 'Default Espace Character'
           type: 'string'
           default: '"'
-        comments:
+        comment:
           title: 'Default Comment Character'
           type: 'string'
           default: '#'

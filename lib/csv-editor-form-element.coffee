@@ -4,6 +4,24 @@ encodings = require('./encodings')
 
 nextId = 0
 
+labelFromValue = (value) ->
+  String(value)
+  .replace('\n','\\n')
+  .replace('\t','\\t')
+  .replace('\r','\\r')
+
+valueFromLabel = (value) ->
+  String(value)
+  .replace('\\n','\n')
+  .replace('\\t','\t')
+  .replace('\\r','\r')
+
+normalizeValue = (value) ->
+  labelFromValue(value?.replace('"','&quot;'))
+
+denormalizeValue = (value) ->
+  valueFromLabel(value?.replace('&quot;', '"'))
+
 module.exports =
 class CSVEditorFormElement extends HTMLElement
   SpacePenDSL.includeInto(this)
@@ -12,23 +30,13 @@ class CSVEditorFormElement extends HTMLElement
   @content: ->
     id = nextId++
 
-    labelFromValue = (value) ->
-      String(value)
-      .replace('\n','\\n')
-      .replace('\t','\\t')
-      .replace('\r','\\r')
-      .replace('\t','\\t')
-
-    normalizeValue = (value) ->
-      value?.replace('"','&quot;')
-
     radios = (options) =>
-      {name, label, options, outlet, selected} = options
+      {name, label, options, outlet, output, selected} = options
 
-      @div class: 'controls btn-group', 'data-initial': selected, 'data-id': outlet, =>
+      @div class: 'controls btn-group', 'data-initial': selected, 'data-id': outlet, 'data-output': output ? outlet, =>
         for optionName, value of options
           inputOption = type: 'radio', value: normalizeValue(value), name: name, id: "#{optionName}-#{name}-#{id}", 'data-name': optionName
-          inputOption.checked = true if selected is optionName
+          inputOption.checked = true if optionName is value
           @input(inputOption)
           @label class: 'btn', for: "#{optionName}-#{name}-#{id}", labelFromValue(value)
 
@@ -113,7 +121,8 @@ class CSVEditorFormElement extends HTMLElement
           radiosWithTextEditor {
             label: 'Column Delimiter'
             name: 'delimiter'
-            outlet: 'delimiter'
+            output: 'delimiter'
+            outlet: 'columnDelimiter'
             selected: 'comma'
             options:
               'comma': ','
@@ -200,16 +209,26 @@ class CSVEditorFormElement extends HTMLElement
         @emitChangeEvent()
 
   initializeDefaults: (options) ->
+    @querySelector('[id^="header"]').checked = true if options.header
+    @querySelector('[id^="eof"]').checked = true if options.eof
+    @querySelector('[id^="quoted"]').checked = true if options.quoted
+    @querySelector('[id^="skip-empty-lines"]').checked = true if options.skip_empty_lines
+
+    @querySelector('[id^="left-trim"]').checked = true if options.ltrim
+    @querySelector('[id^="right-trim"]').checked = true if options.rtrim
+    @querySelector('[id^="both-trim"]').checked = true if options.trim
+
     radioGroups = @querySelectorAll('.with-text-editor .btn-group')
 
     Array::forEach.call radioGroups, (radioGroup) =>
       outlet = radioGroup.dataset.id
+      output = radioGroup.dataset.output
       initial = radioGroup.dataset.initial
 
       radios = radioGroup.querySelectorAll('input[type="radio"]')
       radioOptions = {}
 
-      value = options[outlet]
+      value = labelFromValue(options[output] ? atom.config.get("tablr.csvEditor.#{outlet}"))
 
       if value? and radio = Array::filter.call(radios, (r) -> r.value is value)[0]
         radio.checked = true
@@ -249,15 +268,6 @@ class CSVEditorFormElement extends HTMLElement
     @messagesContainer.innerHTML = ''
 
   setModel: (options={}) ->
-    @querySelector('[id^="header"]').checked = true if options.header
-    @querySelector('[id^="eof"]').checked = true if options.eof
-    @querySelector('[id^="quoted"]').checked = true if options.quoted
-    @querySelector('[id^="skip-empty-lines"]').checked = true if options.skip_empty_lines
-
-    @querySelector('[id^="left-trim"]').checked = true if options.ltrim
-    @querySelector('[id^="right-trim"]').checked = true if options.rtrim
-    @querySelector('[id^="both-trim"]').checked = true if options.trim
-
     requestAnimationFrame => @initializeDefaults(options)
 
   collectOptions: ->
@@ -275,6 +285,9 @@ class CSVEditorFormElement extends HTMLElement
     quote = @querySelector('[name="quote"]:checked')?.value
     delimiter =  @querySelector('[name="delimiter"]:checked')?.value
     rowDelimiter = @querySelector('[name="row-delimiter"]:checked')?.value
+
+    if quote is '' or delimiter is '' or rowDelimiter is '' or comment is '' or escape is ''
+      throw new Error('It should not be empty')
 
     if quote is 'custom'
       options.quote = @quoteTextEditor.getText()
@@ -294,14 +307,16 @@ class CSVEditorFormElement extends HTMLElement
       options.comment = comment
 
     if delimiter is 'custom'
-      options.delimiter = @delimiterTextEditor.getText()
+      options.delimiter = @columnDelimiterTextEditor.getText()
     else
       options.delimiter = delimiter
 
     if rowDelimiter is 'custom'
       options.rowDelimiter = @rowDelimiterTextEditor.getText()
     else unless rowDelimiter is 'auto'
-      options.rowDelimiter = rowDelimiter
+      options.rowDelimiter = denormalizeValue(rowDelimiter)
+
+    console.log options
 
     switch trim
       when 'both' then options.trim = true

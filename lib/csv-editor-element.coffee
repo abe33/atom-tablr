@@ -86,6 +86,7 @@ class CSVEditorElement extends HTMLElement
       @updatePreview(options)
 
     container.appendChild(@form)
+    @form.setModel(@model.options) if @model?
     @appendChild(container)
 
   updatePreview: (options) ->

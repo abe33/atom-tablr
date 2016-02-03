@@ -31,7 +31,8 @@ describe "CSVEditor", ->
           csvEditor = t
           csvEditorElement = atom.views.getView(csvEditor)
 
-      runs -> expect(csvEditor.file).toBeDefined()
+      runs ->
+        expect(csvEditor.file).toBeDefined()
 
       return
 
@@ -74,6 +75,12 @@ describe "CSVEditor", ->
   beforeEach ->
     [csvEditor, csvEditorElement, csvDest, projectPath, tableEditor, tableEditorElement, openSpy, destroySpy, savedContent, spy] = []
 
+    atom.config.set('tablr.csvEditor.rowDelimiter', 'auto')
+    atom.config.set('tablr.csvEditor.columnDelimiter', ',')
+    atom.config.set('tablr.csvEditor.quote', '"')
+    atom.config.set('tablr.csvEditor.escape', '"')
+    atom.config.set('tablr.csvEditor.comment', '#')
+
     jasmineContent = document.body.querySelector('#jasmine-content')
     workspaceElement = atom.views.getView(atom.workspace)
     jasmineContent.appendChild(workspaceElement)
@@ -101,6 +108,24 @@ describe "CSVEditor", ->
       runs ->
         expect(csvEditor instanceof CSVEditor).toBeTruthy()
 
+    it 'fills the form with the default values from the config', ->
+      atom.config.set('tablr.csvEditor.columnDelimiter', ';')
+      atom.config.set('tablr.csvEditor.rowDelimiter', '\\r')
+      atom.config.set('tablr.csvEditor.quote', '\'')
+      atom.config.set('tablr.csvEditor.escape', '\\')
+      atom.config.set('tablr.csvEditor.comment', '$')
+
+      openFixture('sample.csv')
+      runs ->
+        nextAnimationFrame()
+
+        expect(csvEditorElement.querySelector('[id^="semi-colon"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="char-return"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="custom-comment"]:checked')).toExist()
+        expect(csvEditorElement.form.commentTextEditor.getText()).toEqual('$')
+        expect(csvEditorElement.querySelector('[id^="single-quote-quote"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="backslash-escape"]:checked')).toExist()
+
     describe '::copy', ->
       it 'returns a CSVEditor in a pending state', ->
         openFixture('sample.csv')
@@ -118,6 +143,7 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
+          nextAnimationFrame()
           changeSpy = jasmine.createSpy('did-change')
           changeSubscription = csvEditor.file.onDidChange(changeSpy)
 
@@ -231,6 +257,8 @@ describe "CSVEditor", ->
 
             describe 'and the csv setting is changed to a valid format', ->
               beforeEach ->
+                nextAnimationFrame()
+
                 tableEditor = null
                 csvEditorElement.querySelector('[id^="semi-colon"]').checked = true
 
@@ -259,6 +287,7 @@ describe "CSVEditor", ->
 
           openFixture('sample.csv', {})
           runs ->
+            nextAnimationFrame()
             spy = jasmine.createSpy('did-change-path')
             spyTitle = jasmine.createSpy('did-change-title')
             csvEditor.onDidChangePath(spy)
@@ -289,6 +318,7 @@ describe "CSVEditor", ->
 
         openFixture('sample.csv', {})
         runs ->
+          nextAnimationFrame()
           deleteSpy = jasmine.createSpy('delete')
           csvEditor.file.onDidDelete(deleteSpy)
 
@@ -333,6 +363,8 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
+          nextAnimationFrame()
+
           destroySpy = jasmine.createSpy('did-destroy')
           csvEditor.onDidDestroy(destroySpy)
 
@@ -363,6 +395,8 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
+          nextAnimationFrame()
+
           csvEditorElement.querySelector('[id^="remember-choice"]').checked = true
 
           destroySpy = jasmine.createSpy('did-destroy')
@@ -393,6 +427,8 @@ describe "CSVEditor", ->
           openFixture('sample.csv')
 
           runs ->
+            nextAnimationFrame()
+
             csvEditor.onDidOpen ({editor}) ->
               tableEditor = editor
 
@@ -480,6 +516,8 @@ describe "CSVEditor", ->
                 secondCSVEditor = t
                 secondCSVEditorElement = atom.views.getView(secondCSVEditor)
 
+                nextAnimationFrame()
+
                 tableEditorButton = secondCSVEditorElement.form.openTableEditorButton
                 click(tableEditorButton)
 
@@ -513,6 +551,8 @@ describe "CSVEditor", ->
                   atom.workspace.open(path.join(projectPath, 'sample.csv')).then (t) ->
                     csvEditor = t
                     csvEditorElement = atom.views.getView(csvEditor)
+
+                    nextAnimationFrame()
 
                     csvEditor.onDidOpen ({editor}) ->
                       tableEditor = editor
@@ -601,6 +641,8 @@ describe "CSVEditor", ->
           openFixture('iso-8859-1.csv')
 
           runs ->
+            nextAnimationFrame()
+
             csvEditor.onDidOpen ({editor}) -> tableEditor = editor
 
             encodingSelect = csvEditorElement.form.encodingSelect
@@ -638,6 +680,8 @@ describe "CSVEditor", ->
         openFixture('invalid.csv')
 
         runs ->
+          nextAnimationFrame()
+
           tableEditorButton = csvEditorElement.form.openTableEditorButton
           click(tableEditorButton)
 
@@ -654,6 +698,8 @@ describe "CSVEditor", ->
         openFixture('semi-colon.csv')
 
         runs ->
+          nextAnimationFrame()
+
           csvEditorElement.querySelector('[id^="semi-colon"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
@@ -693,6 +739,8 @@ describe "CSVEditor", ->
         openFixture('sample.csv')
 
         runs ->
+          nextAnimationFrame()
+
           csvEditorElement.querySelector('[id^="header"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
             tableEditor = editor
@@ -735,6 +783,8 @@ describe "CSVEditor", ->
         openFixture('custom-row-delimiter.csv')
 
         runs ->
+          nextAnimationFrame()
+
           csvEditorElement.querySelector('atom-text-editor').getModel().setText('::')
           csvEditorElement.querySelector('[id^="custom-row-delimiter"]').checked = true
           csvEditor.onDidOpen ({editor}) ->
@@ -909,6 +959,8 @@ describe "CSVEditor", ->
     it 'serializes the csv editor', ->
       openFixture('sample.csv')
       runs ->
+        nextAnimationFrame()
+
         expect(csvEditor.serialize()).toEqual({
           deserializer: 'CSVEditor'
           filePath: csvDest
@@ -919,6 +971,7 @@ describe "CSVEditor", ->
     describe 'when the editor has a choice', ->
       it 'serializes the user choice', ->
         openFixture('sample.csv')
+        runs -> nextAnimationFrame()
         waitsForPromise -> csvEditor.openTableEditor()
         runs ->
           expect(csvEditor.serialize()).toEqual({
@@ -934,6 +987,7 @@ describe "CSVEditor", ->
     describe 'when the table editor has a layout', ->
       it 'serializes the layout', ->
         openFixture('sample.csv')
+        runs -> nextAnimationFrame()
         waitsForPromise -> csvEditor.openTableEditor()
         runs ->
           {editor: tableEditor} = csvEditor
@@ -967,6 +1021,7 @@ describe "CSVEditor", ->
     describe 'that has unsaved changes', ->
       it 'serializes the table editor and its children', ->
         openFixture('sample.csv')
+        runs -> nextAnimationFrame()
         waitsForPromise -> csvEditor.openTableEditor()
         runs ->
           csvEditor.editor.addRow()
