@@ -1,3 +1,16 @@
+<a name="v1.0.0"></a>
+# v1.0.0 (2016-02-03)
+
+## :sparkles: Features
+
+- Add global default settings for remaining CSV fields ([9fc64351](https://github.com/abe33/atom-tablr/commit/9fc64351f52d95eb42a7167273dce4c89294a9b1))
+- Implement using default CSV config from table settings ([3ace76c4](https://github.com/abe33/atom-tablr/commit/3ace76c4a1a59da630a2a41723ff0db6f7a4dc16), [#28](https://github.com/abe33/atom-tablr/issues/28))
+- Add description and proper label to all the settings ([702cd764](https://github.com/abe33/atom-tablr/commit/702cd764f9593df9794f48d6c41171c9af073138))
+
+## Breaking Changes
+
+- due to [3f5505ba](https://github.com/abe33/atom-tablr/commit/3f5505ba56033945e34b0af853ed78b0c82d5a3c), since the settings paths have changed most users will have to reconfigure the package.
+
 <a name="v0.10.0"></a>
 # v0.10.0 (2016-01-16)
 
