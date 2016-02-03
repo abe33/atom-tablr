@@ -100,22 +100,27 @@ module.exports =
       properties:
         columnDelimiter:
           title: 'Default Column Delimiter'
+          description: 'The default column delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\t` instead of using the proper character.'
           type: 'string'
           default: ','
         rowDelimiter:
           title: 'Default Row Delimiter'
+          description: 'The default row delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\r` instead of using the proper character. The `auto` value will let the CSV parser determine the proper separator to use depending on the file\'s content.'
           type: 'string'
           default: 'auto'
         quote:
           title: 'Default Quote Character'
+          description: 'The default quote character for quoted content.'
           type: 'string'
           default: '"'
         escape:
           title: 'Default Espace Character'
+          description: 'The default escape character for escaped quotes in quoted content.'
           type: 'string'
           default: '"'
         comment:
           title: 'Default Comment Character'
+          description: 'The default character that indicate a comment. Everything past this character in a line will be ignored. You can set it to `none` to disable the use of comments.'
           type: 'string'
           default: '#'
 
