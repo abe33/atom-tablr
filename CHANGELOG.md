@@ -1,3 +1,10 @@
+<a name="v01.0.1"></a>
+# v01.0.1 (2016-02-04)
+
+## :bug: Bug Fixes
+
+- :fire: remaining logs ([d3fa1b45](https://github.com/abe33/atom-tablr/commit/d3fa1b45670f64d6923e8541de1a3b19155418a6))
+
 <a name="v1.0.0"></a>
 # v1.0.0 (2016-02-03)
 
