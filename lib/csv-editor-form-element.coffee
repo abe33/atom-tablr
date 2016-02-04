@@ -335,8 +335,6 @@ class CSVEditorFormElement extends HTMLElement
     else unless rowDelimiter is 'auto'
       options.rowDelimiter = denormalizeValue(rowDelimiter)
 
-    console.log options
-
     switch trim
       when 'both' then options.trim = true
       when 'left' then options.ltrim = true
