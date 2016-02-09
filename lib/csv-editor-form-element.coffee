@@ -328,7 +328,7 @@ class CSVEditorFormElement extends HTMLElement
     if delimiter is 'custom'
       options.delimiter = @columnDelimiterTextEditor.getText()
     else
-      options.delimiter = delimiter
+      options.delimiter = denormalizeValue(delimiter)
 
     if rowDelimiter is 'custom'
       options.rowDelimiter = @rowDelimiterTextEditor.getText()
