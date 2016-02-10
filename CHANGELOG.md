@@ -1,3 +1,10 @@
+<a name="v01.0.2"></a>
+# v01.0.2 (2016-02-04)
+
+## :bug: Bug Fixes
+
+- Fix issue with tab delimited files ([5826cd11](https://github.com/abe33/atom-tablr/commit/5826cd11007fd7b9d68876f8e8a37c14d497bf6b), [#30](https://github.com/abe33/atom-tablr/issues/30))
+
 <a name="v01.0.1"></a>
 # v01.0.1 (2016-02-04)
 
