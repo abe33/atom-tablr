@@ -60,12 +60,12 @@ Command|Action
 ---|---
 `core:confirm`|<p>OSX/Win/Linux: <kbd>enter</kbd></p>Start an edit session for every cursors.
 `core:backspace`|<p>OSX/Win/Linux: <kbd>backspace</kbd></p>Delete the value of the currently selected cells.
-`tablr:insert-row-before`|<p>OSX: <kbd>cmd-shift-n up</kbd><br/>Win/Linux: <kbd>ctrl-shift-n up</kbd></p>Insert a new empty row before the last cursor's row.
-`tablr:insert-row-after`|<p>OSX: <kbd>cmd-shift-n down</kbd><br/>Win/Linux: <kbd>ctrl-shift-n down</kbd></p>Insert a new empty row after the last cursor's row.
-`tablr:insert-column-before`|<p>OSX: <kbd>cmd-shift-n left</kbd><br/>Win/Linux: <kbd>ctrl-shift-n left</kbd></p>Insert a new empty column before the last cursor's column.
-`tablr:insert-column-after`|<p>OSX: <kbd>cmd-shift-n right</kbd><br/>Win/Linux: <kbd>ctrl-shift-n right</kbd></p>Insert a new empty column after the last cursor's column.
-`tablr:delete-row`|<p>OSX: <kbd>cmd-shift-backspace left</kbd> <kbd>cmd-shift-backspace right</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace left</kbd> <kbd>ctrl-shift-backspace right</kbd></p>Delete the row at the last cursor's position.
-`tablr:delete-column`|<p>OSX: <kbd>cmd-shift-backspace up</kbd> <kbd>cmd-shift-backspace down</kbd><br/>Win/Linux: <kbd>ctrl-shift-backspace up</kbd> <kbd>ctrl-shift-backspace down</kbd></p>Delete the column at the last cursor's position.
+`tablr:insert-row-before`|<p>OSX: <kbd>cmd-alt-n up</kbd><br/>Win/Linux: <kbd>ctrl-alt-n up</kbd></p>Insert a new empty row before the last cursor's row.
+`tablr:insert-row-after`|<p>OSX: <kbd>cmd-alt-n down</kbd><br/>Win/Linux: <kbd>ctrl-alt-n down</kbd></p>Insert a new empty row after the last cursor's row.
+`tablr:insert-column-before`|<p>OSX: <kbd>cmd-alt-n left</kbd><br/>Win/Linux: <kbd>ctrl-alt-n left</kbd></p>Insert a new empty column before the last cursor's column.
+`tablr:insert-column-after`|<p>OSX: <kbd>cmd-alt-n right</kbd><br/>Win/Linux: <kbd>ctrl-alt-n right</kbd></p>Insert a new empty column after the last cursor's column.
+`tablr:delete-row`|<p>OSX: <kbd>cmd-alt-backspace left</kbd> <kbd>cmd-alt-backspace right</kbd><br/>Win/Linux: <kbd>ctrl-alt-backspace left</kbd> <kbd>ctrl-alt-backspace right</kbd></p>Delete the row at the last cursor's position.
+`tablr:delete-column`|<p>OSX: <kbd>cmd-alt-backspace up</kbd> <kbd>cmd-alt-backspace down</kbd><br/>Win/Linux: <kbd>ctrl-alt-backspace up</kbd> <kbd>ctrl-alt-backspace down</kbd></p>Delete the column at the last cursor's position.
 `tablr:align-left`|Change the alignment of the column at the last cursor's position to `left`.
 `tablr:align-center`|Change the alignment of the column at the last cursor's position to `center`.
 `tablr:align-right`|Change the alignment of the column at the last cursor's position to `right`.
