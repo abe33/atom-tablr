@@ -66,13 +66,6 @@ isVisible = (node) ->
   node.offsetHeight? and
   node.offsetHeight isnt 0
 
-# The real implementation use a requestAnimationFrame to ensure that there is
-# no forced layout update of the DOM when evaluating the size of the cell's
-# content. However, in tests, this lead to nasty side effects as we mock the
-# requestAnimationFrame method.
-TableElement::requestEllipsisCheck = ->
-  cell.checkEllipsis() for key,cell of @cells
-
 describe 'tableElement', ->
   [tableElement, tableShadowRoot, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
@@ -243,9 +236,6 @@ describe 'tableElement', ->
       beforeEach ->
         tableEditor.setValueAtPosition([0,0], "some really long text")
         nextAnimationFrame()
-
-      it 'adds an ellipsis class to the cell', ->
-        expect(tableElement.getScreenCellAtPosition([0,0]).classList.contains('ellipsis')).toBeTruthy()
 
     it 'sets the proper width and height on the table rows container', ->
       bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')

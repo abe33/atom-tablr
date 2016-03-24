@@ -38,11 +38,7 @@ class TableCellElement extends HTMLElement
     classes = ['tablr-cell']
     classes.push 'active' if @tableElement.isCursorCell([row, column])
     classes.push 'selected' if @tableElement.isSelectedCell([row, column])
-    classes.push 'ellipsis' if @classList.contains('ellipsis') and @isSameCell(cell, column, row)
     classes
-
-  checkEllipsis: ->
-    @classList.toggle('ellipsis', @scrollHeight > @clientHeight or @scrollWidth > @clientWidth)
 
   isSameCell: (cell, column, row) ->
     cell.value is @lastValue and column is @lastColumn and row is @lastRow

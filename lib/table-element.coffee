@@ -682,8 +682,8 @@ class TableElement extends HTMLElement
 
   checkEllipsisDisplay: ->
     @cancelEllipsisDisplay()
-    if @getScreenCellAtPosition(@tableEditor.getCursorPosition())?.classList.contains('ellipsis')
-      @scheduleEllipsisDisplay()
+    cell = @getScreenCellAtPosition(@tableEditor.getCursorPosition())
+    @scheduleEllipsisDisplay() if cell? and @contentOverflow(cell)
 
   cancelEllipsisDisplay: ->
     clearTimeout(@ellipsisTimeout) if @ellipsisTimeout?
@@ -693,6 +693,9 @@ class TableElement extends HTMLElement
 
   scheduleEllipsisDisplay: ->
     @ellipsisTimeout = setTimeout((=> @displayEllipsis()), 500)
+
+  contentOverflow: (cell) ->
+    cell.scrollHeight > cell.clientHeight or cell.scrollWidth > cell.clientWidth
 
   displayEllipsis: ->
     delete @ellipsisTimeout
@@ -1298,9 +1301,6 @@ class TableElement extends HTMLElement
       @update()
       @updateRequested = false
 
-  requestEllipsisCheck: ->
-    requestAnimationFrame => cell.checkEllipsis() for key,cell of @cells
-
   markDirtyCell: (position) ->
     @dirtyPositions ?= []
     @dirtyPositions[position.row] ?= []
@@ -1361,7 +1361,6 @@ class TableElement extends HTMLElement
       @dirtyPositions = null
       @dirtyColumns = null
       @wholeTableIsDirty = false
-      @requestEllipsisCheck()
 
     # We never rendered anything
     unless @firstRenderedRow?
