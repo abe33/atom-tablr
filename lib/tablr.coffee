@@ -159,7 +159,7 @@ module.exports =
 
     supportedCsvExtensions:
       type: 'array'
-      default: ['csv', 'tsv']
+      default: ['csv', 'tsv', 'CSV', 'TSV']
       description: 'The extensions for which the CSV opener will be used.'
     defaultColumnNamingMethod:
       type: 'string'
