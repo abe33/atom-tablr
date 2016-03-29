@@ -179,7 +179,7 @@ describe "CSVEditor", ->
 
           waitsFor 'change callback called', -> changeSpy.callCount > 0
 
-        it 'updates the preview', ->
+        fit 'updates the preview', ->
           expect(csvEditorElement.updatePreview).toHaveBeenCalled()
 
       describe 'and the user has open a table', ->

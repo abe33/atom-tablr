@@ -288,17 +288,45 @@ class CSVEditor
 
       .catch (err) -> reject(err)
 
+  createReadStream: (options) ->
+    @file.setEncoding(options.fileEncoding)
+
+    input = @file.createReadStream()
+    parser = csv.parse(options)
+
+    input.pipe(parser)
+
+    parser.stop = ->
+      input.unpipe(parser)
+      parser.end()
+
+    parser
+
   previewCSV: (options) ->
     new Promise (resolve, reject) =>
-      @file.setEncoding(options.fileEncoding)
+      output = []
+      input = @createReadStream(options)
+      limit = 5
+      limit = 6 if options.header
 
-      @file.read(true).then (fileContent) =>
-        csv.parse fileContent, options, (err, data) =>
-          return reject(err) if err?
+      stop = ->
+        input.stop()
+        input.removeListener 'readable', read
+        input.removeListener 'end', end
+        input.removeListener 'error', error
+        resolve(output[0...limit])
 
-          resolve(data)
+      read = ->
+        output.push record while record = input.read()
+        stop() if output.length > limit
 
-      .catch (err) -> reject(err)
+      end = -> resolve(output[0...limit])
+
+      error = (err) -> reject(err)
+
+      input.on 'readable', read
+      input.on 'end', end
+      input.on 'error', error
 
   preventFileChangeEvents: -> @nofileChangeEvent = true
 
