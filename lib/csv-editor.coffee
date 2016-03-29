@@ -2,7 +2,8 @@ _ = require 'underscore-plus'
 fs = require 'fs'
 csv = require 'csv'
 path = require 'path'
-{CompositeDisposable, Emitter, File} = require 'atom'
+{CompositeDisposable, Emitter} = require 'atom'
+{File} = require 'pathwatcher'
 TableEditor = require './table-editor'
 Tablr = null
 
