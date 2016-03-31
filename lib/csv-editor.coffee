@@ -2,6 +2,7 @@ _ = require 'underscore-plus'
 fs = require 'fs'
 csv = require 'csv'
 path = require 'path'
+stream = require 'stream'
 {CompositeDisposable, Emitter} = require 'atom'
 {File} = require 'pathwatcher'
 TableEditor = require './table-editor'
@@ -289,20 +290,6 @@ class CSVEditor
 
       .catch (err) -> reject(err)
 
-  createReadStream: (options) ->
-    @file.setEncoding(options.fileEncoding)
-
-    input = @file.createReadStream()
-    parser = csv.parse(options)
-
-    input.pipe(parser)
-
-    parser.stop = ->
-      input.unpipe(parser)
-      parser.end()
-
-    parser
-
   previewCSV: (options) ->
     new Promise (resolve, reject) =>
       output = []
@@ -328,6 +315,31 @@ class CSVEditor
       input.on 'readable', read
       input.on 'end', end
       input.on 'error', error
+
+  createReadStream: (options) ->
+    @file.setEncoding(options.fileEncoding)
+
+    input = @file.createReadStream()
+    parser = csv.parse(options)
+    length = 0
+
+    counter = new stream.Transform
+      transform: (chunk, encoding, callback) ->
+        length += chunk.length
+        @push chunk
+        callback()
+
+    input.pipe(counter).pipe(parser)
+
+    parser.stop = ->
+      input.unpipe(parser)
+      counter.removeListener('read', count)
+      parser.end()
+
+    parser.getProgress = ->
+      return length
+
+    parser
 
   preventFileChangeEvents: -> @nofileChangeEvent = true
 
