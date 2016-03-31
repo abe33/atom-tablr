@@ -275,7 +275,8 @@ class CSVEditor
             for column,i in data.shift()
               tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
           else
-            for i in [0...data[0].length]
+            length = Math.max(data.map((a) -> a.length)...)
+            for i in [0...length]
               tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
 
           tableEditor.addRows(data)
