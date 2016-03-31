@@ -1,4 +1,4 @@
-{CompositeDisposable} = require 'event-kit'
+{CompositeDisposable} = require 'atom'
 {EventsDelegation, SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 Selection = require './selection'
 

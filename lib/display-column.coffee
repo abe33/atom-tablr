@@ -1,4 +1,4 @@
-{Emitter} = require 'event-kit'
+{Emitter} = require 'atom'
 PropertyAccessors = require 'property-accessors'
 Identifiable = require './mixins/identifiable'
 

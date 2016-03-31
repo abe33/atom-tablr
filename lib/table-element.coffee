@@ -1,6 +1,5 @@
 Delegator = require 'delegato'
-{Point} = require 'atom'
-{CompositeDisposable, Disposable} = require 'event-kit'
+{Point, CompositeDisposable, Disposable} = require 'atom'
 {EventsDelegation, SpacePenDSL, registerOrUpdateElement} = require 'atom-utils'
 PropertyAccessors = require 'property-accessors'
 

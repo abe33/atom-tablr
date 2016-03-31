@@ -1,5 +1,4 @@
-{Point} = require 'atom'
-{Emitter, Disposable, CompositeDisposable} = require 'event-kit'
+{Point, Emitter, Disposable, CompositeDisposable} = require 'atom'
 Identifiable = require './mixins/identifiable'
 Transactions = require './mixins/transactions'
 Range = require './range'
