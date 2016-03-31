@@ -1,3 +1,16 @@
+<a name="v1.1.0"></a>
+# v1.1.0 (2016-03-31)
+
+## :sparkles: Features
+
+- Add uppercase version of csv and tsv extensions ([1f8011ed](https://github.com/abe33/atom-tablr/commit/1f8011ed33cbfc83c9650c8110478b05aa1ffb24), [#29](https://github.com/abe33/atom-tablr/issues/29))
+
+## :bug: Bug Fixes
+
+- Fix using only the first row to deduce the column count ([7691a4ab](https://github.com/abe33/atom-tablr/commit/7691a4aba970b3c29d445fe67a1c875fd999c325), [#35](https://github.com/abe33/atom-tablr/issues/35))
+- Remove ellipsis hint in cells ([7464c737](https://github.com/abe33/atom-tablr/commit/7464c7375a399efa613f53712f0acfe0aed30f63), [#33](https://github.com/abe33/atom-tablr/issues/33))
+- Fixing row/column add/delete shortcuts to reflect `table-edit.json` ([0c8322fd](https://github.com/abe33/atom-tablr/commit/0c8322fd085c75062524febb48bd33d47a1c46ea))
+
 <a name="v01.0.2"></a>
 # v01.0.2 (2016-02-04)
 

@@ -440,6 +440,25 @@ describe "CSVEditor", ->
         expect(atom.workspace.getActiveTextEditor()).toBeDefined()
 
     describe 'when the user choose to open a table editor', ->
+      describe 'when the csv has inconsistent row length', ->
+        beforeEach ->
+          openFixture('incomplete-first-row.csv')
+
+          runs ->
+            nextAnimationFrame()
+
+            csvEditor.onDidOpen ({editor}) ->
+              tableEditor = editor
+
+            tableEditorButton = csvEditorElement.form.openTableEditorButton
+            click(tableEditorButton)
+
+          waitsFor 'table editor created', -> tableEditor?
+
+        it 'has a table filled with the file content', ->
+          expect(tableEditor.getScreenColumnCount()).toEqual(5)
+          expect(tableEditor.getScreenRowCount()).toEqual(2)
+
       describe 'with the default options', ->
         beforeEach ->
           openFixture('sample.csv')
