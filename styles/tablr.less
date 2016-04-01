@@ -646,6 +646,31 @@ atom-csv-editor {
     padding-bottom: 140px;
   }
 
+  atom-csv-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: @base-background-color;
+
+    .wrapper {
+      min-width: 200px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .bytes {
+      float: right;
+    }
+
+    progress {
+      width: 100%;
+    }
+  }
+
   atom-csv-preview {
     display: block;
     height: 140px;
