@@ -17,7 +17,8 @@ class CSVPreviewElement extends HTMLElement
     columns = if options.header
       preview.shift()
     else
-      columnName(i) for i in [0...preview[0].length]
+      length = Math.max(preview.map((d) -> d.length)...)
+      columnName(i) for i in [0...length]
 
     table = document.createElement('table')
     header = document.createElement('thead')
@@ -32,9 +33,9 @@ class CSVPreviewElement extends HTMLElement
     for row in preview
       rowElement = document.createElement('tr')
 
-      for value in row
+      for i in [0...columns.length]
         cell = document.createElement('td')
-        cell.textContent = value
+        cell.textContent = row[i]
         rowElement.appendChild(cell)
 
       body.appendChild(rowElement)
