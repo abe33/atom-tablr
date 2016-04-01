@@ -1,3 +1,10 @@
+<a name="v1.1.1"></a>
+# v1.1.1 (2016-04-01)
+
+## :bug: Bug Fixes
+
+- Fix preview of css with incomplete rows ([0b47c916](https://github.com/abe33/atom-tablr/commit/0b47c916e345c42f6e46bd1f2704e5eb729e2636))
+
 <a name="v1.1.0"></a>
 # v1.1.0 (2016-03-31)
 
