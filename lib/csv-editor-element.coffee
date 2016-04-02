@@ -3,6 +3,7 @@
 CSVEditor = require './csv-editor'
 CSVEditorFormElement = require './csv-editor-form-element'
 CSVPreviewElement = require './csv-preview-element'
+CSVProgressElement = require './csv-progress-element'
 TableEditor = require './table-editor'
 
 module.exports =
@@ -40,8 +41,27 @@ class CSVEditorElement extends HTMLElement
       else
         @updatePreview()
 
+    loadingSubscription = null
+    @subscriptions.add @model.onWillOpen =>
+      @displayProgress()
+      loadingSubscription = @subscriptions.add @model.onDidReadData ({@input, @lines}) =>
+        @requestProgressUpdate()
+
+    @subscriptions.add @model.onWillFillTable =>
+      loadingSubscription?.dispose()
+      loadingSubscription = @subscriptions.add @model.onFillTable ({table}) =>
+        count = table.getRowCount()
+        @progress.updateFillTable(count, count / @lines)
+
+    @subscriptions.add @model.onDidFailOpen ({err}) =>
+      @hideProgress()
+      @form.alert(err.message)
+
     @subscriptions.add @model.onDidOpen ({editor}) =>
       return unless editor instanceof TableEditor
+
+      @hideProgress()
+      loadingSubscription?.dispose()
 
       @displayTableEditor(editor)
 
@@ -54,7 +74,7 @@ class CSVEditorElement extends HTMLElement
 
   displayTableEditor: (editor) ->
     delete @form
-    @innerHTML = ''
+    @removeChild(@form) if @form?.parentNode?
 
     @tableElement = atom.views.getView(editor)
     @appendChild(@tableElement)
@@ -62,7 +82,7 @@ class CSVEditorElement extends HTMLElement
     @tableElement.focus()
 
   createFormView: ->
-    @innerHTML = ''
+    @removeChild(@tableElement) if @tableElement?.parentNode?
 
     container = document.createElement('div')
     container.className = 'settings-view'
@@ -101,6 +121,21 @@ class CSVEditorElement extends HTMLElement
       return unless @form?
       @form.preview.error(reason)
       @form.openTableEditorButton.setAttribute('disabled', 'true')
+
+  displayProgress: ->
+    @progress = new CSVProgressElement
+    @appendChild(@progress)
+
+  hideProgress: ->
+    @removeChild(@progress) if @progress?.parentNode?
+
+  requestProgressUpdate: ->
+    return if @frameRequested or !@progress?
+    @frameRequested = true
+
+    requestAnimationFrame =>
+      @progress.updateReadData(@input, @lines)
+      @frameRequested = false
 
 module.exports =
 CSVEditorElement =

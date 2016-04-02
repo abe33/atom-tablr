@@ -32,7 +32,7 @@ class TableEditor
     'getScreenRow','getScreenRowCount', 'getScreenRows', 'getScreenRowHeightAt', 'getScreenRowOffsetAt', 'setScreenRowHeightAt', 'getMinimumRowHeight', 'getScreenRowIndexAtPixelPosition', 'rowRangeFrom',
     'onDidAddRow', 'onDidRemoveRow', 'onDidChange', 'onDidChangeRowHeight',
     'getScreenColumn', 'getScreenColumns', 'getScreenColumnCount', 'getLastColumnIndex', 'getScreenColumnIndex',
-    'getScreenColumnWidth', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'setScreenColumnAlignAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth', 'getColumnIndex',
+    'getScreenColumnWidth', 'setScreenColumnOptions', 'setScreenColumnWidthAt', 'getScreenColumnWidthAt', 'getScreenColumnAlignAt', 'getScreenColumnOffsetAt', 'setScreenColumnAlignAt', 'getScreenColumnIndexAtPixelPosition', 'getMinimumScreenColumnWidth', 'getColumnIndex',
     'addColumn', 'addColumnAt', 'removeColumn', 'removeColumnAt', 'swapColumns', 'getColumns',
     'onDidAddColumn','onDidRemoveColumn', 'onDidChangeColumnOption', 'onDidRenameColumn', 'onDidChangeLayout',
     'getScreenCellRect', 'getScreenCellPosition',
@@ -42,7 +42,7 @@ class TableEditor
     toProperty: 'displayTable'
   )
   @delegatesMethods(
-    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterSetup', 'lockModifiedStatus', 'unlockModifiedStatus',
+    'save', 'isModified', 'onDidSave', 'onWillSave', 'setSaveHandler', 'initializeAfterSetup', 'lockModifiedStatus', 'unlockModifiedStatus', 'getRowCount',
     toProperty: 'table'
   )
 

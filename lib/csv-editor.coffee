@@ -6,6 +6,7 @@ stream = require 'stream'
 {CompositeDisposable, Emitter} = require 'atom'
 {File} = require 'pathwatcher'
 TableEditor = require './table-editor'
+Table = require './table'
 Tablr = null
 
 module.exports =
@@ -113,8 +114,26 @@ class CSVEditor
   shouldPromptToSave: (options) ->
     @editor?.shouldPromptToSave(options) ? false
 
+  onWillOpen: (callback) ->
+    @emitter.on 'will-open', callback
+
+  onDidReadData: (callback) ->
+    @emitter.on 'did-read-data', callback
+
   onDidOpen: (callback) ->
     @emitter.on 'did-open', callback
+
+  onDidFailOpen: (callback) ->
+    @emitter.on 'did-fail-open', callback
+
+  onWillFillTable: (callback) ->
+    @emitter.on 'will-fill-table', callback
+
+  onFillTable: (callback) ->
+    @emitter.on 'fill-table', callback
+
+  onDidFillTable: (callback) ->
+    @emitter.on 'did-fill-table', callback
 
   onDidDestroy: (callback) ->
     @emitter.on 'did-destroy', callback
@@ -154,6 +173,8 @@ class CSVEditor
       pane.activateItem(editor)
 
   openTableEditor: (@options={}) ->
+    @emitter.emit 'will-open', {options: _.clone(options)}
+
     @openCSV().then (@editor) =>
       @subscribeToEditor()
 
@@ -162,6 +183,8 @@ class CSVEditor
 
       @saveConfig('TableEditor')
       @editor
+    .catch (err) =>
+      @emitter.emit 'did-fail-open', {err, options: _.clone(options)}
 
   subscribeToEditor: ->
     @editorSubscriptions = new CompositeDisposable
@@ -263,32 +286,70 @@ class CSVEditor
 
   getTableEditor: (options, layout) ->
     new Promise (resolve, reject) =>
-      @file.setEncoding(options.fileEncoding)
+      output = []
+      input = @createReadStream(options)
+      length = 0
+      read = =>
+        while record = input.read()
+          output.push(record)
+          length = Math.max(length, record.length)
 
-      @file.read(true).then (fileContent) =>
-        csv.parse fileContent, options, (err, data) =>
-          return reject(err) if err?
+        @emitter.emit 'did-read-data', {input, lines: output.length}
 
-          tableEditor = new TableEditor
-          return resolve(tableEditor) if data.length is 0
-          tableEditor.lockModifiedStatus()
+      end = =>
+        table = new Table
+        return resolve(new TableEditor({table})) if output.length is 0
 
-          if options.header
-            for column,i in data.shift()
-              tableEditor.addColumn(column, layout?.columns[i] ? {}, false)
-          else
-            length = Math.max(data.map((a) -> a.length)...)
-            for i in [0...length]
-              tableEditor.addColumn(undefined, layout?.columns[i] ? {}, false)
+        table.lockModifiedStatus()
 
-          tableEditor.addRows(data)
-          tableEditor.displayTable.setRowHeights(layout.rowHeights) if layout?
+        if options.header
+          for column,i in output.shift()
+            table.addColumn(column, false)
+        else
+          for i in [0...length]
+            table.addColumn(undefined, false)
+
+        @emitter.emit 'will-fill-table', {table}
+        @fillTable(table, output).then =>
+          @emitter.emit 'did-fill-table', {table}
+          tableEditor = new TableEditor({table})
+
+          if layout?
+            for i in [0...length] when layout.columns[i]?
+              tableEditor.setScreenColumnOptions(layout.columns[i])
+            tableEditor.displayTable.setRowHeights(layout.rowHeights)
+
           tableEditor.setSaveHandler(@save)
           tableEditor.initializeAfterSetup()
           tableEditor.unlockModifiedStatus()
           resolve(tableEditor)
+        .catch (err) -> reject(err)
 
-      .catch (err) -> reject(err)
+      error = (err) -> reject(err)
+
+      input.on 'readable', read
+      input.on 'end', end
+      input.on 'error', error
+
+  fillTable: (table, rows) ->
+    batchSize = 1000
+    new Promise (resolve, reject) =>
+      if rows.length <= batchSize
+        table.addRows(rows, false)
+        @emitter.emit 'fill-table', {table}
+        resolve()
+      else
+        fill = =>
+          currentRows = rows.splice(0,batchSize)
+          table.addRows(currentRows, false)
+          @emitter.emit 'fill-table', {table}
+
+          if rows.length > 0
+            requestAnimationFrame(-> fill table, rows)
+          else
+            resolve()
+
+        fill()
 
   previewCSV: (options) ->
     new Promise (resolve, reject) =>
@@ -319,6 +380,7 @@ class CSVEditor
   createReadStream: (options) ->
     @file.setEncoding(options.fileEncoding)
 
+    size = fs.lstatSync(@file.getPath()).size
     input = @file.createReadStream()
     parser = csv.parse(options)
     length = 0
@@ -332,12 +394,12 @@ class CSVEditor
     input.pipe(counter).pipe(parser)
 
     parser.stop = ->
-      input.unpipe(parser)
-      counter.removeListener('read', count)
+      input.unpipe(counter)
+      counter.unpipe(parser)
       parser.end()
 
     parser.getProgress = ->
-      return length
+      return {length, total: size, ratio: length/size}
 
     parser
 

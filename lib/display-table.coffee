@@ -35,7 +35,7 @@ class DisplayTable
       @subscribeToScreenColumn(screenColumn)
       screenColumn
 
-    @rowHeights ?= @table.getColumns().map (column) => @getRowHeight()
+    @rowHeights ?= new Array(@table.getRowCount())
     @computeScreenColumnOffsets()
     @updateScreenRows()
 
@@ -213,6 +213,9 @@ class DisplayTable
   getMinimumScreenColumnWidth: ->
     @minimumScreenColumnWidth ? @configMinimumScreenColumnWidth
 
+  setScreenColumnOptions: (index, options) ->
+    @getScreenColumn(index)?.setOptions(options)
+
   setScreenColumnWidth: (@minimumScreenColumnWidth) ->
     @computeScreenColumnOffsets()
 
@@ -246,7 +249,7 @@ class DisplayTable
 
   addColumnAt: (index, column, options={}, transaction=true) ->
     @table.addColumnAt(index, column, transaction)
-    @getScreenColumn(index).setOptions(options)
+    @setScreenColumnOptions(index, options)
 
     if transaction
       columnOptions = _.clone(options)
