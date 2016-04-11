@@ -1,3 +1,10 @@
+<a name="v1.1.2"></a>
+# v1.1.2 (2016-04-11)
+
+## :bug: Bug Fixes
+
+- Fix infinite loop when previewing empty CSV ([f8ec8e3c](https://github.com/abe33/atom-tablr/commit/f8ec8e3cc8bb917f166a879093ba2397eb42ee46), [#38](https://github.com/abe33/atom-tablr/issues/38))
+
 <a name="v1.1.1"></a>
 # v1.1.1 (2016-04-01)
 
