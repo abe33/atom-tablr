@@ -108,6 +108,31 @@ describe "CSVEditor", ->
     csvEditor?.destroy()
     temp.cleanup()
 
+  describe 'when an empty csv file is opened', ->
+    it 'opens a csv editor for the file', ->
+      openFixture('empty.csv')
+      runs ->
+        expect(csvEditor instanceof CSVEditor).toBeTruthy()
+
+    describe 'when the user choose to open a table editor', ->
+      beforeEach ->
+        openFixture('empty.csv')
+
+        runs ->
+          nextAnimationFrame()
+
+          csvEditor.onDidOpen ({editor}) ->
+            tableEditor = editor
+
+          tableEditorButton = csvEditorElement.form.openTableEditorButton
+          click(tableEditorButton)
+
+        waitsFor 'table editor created', -> tableEditor?
+
+      it 'has a table filled with the file content', ->
+        expect(tableEditor.getScreenColumnCount()).toEqual(0)
+        expect(tableEditor.getScreenRowCount()).toEqual(0)
+
   describe 'when a csv file is opened', ->
     it 'opens a csv editor for the file', ->
       openFixture('sample.csv')

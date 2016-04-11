@@ -14,10 +14,12 @@ class CSVPreviewElement extends HTMLElement
     @innerHTML = "<span class=\"alert alert-danger\">#{reason.message}</span>"
 
   render: (preview, options={}) ->
+    return if preview.length is 0
+
     columns = if options.header
       preview.shift()
     else
-      length = Math.max(preview.map((d) -> d.length)...)
+      length = Math.max(0, preview.map((d) -> d.length)...)
       columnName(i) for i in [0...length]
 
     table = document.createElement('table')
