@@ -86,6 +86,8 @@ describe "CSVEditor", ->
     atom.config.set('tablr.csvEditor.skipEmptyLines', false)
     atom.config.set('tablr.csvEditor.trim', 'no')
     atom.config.set('tablr.csvEditor.encoding', 'UTF-8')
+    atom.config.set('tablr.csvEditor.maximumRowsInPreview', 100)
+    atom.config.set('tablr.csvEditor.tableCreationBatchSize', 1000)
 
     jasmineContent = document.body.querySelector('#jasmine-content')
     workspaceElement = atom.views.getView(atom.workspace)
