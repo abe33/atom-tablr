@@ -283,6 +283,8 @@ class CSVEditor
         @getTableEditor(options, layout).then (tableEditor) =>
           CSVEditor.tableEditorForPath[filePath] = tableEditor
           resolve(tableEditor)
+        .catch (err) ->
+          reject(err)
 
   getTableEditor: (options, layout) ->
     new Promise (resolve, reject) =>
@@ -315,8 +317,8 @@ class CSVEditor
           tableEditor = new TableEditor({table})
 
           if layout?
-            for i in [0...length] when layout.columns[i]?
-              tableEditor.setScreenColumnOptions(layout.columns[i])
+            for i in [0...length] when (opts = layout.columns[i])?
+              tableEditor.setScreenColumnOptions(i, opts)
             tableEditor.displayTable.setRowHeights(layout.rowHeights)
 
           tableEditor.setSaveHandler(@save)

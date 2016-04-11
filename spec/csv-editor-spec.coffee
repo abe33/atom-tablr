@@ -220,12 +220,15 @@ describe "CSVEditor", ->
         describe 'and the new content can be parsed with the current settings', ->
           describe 'when the table is in an unmodified state', ->
             beforeEach ->
-              fsp.writeFileSync(csvDest, """
-              foo,bar
-              1,2
-              """)
 
-              waitsFor 'change callback called', -> changeSpy.callCount > 0
+              runs ->
+                fsp.writeFileSync(csvDest, """
+                foo,bar
+                1,2
+                """)
+
+              waitsFor 'change callback called', ->
+                csvEditor.editor isnt tableEditor
 
             it 'replaces the table content with the new one', ->
               nextAnimationFrame()
@@ -314,7 +317,9 @@ describe "CSVEditor", ->
                 waitsFor 'table editor created', -> tableEditor?
 
               it 'now opens the new version of the file', ->
-                expect(csvEditor.editor.getColumns()).toEqual([undefined, undefined])
+                expect(csvEditor.editor.getColumns()).toEqual([
+                  undefined, undefined
+                  ])
                 expect(csvEditor.editor.getRows()).toEqual([
                   ['foo', 'bar']
                   ['1', '2']
@@ -509,8 +514,8 @@ describe "CSVEditor", ->
           expect(document.activeElement).toBe(tableElement)
           expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
 
-        it 'clears the table undo stack', ->
-          expect(tableEditor.getTable().undoStack.length).toEqual(0)
+        it 'has an empty undo stack', ->
+          expect(tableEditor.getTable().undoStack).toBeUndefined()
 
         it 'leaves the table in a unmodified state', ->
           expect(tableEditor.isModified()).toBeFalsy()
@@ -743,9 +748,6 @@ describe "CSVEditor", ->
 
         runs ->
           nextAnimationFrame()
-
-          tableEditorButton = csvEditorElement.form.openTableEditorButton
-          click(tableEditorButton)
 
       it 'displays the error in the csv preview', ->
         waitsFor 'csv alert displayed in the DOM', ->

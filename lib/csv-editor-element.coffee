@@ -34,9 +34,9 @@ class CSVEditorElement extends HTMLElement
     @subscriptions.add @model.onDidChange =>
       if @model.editor?
         if @model.editor isnt @tableElement.getModel()
+          @removeTableEditor()
           @displayTableEditor(@model.editor)
       else if @tableElement?
-        delete @tableElement
         @createFormView()
       else
         @updatePreview()
@@ -44,11 +44,13 @@ class CSVEditorElement extends HTMLElement
     loadingSubscription = null
     @subscriptions.add @model.onWillOpen =>
       @displayProgress()
+      @removeFormView()
       loadingSubscription = @subscriptions.add @model.onDidReadData ({@input, @lines}) =>
         @requestProgressUpdate()
 
     @subscriptions.add @model.onWillFillTable =>
       loadingSubscription?.dispose()
+
       loadingSubscription = @subscriptions.add @model.onFillTable ({table}) =>
         count = table.getRowCount()
         @progress.updateFillTable(count, count / @lines)
@@ -73,19 +75,22 @@ class CSVEditorElement extends HTMLElement
     @model.applyChoice()
 
   displayTableEditor: (editor) ->
-    delete @form
-    @removeChild(@form) if @form?.parentNode?
+    @removeFormView()
 
     @tableElement = atom.views.getView(editor)
     @appendChild(@tableElement)
 
     @tableElement.focus()
 
-  createFormView: ->
+  removeTableEditor: ->
     @removeChild(@tableElement) if @tableElement?.parentNode?
+    delete @tableElement
 
-    container = document.createElement('div')
-    container.className = 'settings-view'
+  createFormView: ->
+    @removeTableEditor()
+
+    @formContainer = document.createElement('div')
+    @formContainer.className = 'settings-view'
 
     @form = document.createElement 'atom-csv-editor-form'
     @formSubscriptions = new CompositeDisposable
@@ -99,15 +104,19 @@ class CSVEditorElement extends HTMLElement
       click: =>
         @form.cleanMessages()
         @model.choice = 'TableEditor'
-        @model.openTableEditor(@collectOptions()).catch (reason) =>
-          @form.alert(reason.message)
+        @model.openTableEditor(@collectOptions())
 
     @formSubscriptions.add @form.onDidChange (options) =>
       @updatePreview(options)
 
-    container.appendChild(@form)
+    @formContainer.appendChild(@form)
     @form.setModel(@model.options) if @model?
-    @appendChild(container)
+    @appendChild(@formContainer)
+
+  removeFormView: ->
+    @removeChild(@formContainer) if @formContainer?
+    delete @form
+    delete @formContainer
 
   updatePreview: (options) ->
     return if options.remember
