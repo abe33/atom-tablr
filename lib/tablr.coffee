@@ -104,6 +104,11 @@ module.exports =
           default: 100
           minimum: 1
           description: 'The maximum number of rows in the CSV preview. Low numbers can speed up the preview generation but can also lead to error or inconsistencies when parsing the whole file if there is errors past the last row in the preview.'
+        tableCreationBatchSize:
+          type: 'integer'
+          default: 1000
+          minimum: 1
+          description: 'When creating a table from a CSV file, filling the table in one single loop can lock the UI if the table is too large. To prevent that from happening the table is filled in small steps where a number of rows equals to the batch size are added to the table.'
         columnDelimiter:
           title: 'Default Column Delimiter'
           description: 'The default column delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\t` instead of using the proper character.'

@@ -334,7 +334,7 @@ class CSVEditor
       input.on 'error', error
 
   fillTable: (table, rows) ->
-    batchSize = 1000
+    batchSize = atom.config.get('tablr.csvEditor.tableCreationBatchSize')
     new Promise (resolve, reject) =>
       if rows.length <= batchSize
         table.addRows(rows, false)
