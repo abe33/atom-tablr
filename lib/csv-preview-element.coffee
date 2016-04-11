@@ -27,13 +27,22 @@ class CSVPreviewElement extends HTMLElement
     body = document.createElement('tbody')
 
     headerRow = document.createElement('tr')
+
+    cell = document.createElement('th')
+    cell.textContent = '#'
+    headerRow.appendChild(cell)
+
     for column in columns
       cell = document.createElement('th')
       cell.textContent = column
       headerRow.appendChild(cell)
 
-    for row in preview
+    for row,r in preview
       rowElement = document.createElement('tr')
+
+      cell = document.createElement('td')
+      cell.textContent = r + 1
+      rowElement.appendChild(cell)
 
       for i in [0...columns.length]
         cell = document.createElement('td')
