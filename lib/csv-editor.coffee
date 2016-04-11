@@ -357,8 +357,8 @@ class CSVEditor
     new Promise (resolve, reject) =>
       output = []
       input = @createReadStream(options)
-      limit = 5
-      limit = 6 if options.header
+      limit = atom.config.get('tablr.csvEditor.maximumRowsInPreview')
+      limit += 1 if options.header
 
       stop = ->
         input.stop()

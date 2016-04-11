@@ -99,6 +99,11 @@ module.exports =
     csvEditor:
       type: 'object'
       properties:
+        maximumRowsInPreview:
+          type: 'integer'
+          default: 100
+          minimum: 1
+          description: 'The maximum number of rows in the CSV preview. Low numbers can speed up the preview generation but can also lead to error or inconsistencies when parsing the whole file if there is errors past the last row in the preview.'
         columnDelimiter:
           title: 'Default Column Delimiter'
           description: 'The default column delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\t` instead of using the proper character.'
