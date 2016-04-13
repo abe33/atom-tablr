@@ -1,3 +1,12 @@
+<a name="v1.2.1"></a>
+# v1.2.1 (2016-04-14)
+
+
+## :bug: Bug Fixes
+
+- Add human readable file size in progress ([0e4b8eab](https://github.com/abe33/atom-tablr/commit/0e4b8eab8e95be529f8d98f1683c29bbc9c125f7))
+- Fix missing progress view on deserialization ([145ba62f](https://github.com/abe33/atom-tablr/commit/145ba62f0edb3dceae4fab931fa9930d49d2408d))
+
 <a name="v1.2.0"></a>
 # v1.2.0 (2016-04-13)
 
