@@ -10,22 +10,31 @@ git:
 
 sudo: false
 
+language: node_js
+
+node_js:
+- "node"
+
 os:
-  - osx
-  - linux
+- osx
+- linux
 
 env:
   global:
-    - APM_TEST_PACKAGES=""
+  - APM_TEST_PACKAGES=""
+  - CC=gcc-4.8 CXX=g++-4.8
 
   matrix:
-    - ATOM_CHANNEL=stable
-    - ATOM_CHANNEL=beta
+  - ATOM_CHANNEL=stable
+  - ATOM_CHANNEL=beta
 
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - build-essential
     - git
     - libgnome-keyring-dev
     - fakeroot
+    - g++-4.8
