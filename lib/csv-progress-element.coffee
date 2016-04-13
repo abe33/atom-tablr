@@ -1,5 +1,7 @@
 {registerOrUpdateElement, SpacePenDSL} = require 'atom-utils'
 
+byteUnits = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
 module.exports =
 class CSVProgressElement extends HTMLElement
   SpacePenDSL.includeInto(this)
@@ -11,15 +13,29 @@ class CSVProgressElement extends HTMLElement
       @div class: 'block', =>
         @tag 'progress', max: '100', outlet: 'progress'
 
-  createdCallback: ->
-
-  attachedCallback: ->
-
   updateReadData: (input, lines) ->
     progressData = input.getProgress()
     @linesLabel.textContent = "#{lines} #{if lines is 1 then 'line' else 'lines'}"
-    @bytesLabel.textContent = "#{progressData.length}/#{progressData.total}"
+
+    {total, length, ration} = progressData
+
+    byteScale = @getByteScale(total)
+    byteDivider = Math.max(1, Math.pow(1000, byteScale))
+    unit = @getUnit(byteScale)
+
+    @bytesLabel.textContent = "#{(length / byteDivider).toFixed(1)}/#{(total / byteDivider).toFixed(1)}#{unit}"
     @progress.setAttribute('value', Math.floor(progressData.ratio * 100))
+
+  getByteScale: (size) ->
+    i = 0
+
+    while size > 1000
+      size = size / 1000
+      i++
+
+    i
+
+  getUnit: (scale) -> byteUnits[scale]
 
   updateFillTable: (lines, ratio) ->
     @linesLabel.textContent = "#{lines} #{if lines is 1 then 'row' else 'rows'} added"
