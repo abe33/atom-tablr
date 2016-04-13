@@ -1,3 +1,19 @@
+<a name="v1.2.0"></a>
+# v1.2.0 (2016-04-13)
+
+## :sparkles: Features
+
+- Add new config in CSV specs ([edb7a6e2](https://github.com/abe33/atom-tablr/commit/edb7a6e24204d79f1e6439be03f63a19ad1f4fd1))
+- Add a setting for the table creation batch size ([b1420d85](https://github.com/abe33/atom-tablr/commit/b1420d85cec9374a0a679958960153d39983647d))
+- Add the row number in preview ([3fe04333](https://github.com/abe33/atom-tablr/commit/3fe0433348156656fb2afee0a1ee8dd201fb934c))
+- Add setting for maximum row count in preview ([37f29faa](https://github.com/abe33/atom-tablr/commit/37f29faa94b9ebd710e98166e188dbaee905a003), [#26](https://github.com/abe33/atom-tablr/issues/26))
+- Add a loading indicator when opening files ([bf29db1e](https://github.com/abe33/atom-tablr/commit/bf29db1e805d264d424f5f01aa8933c264c6be58))
+
+## :racehorse: Performances
+
+- Speed up table cache content generation through JSON serialization ([c407f8c0](https://github.com/abe33/atom-tablr/commit/c407f8c0f4172da48bae5de1d7b4ad3106800b2f))
+- Speed up screen rows update by removing calls to indexOf ([a2f3e08b](https://github.com/abe33/atom-tablr/commit/a2f3e08b2899d45a49a71bb0400c267baa5296ea))
+
 <a name="v1.1.2"></a>
 # v1.1.2 (2016-04-11)
 
