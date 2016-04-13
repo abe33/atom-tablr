@@ -504,20 +504,43 @@ class DisplayTable
     rows = @table.getRows()
     @screenRows = rows.concat()
 
+    @screenToModelRowsMap = []
+    @modelToScreenRowsMap = []
+
     if @order?
       if typeof @order is 'function'
         @screenRows.sort(@order)
-      else
-        orderFunction = @compareRows(@order, @direction)
-        @screenRows.sort(orderFunction)
+        for row,i in rows
+          @modelToScreenRowsMap[i] = index = @screenRows.indexOf(row)
+          @screenToModelRowsMap[index] = i
 
-    @screenToModelRowsMap = (rows.indexOf(row) for row in @screenRows)
-    @modelToScreenRowsMap = (@screenRows.indexOf(row) for row in rows)
+      else
+        orderArray = @screenRows.map (row, i) =>
+          originalIndex: i
+          value: row[@order]
+
+        orderArray.sort(@compareScreenRows(@direction))
+
+        for {originalIndex},i in orderArray
+          @screenRows[i] = rows[originalIndex]
+          @modelToScreenRowsMap[originalIndex] = i
+          @screenToModelRowsMap[i] = originalIndex
+
+    else
+      for row,i in rows
+        @modelToScreenRowsMap[i] = @screenToModelRowsMap[i] = i
+
     @computeRowOffsets()
 
-  compareRows: (order, direction=1) ->
-    collator = new Intl.Collator("en-US", numeric: true)
-    return (a,b) -> collator.compare(a[order],b[order]) * direction
+  compareScreenRows: (direction=1) ->
+    collator = @getCollator()
+    return (a,b) -> collator.compare(a.value,b.value) * direction
+
+  compareModelRows: (order, direction=1) ->
+    collator = @getCollator()
+    return (a,b) -> collator.compare(a[order], b[order]) * direction
+
+  getCollator: -> @collator ?= new Intl.Collator("en-US", numeric: true)
 
   ##     ######  ######## ##       ##        ######
   ##    ##    ## ##       ##       ##       ##    ##
@@ -624,7 +647,7 @@ class DisplayTable
       if typeof @order is 'function'
         orderFunction = @order
       else
-        orderFunction = @compareRows(@order, @direction)
+        orderFunction = @compareModelRows(@order, @direction)
 
       order = @order
 
