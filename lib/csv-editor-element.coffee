@@ -43,13 +43,15 @@ class CSVEditorElement extends HTMLElement
 
     loadingSubscription = null
     @subscriptions.add @model.onWillOpen =>
-      @displayProgress()
+      @ensureProgress()
       @removeFormView()
       loadingSubscription = @subscriptions.add @model.onDidReadData ({@input, @lines}) =>
         @requestProgressUpdate()
 
     @subscriptions.add @model.onWillFillTable =>
       loadingSubscription?.dispose()
+      @ensureProgress()
+      @removeFormView()
 
       loadingSubscription = @subscriptions.add @model.onFillTable ({table}) =>
         count = table.getRowCount()
@@ -130,6 +132,9 @@ class CSVEditorElement extends HTMLElement
       return unless @form?
       @form.preview.error(reason)
       @form.openTableEditorButton.setAttribute('disabled', 'true')
+
+  ensureProgress: ->
+    @displayProgress() unless @progress?
 
   displayProgress: ->
     @progress = new CSVProgressElement
