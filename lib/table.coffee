@@ -89,7 +89,7 @@ class Table
     @cachedContents = @getCacheContent()
 
   getCacheContent: ->
-    res = [@columns].concat(@rows).join('\n')
+    JSON.stringify([@columns].concat(@rows))
 
   initializeAfterSetup: ->
     @clearUndoStack()
