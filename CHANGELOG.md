@@ -1,6 +1,12 @@
+<a name="v1.2.2"></a>
+# v1.2.2 (2016-04-14)
+
+## :bug: Bug Fixes
+
+- Remove pathwatcher and create stream from iconv instead ([c749e29e](https://github.com/abe33/atom-tablr/commit/c749e29e65891b51353c3fb9a0f81b51e21562b0), [#40](https://github.com/abe33/atom-tablr/issues/40))
+
 <a name="v1.2.1"></a>
 # v1.2.1 (2016-04-14)
-
 
 ## :bug: Bug Fixes
 
