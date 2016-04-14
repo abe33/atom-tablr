@@ -3,11 +3,11 @@ fs = require 'fs'
 csv = require 'csv'
 path = require 'path'
 stream = require 'stream'
-{CompositeDisposable, Emitter} = require 'atom'
-{File} = require 'pathwatcher'
+{File, CompositeDisposable, Emitter} = require 'atom'
 TableEditor = require './table-editor'
 Table = require './table'
 Tablr = null
+iconv = null
 
 module.exports =
 class CSVEditor
@@ -380,10 +380,17 @@ class CSVEditor
       input.on 'error', error
 
   createReadStream: (options) ->
-    @file.setEncoding(options.fileEncoding)
+    encoding = options.fileEncoding ? 'utf8'
+    filePath = @file.getPath()
+    @file.setEncoding(encoding)
 
-    size = fs.lstatSync(@file.getPath()).size
-    input = @file.createReadStream()
+    if encoding is 'utf8'
+      input = fs.createReadStream(filePath, {encoding})
+    else
+      iconv ?= require 'iconv-lite'
+      input = fs.createReadStream(filePath).pipe(iconv.decodeStream(encoding))
+
+    size = fs.lstatSync(filePath).size
     parser = csv.parse(options)
     length = 0
 
