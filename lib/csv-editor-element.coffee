@@ -121,7 +121,7 @@ class CSVEditorElement extends HTMLElement
     delete @formContainer
 
   updatePreview: (options) ->
-    return if options.remember
+    return if options.remember or atom.config.get('tablr.disablePreview')
 
     @form.preview.clean()
     @model.previewCSV(options).then (preview) =>
