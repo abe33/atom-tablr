@@ -59,6 +59,7 @@ class CSVEditorElement extends HTMLElement
 
     @subscriptions.add @model.onDidFailOpen ({err}) =>
       @hideProgress()
+      @createFormView()
       @form.alert(err.message)
 
     @subscriptions.add @model.onDidOpen ({editor}) =>
@@ -89,6 +90,8 @@ class CSVEditorElement extends HTMLElement
     delete @tableElement
 
   createFormView: ->
+    return if @form?
+
     @removeTableEditor()
 
     @formContainer = document.createElement('div')

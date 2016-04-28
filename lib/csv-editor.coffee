@@ -364,7 +364,7 @@ class CSVEditor
         input.stop()
         input.removeListener 'readable', read
         input.removeListener 'end', end
-        input.removeListener 'error', error
+        # input.removeListener 'error', error
         resolve(output[0...limit])
 
       read = ->
