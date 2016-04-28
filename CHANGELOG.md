@@ -1,3 +1,10 @@
+<a name="v1.2.3"></a>
+# v1.2.3 (2016-04-28)
+
+## :bug: Bug Fixes
+
+- Fix uncaught exception when previewing a CSV ([dbe569d3](https://github.com/abe33/atom-tablr/commit/dbe569d3ab512436f12c020e9603ce6f86585326), [#41](https://github.com/abe33/atom-tablr/issues/41))
+
 <a name="v1.2.2"></a>
 # v1.2.2 (2016-04-14)
 
