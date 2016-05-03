@@ -473,23 +473,43 @@ describe "CSVEditor", ->
 
     describe 'when the user choose to open a table editor', ->
       describe 'when the csv has inconsistent row length', ->
-        beforeEach ->
-          openFixture('incomplete-first-row.csv')
+        describe 'due to an incomplete first row', ->
+          beforeEach ->
+            openFixture('incomplete-first-row.csv')
 
-          runs ->
-            nextAnimationFrame()
+            runs ->
+              nextAnimationFrame()
 
-            csvEditor.onDidOpen ({editor}) ->
-              tableEditor = editor
+              csvEditor.onDidOpen ({editor}) ->
+                tableEditor = editor
 
-            tableEditorButton = csvEditorElement.form.openTableEditorButton
-            click(tableEditorButton)
+              tableEditorButton = csvEditorElement.form.openTableEditorButton
+              click(tableEditorButton)
 
-          waitsFor 'table editor created', -> tableEditor?
+            waitsFor 'table editor created', -> tableEditor?
 
-        it 'has a table filled with the file content', ->
-          expect(tableEditor.getScreenColumnCount()).toEqual(5)
-          expect(tableEditor.getScreenRowCount()).toEqual(2)
+          it 'has a table filled with the file content', ->
+            expect(tableEditor.getScreenColumnCount()).toEqual(5)
+            expect(tableEditor.getScreenRowCount()).toEqual(2)
+
+        describe 'due to an incomplete row later in the file', ->
+          beforeEach ->
+            openFixture('inconsistent-column-count.csv')
+
+            runs ->
+              nextAnimationFrame()
+
+              csvEditor.onDidOpen ({editor}) ->
+                tableEditor = editor
+
+              tableEditorButton = csvEditorElement.form.openTableEditorButton
+              click(tableEditorButton)
+
+            waitsFor 'table editor created', -> tableEditor?
+
+          it 'has a table filled with the file content', ->
+            expect(tableEditor.getScreenColumnCount()).toEqual(6)
+            expect(tableEditor.getScreenRowCount()).toEqual(108)
 
       describe 'with the default options', ->
         beforeEach ->
