@@ -171,6 +171,13 @@ module.exports =
       type: 'array'
       default: ['csv', 'tsv', 'CSV', 'TSV']
       description: 'The extensions for which the CSV opener will be used.'
+      
+    disablePreview:
+      title: 'Disable preview'
+      description: 'When checked, preview will not be presented.'
+      type: 'boolean'
+      default: false
+      
     defaultColumnNamingMethod:
       type: 'string'
       default: 'alphabetic'
