@@ -171,13 +171,13 @@ module.exports =
       type: 'array'
       default: ['csv', 'tsv', 'CSV', 'TSV']
       description: 'The extensions for which the CSV opener will be used.'
-      
+
     disablePreview:
       title: 'Disable preview'
       description: 'When checked, preview will not be presented.'
       type: 'boolean'
       default: false
-      
+
     defaultColumnNamingMethod:
       type: 'string'
       default: 'alphabetic'
@@ -200,7 +200,9 @@ module.exports =
       'tablr:clear-csv-layout': => @csvConfig.clearOption('layout')
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
-      return unless ///\.#{atom.config.get('tablr.supportedCsvExtensions').join('|')}$///.test uriToOpen
+      console.log atom.config.get('tablr.supportedCsvExtensions').join('|')
+      console.log ///\.(#{atom.config.get('tablr.supportedCsvExtensions').join('|')})$///.test uriToOpen
+      return unless ///\.(#{atom.config.get('tablr.supportedCsvExtensions').join('|')})$///.test uriToOpen
 
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})

@@ -110,6 +110,13 @@ describe "CSVEditor", ->
     csvEditor?.destroy()
     temp.cleanup()
 
+  describe 'when opening a file whose name contains CSV', ->
+    it 'does not open a csv editor for the file', ->
+      waitsForPromise ->
+        atom.workspace.open('CSVExporter.coffee').then (t) -> csvEditor = t
+      runs ->
+        expect(csvEditor instanceof CSVEditor).toBeFalsy()
+
   describe 'when an empty csv file is opened', ->
     it 'opens a csv editor for the file', ->
       openFixture('empty.csv')
