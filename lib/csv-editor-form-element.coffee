@@ -297,6 +297,7 @@ class CSVEditorFormElement extends HTMLElement
       quoted: @querySelector('[id^="quoted"]').checked
       skip_empty_lines: @querySelector('[id^="skip-empty-lines"]').checked
       fileEncoding: @encodingSelect.value
+      relax_column_count: true
 
     trim = @querySelector('[name="trim"]:checked')?.value
     comment = @querySelector('[name="comment"]:checked')?.value
