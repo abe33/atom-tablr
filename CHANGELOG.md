@@ -1,3 +1,15 @@
+<a name="v1.3.0"></a>
+# v1.3.0 (2016-05-09)
+
+## :sparkles: Features
+
+- Add disable preview options ([5980fbac](https://github.com/abe33/atom-tablr/commit/5980fbac9c91f624c8c61fd74792fc8f9d9804eb))
+
+## :bug: Bug Fixes
+
+- Fix issue with file name with CSV in it ([afd50964](https://github.com/abe33/atom-tablr/commit/afd50964041e20a8a5cb68532bf1b0595d9795b7), [#45](https://github.com/abe33/atom-tablr/issues/45))
+- Fix errors on inconsistent columns count ([6fc2bba1](https://github.com/abe33/atom-tablr/commit/6fc2bba1ad96eae688682f1ba1a240766992cf4b), [#48](https://github.com/abe33/atom-tablr/issues/48))
+
 <a name="v1.2.3"></a>
 # v1.2.3 (2016-04-28)
 
