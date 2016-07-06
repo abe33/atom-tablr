@@ -1,3 +1,13 @@
+<a name="v1.3.2"></a>
+# v1.3.2 (2016-07-06)
+
+## :bug: Bug Fixes
+
+- Fix text editor going past the limit of the pane ([1d02499c](https://github.com/abe33/atom-tablr/commit/1d02499c493605cb6af66fc40862b2d23ff1d02c), [#59](https://github.com/abe33/atom-tablr/issues/59))
+- Ensure there's a column and a row when starting an edit ([cb6dc4c3](https://github.com/abe33/atom-tablr/commit/cb6dc4c30552780a09f6c1d53bbcd2aaf9a7d4b4), [#53](https://github.com/abe33/atom-tablr/issues/53))
+- Fix inability to save after editing an empty CSV ([abb38230](https://github.com/abe33/atom-tablr/commit/abb38230a93bbf26724f2b75b380b9d907676923), [#58](https://github.com/abe33/atom-tablr/issues/58))
+- Fix package defaults not used unless a setting is changed in the form ([0ce23053](https://github.com/abe33/atom-tablr/commit/0ce230535e12ad90c8c464ca54f7b687eceda114), [#57](https://github.com/abe33/atom-tablr/issues/57), [#60](https://github.com/abe33/atom-tablr/issues/60))
+
 <a name="v1.3.1"></a>
 # v1.3.1 (2016-05-09)
 
