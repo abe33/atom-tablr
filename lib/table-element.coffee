@@ -833,10 +833,19 @@ class TableElement extends HTMLElement
     activeCellRect = @cellScreenRect(position)
     bounds = @getBoundingClientRect()
 
-    @editorElement.style.top = @toUnit(activeCellRect.top + bounds.top)
-    @editorElement.style.left = @toUnit(activeCellRect.left + bounds.left)
-    @editorElement.style.minWidth = @toUnit(activeCellRect.width)
-    @editorElement.style.minHeight = @toUnit(activeCellRect.height)
+    leftPos = Math.max(activeCellRect.left + bounds.left, bounds.left)
+    topPos = Math.max(activeCellRect.top + bounds.top, bounds.top)
+    availableWidth = (bounds.left + @clientWidth) - leftPos
+    availableHeight = (bounds.top + @clientHeight) - topPos
+    preferredWidth = Math.min(activeCellRect.width, availableWidth)
+    preferredHeight = Math.min(activeCellRect.height, availableHeight)
+
+    @editorElement.style.top = @toUnit(topPos)
+    @editorElement.style.left = @toUnit(leftPos)
+    @editorElement.style.minWidth = @toUnit(preferredWidth)
+    @editorElement.style.maxWidth = @toUnit(availableWidth)
+    @editorElement.style.minHeight = @toUnit(preferredHeight)
+    @editorElement.style.maxHeight = @toUnit(availableHeight)
     @editorElement.style.display = 'block'
 
     @editorElement.dataset.column = @tableEditor.getScreenColumn(position.column).name ? columnName(position.column)
