@@ -186,6 +186,7 @@ class TableEditor
     @addRowAt(newRowIndex)
 
     @setCursorAtScreenPosition([newRowIndex, column])
+    @ensureValidCursorCoordinates()
 
   insertRowAfter: ->
     {column, row} = @getCursorPosition()
@@ -193,6 +194,7 @@ class TableEditor
     @addRowAt(newRowIndex)
 
     @setCursorAtScreenPosition([newRowIndex, column])
+    @ensureValidCursorCoordinates()
 
   delete: ->
     @table.batchTransaction =>
@@ -204,12 +206,15 @@ class TableEditor
 
   insertColumnBefore: ->
     @addColumnAt(@getCursorPosition().column)
+    @ensureValidCursorCoordinates()
 
   insertColumnAfter: ->
     @addColumnAt(@getCursorPosition().column + 1)
+    @ensureValidCursorCoordinates()
 
   deleteColumnAtCursor: ->
     @removeColumnAt(@getCursorPosition().column)
+    @ensureValidCursorCoordinates()
 
   serialize: ->
     {
@@ -546,6 +551,12 @@ class TableEditor
   moveCursors: (fn) ->
     fn(cursor) for cursor in @getCursors()
     @mergeCursors()
+
+  ensureValidCursorCoordinates: ->
+    @moveCursors (cursor) ->
+      pos = cursor.getPosition()
+      if pos.column < 0 or isNaN(pos.column) or pos.row < 0 or isNaN(pos.row)
+        cursor.setPosition([0,0])
 
   initiateCursorManipulation: (block) ->
     originalCursorPositions = @getCursors().map (cursor) ->

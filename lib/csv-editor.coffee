@@ -319,7 +319,11 @@ class CSVEditor
 
       end = =>
         table = new Table
-        return resolve(new TableEditor({table})) if output.length is 0
+        if output.length is 0
+          tableEditor = new TableEditor({table})
+          tableEditor.setSaveHandler(@save)
+          tableEditor.initializeAfterSetup()
+          return resolve(tableEditor)
 
         table.lockModifiedStatus()
 

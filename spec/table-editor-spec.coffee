@@ -174,6 +174,18 @@ describe 'TableEditor', ->
     ##    ##    ## ##     ## ##    ##  ##    ## ##     ## ##    ##  ##    ##
     ##     ######   #######  ##     ##  ######   #######  ##     ##  ######
 
+    describe 'for an empty table', ->
+      describe 'adding a column and a row', ->
+        it 'set the cursor position to 0,0', ->
+          table = new Table
+          tableEditor = new TableEditor({table})
+          tableEditor.initializeAfterSetup()
+
+          tableEditor.insertColumnAfter()
+          tableEditor.insertRowAfter()
+
+          expect(tableEditor.getCursorPosition()).toEqual([0,0])
+
     describe '::addCursorAtScreenPosition', ->
       it 'adds a cursor', ->
         tableEditor.addCursorAtScreenPosition([1,1])
