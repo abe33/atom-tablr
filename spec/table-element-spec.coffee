@@ -1673,6 +1673,23 @@ describe 'tableElement', ->
       editor = tableElement.querySelector('atom-text-editor').model
       expect(editor.getText()).toEqual('x')
 
+    describe 'on an empty table', ->
+      beforeEach ->
+        tableEditor = new TableEditor
+        tableElement = atom.views.getView(tableEditor)
+        tableShadowRoot = tableElement.shadowRoot
+
+        jasmineContent.insertBefore(tableElement, jasmineContent.firstChild)
+
+        textInput(tableElement.hiddenInput, 'x')
+
+      it 'creates a column and a row prior to the edit', ->
+        expect(tableEditor.getScreenColumnCount()).toEqual(1)
+        expect(tableEditor.getScreenRowCount()).toEqual(1)
+
+        editor = tableElement.querySelector('atom-text-editor').model
+        expect(editor.getText()).toEqual('x')
+
   describe 'double clicking on a cell', ->
     beforeEach ->
       cell = tableShadowRoot.querySelector('tablr-cell:last-child')

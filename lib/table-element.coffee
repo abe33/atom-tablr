@@ -80,6 +80,8 @@ class TableElement extends HTMLElement
     @subscriptions.add @subscribeTo @hiddenInput,
       'textInput': (e) =>
         unless @isEditing()
+          @insertColumnAfter() if @tableEditor.getScreenColumnCount() is 0
+          @insertRowAfter() if @tableEditor.getScreenRowCount() is 0
           @startCellEdit(e.data)
 
     @subscriptions.add @subscribeTo this,
