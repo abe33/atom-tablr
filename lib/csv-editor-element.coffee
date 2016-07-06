@@ -39,7 +39,7 @@ class CSVEditorElement extends HTMLElement
       else if @tableElement?
         @createFormView()
       else
-        @updatePreview()
+        @updatePreview(@model.options)
 
     loadingSubscription = null
     @subscriptions.add @model.onWillOpen =>
