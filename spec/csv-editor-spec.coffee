@@ -899,6 +899,8 @@ describe "CSVEditor", ->
       describe 'when modified and saved', ->
         beforeEach ->
           modifyAndSave ->
+            tableEditor.setValueAtPosition([1,1], "34\n")
+
             tableEditor.addRow ['GHI', 56]
             tableEditor.addRow ['JKL', 78]
 
