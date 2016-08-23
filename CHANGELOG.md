@@ -1,3 +1,10 @@
+<a name="v1.4.0"></a>
+# v1.4.0 (2016-08-23)
+
+## :sparkles: Features
+
+- Add a row when tabbing on the last cell of a table ([c09ba8f9](https://github.com/abe33/atom-tablr/commit/c09ba8f9afe1d8c703e8c10bb50d98c088567bf5), [#62](https://github.com/abe33/atom-tablr/issues/62))
+
 <a name="v1.3.2"></a>
 # v1.3.2 (2016-07-06)
 
