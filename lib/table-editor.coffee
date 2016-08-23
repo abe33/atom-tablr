@@ -191,6 +191,7 @@ class TableEditor
   insertRowAfter: ->
     {column, row} = @getCursorPosition()
     newRowIndex = @screenRowToModelRow(row) + 1
+
     @addRowAt(newRowIndex)
 
     @setCursorAtScreenPosition([newRowIndex, column])

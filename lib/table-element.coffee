@@ -602,7 +602,21 @@ class TableElement extends HTMLElement
     @afterCursorMove()
 
   moveRightInSelection: ->
-    @tableEditor.moveRightInSelection()
+    cursor = @tableEditor.getLastCursor()
+    lastCell = [
+      @tableEditor.getLastRowIndex()
+      @tableEditor.getLastColumnIndex()
+    ]
+
+    if cursor.getPosition().isEqual(lastCell) and not cursor.selection.spanMoreThanOneCell()
+      @insertRowAfter()
+      @tableEditor.setCursorAtScreenPosition([
+        @tableEditor.getLastRowIndex()
+        0
+      ])
+    else
+      @tableEditor.moveRightInSelection()
+
     @afterCursorMove()
 
   moveUpInSelection: ->
