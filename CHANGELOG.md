@@ -1,3 +1,10 @@
+<a name="v1.4.1"></a>
+# v1.4.1 (2016-08-25)
+
+## :racehorse: Performances
+
+- Implement a deserialize placeholder for faster startup ([ba2464a4](https://github.com/abe33/atom-tablr/commit/ba2464a4441e3dd64148afb8db1eefb5308f5ff3))
+
 <a name="v1.4.0"></a>
 # v1.4.0 (2016-08-23)
 
