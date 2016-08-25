@@ -29,5 +29,272 @@
   "devDependencies": {
     "temp": "~0.8.0",
     "fs-plus": "^2.8.1"
+  },
+  "configSchema": {
+    "tableEditor": {
+      "type": "object",
+      "properties": {
+        "undefinedDisplay": {
+          "title": "Undefined Value Display",
+          "description": "How to render undefined values in a cell. Leave the field blank to display an empty cell.",
+          "type": "string",
+          "default": ""
+        },
+        "pageMoveRowAmount": {
+          "title": "Page Move Row Amount",
+          "description": "The number of rows to jump when using the `core:page-up` and `core:page-down` commands.",
+          "type": "integer",
+          "default": 20
+        },
+        "pageMoveColumnAmount": {
+          "title": "Page Move Column Amount",
+          "description": "The number of columns to jump when using the `tablr:page-left` and `tablr:page-right` commands.",
+          "type": "integer",
+          "default": 5
+        },
+        "scrollSpeedDuringDrag": {
+          "title": "Scroll Speed During Drag",
+          "description": "The speed of the scrolling motion during a drag gesture, in pixels.",
+          "type": "integer",
+          "default": 20
+        },
+        "scrollPastEnd": {
+          "title": "Scroll Past End",
+          "description": "When enabled, the table can scroll past the end of the table both vertically and horizontally to let manipulate rows and columns more easily.",
+          "type": "boolean",
+          "default": false
+        },
+        "rowHeight": {
+          "title": "Row Height",
+          "description": "The default row height in pixels.",
+          "type": "integer",
+          "default": 24
+        },
+        "rowOverdraw": {
+          "description": "The number of rows to render outside the bounds of the visible area to smooth the scrolling motion.",
+          "title": "Row Overdraw",
+          "type": "integer",
+          "default": 3
+        },
+        "minimumRowHeight": {
+          "title": "Minimum Row Height",
+          "description": "The minimum height of a row in pixels.",
+          "type": "integer",
+          "default": 16
+        },
+        "rowHeightIncrement": {
+          "title": "Row Height Increment",
+          "description": "The amount of pixels to add or remove to a row when using the row resizing commands.",
+          "type": "integer",
+          "default": 20
+        },
+        "columnWidth": {
+          "title": "Column Width",
+          "description": "The default column width in pixels.",
+          "type": "integer",
+          "default": 120
+        },
+        "columnOverdraw": {
+          "title": "Column Overdraw",
+          "description": "The number of columns to render outside the bounds of the visible area to smooth the scrolling motion.",
+          "type": "integer",
+          "default": 2
+        },
+        "minimumColumnWidth": {
+          "title": "Minimum Column Width",
+          "description": "The minimum column width in pixels.",
+          "type": "integer",
+          "default": 40
+        },
+        "columnWidthIncrement": {
+          "title": "Column Width Increment",
+          "description": "The amount of pixels to add or remove to a column when using the column resizing commands.",
+          "type": "integer",
+          "default": 20
+        }
+      }
+    },
+    "copyPaste": {
+      "type": "object",
+      "properties": {
+        "flattenBufferMultiSelectionOnPaste": {
+          "title": "Flatten Buffer Multi Selection On Paste",
+          "type": "boolean",
+          "default": false,
+          "description": "If the clipboard content comes from a multiple selection copy in a text editor, the whole clipboard text will be pasted in each cell of the table selection."
+        },
+        "distributeBufferMultiSelectionOnPaste": {
+          "title": "Distribute Buffer Multi Selection On Paste",
+          "type": "string",
+          "default": "vertically",
+          "enum": [
+            "horizontally",
+            "vertically"
+          ],
+          "description": "If the clipboard content comes from a multiple selection copy in a text editor, each selection will be considered as part of the same column (`vertically`) or of the same row (`horizontally`)."
+        },
+        "treatEachCellAsASelectionWhenPastingToABuffer": {
+          "title": "Treat Each Cell As A Selection When Pasting To A Buffer",
+          "type": "boolean",
+          "default": true,
+          "description": "When copying from a table to paste the content in a text editor this setting will make each cell appear as if they were created from different selections."
+        }
+      }
+    },
+    "csvEditor": {
+      "type": "object",
+      "properties": {
+        "maximumRowsInPreview": {
+          "type": "integer",
+          "default": 100,
+          "minimum": 1,
+          "description": "The maximum number of rows in the CSV preview. Low numbers can speed up the preview generation but can also lead to error or inconsistencies when parsing the whole file if there is errors past the last row in the preview."
+        },
+        "tableCreationBatchSize": {
+          "type": "integer",
+          "default": 1000,
+          "minimum": 1,
+          "description": "When creating a table from a CSV file, filling the table in one single loop can lock the UI if the table is too large. To prevent that from happening the table is filled in small steps where a number of rows equals to the batch size are added to the table."
+        },
+        "columnDelimiter": {
+          "title": "Default Column Delimiter",
+          "description": "The default column delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\t` instead of using the proper character.",
+          "type": "string",
+          "default": ","
+        },
+        "rowDelimiter": {
+          "title": "Default Row Delimiter",
+          "description": "The default row delimiter to use when opening a CSV for the first time. You can write space characters code such as `\\r` instead of using the proper character. The `auto` value will let the CSV parser determine the proper separator to use depending on the file's content.",
+          "type": "string",
+          "default": "auto"
+        },
+        "quote": {
+          "title": "Default Quote Character",
+          "description": "The default quote character for quoted content.",
+          "type": "string",
+          "default": "\""
+        },
+        "escape": {
+          "title": "Default Espace Character",
+          "description": "The default escape character for escaped quotes in quoted content.",
+          "type": "string",
+          "default": "\""
+        },
+        "comment": {
+          "title": "Default Comment Character",
+          "description": "The default character that indicate a comment. Everything past this character in a line will be ignored. You can set it to `none` to disable the use of comments.",
+          "type": "string",
+          "default": "#"
+        },
+        "quoted": {
+          "title": "Quoted Content",
+          "description": "Whether the column's content are wrapped into quotes or not.",
+          "type": "boolean",
+          "default": false
+        },
+        "header": {
+          "title": "File Header",
+          "description": "Whether to treat the first line of a CSV as the file header or not.",
+          "type": "boolean",
+          "default": false
+        },
+        "eof": {
+          "title": "Ensure New Line At End Of File",
+          "description": "When checked, every file will be saved with an extra new-line character at the end of the file.",
+          "type": "boolean",
+          "default": false
+        },
+        "skipEmptyLines": {
+          "title": "Skip Empty Lines",
+          "description": "When checked, empty lines will simply be ignored.",
+          "type": "boolean",
+          "default": false
+        },
+        "trim": {
+          "title": "Trim Cell Content",
+          "description": "How to treat cell's content when parsing a CSV file.",
+          "type": "string",
+          "default": "no",
+          "enum": [
+            "no",
+            "left",
+            "right",
+            "both"
+          ]
+        },
+        "encoding": {
+          "title": "Default Encoding",
+          "description": "The default encoding to use when opening a new CSV file.",
+          "type": "string",
+          "default": "UTF-8",
+          "enum": [
+            "UTF-8",
+            "UTF-16 LE",
+            "UTF-16 BE",
+            "Western (Windows 1252)",
+            "Western (ISO 8859-1)",
+            "Western (ISO 8859-3)",
+            "Western (ISO 8859-15)",
+            "Western (Mac Roman)",
+            "DOS (CP 437)",
+            "Arabic (Windows 1256)",
+            "Arabic (ISO 8859-6)",
+            "Baltic (Windows 1257)",
+            "Baltic (ISO 8859-4)",
+            "Celtic (ISO 8859-14)",
+            "Central European (Windows 1250)",
+            "Central European (ISO 8859-2)",
+            "Cyrillic (Windows 1251)",
+            "Cyrillic (CP 866)",
+            "Cyrillic (ISO 8859-5)",
+            "Cyrillic (KOI8-R)",
+            "Cyrillic (KOI8-U)",
+            "Estonian (ISO 8859-13)",
+            "Greek (Windows 1253)",
+            "Greek (ISO 8859-7)",
+            "Hebrew (Windows 1255)",
+            "Hebrew (ISO 8859-8)",
+            "Nordic (ISO 8859-10)",
+            "Romanian (ISO 8859-16)",
+            "Turkish (Windows 1254)",
+            "Turkish (ISO 8859-9)",
+            "Vietnamese (Windows 1254)",
+            "Chinese (GBK)",
+            "Chinese (GB18030)",
+            "Traditional Chinese (Big5)",
+            "Traditional Chinese (Big5-HKSCS)",
+            "Japanese (Shift JIS)",
+            "Japanese (EUC-JP)",
+            "Korean (EUC-KR)"
+          ]
+        }
+      }
+    },
+    "supportedCsvExtensions": {
+      "type": "array",
+      "default": [
+        "csv",
+        "tsv",
+        "CSV",
+        "TSV"
+      ],
+      "description": "The extensions for which the CSV opener will be used."
+    },
+    "disablePreview": {
+      "title": "Disable preview",
+      "description": "When checked, preview will not be presented.",
+      "type": "boolean",
+      "default": false
+    },
+    "defaultColumnNamingMethod": {
+      "type": "string",
+      "default": "alphabetic",
+      "enum": [
+        "alphabetic",
+        "numeric",
+        "numericZeroBased"
+      ],
+      "description": "When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,…, Z, AA, AB… `numeric` is for simple numbers, ie 1, 2… `numericZeroBased` is similar to `numeric`, except that it starts numbering from 0 instead of 1"
+    }
   }
 }
