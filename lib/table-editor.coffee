@@ -17,6 +17,8 @@ class TableEditor
 
     new TableEditor(state)
 
+  atom.deserializers.add(this)
+
   @delegatesProperties(
     'order', 'direction',
     toProperty: 'displayTable'

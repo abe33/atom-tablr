@@ -1,7 +1,10 @@
-_ = require 'underscore-plus'
-{CompositeDisposable} = require 'atom'
 encodings = require './encodings'
-[url, Range, Table, DisplayTable, TableEditor, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
+[_, url, CompositeDisposable, Range, Table, DisplayTable, TableEditor, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
+
+{CSVEditorPlaceholder, CSVEditorPlaceholderElement} = require './csv-editor-placeholder'
+
+atom.deserializers.add(CSVEditorPlaceholder)
+CSVEditorPlaceholderElement.registerViewProvider()
 
 module.exports =
   config:
@@ -184,11 +187,13 @@ module.exports =
       enum: ['alphabetic', 'numeric', 'numericZeroBased']
       description: 'When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,…, Z, AA, AB… `numeric` is for simple numbers, ie 1, 2… `numericZeroBased` is similar to `numeric`, except that it starts numbering from 0 instead of 1'
 
-
   activate: ({csvConfig}) ->
-    @csvConfig = new CSVConfig(csvConfig)
+    CompositeDisposable ?= require('atom').CompositeDisposable
+    CSVConfig ?= require './csv-config'
 
+    @csvConfig = new CSVConfig(csvConfig)
     @subscriptions = new CompositeDisposable
+
     if atom.inDevMode()
       @subscriptions.add atom.commands.add 'atom-workspace',
         'tablr:demo-large': => atom.workspace.open('tablr://large')
@@ -201,6 +206,11 @@ module.exports =
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
       return unless ///\.(#{atom.config.get('tablr.supportedCsvExtensions').join('|')})$///.test uriToOpen
+
+      _ ?= require 'underscore-plus'
+      CSVEditor ?= require './csv-editor'
+
+      @registerViews()
 
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})
@@ -251,13 +261,37 @@ module.exports =
           , 10
       }]
 
+    @replacePlaceholders()
+
   deactivate: ->
     @subscriptions.dispose()
 
   provideTablrModelsServiceV1: ->
+    Range ?= require './range'
+    Table ?= require './table'
+    DisplayTable ?= require './display-table'
+    TableEditor ?= require './table-editor'
+
     {Table, DisplayTable, TableEditor, Range}
 
+  replacePlaceholders: ->
+    @registerViews()
+    placeholders = atom.workspace.getPaneItems()
+    .filter (item) -> item instanceof CSVEditorPlaceholder
+    .forEach (item) ->
+      pane = atom.workspace.paneForItem(item)
+      itemIndex = pane.getItems().indexOf(item)
+      isActive = pane.getActiveItem() is item
+      csvEditor = item.getCSVEditor()
+      pane.removeItem(item)
+      pane.addItem(csvEditor, index: itemIndex)
+      pane.activateItem(csvEditor) if isActive
+
   getSmallTable: ->
+    @registerViews()
+
+    TableEditor ?= require './table-editor'
+
     table = new TableEditor
 
     table.lockModifiedStatus()
@@ -281,6 +315,10 @@ module.exports =
     return table
 
   getLargeTable: ->
+    @registerViews()
+
+    TableEditor ?= require './table-editor'
+
     table = new TableEditor
 
     table.lockModifiedStatus()
@@ -311,27 +349,15 @@ module.exports =
 
     return table
 
+  registerViews: ->
+    unless CSVEditorElement?
+      TableElement ?= require './table-element'
+      TableSelectionElement ?= require './table-selection-element'
+      CSVEditorElement ?= require './csv-editor-element'
+
+      CSVEditorElement.registerViewProvider()
+      TableElement.registerViewProvider()
+      TableSelectionElement.registerViewProvider()
+
   serialize: ->
     csvConfig: @csvConfig.serialize()
-
-  loadModelsAndRegisterViews: ->
-    Range = require './range'
-    Table = require './table'
-    DisplayTable = require './display-table'
-    TableEditor = require './table-editor'
-    TableElement = require './table-element'
-    TableSelectionElement = require './table-selection-element'
-    CSVConfig = require './csv-config'
-    CSVEditor = require './csv-editor'
-    CSVEditorElement = require './csv-editor-element'
-
-    CSVEditorElement.registerViewProvider()
-    TableElement.registerViewProvider()
-    TableSelectionElement.registerViewProvider()
-
-    atom.deserializers.add(CSVEditor)
-    atom.deserializers.add(TableEditor)
-    atom.deserializers.add(DisplayTable)
-    atom.deserializers.add(Table)
-
-module.exports.loadModelsAndRegisterViews()

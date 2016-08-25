@@ -12,6 +12,8 @@ class DisplayTable
     state.table = atom.deserializers.deserialize(state.table) if state.table?
     displayTable = new DisplayTable(state)
 
+  atom.deserializers.add(this)
+
   @delegatesMethods(
     'changeColumnName', 'undo', 'redo', 'getRows', 'getColumns','getColumnCount', 'getColumnIndex', 'getRowCount', 'clearUndoStack', 'clearRedoStack', 'getValueAtPosition', 'swapColumns', 'setValueAtPosition', 'setValuesAtPositions', 'setValuesInRange', 'rowRangeFrom', 'swapRows', 'getRow',
     toProperty: 'table'

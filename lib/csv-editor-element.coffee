@@ -1,10 +1,9 @@
 {CompositeDisposable} = require 'atom'
 {SpacePenDSL, EventsDelegation, registerOrUpdateElement} = require 'atom-utils'
-CSVEditor = require './csv-editor'
-CSVEditorFormElement = require './csv-editor-form-element'
-CSVPreviewElement = require './csv-preview-element'
-CSVProgressElement = require './csv-progress-element'
-TableEditor = require './table-editor'
+
+[CSVEditorFormElement, CSVPreviewElement, CSVProgressElement, CSVEditor] = []
+
+TableEditor = null
 
 module.exports =
 class CSVEditorElement extends HTMLElement
@@ -63,6 +62,8 @@ class CSVEditorElement extends HTMLElement
       @form.alert(err.message)
 
     @subscriptions.add @model.onDidOpen ({editor}) =>
+      TableEditor ?= require './table-editor'
+
       return unless editor instanceof TableEditor
 
       @hideProgress()
@@ -159,6 +160,11 @@ CSVEditorElement =
 registerOrUpdateElement 'atom-csv-editor', CSVEditorElement.prototype
 
 CSVEditorElement.registerViewProvider = ->
+  CSVEditorFormElement ?= require './csv-editor-form-element'
+  CSVPreviewElement ?= require './csv-preview-element'
+  CSVProgressElement ?= require './csv-progress-element'
+  CSVEditor ?= require './csv-editor'
+
   atom.views.addViewProvider CSVEditor, (model) ->
     element = new CSVEditorElement
     element.setModel(model)
