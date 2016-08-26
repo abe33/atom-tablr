@@ -1,3 +1,14 @@
+<a name="v1.5.0"></a>
+# v1.5.0 (2016-08-26)
+
+## :racehorse: Performances
+
+- Move deserializers and view providers in package.json ([d4ab79c4](https://github.com/abe33/atom-tablr/commit/d4ab79c40551d22c0b422f33b353d516150eadb2))
+
+## :arrow_up: Dependencies Update
+
+- Bump engine version to >= 1.7.0 ([62c18329](https://github.com/abe33/atom-tablr/commit/62c18329e27f443ebac0427f33462f49e708efb9))
+
 <a name="v1.4.1"></a>
 # v1.4.1 (2016-08-25)
 
