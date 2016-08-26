@@ -1,4 +1,3 @@
-encodings = require './encodings'
 [_, url, CompositeDisposable, Range, Table, DisplayTable, TableEditor, Selection, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
 
 module.exports =
@@ -33,7 +32,7 @@ module.exports =
       new CSVEditor({filePath: uriToOpen, options, choice})
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
-      url ||= require 'url'
+      url ?= require 'url'
 
       {protocol, host} = url.parse uriToOpen
       return unless protocol is 'tablr:'
