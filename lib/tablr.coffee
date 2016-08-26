@@ -1,10 +1,5 @@
 encodings = require './encodings'
-[_, url, CompositeDisposable, Range, Table, DisplayTable, TableEditor, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
-
-{CSVEditorPlaceholder, CSVEditorPlaceholderElement} = require './csv-editor-placeholder'
-
-atom.deserializers.add(CSVEditorPlaceholder)
-CSVEditorPlaceholderElement.registerViewProvider()
+[_, url, CompositeDisposable, Range, Table, DisplayTable, TableEditor, Selection, TableElement, TableSelectionElement, CSVConfig, CSVEditor, CSVEditorElement] = []
 
 module.exports =
   activate: ({csvConfig}) ->
@@ -29,8 +24,6 @@ module.exports =
 
       _ ?= require 'underscore-plus'
       CSVEditor ?= require './csv-editor'
-
-      @registerViews()
 
       choice = @csvConfig.get(uriToOpen, 'choice')
       options = _.clone(@csvConfig.get(uriToOpen, 'options') ? {})
@@ -81,8 +74,6 @@ module.exports =
           , 10
       }]
 
-    @replacePlaceholders()
-
   deactivate: ->
     @subscriptions.dispose()
 
@@ -94,22 +85,43 @@ module.exports =
 
     {Table, DisplayTable, TableEditor, Range}
 
-  replacePlaceholders: ->
-    @registerViews()
-    placeholders = atom.workspace.getPaneItems()
-    .filter (item) -> item instanceof CSVEditorPlaceholder
-    .forEach (item) ->
-      pane = atom.workspace.paneForItem(item)
-      itemIndex = pane.getItems().indexOf(item)
-      isActive = pane.getActiveItem() is item
-      csvEditor = item.getCSVEditor()
-      pane.removeItem(item)
-      pane.addItem(csvEditor, index: itemIndex)
-      pane.activateItem(csvEditor) if isActive
+  deserializeCSVEditor: (state) ->
+    CSVEditor ?= require './csv-editor'
+    CSVEditor.deserialize(state)
+
+  deserializeTableEditor: (state) ->
+    TableEditor ?= require './table-editor'
+    TableEditor.deserialize(state)
+
+  deserializeDisplayTable: (state) ->
+    DisplayTable ?= require './display-table'
+    DisplayTable.deserialize(state)
+
+  deserializeTable: (state) ->
+    Table ?= require './table'
+    Table.deserialize(state)
+
+  tablrViewProvider: (model) ->
+    TableEditor ?= require './table-editor'
+    Selection ?= require './selection'
+    CSVEditor ?= require './csv-editor'
+
+    element = if model instanceof TableEditor
+      TableElement ?= require './table-element'
+      new TableElement
+
+    else if model instanceof Selection
+      TableSelectionElement ?= require './table-selection-element'
+      new TableSelectionElement
+
+    else if model instanceof CSVEditor
+      CSVEditorElement ?= require './csv-editor-element'
+      new CSVEditorElement
+
+    element.setModel(model) if element?
+    element
 
   getSmallTable: ->
-    @registerViews()
-
     TableEditor ?= require './table-editor'
 
     table = new TableEditor
@@ -135,8 +147,6 @@ module.exports =
     return table
 
   getLargeTable: ->
-    @registerViews()
-
     TableEditor ?= require './table-editor'
 
     table = new TableEditor
@@ -168,16 +178,6 @@ module.exports =
     table.unlockModifiedStatus()
 
     return table
-
-  registerViews: ->
-    unless CSVEditorElement?
-      TableElement ?= require './table-element'
-      TableSelectionElement ?= require './table-selection-element'
-      CSVEditorElement ?= require './csv-editor-element'
-
-      CSVEditorElement.registerViewProvider()
-      TableElement.registerViewProvider()
-      TableSelectionElement.registerViewProvider()
 
   serialize: ->
     csvConfig: @csvConfig.serialize()

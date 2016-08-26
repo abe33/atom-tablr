@@ -1,23 +1,16 @@
 Tablr = require '../../lib/tablr'
+TableElement = require '../../lib/table-element'
+
+deserializers = {
+  CSVEditor: 'deserializeCSVEditor',
+  TableEditor: 'deserializeTableEditor',
+  DisplayTable: 'deserializeDisplayTable',
+  Table: 'deserializeTable'
+}
 
 beforeEach ->
-  Table = require '../../lib/table'
-  DisplayTable = require '../../lib/display-table'
-  TableEditor = require '../../lib/table-editor'
-  CSVEditor = require '../../lib/csv-editor'
-  {CSVEditorPlaceholder, CSVEditorPlaceholderElement} = require '../../lib/csv-editor-placeholder'
+  atom.views.addViewProvider(Tablr.tablrViewProvider)
+  TableElement.registerCommands()
 
-  atom.deserializers.add(CSVEditor)
-  atom.deserializers.add(CSVEditorPlaceholder)
-  atom.deserializers.add(TableEditor)
-  atom.deserializers.add(DisplayTable)
-  atom.deserializers.add(Table)
-
-  TableElement = require '../../lib/table-element'
-  TableSelectionElement = require '../../lib/table-selection-element'
-  CSVEditorElement = require '../../lib/csv-editor-element'
-
-  CSVEditorElement.registerViewProvider()
-  TableElement.registerViewProvider()
-  TableSelectionElement.registerViewProvider()
-  CSVEditorPlaceholderElement.registerViewProvider()
+  for k,v of deserializers
+    atom.deserializers.add name: k, deserialize: Tablr[v]

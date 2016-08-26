@@ -16,8 +16,6 @@ class CSVEditor
     csvEditor.applyChoice()
     csvEditor
 
-  atom.deserializers.add(this)
-
   @tableEditorForPath: {}
 
   constructor: (state={}) ->
@@ -443,7 +441,7 @@ class CSVEditor
 
   serialize: ->
     out = {
-      deserializer: 'CSVEditorPlaceholder'
+      deserializer: 'CSVEditor'
       filePath: @getPath()
       @options
       @choice

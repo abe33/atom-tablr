@@ -1568,13 +1568,6 @@ module.exports =
 TableElement =
 registerOrUpdateElement 'tablr-editor', TableElement.prototype
 
-TableElement.registerViewProvider = ->
-  atom.views.addViewProvider TableEditor, (model) ->
-    element = new TableElement
-    element.setModel(model)
-    element
-
-
 #     ######  ##     ## ########
 #    ##    ## ###   ### ##     ##
 #    ##       #### #### ##     ##

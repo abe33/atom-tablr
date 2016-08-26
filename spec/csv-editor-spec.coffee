@@ -1057,7 +1057,7 @@ describe "CSVEditor", ->
         nextAnimationFrame()
 
         expect(csvEditor.serialize()).toEqual({
-          deserializer: 'CSVEditorPlaceholder'
+          deserializer: 'CSVEditor'
           filePath: csvDest
           options: csvEditor.options
           choice: undefined
@@ -1070,7 +1070,7 @@ describe "CSVEditor", ->
         waitsForPromise -> csvEditor.openTableEditor()
         runs ->
           expect(csvEditor.serialize()).toEqual({
-            deserializer: 'CSVEditorPlaceholder'
+            deserializer: 'CSVEditor'
             filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
@@ -1096,7 +1096,7 @@ describe "CSVEditor", ->
           csvEditor.saveLayout()
 
           expect(csvEditor.serialize()).toEqual({
-            deserializer: 'CSVEditorPlaceholder'
+            deserializer: 'CSVEditor'
             filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'
@@ -1122,7 +1122,7 @@ describe "CSVEditor", ->
           csvEditor.editor.addRow()
 
           expect(csvEditor.serialize()).toEqual({
-            deserializer: 'CSVEditorPlaceholder'
+            deserializer: 'CSVEditor'
             filePath: csvDest
             options: csvEditor.options
             choice: 'TableEditor'

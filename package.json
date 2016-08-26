@@ -16,20 +16,15 @@
       }
     }
   },
-  "dependencies": {
-    "atom-utils": "0.9.x",
-    "underscore-plus": "^1",
-    "mixto": "1.x",
-    "property-accessors": "1.x",
-    "delegato": "1.x",
-    "coffee-script": "1.7.x",
-    "csv": "~0.4.5",
-    "iconv-lite": "~0.4.4"
+  "deserializers": {
+    "CSVEditor": "deserializeCSVEditor",
+    "TableEditor": "deserializeTableEditor",
+    "DisplayTable": "deserializeDisplayTable",
+    "Table": "deserializeTable"
   },
-  "devDependencies": {
-    "temp": "~0.8.0",
-    "fs-plus": "^2.8.1"
-  },
+  "viewProviders": [
+    "tablrViewProvider"
+  ],
   "configSchema": {
     "tableEditor": {
       "type": "object",
@@ -296,5 +291,19 @@
       ],
       "description": "When file has no header, select the default naming method for the columns. `alphabetic` means use A, B,…, Z, AA, AB… `numeric` is for simple numbers, ie 1, 2… `numericZeroBased` is similar to `numeric`, except that it starts numbering from 0 instead of 1"
     }
+  },
+  "dependencies": {
+    "atom-utils": "0.9.x",
+    "underscore-plus": "^1",
+    "mixto": "1.x",
+    "property-accessors": "1.x",
+    "delegato": "1.x",
+    "coffee-script": "1.7.x",
+    "csv": "~0.4.5",
+    "iconv-lite": "~0.4.4"
+  },
+  "devDependencies": {
+    "temp": "~0.8.0",
+    "fs-plus": "^2.8.1"
   }
 }

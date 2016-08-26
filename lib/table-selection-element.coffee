@@ -57,9 +57,3 @@ class TableSelectionElement extends HTMLElement
 module.exports =
 TableSelectionElement =
 registerOrUpdateElement 'tablr-editor-selection', TableSelectionElement.prototype
-
-TableSelectionElement.registerViewProvider = ->
-  atom.views.addViewProvider Selection, (model) ->
-    element = new TableSelectionElement
-    element.setModel(model)
-    element

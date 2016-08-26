@@ -15,8 +15,6 @@ class Table
     table.initializeAfterSetup()
     table
 
-  atom.deserializers.add(this)
-
   constructor: (state={}) ->
     {@id, @columns, @rows, modified} = state
     @cachedContents = state.cachedContents ? '' if modified

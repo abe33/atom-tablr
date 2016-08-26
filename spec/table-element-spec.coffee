@@ -73,10 +73,6 @@ describe 'tableElement', ->
     window.requestAnimationFrame = requestAnimationFrameSafe
 
   beforeEach ->
-    TableElement.registerViewProvider()
-    TableSelectionElement.registerViewProvider()
-    TableElement.registerCommands()
-
     jasmineContent = document.body.querySelector('#jasmine-content')
 
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
