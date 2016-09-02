@@ -19,7 +19,9 @@ module.exports =
       'tablr:clear-csv-layout': => @csvConfig.clearOption('layout')
 
     @subscriptions.add atom.workspace.addOpener (uriToOpen) =>
-      return unless ///\.(#{atom.config.get('tablr.supportedCsvExtensions').join('|')})$///.test uriToOpen
+      extensions = atom.config.get('tablr.supportedCsvExtensions') ? ['csv', 'tsv', 'CSV', 'TSV']
+
+      return unless ///\.(#{extensions.join('|')})$///.test uriToOpen
 
       _ ?= require 'underscore-plus'
       CSVEditor ?= require './csv-editor'
