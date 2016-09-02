@@ -1,3 +1,10 @@
+<a name="v1.5.1"></a>
+# v1.5.1 (2016-09-02)
+
+## :bug: Bug Fixes
+
+- Fix issue if tablr.supportedCsvExtensions gets null ([2c673f2c](https://github.com/abe33/atom-tablr/commit/2c673f2cef48bb88eeb86062ceb7b68ae4fb84f0), [#64](https://github.com/abe33/atom-tablr/issues/64))
+
 <a name="v1.5.0"></a>
 # v1.5.0 (2016-08-26)
 
