@@ -715,6 +715,8 @@ class TableElement extends HTMLElement
   displayEllipsis: ->
     delete @ellipsisTimeout
 
+    return if @isDestroyed() or not @tableEditor?
+
     cellPosition = @tableEditor.getCursorPosition()
     cellElement = @getScreenCellAtPosition(cellPosition)
     return unless cellElement?
