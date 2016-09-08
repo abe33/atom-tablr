@@ -133,6 +133,10 @@ class CSVEditor
   shouldPromptToSave: (options) ->
     @editor?.shouldPromptToSave(options) ? false
 
+  terminatePendingState: ->
+    @emitter.emit 'did-terminate-pending-state' if not @hasTerminatedPendingState
+    @hasTerminatedPendingState = true
+
   onWillOpen: (callback) ->
     @emitter.on 'will-open', callback
 
@@ -172,6 +176,9 @@ class CSVEditor
   onDidChangeTitle: (callback) ->
     @emitter.on 'did-change-title', callback
 
+  onDidTerminatePendingState: (callback) ->
+    @emitter.on 'did-terminate-pending-state', callback
+
   applyChoice: ->
     return if @choiceApplied
     if @choice?
@@ -199,6 +206,7 @@ class CSVEditor
 
       @emitter.emit 'did-open', {@editor, options: _.clone(options)}
       @emitter.emit 'did-change-modified', @editor.isModified()
+      @terminatePendingState()
 
       @saveConfig('TableEditor')
       @editor
