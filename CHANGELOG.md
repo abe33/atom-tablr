@@ -1,3 +1,11 @@
+<a name="v1.5.2"></a>
+# v1.5.2 (2016-09-08)
+
+## :bug: Bug Fixes
+
+- Fix pending state on CSV editor when confirming opening a table editor ([24becf4f](https://github.com/abe33/atom-tablr/commit/24becf4fe15e7b4b1fb381a37552d61b86d67c8a), [#65](https://github.com/abe33/atom-tablr/issues/65))
+- Fix error in displayEllipsis if there's no table editor ([d97add73](https://github.com/abe33/atom-tablr/commit/d97add732d6ef2f99261f774cdbf7b6323461884), [#63](https://github.com/abe33/atom-tablr/issues/63))
+
 <a name="v1.5.1"></a>
 # v1.5.1 (2016-09-02)
 
