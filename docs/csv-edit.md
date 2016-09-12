@@ -12,6 +12,8 @@ At the bottom of the panel lies the preview area. It displays a preview of the `
 
 This panel will appear every time you open the same file using Atom open dialog or `fuzzy-finder`. You can check the `Remember my choice` checkbox to set once and for all how you want a file to be edited.
 
+In case you want to reset the choices made for previously opened CSV file, the `Tablr: Clear Csv Choice` command will erase all remembered choices for the current Atom project.
+
 ### CSV Settings
 
 These settings are only used when using the `Table Editor` mode.

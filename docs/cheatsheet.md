@@ -99,4 +99,6 @@ Command|Action
 
 Command|Context|Action
 ---|---|---
-`tablr:clear-csv-storage`|`atom-workspace`|Removes any data stored for previously opened csv files.
+`tablr:clear-csv-choice`|`atom-workspace`|Removes any choice remembered when opening a CSV file.
+`tablr:clear-csv-layout`|`atom-workspace`|Removes any layout data stored for previously opened csv files.
+`tablr:clear-csv-storage`|`atom-workspace`|Removes any data stored for previously opened csv files. It includes both choices and layouts.
