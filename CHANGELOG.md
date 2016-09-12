@@ -1,3 +1,10 @@
+<a name="v1.5.3"></a>
+# v1.5.3 (2016-09-12)
+
+## :bug: Bug Fixes
+
+- Fix default setting not always applied on file open ([7a0b9d35](https://github.com/abe33/atom-tablr/commit/7a0b9d3521ea09b58fe3e7a149e49808c1bace0e), [#67](https://github.com/abe33/atom-tablr/issues/67))
+
 <a name="v1.5.2"></a>
 # v1.5.2 (2016-09-08)
 
