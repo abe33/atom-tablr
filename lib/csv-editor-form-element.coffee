@@ -209,7 +209,7 @@ class CSVEditorFormElement extends HTMLElement
         return unless @attached
         if element.getText() isnt ''
           radioGroup.querySelector("[id^='custom-']")?.checked = true
-        else
+        else if radioGroup.querySelector("[id^='custom-']")?.checked
           radioGroup.querySelector("[id^='#{initial}-']")?.checked = true
 
         @emitChangeEvent()

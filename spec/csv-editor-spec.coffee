@@ -93,15 +93,20 @@ describe "CSVEditor", ->
     workspaceElement = atom.views.getView(atom.workspace)
     jasmineContent.appendChild(workspaceElement)
 
+    stackedFrames = []
     noAnimationFrame = -> throw new Error('No animation frame requested')
     nextAnimationFrame = noAnimationFrame
 
     requestAnimationFrameSafe = window.requestAnimationFrame
     spyOn(window, 'requestAnimationFrame').andCallFake (fn) ->
-      lastFn = fn
-      nextAnimationFrame = ->
-        nextAnimationFrame = noAnimationFrame
-        fn()
+      if stackedFrames.length is 0
+        nextAnimationFrame = ->
+          nextAnimationFrame = noAnimationFrame
+          while stackedFrames.length
+            fn = stackedFrames.shift()
+            fn()
+
+      stackedFrames.push(fn)
 
     waitsForPromise -> atom.packages.activatePackage('tablr').then (pkg) ->
       tableEditPackage = pkg.mainModule
@@ -149,7 +154,7 @@ describe "CSVEditor", ->
         expect(csvEditor instanceof CSVEditor).toBeTruthy()
 
     it 'fills the form with the default values from the config', ->
-      atom.config.set('tablr.csvEditor.columnDelimiter', ';')
+      atom.config.set('tablr.csvEditor.columnDelimiter', '\\t')
       atom.config.set('tablr.csvEditor.rowDelimiter', '\\r')
       atom.config.set('tablr.csvEditor.quote', '\'')
       atom.config.set('tablr.csvEditor.escape', '\\')
@@ -165,7 +170,7 @@ describe "CSVEditor", ->
       runs ->
         nextAnimationFrame()
 
-        expect(csvEditorElement.querySelector('[id^="semi-colon"]:checked')).toExist()
+        expect(csvEditorElement.querySelector('[id^="tab"]:checked')).toExist()
         expect(csvEditorElement.querySelector('[id^="char-return"]:checked')).toExist()
         expect(csvEditorElement.querySelector('[id^="custom-comment"]:checked')).toExist()
         expect(csvEditorElement.form.commentTextEditor.getText()).toEqual('$')
@@ -479,6 +484,24 @@ describe "CSVEditor", ->
         expect(atom.workspace.getActiveTextEditor()).toBeDefined()
 
     describe 'when the user choose to open a table editor', ->
+      describe 'with a escaped chars in column delimiter setting', ->
+        beforeEach ->
+          atom.config.set('tablr.csvEditor.columnDelimiter', '\\t')
+          openFixture('tab-delimiter.csv')
+
+          runs ->
+            nextAnimationFrame()
+
+            csvEditor.onDidOpen ({editor}) -> tableEditor = editor
+
+            tableEditorButton = csvEditorElement.form.openTableEditorButton
+            click(tableEditorButton)
+
+          waitsFor 'table editor created', -> tableEditor?
+
+        it 'properly unescape the delimiter value', ->
+          expect(tableEditor.getScreenColumnCount()).toEqual(2)
+
       describe 'when the csv has inconsistent row length', ->
         describe 'due to an incomplete first row', ->
           beforeEach ->

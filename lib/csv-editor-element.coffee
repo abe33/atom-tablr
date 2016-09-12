@@ -38,7 +38,7 @@ class CSVEditorElement extends HTMLElement
       else if @tableElement?
         @createFormView()
       else
-        @updatePreview(@model.options)
+        @updatePreview(@collectOptions())
 
     loadingSubscription = null
     @subscriptions.add @model.onWillOpen =>
@@ -74,9 +74,9 @@ class CSVEditorElement extends HTMLElement
       @formSubscriptions.dispose()
       @formSubscriptions = null
 
-    @updatePreview(@model.options)
-
-    @model.applyChoice()
+    requestAnimationFrame =>
+      @updatePreview(@collectOptions())
+      @model.applyChoice()
 
   displayTableEditor: (editor) ->
     @removeFormView()
