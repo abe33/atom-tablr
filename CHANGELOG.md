@@ -1,3 +1,10 @@
+<a name="v1.5.4"></a>
+# v1.5.4 (2016-09-30)
+
+## :bug: Bug Fixes
+
+- Remove import of buttons.less ([7c424eac](https://github.com/abe33/atom-tablr/commit/7c424eacba67982f7285ce716fc434439d713cd2), [#69](https://github.com/abe33/atom-tablr/issues/69))
+
 <a name="v1.5.3"></a>
 # v1.5.3 (2016-09-12)
 
