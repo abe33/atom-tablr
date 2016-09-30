@@ -70,7 +70,7 @@ class CSVEditorFormElement extends HTMLElement
       @div class: "control-group select #{name}", =>
         @div class: 'controls', =>
           @label class: 'setting-title', label
-          @select class: 'form-control', outlet: "#{outlet}Select", =>
+          @select class: 'form-control btn', outlet: "#{outlet}Select", =>
             options.forEach (option) =>
               @option value: option.value, option.name
 

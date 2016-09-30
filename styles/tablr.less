@@ -1,6 +1,5 @@
 @import "ui-variables";
 @import "syntax-variables";
-@import "buttons";
 
 @double-padding: @component-padding * 2;
 @half-padding: @component-padding / 2;
@@ -894,8 +893,6 @@ atom-csv-editor {
           select.form-control {
             -webkit-appearance: none;
             font-size: 1em;
-            .btn;
-
           }
           &::after {
             content: '\f05f';
@@ -918,9 +915,9 @@ atom-csv-editor {
     input[type="radio"] {
       display: none;
     }
-    input[type="radio"] + label {
-      .btn;
-    }
+    // input[type="radio"] + label {
+    //   .btn;
+    // }
 
     .quotes .btn,
     .escapes .btn,
