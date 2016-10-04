@@ -199,19 +199,19 @@ class CSVEditor
       pane.activateItem(editor)
 
   openTableEditor: (@options={}) ->
-    @emitter.emit 'will-open', {options: _.clone(options)}
+    @emitter.emit 'will-open', {options: _.clone(@options)}
 
     @openCSV().then (@editor) =>
       @subscribeToEditor()
 
-      @emitter.emit 'did-open', {@editor, options: _.clone(options)}
+      @emitter.emit 'did-open', {@editor, options: _.clone(@options)}
       @emitter.emit 'did-change-modified', @editor.isModified()
       @terminatePendingState()
 
       @saveConfig('TableEditor')
       @editor
     .catch (err) =>
-      @emitter.emit 'did-fail-open', {err, options: _.clone(options)}
+      @emitter.emit 'did-fail-open', {err, options: _.clone(@options)}
 
   subscribeToEditor: ->
     @editorSubscriptions = new CompositeDisposable
