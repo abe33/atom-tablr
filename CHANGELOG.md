@@ -1,3 +1,10 @@
+<a name="v1.5.5"></a>
+# v1.5.5 (2016-10-04)
+
+## :bug: Bug Fixes
+
+- Fix issues related to incoming coffee script version bump in Atom ([05581970](https://github.com/abe33/atom-tablr/commit/0558197003e60822cc7f26f8eab5cc79211c335d), [#70](https://github.com/abe33/atom-tablr/issues/70))
+
 <a name="v1.5.4"></a>
 # v1.5.4 (2016-09-30)
 
