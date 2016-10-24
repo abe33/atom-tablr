@@ -6,7 +6,7 @@
   "repository": "https://github.com/abe33/atom-tablr",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.7.0"
+    "atom": ">=1.13.0"
   },
   "providedServices": {
     "tablr-models": {
