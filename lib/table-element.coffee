@@ -1480,7 +1480,6 @@ class TableElement extends HTMLElement
   updateWidthAndHeight: ->
     width = @tableEditor.getContentWidth()
     height = @tableEditor.getContentHeight()
-    console.log(width, height)
 
     if @scrollPastEnd
       columnWidth = @tableEditor.getScreenColumnWidth()
