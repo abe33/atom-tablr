@@ -29,8 +29,6 @@ class TableElement extends HTMLElement
   Pool.includeInto(this)
   Delegator.includeInto(this)
 
-  @useShadowRoot()
-
   @content: ->
     @div class: 'tablr-header', outlet: 'head', =>
       @div class: 'tablr-header-content', =>
@@ -229,7 +227,7 @@ class TableElement extends HTMLElement
     @height = @clientHeight
     @width = @clientWidth
 
-  getGutter: -> @shadowRoot.querySelector('.tablr-gutter')
+  getGutter: -> @querySelector('.tablr-gutter')
 
   #    ##     ##  #######  ########  ######## ##
   #    ###   ### ##     ## ##     ## ##       ##
@@ -553,7 +551,7 @@ class TableElement extends HTMLElement
     unless @measuringCell?
       @measuringCell = document.createElement('div')
       @measuringCell.className = 'measuring-cell'
-      @shadowRoot.appendChild(@measuringCell)
+      @appendChild(@measuringCell)
 
   #     ######   #######  ##    ## ######## ########   #######  ##
   #    ##    ## ##     ## ###   ##    ##    ##     ## ##     ## ##
@@ -579,7 +577,7 @@ class TableElement extends HTMLElement
 
   focus: -> @hiddenInput.focus() unless @hasFocus()
 
-  hasFocus: -> this is document.activeElement
+  hasFocus: -> document.activeElement is @hiddenInput
 
   moveLeft: ->
     @tableEditor.moveLeft()
@@ -734,7 +732,7 @@ class TableElement extends HTMLElement
       min-height: #{cellRect.height}px;
     "
 
-    @shadowRoot.appendChild(@ellipsisDisplay)
+    @appendChild(@ellipsisDisplay)
 
   alignLeft: ->
     if @contextMenuColumn?
@@ -887,7 +885,7 @@ class TableElement extends HTMLElement
   startColumnEdit: ({target, pageX, pageY}) =>
     return if @readOnly
 
-    @createTextEditor() unless @editor?
+    @createTextEditor()
 
     @subscribeToColumnTextEditor(@editor)
 
@@ -929,14 +927,14 @@ class TableElement extends HTMLElement
 
   stopEdit: ->
     @editing = false
-    @editorElement.style.display = 'none'
+    @editorElement.parentNode.removeChild(@editorElement)
     @textEditorSubscriptions?.dispose()
     @textEditorSubscriptions = null
     @focus()
 
   createTextEditor: ->
-    @editor = atom.workspace.buildTextEditor({mini: true})
-    @editorElement = atom.views.getView(@editor)
+    @editor ?= atom.workspace.buildTextEditor({mini: true})
+    @editorElement ?= atom.views.getView(@editor)
     @appendChild(@editorElement)
 
   subscribeToCellTextEditor: (editor) ->
@@ -1482,6 +1480,7 @@ class TableElement extends HTMLElement
   updateWidthAndHeight: ->
     width = @tableEditor.getContentWidth()
     height = @tableEditor.getContentHeight()
+    console.log(width, height)
 
     if @scrollPastEnd
       columnWidth = @tableEditor.getScreenColumnWidth()

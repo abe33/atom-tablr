@@ -563,8 +563,7 @@ describe "CSVEditor", ->
         it 'places the focus on the table element', ->
           tableElement = atom.views.getView(tableEditor)
 
-          expect(document.activeElement).toBe(tableElement)
-          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+          expect(document.activeElement).toBe(tableElement.hiddenInput)
 
         it 'has an empty undo stack', ->
           expect(tableEditor.getTable().undoStack).toBeUndefined()

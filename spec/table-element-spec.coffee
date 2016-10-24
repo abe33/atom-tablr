@@ -15,34 +15,35 @@ stylesheet = "
   #{atom.themes.loadStylesheet(stylesheetPath)}
 
   tablr-editor {
+    z-index: 100000;
     height: 200px;
     width: 400px;
   }
 
-  tablr-editor::shadow .tablr-header {
+  tablr-editor .tablr-header {
     height: 27px;
     border: 1px solid black;
   }
 
-  tablr-editor::shadow .tablr-body {
+  tablr-editor .tablr-body {
     border: 1px solid black;
   }
 
-  tablr-editor::shadow tablr-cell {
+  tablr-editor tablr-cell {
     border: none;
     padding: 0;
   }
 
-  tablr-editor::shadow .measuring-cell {
+  tablr-editor .measuring-cell {
     border-bottom: none;
   }
 
-  tablr-editor::shadow tablr-gutter-cell {
+  tablr-editor tablr-gutter-cell {
     border: none;
     padding: 0;
   }
 
-  tablr-editor::shadow .selection-box-handle {
+  tablr-editor .selection-box-handle {
     width: 1px;
     height: 1px;
     margin: 0;
@@ -67,7 +68,7 @@ isVisible = (node) ->
   node.offsetHeight isnt 0
 
 describe 'tableElement', ->
-  [tableElement, tableShadowRoot, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
+  [tableElement, tableEditor, nextAnimationFrame, noAnimationFrame, requestAnimationFrameSafe, styleNode, row, cells, jasmineContent] = []
 
   afterEach ->
     window.requestAnimationFrame = requestAnimationFrameSafe
@@ -109,7 +110,6 @@ describe 'tableElement', ->
     atom.config.set 'tablr.tableEditor.scrollSpeedDuringDrag', 20
 
     tableElement = atom.views.getView(tableEditor)
-    tableShadowRoot = tableElement.shadowRoot
 
     styleNode = document.createElement('style')
     styleNode.textContent = stylesheet
@@ -144,7 +144,7 @@ describe 'tableElement', ->
         expect(model.getScreenRowCount()).toEqual(1)
 
       it 'renders the default model', ->
-        cell = element.shadowRoot.querySelectorAll('tablr-cell')
+        cell = element.querySelectorAll('tablr-cell')
         expect(cell.length).toEqual(1)
 
   describe 'when the table is destroyed', ->
@@ -180,11 +180,11 @@ describe 'tableElement', ->
   #     ######   #######  ##    ##    ##    ######## ##    ##    ##
 
   it 'has a body', ->
-    expect(tableShadowRoot.querySelector('.tablr-body')).toExist()
+    expect(tableElement.querySelector('.tablr-body')).toExist()
 
   describe 'when not scrolled yet', ->
     it 'renders the lines at the top of the table', ->
-      cells = tableShadowRoot.querySelectorAll('tablr-cell')
+      cells = tableElement.querySelectorAll('tablr-cell')
       expect(cells.length).toEqual(18 * 3)
       expect(cells[0].dataset.row).toEqual('0')
       expect(cells[cells.length - 1].dataset.row).toEqual('17')
@@ -208,7 +208,7 @@ describe 'tableElement', ->
 
   describe 'once rendered', ->
     beforeEach ->
-      cells = tableShadowRoot.querySelectorAll('tablr-cell[data-row="0"]')
+      cells = tableElement.querySelectorAll('tablr-cell[data-row="0"]')
 
     it 'has as many columns as the model row', ->
       expect(cells.length).toEqual(3)
@@ -234,7 +234,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
     it 'sets the proper width and height on the table rows container', ->
-      bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
+      bodyContent = tableElement.querySelector('.tablr-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2000)
       expect(bodyContent.offsetWidth).toBeCloseTo(tableElement.clientWidth - tableElement.tableGutter.offsetWidth, -2)
@@ -247,10 +247,10 @@ describe 'tableElement', ->
       it 'repaints the table', ->
         tableElement.pollDOM()
         nextAnimationFrame()
-        expect(tableShadowRoot.querySelectorAll('.tablr-rows')).not.toEqual(18)
+        expect(tableElement.querySelectorAll('.tablr-rows')).not.toEqual(18)
     describe 'the columns widths', ->
       beforeEach ->
-        cells = tableShadowRoot.querySelectorAll('tablr-cell[data-row="0"]')
+        cells = tableElement.querySelectorAll('tablr-cell[data-row="0"]')
 
       describe 'without any columns layout data', ->
         it 'has cells that all have the same width', ->
@@ -268,7 +268,7 @@ describe 'tableElement', ->
           expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         it 'sets the proper width and height on the table rows container', ->
-          bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
+          bodyContent = tableElement.querySelector('.tablr-rows-wrapper')
 
           expect(bodyContent.offsetHeight).toEqual(2000)
           expect(bodyContent.offsetWidth).toEqual(600)
@@ -278,7 +278,7 @@ describe 'tableElement', ->
           expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
         it 'sets the proper widths on the header cells', ->
-          cells = tableShadowRoot.querySelectorAll('tablr-header-cell')
+          cells = tableElement.querySelectorAll('tablr-header-cell')
           widths = [100,200,300]
           expect(cell.offsetWidth).toEqual(widths[i]) for cell,i in cells
 
@@ -327,7 +327,7 @@ describe 'tableElement', ->
       expect(tableElement.getRowsContainer().scrollTop).toEqual(100)
 
     it 'renders new rows', ->
-      cells = tableShadowRoot.querySelectorAll('tablr-cell')
+      cells = tableElement.querySelectorAll('tablr-cell')
       expect(cells.length).toEqual(18 * 3)
 
   describe 'when scrolled by 300px', ->
@@ -344,7 +344,7 @@ describe 'tableElement', ->
         expect(tableElement.getLastVisibleRow()).toEqual(23)
 
     it 'renders new rows', ->
-      cells = tableShadowRoot.querySelectorAll('tablr-cell')
+      cells = tableElement.querySelectorAll('tablr-cell')
       expect(cells.length).toEqual(28 * 3)
 
   describe 'when the table rows are modified', ->
@@ -354,18 +354,18 @@ describe 'tableElement', ->
 
         nextAnimationFrame()
 
-        cells = tableShadowRoot.querySelectorAll('tablr-cell')
+        cells = tableElement.querySelectorAll('tablr-cell')
         expect(cells.length).toEqual(18 * 3)
 
     describe 'by adding one at the begining', ->
       it 'updates the rows', ->
-        expect(tableShadowRoot.querySelector('tablr-cell').textContent).toEqual('row0')
+        expect(tableElement.querySelector('tablr-cell').textContent).toEqual('row0')
 
         tableEditor.addRowAt 0, ['foo', 'bar', 'baz']
 
         nextAnimationFrame()
 
-        cells = tableShadowRoot.querySelectorAll('tablr-cell')
+        cells = tableElement.querySelectorAll('tablr-cell')
         cell = tableElement.getScreenCellAtPosition([0,0])
         expect(cells.length).toEqual(18 * 3)
         expect(cell.dataset.row).toEqual('0')
@@ -373,14 +373,14 @@ describe 'tableElement', ->
 
     describe 'by adding one in the middle', ->
       it 'updates the rows', ->
-        cell = tableShadowRoot.querySelector('tablr-cell[data-row="6"]')
+        cell = tableElement.querySelector('tablr-cell[data-row="6"]')
         expect(cell.textContent).toEqual('row6')
 
         tableEditor.addRowAt 6, ['foo', 'bar', 'baz']
 
         nextAnimationFrame()
 
-        cells = tableShadowRoot.querySelectorAll('tablr-cell')
+        cells = tableElement.querySelectorAll('tablr-cell')
         cell = tableElement.getScreenCellAtPosition([6,0])
         expect(cells.length).toEqual(18 * 3)
         expect(cell.textContent).toEqual('foo')
@@ -402,22 +402,22 @@ describe 'tableElement', ->
       nextAnimationFrame()
 
     it 'sets the proper height on the table body content', ->
-      bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
+      bodyContent = tableElement.querySelector('.tablr-rows-wrapper')
 
       expect(bodyContent.offsetHeight).toBeCloseTo(2080)
 
     it "renders the row's cells with the provided height", ->
-      cell = tableShadowRoot.querySelector('tablr-cell[data-row="2"]')
+      cell = tableElement.querySelector('tablr-cell[data-row="2"]')
 
       expect(cell.offsetHeight).toEqual(100)
 
     it 'offsets the cells after the modified one', ->
-      cell = tableShadowRoot.querySelector('tablr-cell[data-row="3"]')
+      cell = tableElement.querySelector('tablr-cell[data-row="3"]')
 
       expect(cell.style.top).toEqual('140px')
 
     it 'activates the cell under the mouse when pressed', ->
-      cell = tableShadowRoot.querySelectorAll('tablr-cell[data-row="3"]')[1]
+      cell = tableElement.querySelectorAll('tablr-cell[data-row="3"]')[1]
       mousedown(cell)
 
       expect(tableEditor.getLastCursor().getValue()).toEqual(300)
@@ -435,7 +435,7 @@ describe 'tableElement', ->
       tableElement.startCellEdit()
 
       editorBounds = tableElement.querySelector('atom-text-editor').getBoundingClientRect()
-      cellBounds = tableShadowRoot.querySelector('tablr-cell.active').getBoundingClientRect()
+      cellBounds = tableElement.querySelector('tablr-cell.active').getBoundingClientRect()
       expect(editorBounds.top).toBeCloseTo(cellBounds.top)
       expect(editorBounds.left).toBeCloseTo(cellBounds.left)
       expect(editorBounds.width).toBeCloseTo(cellBounds.width)
@@ -447,17 +447,17 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'sets the proper height on the table body content', ->
-        bodyContent = tableShadowRoot.querySelector('.tablr-rows-wrapper')
+        bodyContent = tableElement.querySelector('.tablr-rows-wrapper')
 
         expect(bodyContent.offsetHeight).toBeCloseTo(2030)
 
       it "renders the row's cells with the provided height", ->
-        cell = tableShadowRoot.querySelector('tablr-cell[data-row="2"]')
+        cell = tableElement.querySelector('tablr-cell[data-row="2"]')
 
         expect(cell.offsetHeight).toEqual(50)
 
       it 'offsets the cells after the modified one', ->
-        cell = tableShadowRoot.querySelector('tablr-cell[data-row="3"]')
+        cell = tableElement.querySelector('tablr-cell[data-row="3"]')
 
         expect(cell.style.top).toEqual('90px')
 
@@ -467,7 +467,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelectorAll('tablr-cell[data-row="14"] ')[1]
+        cell = tableElement.querySelectorAll('tablr-cell[data-row="14"] ')[1]
         mousedown(cell)
 
         expect(tableEditor.getLastCursor().getValue()).toEqual(1400)
@@ -478,7 +478,7 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'activates the cell under the mouse when pressed', ->
-        cell = tableShadowRoot.querySelector('tablr-cell[data-row="99"][data-column="1"]')
+        cell = tableElement.querySelector('tablr-cell[data-row="99"][data-column="1"]')
         mousedown(cell)
 
         expect(tableEditor.getLastCursor().getValue()).toEqual(9900)
@@ -519,7 +519,7 @@ describe 'tableElement', ->
   #    ##     ## ######## ##     ## ########  ######## ##     ##
 
   it 'has a header', ->
-    expect(tableShadowRoot.querySelector('.tablr-header')).toExist()
+    expect(tableElement.querySelector('.tablr-header')).toExist()
 
   describe 'header', ->
     header = null
@@ -528,24 +528,24 @@ describe 'tableElement', ->
       header = tableElement.head
 
     it 'has as many cells as there is columns in the table', ->
-      cells = tableShadowRoot.querySelectorAll('tablr-header-cell')
+      cells = tableElement.querySelectorAll('tablr-header-cell')
       expect(cells.length).toEqual(3)
       expect(cells[0].textContent).toEqual('key')
       expect(cells[1].textContent).toEqual('value')
       expect(cells[2].textContent).toEqual('foo')
 
     it 'has cells that contains a resize handle', ->
-      expect(tableShadowRoot.querySelectorAll('.column-resize-handle').length).toEqual(tableShadowRoot.querySelectorAll('tablr-header-cell').length)
+      expect(tableElement.querySelectorAll('.column-resize-handle').length).toEqual(tableElement.querySelectorAll('tablr-header-cell').length)
 
     it 'has cells that contains an edit button', ->
-      expect(tableShadowRoot.querySelectorAll('.column-edit-action').length).toEqual(tableShadowRoot.querySelectorAll('tablr-header-cell').length)
+      expect(tableElement.querySelectorAll('.column-edit-action').length).toEqual(tableElement.querySelectorAll('tablr-header-cell').length)
 
     it 'has cells that have the same width as the body cells', ->
       tableElement.setColumnsWidths([0.2, 0.3, 0.5])
       nextAnimationFrame()
 
-      cells = tableShadowRoot.querySelectorAll('tablr-header-cell')
-      rowCells = tableShadowRoot.querySelectorAll('tablr-cell[data-row="0"]')
+      cells = tableElement.querySelectorAll('tablr-header-cell')
+      rowCells = tableElement.querySelectorAll('tablr-cell[data-row="0"]')
 
       expect(cells[0].offsetWidth).toBeCloseTo(rowCells[0].offsetWidth, -2)
       expect(cells[1].offsetWidth).toBeCloseTo(rowCells[1].offsetWidth, -2)
@@ -558,7 +558,7 @@ describe 'tableElement', ->
       [column] = []
 
       beforeEach ->
-        column = tableShadowRoot.querySelector('tablr-header-cell:last-child')
+        column = tableElement.querySelector('tablr-header-cell:last-child')
         mousedown(column)
 
       it 'changes the sort order to use the clicked column', ->
@@ -586,7 +586,7 @@ describe 'tableElement', ->
           tableElement.setColumnsWidths([100, 200, 300])
           nextAnimationFrame()
 
-          column = tableShadowRoot.querySelector('tablr-header-cell:nth-child(2)')
+          column = tableElement.querySelector('tablr-header-cell:nth-child(2)')
           mousedown(column)
 
         it 'changes the sort order to use the clicked column', ->
@@ -623,19 +623,19 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumn(2).width).toBeCloseTo(100)
 
       it 'displays a ruler when the drag have begun', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
+        ruler = tableElement.querySelector('.column-resize-ruler')
 
         expect(isVisible(ruler)).toBeFalsy()
 
-        handle = tableShadowRoot.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
+        handle = tableElement.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
         mousedown(handle)
 
         expect(isVisible(ruler)).toBeTruthy()
         expect(ruler.getBoundingClientRect().left).toEqual(Math.floor(handle.getBoundingClientRect().left + handle.offsetWidth - 1))
 
       it 'moves the handle during the drag', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-        handle = tableShadowRoot.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
+        ruler = tableElement.querySelector('.column-resize-ruler')
+        handle = tableElement.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
         {x, y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -644,16 +644,16 @@ describe 'tableElement', ->
         expect(ruler.getBoundingClientRect().left).toEqual(handle.getBoundingClientRect().left + 50)
 
       it 'hides the ruler on drag end', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-        handle = tableShadowRoot.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
+        ruler = tableElement.querySelector('.column-resize-ruler')
+        handle = tableElement.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
         mousedown(handle)
         mouseup(handle)
 
         expect(isVisible(ruler)).toBeFalsy()
 
       it 'stops the resize when the height is lower than the minimum column height', ->
-        ruler = tableShadowRoot.querySelector('.column-resize-ruler')
-        handle = tableShadowRoot.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
+        ruler = tableElement.querySelector('.column-resize-ruler')
+        handle = tableElement.querySelectorAll('tablr-header-cell .column-resize-handle')[2]
         {x, y} = objectCenterCoordinates(handle)
 
         mousedown(handle)
@@ -766,7 +766,7 @@ describe 'tableElement', ->
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
         it 'gives the focus to the editor', ->
-          expect(document.activeElement).toBe(editorElement)
+          expect(document.activeElement).toBe(editorElement.querySelector('input'))
 
         it 'fills the editor with the cell value', ->
           expect(editor.getText()).toEqual('key')
@@ -789,8 +789,8 @@ describe 'tableElement', ->
             expect(isVisible(editorElement)).toBeFalsy()
 
           it 'gives the focus back to the table view', ->
-            expect(document.activeElement).toBe(tableElement)
-            expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+            expect(document.activeElement).toBe(tableElement.hiddenInput)
+            expect(tableElement.hasFocus()).toBeTruthy()
 
           it 'changes the cell value', ->
             expect(tableEditor.getScreenColumn(0).name).toEqual('foobar')
@@ -851,8 +851,8 @@ describe 'tableElement', ->
       [content, gutter] = []
 
       beforeEach ->
-        content = tableShadowRoot.querySelector('.tablr-content')
-        gutter = tableShadowRoot.querySelector('.tablr-gutter')
+        content = tableElement.querySelector('.tablr-content')
+        gutter = tableElement.querySelector('.tablr-gutter')
 
       it 'contains a filler div to set the gutter width', ->
         expect(gutter.querySelector('.tablr-gutter-filler')).toExist()
@@ -924,8 +924,8 @@ describe 'tableElement', ->
           tableElement.setScrollTop(300)
           nextAnimationFrame()
 
-          startCell = tableShadowRoot.querySelector('tablr-gutter-cell:nth-child(12)')
-          endCell = tableShadowRoot.querySelector('tablr-gutter-cell:nth-child(9)')
+          startCell = tableElement.querySelector('tablr-gutter-cell:nth-child(12)')
+          endCell = tableElement.querySelector('tablr-gutter-cell:nth-child(9)')
 
           mousedown(startCell)
           mousemove(endCell)
@@ -934,7 +934,7 @@ describe 'tableElement', ->
 
       describe 'dragging the resize handler of a row number', ->
         it 'resize the row on mouse up', ->
-          handle = tableShadowRoot.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
+          handle = tableElement.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -943,19 +943,19 @@ describe 'tableElement', ->
           expect(tableEditor.getRowHeightAt(2)).toEqual(70)
 
         it 'displays a ruler when the drag have begun', ->
-          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
+          ruler = tableElement.querySelector('.row-resize-ruler')
 
           expect(isVisible(ruler)).toBeFalsy()
 
-          handle = tableShadowRoot.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
+          handle = tableElement.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
           mousedown(handle)
 
           expect(isVisible(ruler)).toBeTruthy()
           expect(ruler.getBoundingClientRect().top).toEqual(handle.getBoundingClientRect().top + handle.offsetHeight)
 
         it 'moves the handle during the drag', ->
-          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
+          ruler = tableElement.querySelector('.row-resize-ruler')
+          handle = tableElement.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -964,16 +964,16 @@ describe 'tableElement', ->
           expect(ruler.getBoundingClientRect().top).toEqual(y + 50 - ruler.offsetHeight)
 
         it 'hides the ruler on drag end', ->
-          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
+          ruler = tableElement.querySelector('.row-resize-ruler')
+          handle = tableElement.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
           mousedown(handle)
           mouseup(handle)
 
           expect(isVisible(ruler)).toBeFalsy()
 
         it 'stops the resize when the height is lower than the minimum row height', ->
-          ruler = tableShadowRoot.querySelector('.row-resize-ruler')
-          handle = tableShadowRoot.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
+          ruler = tableElement.querySelector('.row-resize-ruler')
+          handle = tableElement.querySelectorAll('tablr-gutter-cell .row-resize-handle')[2]
           {x, y} = objectCenterCoordinates(handle)
 
           mousedown(handle)
@@ -994,7 +994,7 @@ describe 'tableElement', ->
           editor = editorElement.model
 
         it 'opens a text editor above the cursor', ->
-          cell = tableShadowRoot.querySelector('tablr-cell')
+          cell = tableElement.querySelector('tablr-cell')
           cellOffset = cell.getBoundingClientRect()
 
           editorOffset = editorElement.getBoundingClientRect()
@@ -1016,11 +1016,11 @@ describe 'tableElement', ->
   it 'gains focus when mouse is pressed on the table view', ->
     mousedown(tableElement)
 
-    expect(document.activeElement).toBe(tableElement)
-    expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+    expect(document.activeElement).toBe(tableElement.hiddenInput)
+    expect(tableElement.hasFocus()).toBeTruthy()
 
   it 'activates the cell under the mouse when pressed', ->
-    cell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="2"]')
+    cell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="2"]')
     mousedown(cell)
 
     expect(tableEditor.getLastCursor().getValue()).toEqual('no')
@@ -1033,8 +1033,8 @@ describe 'tableElement', ->
 
     expect(tableElement.hiddenInput.focus).toHaveBeenCalled()
     expect(tableElement.hiddenInput.focus.calls.length).toEqual(1)
-    expect(document.activeElement).toBe(tableElement)
-    expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+    expect(document.activeElement).toBe(tableElement.hiddenInput)
+    expect(tableElement.hasFocus()).toBeTruthy()
 
   it 'has an cursor', ->
     cursor = tableEditor.getLastCursor()
@@ -1042,9 +1042,9 @@ describe 'tableElement', ->
     expect(cursor.getValue()).toEqual('row0')
 
   it 'renders the cursor using a class', ->
-    expect(tableShadowRoot.querySelectorAll('tablr-header-cell.active-column').length).toEqual(1)
-    expect(tableShadowRoot.querySelectorAll('tablr-gutter-cell.active-row').length).toEqual(1)
-    expect(tableShadowRoot.querySelectorAll('tablr-cell.active').length).toEqual(1)
+    expect(tableElement.querySelectorAll('tablr-header-cell.active-column').length).toEqual(1)
+    expect(tableElement.querySelectorAll('tablr-gutter-cell.active-row').length).toEqual(1)
+    expect(tableElement.querySelectorAll('tablr-cell.active').length).toEqual(1)
 
   describe 'core:move-right', ->
     it 'requests an update', ->
@@ -1367,8 +1367,8 @@ describe 'tableElement', ->
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelector('tablr-header-cell[data-column="0"] span').textContent).toEqual('A')
-        expect(tableShadowRoot.querySelector('tablr-header-cell[data-column="1"] span').textContent).toEqual('B')
+        expect(tableElement.querySelector('tablr-header-cell[data-column="0"] span').textContent).toEqual('A')
+        expect(tableElement.querySelector('tablr-header-cell[data-column="1"] span').textContent).toEqual('B')
 
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
@@ -1390,8 +1390,8 @@ describe 'tableElement', ->
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelector('tablr-header-cell[data-column="1"] span').textContent).toEqual('B')
-        expect(tableShadowRoot.querySelector('tablr-header-cell[data-column="2"] span').textContent).toEqual('C')
+        expect(tableElement.querySelector('tablr-header-cell[data-column="1"] span').textContent).toEqual('B')
+        expect(tableElement.querySelector('tablr-header-cell[data-column="2"] span').textContent).toEqual('C')
 
     describe 'when the read-only attribute is set', ->
       it 'does not insert the column', ->
@@ -1692,7 +1692,7 @@ describe 'tableElement', ->
       beforeEach ->
         tableEditor = new TableEditor
         tableElement = atom.views.getView(tableEditor)
-        tableShadowRoot = tableElement.shadowRoot
+        tableElement = tableElement
 
         jasmineContent.insertBefore(tableElement, jasmineContent.firstChild)
 
@@ -1707,7 +1707,7 @@ describe 'tableElement', ->
 
   describe 'double clicking on a cell', ->
     beforeEach ->
-      cell = tableShadowRoot.querySelector('tablr-cell:last-child')
+      cell = tableElement.querySelector('tablr-cell:last-child')
       dblclick(cell)
 
     it 'starts the edition of the cell', ->
@@ -1722,7 +1722,7 @@ describe 'tableElement', ->
       editor = editorElement.model
 
     it 'opens a text editor above the cursor', ->
-      cell = tableShadowRoot.querySelector('tablr-cell')
+      cell = tableElement.querySelector('tablr-cell')
       cellOffset = cell.getBoundingClientRect()
 
       editorOffset = editorElement.getBoundingClientRect()
@@ -1734,7 +1734,7 @@ describe 'tableElement', ->
       expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
     it 'gives the focus to the editor', ->
-      expect(document.activeElement).toBe(editorElement)
+      expect(document.activeElement).toBe(editorElement.querySelector('input'))
 
     it 'fills the editor with the cell value', ->
       expect(editor.getText()).toEqual('row0')
@@ -1750,11 +1750,11 @@ describe 'tableElement', ->
 
     it 'closes the editor', ->
       expect(tableElement.isEditing()).toBeFalsy()
-      expect(isVisible(tableElement.querySelector('atom-text-editor'))).toBeFalsy()
+      expect(isVisible(tableElement.editorElement)).toBeFalsy()
 
     it 'gives the focus back to the table view', ->
-      expect(document.activeElement).toBe(tableElement)
-      expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+      expect(document.activeElement).toBe(tableElement.hiddenInput)
+      expect(tableElement.hasFocus()).toBeTruthy()
 
     it 'leaves the cell value as is', ->
       expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
@@ -1801,11 +1801,10 @@ describe 'tableElement', ->
           atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
-          expect(tableShadowRoot.querySelectorAll('atom-text-editor').length).toEqual(0)
+          expect(tableElement.querySelectorAll('atom-text-editor').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
-          expect(document.activeElement).toBe(tableElement)
-          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+          expect(document.activeElement).toBe(tableElement.hiddenInput)
 
         it 'changes the cell value', ->
           expect(tableEditor.getLastCursor().getValue()).toEqual('foobar')
@@ -1816,11 +1815,10 @@ describe 'tableElement', ->
           atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
-          expect(isVisible(tableElement.querySelector('atom-text-editor'))).toBeFalsy()
+          expect(isVisible(tableElement.editorElement)).toBeFalsy()
 
         it 'gives the focus back to the table view', ->
-          expect(document.activeElement).toBe(tableElement)
-          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+          expect(document.activeElement).toBe(tableElement.hiddenInput)
 
         it 'leaves the cell value as is', ->
           expect(tableEditor.getLastCursor().getValue()).toEqual('row0')
@@ -1828,7 +1826,7 @@ describe 'tableElement', ->
 
     describe 'clicking on another cell', ->
       beforeEach ->
-        cell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="2"]')
+        cell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="2"]')
         mousedown(cell)
 
       it 'closes the editor', ->
@@ -1853,11 +1851,10 @@ describe 'tableElement', ->
           atom.commands.dispatch(editorElement, 'core:confirm')
 
         it 'closes the editor', ->
-          expect(tableShadowRoot.querySelectorAll('atom-text-editor').length).toEqual(0)
+          expect(tableElement.querySelectorAll('atom-text-editor').length).toEqual(0)
 
         it 'gives the focus back to the table view', ->
-          expect(document.activeElement).toBe(tableElement)
-          expect(tableElement.shadowRoot.activeElement).toBe(tableElement.hiddenInput)
+          expect(document.activeElement).toBe(tableElement.hiddenInput)
 
         it 'changes the cells value', ->
           expect(tableEditor.getCursors().length).toEqual(2)
@@ -1878,7 +1875,7 @@ describe 'tableElement', ->
 
     describe 'double clicking on a cell', ->
       beforeEach ->
-        cell = tableShadowRoot.querySelector('tablr-cell:last-child')
+        cell = tableElement.querySelector('tablr-cell:last-child')
         dblclick(cell)
 
       it 'does not start the edit mode', ->
@@ -1923,18 +1920,18 @@ describe 'tableElement', ->
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelectorAll('tablr-cell.selected').length).toEqual(6)
+        expect(tableElement.querySelectorAll('tablr-cell.selected').length).toEqual(6)
 
       it 'marks the row number with a selected class', ->
         tableEditor.setSelectedRange([[2,0],[4,3]])
 
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelectorAll('tablr-gutter-cell.selected').length).toEqual(2)
+        expect(tableElement.querySelectorAll('tablr-gutter-cell.selected').length).toEqual(2)
 
     describe 'when the selection spans only one cell', ->
       it 'does not render the selection box', ->
-        expect(tableShadowRoot.querySelector('tablr-editor-selection').style.display).toEqual('none')
+        expect(tableElement.querySelector('tablr-editor-selection').style.display).toEqual('none')
 
     describe 'when the selection spans many cells', ->
       [selectionBox, selectionBoxHandle] = []
@@ -1942,15 +1939,15 @@ describe 'tableElement', ->
       beforeEach ->
         tableEditor.setSelectedRange([[2,0],[4,3]])
         nextAnimationFrame()
-        selectionBox = tableShadowRoot.querySelector('tablr-editor-selection')
-        selectionBoxHandle = tableShadowRoot.querySelector('.selection-box-handle')
+        selectionBox = tableElement.querySelector('tablr-editor-selection')
+        selectionBoxHandle = tableElement.querySelector('.selection-box-handle')
 
       it 'renders the selection box', ->
         expect(selectionBox).toExist()
         expect(selectionBoxHandle).toExist()
 
       it 'positions the selection box over the cells', ->
-        cells = tableShadowRoot.querySelectorAll('tablr-cell.selected')
+        cells = tableElement.querySelectorAll('tablr-cell.selected')
         firstCell = tableElement.getScreenCellAtPosition([2,0])
         lastCell = tableElement.getScreenCellAtPosition([3,2])
 
@@ -1966,8 +1963,8 @@ describe 'tableElement', ->
         tableEditor.setSelectedRange([[2,1],[4,3]])
         nextAnimationFrame()
 
-        selectionBox = tableShadowRoot.querySelector('tablr-editor-selection')
-        cells = tableShadowRoot.querySelectorAll('tablr-cell.selected')
+        selectionBox = tableElement.querySelector('tablr-editor-selection')
+        cells = tableElement.querySelectorAll('tablr-cell.selected')
         firstCell = tableElement.getScreenCellAtPosition([2,1])
         lastCell = tableElement.getScreenCellAtPosition([3,2])
 
@@ -1982,12 +1979,12 @@ describe 'tableElement', ->
 
       describe 'when the columns widths have been changed', ->
         beforeEach ->
-          tableElement.setColumnsWidths([0.1, 0.1, 0.8])
+          tableElement.setColumnsWidths([100, 100, 400])
           tableEditor.setSelectedRange([[2,0],[4,2]])
           nextAnimationFrame()
 
         it 'positions the selection box over the cells', ->
-          cells = tableShadowRoot.querySelectorAll('tablr-cell.selected')
+          cells = tableElement.querySelectorAll('tablr-cell.selected')
           firstCell = tableElement.getScreenCellAtPosition([2,0])
           lastCell = tableElement.getScreenCellAtPosition([3,1])
 
@@ -2014,14 +2011,14 @@ describe 'tableElement', ->
         ])
 
       it 'adds a new selection element in the table', ->
-        expect(tableShadowRoot.querySelectorAll('tablr-editor-selection').length).toEqual(2)
+        expect(tableElement.querySelectorAll('tablr-editor-selection').length).toEqual(2)
 
       describe 'and one selection is destroyed', ->
         beforeEach ->
           tableEditor.setSelectedRanges([[[0,0],[1,3]]])
 
         it 'removes the selection element', ->
-          expect(tableShadowRoot.querySelectorAll('tablr-editor-selection').length).toEqual(1)
+          expect(tableElement.querySelectorAll('tablr-editor-selection').length).toEqual(1)
 
       describe 'core:cancel', ->
         it 'resets all the selections to the last cursor range', ->
@@ -2221,8 +2218,8 @@ describe 'tableElement', ->
 
     describe 'dragging the mouse pressed over cell', ->
       it 'creates a selection with the cells from the mouse movements', ->
-        startCell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="0"]')
-        endCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="2"]')
+        startCell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="0"]')
+        endCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="2"]')
 
         mousedown(startCell)
         mousemove(endCell)
@@ -2236,8 +2233,8 @@ describe 'tableElement', ->
 
       describe 'when the meta key is pressed', ->
         it 'creates a new selection with the cells from the mouse movements', ->
-          startCell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="0"]')
-          endCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="2"]')
+          startCell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="0"]')
+          endCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="2"]')
 
           mousedown(startCell, metaKey: true)
           mousemove(endCell, metaKey: true)
@@ -2249,8 +2246,8 @@ describe 'tableElement', ->
         describe 'to create a selection within another one', ->
           it 'merges the two selections in one', ->
             tableEditor.setSelectedRange([[1,0],[5,3]])
-            startCell = tableShadowRoot.querySelector('tablr-cell[data-row="2"][data-column="0"]')
-            endCell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="2"]')
+            startCell = tableElement.querySelector('tablr-cell[data-row="2"][data-column="0"]')
+            endCell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="2"]')
 
             mousedown(startCell, metaKey: true)
             mousemove(endCell, metaKey: true)
@@ -2262,7 +2259,7 @@ describe 'tableElement', ->
 
       describe 'when the shift key is pressed', ->
         it 'creates a new selection with the cells from the mouse movements', ->
-          startCell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="0"]')
+          startCell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="0"]')
           mousedown(startCell, shiftKey: true)
 
           expect(tableEditor.getLastSelection().getRange()).toEqual([[0,0],[4,1]])
@@ -2271,14 +2268,14 @@ describe 'tableElement', ->
           it 'creates the proper selection', ->
             tableEditor.setCursorAtScreenPosition([4,2])
 
-            startCell = tableShadowRoot.querySelector('tablr-cell[data-row="1"][data-column="0"]')
+            startCell = tableElement.querySelector('tablr-cell[data-row="1"][data-column="0"]')
             mousedown(startCell, shiftKey: true)
 
             expect(tableEditor.getLastSelection().getRange()).toEqual([[1,0],[5,3]])
 
       it 'scrolls the view when the selection reach the last row', ->
-        startCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="0"]')
-        endCell = tableShadowRoot.querySelector('tablr-cell[data-row="9"][data-column="2"]')
+        startCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="0"]')
+        endCell = tableElement.querySelector('tablr-cell[data-row="9"][data-column="2"]')
 
         mousedown(startCell)
         mousemove(endCell)
@@ -2289,8 +2286,8 @@ describe 'tableElement', ->
         tableElement.setScrollTop(300)
         nextAnimationFrame()
 
-        startCell = tableShadowRoot.querySelector('tablr-cell[data-row="11"][data-column="0"]')
-        endCell = tableShadowRoot.querySelector('tablr-cell[data-row="8"][data-column="2"]')
+        startCell = tableElement.querySelector('tablr-cell[data-row="11"][data-column="0"]')
+        endCell = tableElement.querySelector('tablr-cell[data-row="8"][data-column="2"]')
 
         mousedown(startCell)
         mousemove(endCell)
@@ -2303,8 +2300,8 @@ describe 'tableElement', ->
       tableElement.setColumnsWidths([500, 500, 500, 500, 500])
       nextAnimationFrame()
 
-      startCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="0"]')
-      endCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="2"]')
+      startCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="0"]')
+      endCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="2"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -2318,8 +2315,8 @@ describe 'tableElement', ->
       tableElement.setScrollLeft(550)
       nextAnimationFrame()
 
-      startCell = tableShadowRoot.querySelector('tablr-cell[data-row="11"][data-column="1"]')
-      endCell = tableShadowRoot.querySelector('tablr-cell[data-row="11"][data-column="0"]')
+      startCell = tableElement.querySelector('tablr-cell[data-row="11"][data-column="1"]')
+      endCell = tableElement.querySelector('tablr-cell[data-row="11"][data-column="0"]')
 
       mousedown(startCell)
       mousemove(endCell)
@@ -2332,8 +2329,8 @@ describe 'tableElement', ->
         nextAnimationFrame()
 
       it 'creates a selection with the cells from the mouse movements', ->
-        startCell = tableShadowRoot.querySelector('tablr-cell[data-row="3"][data-column="0"]')
-        endCell = tableShadowRoot.querySelector('tablr-cell[data-row="6"][data-column="1"]')
+        startCell = tableElement.querySelector('tablr-cell[data-row="3"][data-column="0"]')
+        endCell = tableElement.querySelector('tablr-cell[data-row="6"][data-column="1"]')
 
         mousedown(startCell)
         mousemove(endCell)
@@ -2346,7 +2343,7 @@ describe 'tableElement', ->
       beforeEach ->
         tableEditor.setSelectedRange([[2,0],[3,2]])
         nextAnimationFrame()
-        handle = tableShadowRoot.querySelector('.selection-box-handle')
+        handle = tableElement.querySelector('.selection-box-handle')
 
         mousedown(handle)
 
@@ -2370,7 +2367,7 @@ describe 'tableElement', ->
         [handle, handleOffset] = []
 
         beforeEach ->
-          handle = tableShadowRoot.querySelector('.selection-box-handle')
+          handle = tableElement.querySelector('.selection-box-handle')
           mousedown(handle)
 
         describe 'to the right', ->
@@ -2405,15 +2402,15 @@ describe 'tableElement', ->
         expect(tableEditor.getLastCursor().getValue()).toEqual(tableEditor.getValueAtPosition([99,0]))
 
       it 'sets the proper height on the table rows container', ->
-        expect(tableShadowRoot.querySelector('.tablr-rows-wrapper').offsetHeight).toEqual(2000)
+        expect(tableElement.querySelector('.tablr-rows-wrapper').offsetHeight).toEqual(2000)
 
       it 'decorates the table header cell with a class', ->
-        expect(tableShadowRoot.querySelectorAll('tablr-header-cell.order.descending').length).toEqual(1)
+        expect(tableElement.querySelectorAll('tablr-header-cell.order.descending').length).toEqual(1)
 
         tableEditor.toggleSortDirection()
         nextAnimationFrame()
 
-        expect(tableShadowRoot.querySelectorAll('tablr-header-cell.order.ascending').length).toEqual(1)
+        expect(tableElement.querySelectorAll('tablr-header-cell.order.ascending').length).toEqual(1)
 
       describe 'opening an editor', ->
         beforeEach ->
