@@ -101,6 +101,7 @@ describe 'tableElement', ->
         if i % 2 is 0 then 'yes' else 'no'
       ]
 
+    atom.config.set 'editor.useShadowDom', false
     atom.config.set 'tablr.tableEditor.rowHeight', 20
     atom.config.set 'tablr.tableEditor.columnWidth', 100
     atom.config.set 'tablr.tableEditor.rowOverdraw', 10
