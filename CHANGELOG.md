@@ -1,3 +1,10 @@
+<a name="v1.6.0"></a>
+# v1.6.0 (2016-10-24)
+
+## :arrow_up: Dependencies Update
+
+- Bump atom engine version since the new version no longer rely on shadow DOM ([2661ac01](https://github.com/abe33/atom-tablr/commit/2661ac01bc97fbcab35119ed134c8c727b8198cb))
+
 <a name="v1.5.5"></a>
 # v1.5.5 (2016-10-04)
 
