@@ -170,7 +170,7 @@
           "default": "\""
         },
         "escape": {
-          "title": "Default Espace Character",
+          "title": "Default Escape Character",
           "description": "The default escape character for escaped quotes in quoted content.",
           "type": "string",
           "default": "\""
