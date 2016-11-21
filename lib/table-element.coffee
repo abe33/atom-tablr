@@ -836,7 +836,7 @@ class TableElement extends HTMLElement
   startCellEdit: (initialData) ->
     return if @readOnly
 
-    @createTextEditor() unless @editor?
+    @createTextEditor()
 
     @subscribeToCellTextEditor(@editor)
 
@@ -927,7 +927,8 @@ class TableElement extends HTMLElement
 
   stopEdit: ->
     @editing = false
-    @editorElement.parentNode.removeChild(@editorElement)
+    console.log(@editorElement)
+    @editorElement?.parentNode?.removeChild(@editorElement)
     @textEditorSubscriptions?.dispose()
     @textEditorSubscriptions = null
     @focus()
@@ -935,6 +936,7 @@ class TableElement extends HTMLElement
   createTextEditor: ->
     @editor ?= atom.workspace.buildTextEditor({mini: true})
     @editorElement ?= atom.views.getView(@editor)
+    console.log(@editor, @editorElement)
     @appendChild(@editorElement)
 
   subscribeToCellTextEditor: (editor) ->
