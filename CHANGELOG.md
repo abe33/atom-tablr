@@ -1,3 +1,11 @@
+<a name="v1.6.2"></a>
+# v1.6.2 (2016-11-21)
+
+## :bug: Bug Fixes
+
+- Fix error raised when closing a cell editor ([2831be2d](https://github.com/abe33/atom-tablr/commit/2831be2d34228f4367ab12d3a2b4726214897ccd))
+- Fix typo in configSchema ([b70eb6e8](https://github.com/abe33/atom-tablr/commit/b70eb6e88ebf250f31fc158128e1d3e48b860dd4))
+
 <a name="v1.6.1"></a>
 # v1.6.1 (2016-10-24)
 
