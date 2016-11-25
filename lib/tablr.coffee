@@ -83,8 +83,9 @@ module.exports =
     Table ?= require './table'
     DisplayTable ?= require './display-table'
     TableEditor ?= require './table-editor'
+    CSVEditor ?= require './csv-editor'
 
-    {Table, DisplayTable, TableEditor, Range}
+    {Table, DisplayTable, TableEditor, Range, CSVEditor}
 
   deserializeCSVEditor: (state) ->
     CSVEditor ?= require './csv-editor'
