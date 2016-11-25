@@ -767,11 +767,11 @@ describe 'tableElement', ->
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
         it 'gives the focus to the editor', ->
-          editorElementRoot = () ->
-            if parseFloat(atom.getVersion()) < 1.13
-              expect(document.activeElement).toBe(editorElement)
-            else
-              expect(document.activeElement).toBe(editorElement.querySelector('input'))
+          if parseFloat(atom.getVersion()) < 1.13
+            expect(document.activeElement).toBe(editorElement)
+          else if process.platform is 'darwin'
+            expect(document.activeElement).toBe(editorElement.querySelector('input'))
+          else console.log(document.activeElement.outerHTML)
 
         it 'fills the editor with the cell value', ->
           expect(editor.getText()).toEqual('key')
@@ -1747,8 +1747,9 @@ describe 'tableElement', ->
     it 'gives the focus to the editor', ->
       if parseFloat(atom.getVersion()) < 1.13
         expect(document.activeElement).toBe(editorElement)
-      else
+      else if process.platform is 'darwin'
         expect(document.activeElement).toBe(editorElement.querySelector('input'))
+      else console.log(document.activeElement.outerHTML)
 
     it 'fills the editor with the cell value', ->
       expect(editor.getText()).toEqual('row0')
