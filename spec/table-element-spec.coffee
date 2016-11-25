@@ -682,12 +682,6 @@ describe 'tableElement', ->
     describe 'clicking on a header cell edit action button', ->
       [editor, editorElement, cell, cellOffset] = []
 
-      editorElementRoot = () ->
-        if parseFloat(atom.getVersion()) < 1.13
-          editorElement.shadowRoot
-        else
-          editorElement
-
       startHeaderCellEdit = (selector) ->
         cell = header.querySelector(selector)
         action = cell.querySelector('.column-edit-action')
@@ -773,7 +767,11 @@ describe 'tableElement', ->
           expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
         it 'gives the focus to the editor', ->
-          expect(document.activeElement).toBe(editorElementRoot().querySelector('input'))
+          editorElementRoot = () ->
+            if parseFloat(atom.getVersion()) < 1.13
+              expect(document.activeElement).toBe(editorElement)
+            else
+              expect(document.activeElement).toBe(editorElement.querySelector('input'))
 
         it 'fills the editor with the cell value', ->
           expect(editor.getText()).toEqual('key')
@@ -1747,7 +1745,10 @@ describe 'tableElement', ->
       expect(editorElement.offsetHeight).toBeCloseTo(cell.offsetHeight, -2)
 
     it 'gives the focus to the editor', ->
-      expect(document.activeElement).toBe(editorElementRoot().querySelector('input'))
+      if parseFloat(atom.getVersion()) < 1.13
+        expect(document.activeElement).toBe(editorElement)
+      else
+        expect(document.activeElement).toBe(editorElement.querySelector('input'))
 
     it 'fills the editor with the cell value', ->
       expect(editor.getText()).toEqual('row0')

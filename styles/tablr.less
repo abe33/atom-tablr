@@ -96,13 +96,6 @@ tablr-editor {
     max-height: none;
     height: auto;
 
-    .gutter {
-      display: none;
-    }
-
-    .lines {
-      width: auto !important;
-    }
 
     &[data-row]::before {
       content:  '#' attr(data-row) ' ' attr(data-column);
@@ -116,10 +109,6 @@ tablr-editor {
       line-height: 1em;
       padding: 6px 6px;
     }
-  }
-
-  &.with-editor-gutter atom-text-editor .gutter {
-    display: block;
   }
 
   * {
