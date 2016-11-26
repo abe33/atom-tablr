@@ -76,6 +76,8 @@ describe 'tableElement', ->
   beforeEach ->
     jasmineContent = document.body.querySelector('#jasmine-content')
 
+    atom.config.set('tablr.defaultColumnNamingMethod', 'alphabetic')
+
     spyOn(window, "setInterval").andCallFake window.fakeSetInterval
     spyOn(window, "clearInterval").andCallFake window.fakeClearInterval
 
