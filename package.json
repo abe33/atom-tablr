@@ -303,7 +303,34 @@
     "iconv-lite": "~0.4.4"
   },
   "devDependencies": {
-    "temp": "~0.8.0",
-    "fs-plus": "^2.8.1"
+    "fs-plus": "^2.8.1",
+    "standard": "^8.6.0",
+    "temp": "~0.8.0"
+  },
+  "standard": {
+    "globals": [
+      "advanceClock",
+      "atom",
+      "beforeEach",
+      "afterEach",
+      "expect",
+      "describe",
+      "fdescribe",
+      "ffdescribe",
+      "fffdescribe",
+      "xdescribe",
+      "it",
+      "xit",
+      "fit",
+      "ffit",
+      "fffit",
+      "jasmine",
+      "runs",
+      "spyOn",
+      "waits",
+      "waitsFor",
+      "waitsForPromise",
+      "requestAnimationFrame"
+    ]
   }
 }
