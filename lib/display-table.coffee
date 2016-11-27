@@ -1,3 +1,5 @@
+'use strict'
+
 _ = require 'underscore-plus'
 {Point, Range, Emitter, CompositeDisposable} = require 'atom'
 Delegator = require 'delegato'
