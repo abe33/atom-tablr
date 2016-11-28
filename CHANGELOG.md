@@ -1,3 +1,14 @@
+<a name="v1.8.0"></a>
+# v1.8.0 (2016-11-29)
+
+## :sparkles: Features
+
+- Add an option to specify the editor grammar for a column ([ef43eedb](https://github.com/abe33/atom-tablr/commit/ef43eedbf33b080e59d02d997a57db0933c1b538))
+
+## :bug: Bug Fixes
+
+- Fix keyboard events not registered ([5dd9a90e](https://github.com/abe33/atom-tablr/commit/5dd9a90ec8b8b243e777b6b5f82aed67cf2a78c2))
+
 <a name="v1.7.0"></a>
 # v1.7.0 (2016-11-28)
 
