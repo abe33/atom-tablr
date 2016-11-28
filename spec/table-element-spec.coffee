@@ -1711,6 +1711,20 @@ describe 'tableElement', ->
         editor = tableElement.querySelector('atom-text-editor').model
         expect(editor.getText()).toEqual('x')
 
+  describe 'on an table with a column with a grammar', ->
+    beforeEach ->
+      waitsForPromise -> atom.packages.activatePackage('language-javascript')
+
+      runs ->
+        tableEditor.getScreenColumn(0).grammarScope = 'source.js'
+
+        cell = tableElement.querySelector('tablr-cell[data-column="0"]')
+        dblclick(cell)
+
+    it 'sets the grammar on the editor', ->
+      editor = tableElement.querySelector('atom-text-editor').model
+      expect(editor.getGrammar().scopeName).toEqual('source.js')
+
   describe 'double clicking on a cell', ->
     beforeEach ->
       cell = tableElement.querySelector('tablr-cell:last-child')

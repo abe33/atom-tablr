@@ -125,6 +125,7 @@ describe 'DisplayTable', ->
       column = displayTable.getScreenColumn(0)
       expect(column.width).toEqual(100)
       expect(column.align).toEqual('left')
+      expect(column.grammarScope).toEqual('text.plain.null-grammar')
 
     it 'computes the columns offset', ->
       expect(displayTable.getScreenColumnOffsetAt(0)).toEqual(0)
@@ -150,13 +151,14 @@ describe 'DisplayTable', ->
 
       describe 'with an option object', ->
         beforeEach ->
-          displayTable.addColumn('locked', width: 200, align: 'right')
+          displayTable.addColumn('locked', width: 200, align: 'right', grammarScope: 'source.js')
 
         it 'creates a new screen column with the given options', ->
           expect(displayTable.getScreenColumns().length).toEqual(3)
           expect(displayTable.getScreenColumn(2).name).toEqual('locked')
           expect(displayTable.getScreenColumn(2).width).toEqual(200)
           expect(displayTable.getScreenColumn(2).align).toEqual('right')
+          expect(displayTable.getScreenColumn(2).grammarScope).toEqual('source.js')
 
       describe 'between two other columns', ->
         beforeEach ->
