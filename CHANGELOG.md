@@ -1,3 +1,15 @@
+<a name="v1.7.0"></a>
+# v1.7.0 (2016-11-28)
+
+## :sparkles: Features
+
+- Expose CSVEditor in service ([18e40d49](https://github.com/abe33/atom-tablr/commit/18e40d49a0ad7424cdb6872b9a6a1e5214fbc9d3))
+
+## :bug: Bug Fixes
+
+- Add background on text-editor ([e1ef96cc](https://github.com/abe33/atom-tablr/commit/e1ef96ccbeb8e146ff6bb809ed7b460f99e080fb), [#74](https://github.com/abe33/atom-tablr/issues/74))
+
+
 <a name="v1.6.2"></a>
 # v1.6.2 (2016-11-21)
 
