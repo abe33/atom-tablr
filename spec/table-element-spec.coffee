@@ -1331,15 +1331,25 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenRowCount()).toEqual(100)
 
   describe 'tablr:delete-row', ->
+    spy = null
+
+    beforeEach ->
+      spy = jasmine.createSpy('did-change')
+      tableEditor.onDidChange(spy)
+
     it 'deletes the current active row', ->
       atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
-      expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
+      waitsFor -> spy.callCount > 0
+      runs ->
+        expect(tableEditor.getScreenRow(0)).toEqual(['row1', 100, 'no'])
 
     it 'moves the cursor on the remaining first row', ->
       atom.commands.dispatch(tableElement, 'tablr:delete-row')
 
-      expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
+      waitsFor -> spy.callCount > 0
+      runs ->
+        expect(tableEditor.getCursorScreenPosition()).toEqual([0,0])
 
     describe 'when the cursor is on the last row', ->
       it 'moves the cursor on row above', ->
@@ -1352,6 +1362,16 @@ describe 'tableElement', ->
         waitsFor -> spy.callCount > 0
         runs ->
           expect(tableEditor.getCursorScreenPosition()).toEqual([98,0])
+
+    describe 'when the seletion spans several rows', ->
+      it 'removes all the rows', ->
+        tableEditor.setSelectedRange([[0, 0], [2, 2]])
+
+        atom.commands.dispatch(tableElement, 'tablr:delete-row')
+
+        waitsFor -> spy.callCount > 0
+        runs ->
+          expect(tableEditor.getScreenRow(0)).toEqual(['row2', 200, 'yes'])
 
     describe 'when the read-only attribute is set', ->
       it 'does not delete the active row', ->
@@ -1407,10 +1427,28 @@ describe 'tableElement', ->
         expect(tableEditor.getScreenColumnCount()).toEqual(3)
 
   describe 'tablr:delete-column', ->
+    spy = null
+
+    beforeEach ->
+      spy = jasmine.createSpy('did-change')
+      tableEditor.onDidRemoveColumn(spy)
+
     it 'deletes the current active column', ->
       atom.commands.dispatch(tableElement, 'tablr:delete-column')
 
-      expect(tableEditor.getScreenRow(0)).toEqual([0, 'yes'])
+      waitsFor -> spy.callCount > 0
+      runs ->
+        expect(tableEditor.getScreenRow(0)).toEqual([0, 'yes'])
+
+    describe 'when the seletion spans several columns', ->
+      it 'removes all the columns', ->
+        tableEditor.setSelectedRange([[0, 0], [2, 2]])
+
+        atom.commands.dispatch(tableElement, 'tablr:delete-column')
+
+        waitsFor -> spy.callCount > 0
+        runs ->
+          expect(tableEditor.getScreenRow(0)).toEqual(['yes'])
 
     describe 'when the read-only attribute is set', ->
       it 'does not delete the column', ->
