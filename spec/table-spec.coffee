@@ -203,7 +203,7 @@ describe 'Table', ->
 
       expect(table.serialize()).toEqual({
         deserializer: 'Table'
-        columns: [undefined, undefined]
+        columns: [null, null]
         rows: [
           [undefined, undefined]
           [undefined, undefined]
