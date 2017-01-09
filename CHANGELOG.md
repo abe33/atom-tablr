@@ -1,3 +1,14 @@
+<a name="v1.8.1"></a>
+# v1.8.1 (2017-01-09)
+
+## :bug: Bug Fixes
+
+- Serialize undefined columns as nil so that can be properly restored ([f03b941d](https://github.com/abe33/atom-tablr/commit/f03b941d1decce1674b7cb6b3a772a8c819f4cd8))
+- Fix Identifiable mixin ([3e1f1fa0](https://github.com/abe33/atom-tablr/commit/3e1f1fa032cd1624fac18d53a0f862f47783bcd4))
+- Fix missing semi-colon in style declaration ([a38317b0](https://github.com/abe33/atom-tablr/commit/a38317b027457561af3e41e158881f0d4eaaf5b0))
+- Fix allow amending a commit during a batch transaction ([b12444d1](https://github.com/abe33/atom-tablr/commit/b12444d10397c7338045f255e3f57f32d9a162c2))
+- Fix CSV settings scroll when window make the row breaks ([8495e3a9](https://github.com/abe33/atom-tablr/commit/8495e3a9e2c1126b8b467e561373ed871ab9950c))
+
 <a name="v1.8.0"></a>
 # v1.8.0 (2016-11-29)
 
