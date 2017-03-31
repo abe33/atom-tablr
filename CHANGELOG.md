@@ -1,3 +1,11 @@
+<a name="v1.8.3"></a>
+# v1.8.3 (2017-03-31)
+
+## :bug: Bug Fixes
+
+- Fix Atom crashing when opening several csv at the same time ([126feac5](https://github.com/abe33/atom-tablr/commit/126feac53277aa756677f2f69d364335f932c76a), [#86](https://github.com/abe33/atom-tablr/issues/86))
+- Fix access to model once destroyed ([0c8e1089](https://github.com/abe33/atom-tablr/commit/0c8e10897e7b078476c220d6d812e30690ee7959), [#87](https://github.com/abe33/atom-tablr/issues/87))
+
 <a name="v1.8.2"></a>
 # v1.8.2 (2017-03-31)
 
