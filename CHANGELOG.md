@@ -1,3 +1,10 @@
+<a name="v1.8.2"></a>
+# v1.8.2 (2017-03-31)
+
+## :bug: Bug Fixes
+
+- Fix access to header for empty file ([69a2558e](https://github.com/abe33/atom-tablr/commit/69a2558e11ec73e6dfc457b99b1ff5203e881881), [#85](https://github.com/abe33/atom-tablr/issues/85))
+
 <a name="v1.8.1"></a>
 # v1.8.1 (2017-01-09)
 
