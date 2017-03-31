@@ -294,13 +294,14 @@
   },
   "dependencies": {
     "atom-utils": "0.9.x",
-    "underscore-plus": "^1",
-    "mixto": "1.x",
-    "property-accessors": "1.x",
-    "delegato": "1.x",
     "coffee-script": "1.7.x",
     "csv": "~0.4.5",
-    "iconv-lite": "~0.4.4"
+    "delegato": "1.x",
+    "element-resize-detector": "^1.1.11",
+    "iconv-lite": "~0.4.4",
+    "mixto": "1.x",
+    "property-accessors": "1.x",
+    "underscore-plus": "^1"
   },
   "devDependencies": {
     "fs-plus": "^2.8.1",
@@ -331,7 +332,8 @@
       "waitsFor",
       "waitsForPromise",
       "requestAnimationFrame",
-      "HTMLElement"
+      "HTMLElement",
+      "IntersectionObserver"
     ]
   }
 }
