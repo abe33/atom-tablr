@@ -1,7 +1,7 @@
 {
   "name": "tablr",
   "main": "./lib/tablr",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Edit CSV files using a table editor",
   "repository": "https://github.com/abe33/atom-tablr",
   "license": "MIT",
