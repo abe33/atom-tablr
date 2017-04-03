@@ -9,8 +9,8 @@ Command|Action
 `core:undo`|<p>OSX: <kbd>cmd-z</kbd><br/>Win/Linux: <kbd>ctrl-z</kbd></p>Undo the last change in the table.
 `core:redo`|<p>OSX: <kbd>cmd-y</kbd><br/>Win/Linux: <kbd>ctrl-y</kbd></p>Redo the last change in the table.
 `core:copy`|<p>OSX: <kbd>cmd-c</kbd><br/>Win/Linux: <kbd>ctrl-c</kbd></p>Copy the current selection in the clipboard.
-`core:cut`|<p>OSX: <kbd>cmd-c</kbd><br/>Win/Linux: <kbd>ctrl-c</kbd></p>Copy the current selection in the clipboard and deletes the value of the selected cells.
-`core:paste`|<p>OSX: <kbd>cmd-c</kbd><br/>Win/Linux: <kbd>ctrl-c</kbd></p>Copy the current selection in the clipboard.
+`core:cut`|<p>OSX: <kbd>cmd-x</kbd><br/>Win/Linux: <kbd>ctrl-x</kbd></p>Cut the current selection in the clipboard and deletes the value of the selected cells.
+`core:paste`|<p>OSX: <kbd>cmd-v</kbd><br/>Win/Linux: <kbd>ctrl-v</kbd></p>Paste the current selection in the clipboard.
 
 ## Cursors
 
