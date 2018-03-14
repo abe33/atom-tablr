@@ -1,6 +1,6 @@
-## Contributing To Pigments
+## Contributing To Tablr
 
-This package try to follow the [Atom contribution guidelines](https://atom.io/docs/latest/contributing).
+This package try to follow the [Atom contribution guidelines](https://github.com/atom/atom/blob/master/CONTRIBUTING.md).
 
 Especially, the commits should follow the conventions defined in the *Git Commit Messages* section of the guideline.
 
